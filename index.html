@@ -909,7 +909,22 @@ function dispatchFlight() {
     const distanceNm = Math.round(selectedRoute.dist);
     const bearing = calculateBearing(origin.lat, origin.lon, destination.lat, destination.lon);
     const isEasterly = (bearing >= 0 && bearing < 180);
-    let altValue = spec.rules.includes("VFR") ? (isEasterly ? 5500 : 6500) : (isEasterly ? 170 : 160);
+
+	// --- NEW ALTITUDE LOGIC ---
+let baseThousands = Math.floor((Math.random() * (spec.maxAlt - spec.minAlt + 1) + spec.minAlt) / 1000);
+let altValue;
+
+if (spec.rules.includes("VFR")) {
+    if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
+    if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
+    altValue = (baseThousands * 1000) + 500;
+} else {
+    if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
+    if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
+    altValue = baseThousands * 10;
+}
+// --------------------------
+	
 let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     
     // Calculate how full the passenger cabin is as a percentage (0.0 to 1.0)
