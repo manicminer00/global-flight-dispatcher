@@ -948,7 +948,7 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     
     // Scale down the max allowed cargo based on the passenger load.
     // E.g., if the cabin is 100% full, cargo capacity is reduced by 80% to prevent MTOW errors.
-    let maxAvailableCargo = spec.maxCargo * (1 - (paxLoadFactor * 0.8)); 
+	let maxAvailableCargo = spec.maxCargo * (1 - paxLoadFactor);
     
     // Ensure cargo doesn't drop below the base 40kg minimum
     let cargoKg = Math.floor(Math.random() * Math.max(0, maxAvailableCargo - 40)) + 40;
