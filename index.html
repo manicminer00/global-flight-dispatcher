@@ -883,7 +883,18 @@ function dispatchFlight() {
     }
     const type = document.getElementById("aircraftSelect").value;
     const spec = activeFleetSpecs[type]; 
-    const validAirports = activeAirportDatabase.filter(ap => spec.rwys.includes(ap.rwy));
+
+const validAirports = activeAirportDatabase.filter(ap => {
+    // 1. Check if the airport category matches the aircraft's allowed categories
+    const isAllowedType = spec.rwys.includes(ap.rwy);
+    
+    // 2. If the airport has a specific length recorded, enforce the safeguard limit.
+    // If no length is recorded yet, trust the category tag.
+    const meetsLength = ap.length ? (ap.length >= spec.minRunwayLength) : true;
+    
+    return isAllowedType && meetsLength;
+});
+	
     if (depOverride && !activeAirportDatabase.some(ap => ap.icao === depOverride)) {
         alert(`Departure override airport ${depOverride} was not found in your database.`);
         return;
