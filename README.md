@@ -1,1 +1,22 @@
-# global-flight-dispatcher
+Global Flight Dispatcher
+
+'Don't know where to fly but know what you want to fly? Just select your aircraft and click Generate Flight and off you go!'
+
+The Global Flight Dispatcher is a lightweight, browser-based tool designed to guarantee a 40–60 minute flight between high-quality destinations. It completely removes the guesswork of planning your next session while adding immersion through dynamic, aircraft-specific missions.
+
+This is not a career add-on. This is a 'simple' flight dispatch tool to take the guesswork out of flying. My goal creating this add-on was to ensure that I can just click and fly without worrying if the runway is long enough or suitable, or if I've overloaded the aircraft, or if the airport actually even exists in MSFS. There are too many variables and life is too short, enjoy flying!
+
+Dedicated to Michael Greenblatt and the good folks at Andras Meridian.
+
+Key Features:
+•	Immersive Job Tickets: Every generated flight includes a custom manifest suited to your airframe. Transport quantum chips to a lab in a helicopter, rush emergency medical supplies in a GA aircraft, haul military-grade hardware in a jet, or fly a VIP in a business jet. 
+•	One-Click SimBrief Integration: The dispatcher automatically generates a custom SimBrief link. Just click, review your paperwork, and fly. 
+•	Curated Scenery Database: Built around a hand-picked database of 286 premium destinations (featuring 183 hand-crafted and 146 payware airports). Store links are included so you can easily check out new sceneries.
+•	Curated Aircraft Database: Comes pre-loaded with a diverse fleet of popular, high-fidelity airframes, from helicopters and light GA to business jets and airliners, ensuring your job tickets perfectly match the aircraft you love to fly.
+•	Fully Customisable: Want to start from a specific location? Enter a custom departure ICAO. Want to fly an aircraft not on the list? You can easily add your own custom airframes and airports to your local database. 
+•	Customisable UI: Choose a colour to suit your mood.
+
+Have fun!
+Toby (manicminer)
+
+
