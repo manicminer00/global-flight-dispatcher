@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Global Flight Dispatcher</title>
+    <style>
+        :root {
+            --accent-color: #2196f3; 
+            --accent-hover: #0b7dda;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .container {
+            background-color: #2d2d2d;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        .important-box {
+            background-color: #3e2723;
+            border-left: 5px solid #ff5722;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .important-box h3 {
+            margin: 0 0 5px 0;
+            color: #ff5722;
+        }
+        .control-group, .settings-group {
+            margin-bottom: 20px;
+            background: #222;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+        .settings-toggle-btn {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: inline-block;
+            width: auto;
+        }
+        .settings-panel {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #555;
+        }
+        .backup-btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .backup-btn {
+            background-color: #444;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .backup-btn:hover {
+            background-color: #555;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        .field-hint {
+            font-size: 12px;
+            color: #aaa;
+            font-weight: normal;
+            display: inline;
+            margin-left: 5px;
+        }
+        .field-hint a {
+            color: #00bcd4;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        select, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-size: 15px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="text"]:focus, select:focus, input[type="number"]:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+        .dispatch-release {
+            margin-top: 30px;
+            display: none;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #444;
+        }
+        .ticket-note {
+            background-color: #1b365d;
+            border-left: 5px solid #00bcd4;
+            padding: 15px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+        .partner-link-box {
+            background-color: #2e1a47;
+            border-left: 5px solid #9c27b0;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .url-box {
+            background-color: #111;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            word-break: break-all;
+            border: 1px solid #333;
+            margin-top: 10px;
+        }
+        a.simbrief-btn {
+            display: inline-block;
+            background-color: #008cba;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        a.simbrief-btn:hover {
+            background-color: #007399;
+        }
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #444;
+        }
+        td, th {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #333;
+            width: 25%;
+        }
+        .db-count-badge {
+            font-size: 12px;
+            background: #444;
+            padding: 3px 8px;
+            border-radius: 10px;
+            color: #ccc;
+            margin-left: 10px;
+        }
+        a.scenery-link {
+            color: #00bcd4;
+            text-decoration: underline;
+        }
+        a.scenery-link:hover {
+            color: #fff;
+        }
+    </style>
+    <script type="text/javascript" src="simbrief.apiv1.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Dynamic Global Flight Dispatcher <span id="dbCount" class="db-count-badge">0 Airframes</span></h1>
+    
+    <div class="important-box">
+        <h3>⚠️ Pre-Flight Reminders</h3>
+        <ul>
+            <h4>"I fly because it releases my mind from the tyranny of petty things." - <strong>Antoine de Saint-Exupéry</strong></h4>
+        </ul>
+    </div>
+    <button type="button" class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Toggle Settings & Database Tools</button>
+    
+    <div id="settingsPanel" class="settings-panel settings-group">
+        <h3>Local Database Backup Control</h3>
+        <div class="backup-btn-container">
+            <button type="button" class="backup-btn" onclick="exportDatabaseBackup()">📥 Export Backup (.json)</button>
+            <button type="button" class="backup-btn" onclick="document.getElementById('importFileInput').click()">📤 Import Backup File</button>
+            <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
+        </div>
+        <hr style="border-color: #444; margin: 15px 0;">
+        <h3>Dispatcher Configuration</h3>
+        <label for="colorPicker">Interface Accent Color:</label>
+        <select id="colorPicker" onchange="changeAccentColor(this.value)">
+			<option value="#2364A1">Blue</option>
+            <option value="#349138">Green</option>
+            <option value="#C7751E">Orange</option>
+            <option value="#edcf1c">Yellow</option>
+            <option value="#616161">Dark Grey</option>
+        </select>
+        <hr style="border-color: #444; margin: 20px 0;">
+        
+        <h3>Add New Airport (to Local DB)</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newIcao">Airport ICAO:</label>
+                <input type="text" id="newIcao" placeholder="e.g. EGLL" maxlength="4">
+            </div>
+            <div>
+                <label for="newName">Airport Name:</label>
+                <input type="text" id="newName" placeholder="e.g. Heathrow">
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newRwyType">Runway Category / Helipad:</label>
+		<select id="newRwyType">
+			<option value="GA">Small Runway &lt;3000ft</option>
+			<option value="TURBO">Medium Runway 3000-6000ft</option>
+			<option value="BIZ JET">Biz Jet Runway (Specialized/Restricted)</option>
+			<option value="JET">Large Runway &gt;6000ft</option>
+			<option value="HELI">Helipad</option>
+		</select>
+            </div>
+            <div>
+                <label for="newSource">Database Tier Source:</label>
+                <select id="newSource">
+                    <option value="MSFS hand-crafted airport">MSFS hand-crafted airport</option>
+                    <option value="Contrail Store">Contrail Store</option>
+                    <option value="ORBX Store">ORBX Store</option>
+                    <option value="SimMarket Store">SimMarket Store</option>
+                    <option value="MSFS Marketplace">MSFS Marketplace</option>
+                    <option value="Other">Other Retail Channels</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" onclick="saveCustomAirport()" style="margin-bottom: 25px; margin-top: 10px;">Save Airport to Local Memory</button>
+        <hr style="border-color: #444; margin: 20px 0;">
+        <h3>Add New Aircraft (to Local DB)</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newAcName">Aircraft Name:</label>
+                <input type="text" id="newAcName" placeholder="e.g. Guimbal Cabri G2">
+            </div>
+            <div>
+                <label for="newAcIcao">Aircraft ICAO Code: <span class="field-hint">(<a href="https://www.icao.int/operational-safety/doc-8643-aircraft-type-designators/search" target="_blank">Look Up Aircraft</a> / <a href="https://www.helihub.com/data/icao-code/" target="_blank">Look Up Heli</a>)</span></label>
+                <input type="text" id="newAcIcao" placeholder="e.g. CABG" maxlength="4">
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newAcLength">Min Takeoff Distance (ft):</label>
+                <input type="number" id="newAcLength" placeholder="Refer to Aircraft Manual / 500ft for Helicopters">
+            </div>
+            <div>
+                <label for="newAcClass">Aircraft Operational Class:</label>
+                <select id="newAcClass">
+                    <option value="GA">GA / STOL (Short Runway &lt;3000ft)</option>
+                    <option value="TURBO">TURBO (Medium Runway 3000ft - 6000ft)</option>
+                    <option value="BIZ JET">BIZ JET (Medium Runway 3000ft - 6000ft)</option>
+                    <option value="JET">JET (Long Runway &gt;6000ft)</option>
+                    <option value="HELI">HELI (Helicopter / Helipad)</option>
+                </select>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button type="button" onclick="saveCustomAircraft()">Save Airframe to Local Fleet</button>
+        </div>
+        <hr style="border-color: #444; margin: 20px 0;">
+        <div>
+            <button type="button" style="background-color: #bd1c11;" onclick="resetToBaselineAirports()">⚠️ Reset database to initial state - Backup your database first!⚠️</button>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="callsignInput">Enter Assigned Operational Callsign (6 Characters): <span class="field-hint"><a onclick="event.preventDefault(); saveCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Save Callsign</a></span></label>
+        <input type="text" id="callsignInput" placeholder="e.g. AMA275" value="AMA275" maxlength="6" required>
+        <label for="aircraftSelect">Select Fleet Airframe Type:</label>
+        <select id="aircraftSelect">
+            </select>
+        <label for="depOverrideInput">Custom Departure Airport ICAO (Optional):</label>
+        <input type="text" id="depOverrideInput" placeholder="e.g. EGLL (Leave blank for random selection)" maxlength="4">
+        <button onclick="dispatchFlight()">🎲 Dynamically Generate Flightplan</button>
+    </div>
+    <div id="dispatchRelease" class="dispatch-release">
+        <h2>Operational Flight Release Paperwork</h2>
+        <hr style="border-color: #444;">
+        
+        <div id="partnerAdBox" class="partner-link-box" style="display:none;">
+            ℹ️ <span id="partnerLink">Scenery availability update metadata details display frame block.</span>
+        </div>
+        <table>
+            <tr><th>Callsign</th><td><strong id="outCallsign" style="color:var(--accent-color);">---</strong></td></tr>
+            <tr><th>Airframe Model</th><td id="outAirframe"></td></tr>
+            <tr><th>Flight Rules</th><td id="outRules"></td></tr>
+            <tr><th>Routing Block</th><td><strong id="outOrig"></strong> ➔ <strong id="outDest"></strong></td></tr>
+            <tr><th>Approximate Distance</th><td id="outDist"></td></tr>
+            <tr><th>Cleared Cruise Level</th><td><strong id="outAlt" style="color:#ff5722;"></strong></td></tr>
+            <tr><th>Magnetic Track Profile</th><td id="outTrack"></td></tr>
+            <tr><th>Scenery Links</th><td id="outScenery"></td></tr>
+        </table>
+        <h3>Job Ticket</h3>
+        <div class="ticket-note" id="outTicket"></div>
+<h3>Weight & Balance Loadsheet</h3>
+        <ul>
+            <li><strong>Assigned Passengers:</strong> <span id="outPax"></span></li>
+            <li><strong>Assigned Cargo Payload:</strong> <span id="outCargo"></span> kg</li>
+            <li><strong>Validation:</strong> Payload strictly mapped under limits in Metric KG.</li>
+        </ul>
+		        <hr style="border-color: #444;">
+<h3>SimBrief Dispatch Processing</h3>
+<p>Click below to pre-fill this dynamic plan into SimBrief:</p>
+<a id="outLink" class="simbrief-btn" target="_blank">Generate Flight Plan via SimBrief</a>
+<p style="margin-top:20px; font-size:12px; color:#aaa;">Manual Copy/Paste Dispatch Link:</p>
+<div class="url-box" id="outRawUrl"></div>
+    </div>
+</div>
+<script>
+function toggleSettingsPanel() {
+    const p = document.getElementById("settingsPanel");
+    p.style.display = (p.style.display === "block") ? "none" : "block";
+}
+// Memory variable to prevent repetition
+let lastMissionType = null;
+const seedAirportDatabase = [
+    { icao: "1Q5", name: "Gravelly Valley Airstrip", rwy: "GA", lat: 39.317, lon: -122.882, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/95546/1q5-gravelly-valley-airport" },
+    { icao: "3W5", name: "Concrete Municipal", rwy: "GA", lat: 48.532, lon: -121.758, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/3w5-msfs" },
+    { icao: "45AA", name: "Davidson Strip", rwy: "GA", lat: 34.695, lon: -86.874, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/3415/davidson-airstrip-alaska-45aa" },
+    { icao: "5Z5", name: "Kantishna Airport", rwy: "GA", lat: 63.531, lon: -150.948, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/3416/kantishna-airport-alaska-5z5" },
+    { icao: "AGGN", name: "Nusatupe Airport", rwy: "TURBO", lat: -8.101, lon: 156.865, source: "Core", tag: "Hand-Crafted" },
+    { icao: "BIAR", name: "Akureyri Airport", rwy: "JET", lat: 65.660, lon: -18.073, source: "Core", tag: "Hand-Crafted" },
+    { icao: "BIIS", name: "Ísafjörður Airport", rwy: "TURBO", lat: 66.058, lon: -23.135, source: "Core", tag: "Hand-Crafted" },
+    { icao: "C53", name: "Lower Loon Creek", rwy: "GA", lat: 44.811, lon: -114.815, source: "Core", tag: "Hand-Crafted" },
+    { icao: "C81", name: "Campbell Airport", rwy: "GA", lat: 42.316, lon: -88.016, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/1437/campbell-airport-c81-illinois" },
+    { icao: "CAA8", name: "Invermere Airport", rwy: "TURBO", lat: 50.518, lon: -116.009, source: "Core", tag: "Hand-Crafted" },
+    { icao: "CAMA", name: "Bugalaga Airstrip", rwy: "TURBO", lat: -3.738, lon: 136.965, source: "Core", tag: "Hand-Crafted" },
+    { icao: "CYBD", name: "Bella Coola Airport", rwy: "TURBO", lat: 52.368, lon: -126.596, source: "Core", tag: "Hand-Crafted" },
+    { icao: "CYCG", name: "Castlegar Airport", rwy: "TURBO", lat: 49.296, lon: -117.632, source: "Core", tag: "Hand-Crafted" },
+    { icao: "CYDA", name: "Dawson City Airport", rwy: "TURBO", lat: 64.043, lon: -139.128, source: "Core", tag: "Hand-Crafted" },
+    { icao: "CYDF", name: "Deer Lake Airport", rwy: "JET", lat: 49.211, lon: -57.391, source: "Core", tag: "Hand-Crafted" },
+    { icao: "CYFB", name: "Iqaluit International Airport", rwy: "JET", lat: 63.756, lon: -68.556, source: "Core", tag: "Hand-Crafted" },
+    { icao: "CYTZ", name: "Billy Bishop Toronto City Airport", rwy: "TURBO", lat: 43.628, lon: -79.396, source: "Core", tag: "Hand-Crafted" },
+    { icao: "CZST", name: "Stewart Aerodrome", rwy: "TURBO", lat: 55.934, lon: -129.985, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EBBR", name: "Brussels Airport", rwy: "JET", lat: 50.901, lon: 4.484, source: "Core", tag: "Third Party", linkText: "Aerosoft via Contrail", url: "https://contrail.shop/products/ebbr-brussels-airport-msfs?" },
+    { icao: "EDDB", name: "Berlin", rwy: "JET", lat: 52.367, lon: 13.503, source: "Core", tag: "Third Party", linkText: "Aerosoft via Contrail", url: "https://contrail.shop/products/aerosoft-eddb-berlin-brandenburg-intl?" },
+    { icao: "EDDF", name: "Frankfurt Airport", rwy: "JET", lat: 50.033, lon: 8.571, source: "Core", tag: "Both", linkText: "Aerosoft via Contrail", url: "https://contrail.shop/products/aerosoft-eddf-frankfurt-airport-msfs?" },
+    { icao: "EDDG", name: "Munster Osnabruck", rwy: "JET", lat: 52.135, lon: 7.685, source: "Core", tag: "Third Party", linkText: "M'M Simulations via Contrail", url: "https://contrail.shop/products/mm-simulations-eddg-munster-osnabruck-airport-msfs?" },
+    { icao: "EDDH", name: "Hamburg", rwy: "JET", lat: 53.630, lon: 9.988, source: "Core", tag: "Third Party", linkText: "Sim-Wings via Contrail", url: "https://contrail.shop/products/eddh-hamburg-intl" },
+    { icao: "EDDK", name: "Cologne Bonn Airport", rwy: "JET", lat: 50.866, lon: 7.143, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EDDL", name: "Dussedorf", rwy: "JET", lat: 51.281, lon: 6.767, source: "Core", tag: "Third Party", linkText: "MKStudios via Contrail", url: "https://contrail.shop/products/mk-studios-eddl-dusseldorf-airport-msfs-2020-2024?" },
+    { icao: "EDDM", name: "Munich Airport", rwy: "JET", lat: 48.354, lon: 11.786, source: "Core", tag: "Third Party", linkText: "Sim-Wings via Contrail", url: "https://contrail.shop/products/eddm-munich-intl?" },
+    { icao: "EDDN", name: "Nuremberg", rwy: "JET", lat: 49.499, lon: 11.078, source: "Core", tag: "Third Party", linkText: "Captain7 via Contrail", url: "https://contrail.shop/products/eddn-nuremberg-airport-msfs?" },
+    { icao: "EDDP", name: "Leipzig/Halle Airport", rwy: "JET", lat: 51.432, lon: 12.242, source: "Core", tag: "Third Party", linkText: "Digital Design via Contrail", url: "https://contrail.shop/products/eddp-leipzig-intl?" },
+    { icao: "EDDS", name: "Stuttgart Airport", rwy: "JET", lat: 48.690, lon: 9.222, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EDGD", name: "Füssen", rwy: "GA", lat: 47.575, lon: 10.684, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EDHL", name: "Lübeck Airport", rwy: "JET", lat: 53.805, lon: 10.719, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EDJA", name: "Memmingen Airport", rwy: "JET", lat: 47.989, lon: 10.239, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EDKB", name: "Bonn/Hangelar", rwy: "GA", lat: 50.768, lon: 7.164, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/86039/edkb-bonn-hangelar" },
+    { icao: "EDLO", name: "Oerlinghausen Airfield", rwy: "GA", lat: 51.931, lon: 8.544, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EDLP", name: "Paderborn Lippstadt", rwy: "JET", lat: 51.614, lon: 8.616, source: "Core", tag: "Third Party", linkText: "Aerosoft via Contrail", url: "https://contrail.shop/products/edlp-paderborn-lippstadt-airport?" },
+    { icao: "EDLW", name: "Dortmund", rwy: "JET", lat: 51.518, lon: 7.612, source: "Core", tag: "Third Party", linkText: "Aerosoft via Contrail", url: "https://contrail.shop/products/aerosoft-edlw-dortmund-airport-msfs-2020-2024?" },
+    { icao: "EDNY", name: "Friedrichshafen Airport", rwy: "JET", lat: 47.671, lon: 9.511, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EDVK", name: "Kassel Airport", rwy: "JET", lat: 51.408, lon: 9.378, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EDXH", name: "Heligoland", rwy: "GA", lat: 54.187, lon: 7.917, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EEKA", name: "Kärdla Airport", rwy: "BIZ JET", lat: 58.991, lon: 22.831, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/90040/kardla-airport-eeka-estonia" },
+    { icao: "EETN", name: "Tallinn", rwy: "JET", lat: 59.413, lon: 24.833, source: "Core", tag: "Third Party", linkText: "Pyreegue via Contrail", url: "https://contrail.shop/products/eetn-tallinn-airport-msfs?" },
+    { icao: "EFHK", name: "Helsinki Airport", rwy: "JET", lat: 60.317, lon: 24.963, source: "Core", tag: "Third Party", linkText: "MKStudios via Contrail", url: "https://contrail.shop/products/mk-studios-efhk-helsinki-airport-v2-msfs-2020-2024?" },
+    { icao: "EFIV", name: "Ivalo Airport", rwy: "JET", lat: 68.607, lon: 27.405, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EFOU", name: "Oulu Airport", rwy: "JET", lat: 64.930, lon: 25.355, source: "Core", tag: "Third Party", linkText: "MMSimulations via Contrail", url: "https://contrail.shop/products/mm-simulations-efou-oulu-airport-msfs?" },
+    { icao: "EFVA", name: "Vaasa Airport", rwy: "JET", lat: 63.051, lon: 21.763, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EGAA", name: "Belfast International", rwy: "JET", lat: 54.658, lon: -6.216, source: "Core", tag: "Third Party", linkText: "Pyreegue - Contrail", url: "https://contrail.shop/products/egaa-belfast-airport-msfs?" },
+    { icao: "EGAO", name: "Aboyne Airfield", rwy: "GA", lat: 57.076, lon: -2.838, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EGBB", name: "Birmingham", rwy: "JET", lat: 52.454, lon: -1.748, source: "Core", tag: "Third Party", linkText: "Maccosim or Pyreegue via Contrail", url: "https://contrail.shop/search?q=egbb" },
+    { icao: "EGCB", name: "Manchester City Airport", rwy: "GA", lat: 53.471, lon: -2.390, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EGCC", name: "Manchester", rwy: "JET", lat: 53.354, lon: -2.275, source: "Core", tag: "Third Party", linkText: "Maccosim via Contrail", url: "https://contrail.shop/products/egcc-manchester-airport?" },
+    { icao: "EGFF", name: "Cardiff", rwy: "JET", lat: 51.397, lon: -3.343, source: "Core", tag: "Third Party", linkText: "SoFly via Contrail or UK2000 via SimMarket", url: "https://secure.simmarket.com/uk2000-scenery-cardiff-2021-msfs.phtml" },
+    { icao: "EGGD", name: "Bristol", rwy: "JET", lat: 51.383, lon: -2.719, source: "Core", tag: "Third Party", linkText: "Pilot Plus via ORBX", url: "https://orbxdirect.com/product/pilotplus-eggd-msfs?" },
+    { icao: "EGGP", name: "Liverpool John Lennon Airport", rwy: "JET", lat: 53.334, lon: -2.850, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EGGW", name: "Luton", rwy: "JET", lat: 51.875, lon: -0.368, source: "Core", tag: "Third Party", linkText: "UK2000 via SimMarket", url: "https://secure.simmarket.com/uk2000-scenery-luton-2020hd-msfs.phtml" },
+    { icao: "EGHC", name: "Land's End Airport", rwy: "GA", lat: 50.103, lon: -5.671, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EGHI", name: "Southampton", rwy: "BIZ JET", lat: 50.950, lon: -1.357, source: "Core", tag: "Third Party", linkText: "Inibuilds via SimMarket", url: "https://secure.simmarket.com/inibuilds-inibuilds-southampton-eghi-msfs.phtml" },
+    { icao: "EGHP", name: "Popham", rwy: "GA", lat: 51.194, lon: -1.231, source: "Core", tag: "Third Party", linkText: "Burning Blue Design", url: "https://burningbluedesign.com/product/popham-airfield/" },
+    { icao: "EGHR", name: "Goodwood", rwy: "BIZ JET", lat: 50.859, lon: -0.759, source: "Core", tag: "Third Party", linkText: "Burning Blue Design", url: "https://burningbluedesign.com/product/goodwood-aerodrome/" },
+    { icao: "EGJB", name: "Guernsey", rwy: "BIZ JET", lat: 49.435, lon: -2.602, source: "Core", tag: "Both", linkText: "UK2000 via SimMarket", url: "https://secure.simmarket.com/uk2000-scenery-guernsey-airport-msfs2420.phtml" },
+    { icao: "EGJJ", name: "Jersey", rwy: "BIZ JET", lat: 49.208, lon: -2.196, source: "Core", tag: "Third Party", linkText: "UK2000 via SimMarket", url: "https://secure.simmarket.com/uk2000-scenery-jersey-2021-msfs.phtml" },
+    { icao: "EGKA", name: "Brighton City Airport", rwy: "BIZ JET", lat: 50.836, lon: -0.297, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/egka-msfs?" },
+    { icao: "EGKB", name: "Biggin Hill", rwy: "BIZ JET", lat: 51.331, lon: 0.033, source: "Core", tag: "Third Party", linkText: "Pilot Plus via ORBX", url: "https://orbxdirect.com/product/pilotplus-egkb-msfs?" },
+    { icao: "EGKH", name: "Headcorn", rwy: "GA", lat: 51.156, lon: 0.642, source: "Core", tag: "Third Party", linkText: "Burning Blue Design via ORBX", url: "https://orbxdirect.com/product/burningblue-egkh-msfs?" },
+    { icao: "EGKK", name: "Gatwick", rwy: "JET", lat: 51.148, lon: -0.190, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/5784/gatwick-egkk-ultra-star-edition-phase-1-0" },
+    { icao: "EGLC", name: "London City Airport v2", rwy: "BIZ JET", lat: 51.505, lon: 0.054, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/eglc-v2-msfs2024?" },
+    { icao: "EGLD", name: "Denham Airdrome", rwy: "GA", lat: 51.588, lon: -0.501, source: "Core", tag: "Third Party", linkText: "Burning Blue Design", url: "https://burningbluedesign.com/product/denham-aerodrome/" },
+    { icao: "EGLF", name: "Farnborough", rwy: "JET", lat: 51.276, lon: -0.776, source: "Core", tag: "Third Party", linkText: "Burning Blue Design", url: "https://burningbluedesign.com/product/farnborough-airport-the-birthplace-of-british-aviation/" },
+    { icao: "EGLL", name: "Heathrow", rwy: "JET", lat: 51.470, lon: -0.454, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EGMC", name: "London Southend", rwy: "BIZ JET", lat: 51.571, lon: 0.696, source: "Core", tag: "Third Party", linkText: "Pilot Plus via ORBX", url: "https://orbxdirect.com/product/pilotplus-egmc-msfs?" },
+    { icao: "EGNJ", name: "Humberside", rwy: "JET", lat: 53.574, lon: -0.351, source: "Core", tag: "Third Party", linkText: "FlyTampa via Contrail", url: "https://contrail.shop/products/flytampa-egnj-humberside-airport-msfs?_pos=1&_sid=14cb25d1e&_ss=r" },
+    { icao: "EGNM", name: "Leeds / Bradford v2", rwy: "JET", lat: 53.866, lon: -1.661, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/egnm-v2-msfs?" },
+    { icao: "EGNS", name: "Isle of Man", rwy: "BIZ JET", lat: 54.083, lon: -4.624, source: "Core", tag: "Third Party", linkText: "UK2000 via SimMarket", url: "https://secure.simmarket.com/uk2000-scenery-isle-of-man-2021hd-msfs.phtml" },
+    { icao: "EGNT", name: "Newcastle", rwy: "JET", lat: 55.038, lon: -1.692, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/egnt-msfs2024?" },
+    { icao: "EGNX", name: "East Midlands Airport", rwy: "JET", lat: 52.831, lon: -1.328, source: "Core", tag: "Third Party", linkText: "Pyreegue via Contrail", url: "https://contrail.shop/products/egnx-east-midlands-airport-msfs?" },
+    { icao: "EGOU", name: "Out Skerries Airstrip", rwy: "GA", lat: 60.424, lon: -0.750, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EGPB", name: "Sumburgh", rwy: "BIZ JET", lat: 59.879, lon: -1.296, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EGPE", name: "Inverness", rwy: "JET", lat: 57.543, lon: -4.050, source: "Core", tag: "Third Party", linkText: "UK2000 via SimMarket", url: "https://secure.simmarket.com/uk2000-scenery-inverness-2020hd-msfs.phtml" },
+    { icao: "EGPF", name: "Glasgow Airport", rwy: "JET", lat: 55.872, lon: -4.433, source: "Core", tag: "Third Party", linkText: "Pyreegue via Contrail", url: "https://contrail.shop/products/egpf-glasgow-airport-msfs?" },
+    { icao: "EGPH", name: "Edinburgh Turnhouse v2", rwy: "JET", lat: 55.950, lon: -3.373, source: "Core", tag: "Third Party", linkText: "Pyreegue via Contrail", url: "https://contrail.shop/products/pyreegue-egph-edinburgh-airport-v2-msfs?" },
+    { icao: "EGPK", name: "Glasgow Prestwick", rwy: "JET", lat: 55.509, lon: -4.587, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/44027/egpk-glasgow-prestwick-airport" },
+    { icao: "EGPN", name: "Dundee", rwy: "BIZ JET", lat: 56.453, lon: -3.026, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/egpn-msfs?" },
+    { icao: "EGPR", name: "Barra Airport", rwy: "GA", lat: 57.025, lon: -7.443, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EGSF", name: "Peterborough Conington", rwy: "BIZ JET", lat: 52.468, lon: -0.251, source: "Core", tag: "Third Party", linkText: "Burning Blue Design", url: "https://burningbluedesign.com/product/peterborough-conington-airport/" },
+    { icao: "EGSH", name: "Norwich Airport", rwy: "JET", lat: 52.676, lon: 1.283, source: "Core", tag: "Third Party", linkText: "UK2000 via SimMarket", url: "https://secure.simmarket.com/uk2000-scenery-norwich-airport-msfs2420.phtml" },
+    { icao: "EGSL", name: "Andrewsfield", rwy: "GA", lat: 51.896, lon: 0.449, source: "Core", tag: "Third Party", linkText: "Burning Blue Design via ORBX", url: "https://orbxdirect.com/product/burningblue-egsl-msfs2024?" },
+    { icao: "EGSS", name: "London Stanstead", rwy: "JET", lat: 51.885, lon: 0.235, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EGTB", name: "Wycombe Air Park", rwy: "GA", lat: 51.612, lon: -0.808, source: "Core", tag: "Third Party", linkText: "Pilot Plus via ORBX", url: "https://orbxdirect.com/product/pilotplus-egtb-msfs?" },
+    { icao: "EGTF", name: "Fairoaks", rwy: "GA", lat: 51.353, lon: -0.563, source: "Core", tag: "Third Party", linkText: "Burning Blue Design", url: "https://burningbluedesign.com/product/fairoaks/" },
+    { icao: "EGTK", name: "London Oxford", rwy: "BIZ JET", lat: 51.837, lon: -1.320, source: "Core", tag: "Third Party", linkText: "Pilot Plus via ORBX", url: "https://orbxdirect.com/product/pilotplus-egtk-msfs?" },
+    { icao: "EGTO", name: "Rochester", rwy: "GA", lat: 51.352, lon: 0.503, source: "Core", tag: "Third Party", linkText: "Burning Blue Design via ORBX", url: "https://orbxdirect.com/product/burningblue-egto-msfs2024?" },
+    { icao: "EHAM", name: "Amsterdam Airport Schiphol", rwy: "JET", lat: 52.308, lon: 4.764, source: "Core", tag: "Third Party", linkText: "Fly Tampa via ORBX", url: "https://orbxdirect.com/product/flytampa-eham-msfs?" },
+    { icao: "EHLE", name: "Lelystad", rwy: "BIZ JET", lat: 52.460, lon: 5.527, source: "Core", tag: "Third Party", linkText: "Papa Hotel via Contrail", url: "https://contrail.shop/search?q=EHLE" },
+    { icao: "EHRD", name: "Rotterdam The Hague Airport", rwy: "JET", lat: 51.957, lon: 4.437, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EICK", name: "Cork", rwy: "JET", lat: 51.841, lon: -8.491, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EIDL", name: "Donegal Airport", rwy: "BIZ JET", lat: 55.044, lon: -8.341, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EIDW", name: "Dublin Airport v2", rwy: "JET", lat: 53.421, lon: -6.270, source: "Core", tag: "Third Party", linkText: "MK Studios via Contrail", url: "https://contrail.shop/products/eidw-dublin-airport-v2-msfs?" },
+    { icao: "EKCH", name: "Copenhagen Airport", rwy: "JET", lat: 55.618, lon: 12.656, source: "Core", tag: "Third Party", linkText: "Fly Tampa via Contrail", url: "https://contrail.shop/products/flytampa-ekch-copenhagen-msfs?" },
+    { icao: "EKRN", name: "Bornholm Airport", rwy: "JET", lat: 55.063, lon: 14.759, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EKYT", name: "Aalborg", rwy: "JET", lat: 57.093, lon: 9.849, source: "Core", tag: "Third Party", linkText: "SimNord via SimMarket", url: "https://secure.simmarket.com/simnord-ekyt-aalborg-airport-msfs.phtml" },
+    { icao: "ELLX", name: "Luxembourg International", rwy: "JET", lat: 49.623, lon: 6.204, source: "Core", tag: "Third Party", linkText: "Atelic via Contrail", url: "https://contrail.shop/products/atelic-ellx-luxembourg-airport-msfs-2020-2024" },
+    { icao: "ENBR", name: "Bergen", rwy: "JET", lat: 60.293, lon: 5.218, source: "Core", tag: "Third Party", linkText: "RDPresets via Contrail", url: "https://contrail.shop/products/enbr-bergen-flesland-airport-msfs?" },
+    { icao: "ENDO", name: "Dkka Airfield Thomlevold", rwy: "GA", lat: 60.871, lon: 10.081, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/96164/endo-dokka-airfield-thomlevold" },
+    { icao: "ENGM", name: "Oslo Gardermoen", rwy: "JET", lat: 60.194, lon: 11.100, source: "Core", tag: "Third Party", linkText: "Aerosoft via Contrail", url: "https://contrail.shop/products/aerosoft-engm-oslo-gardermoen-airport-msfs?" },
+    { icao: "ENLK", name: "Leknes Airport", rwy: "GA", lat: 68.154, lon: 13.612, source: "Core", tag: "Hand-Crafted" },
+    { icao: "ENRA", name: "Mo i Rana Airport", rwy: "GA", lat: 66.364, lon: 14.301, source: "Core", tag: "Hand-Crafted" },
+    { icao: "ENSB", name: "Svalbard Airport", rwy: "JET", lat: 78.246, lon: 15.466, source: "Core", tag: "Hand-Crafted" },
+    { icao: "ENTC", name: "Tromso", rwy: "JET", lat: 69.683, lon: 18.919, source: "Core", tag: "Third Party", linkText: "MMSimulations via Contrail", url: "https://contrail.shop/products/entc-tromso-airport?" },
+    { icao: "ENTY", name: "Tynset Airfield", rwy: "BIZ JET", lat: 62.257, lon: 10.678, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/30921/enty-tynset-airfield" },
+    { icao: "EPGD", name: "Gdansk Airport", rwy: "JET", lat: 54.378, lon: 18.466, source: "Core", tag: "Third Party", linkText: "Drzewiecki Design via Contrail", url: "https://contrail.shop/products/epgd-gdansk-airport-msfs?" },
+    { icao: "EPKK", name: "Kraków-Balice", rwy: "JET", lat: 50.078, lon: 19.785, source: "Core", tag: "Third Party", linkText: "Drzewiecki Design via Contrail", url: "https://contrail.shop/products/drzewiecki-design-epkk-krakow-airport-v2-msfs?" },
+    { icao: "EPWA", name: "Warsaw Chopin", rwy: "JET", lat: 52.166, lon: 20.967, source: "Core", tag: "Third Party", linkText: "Drzewiecki Design via Contrail", url: "https://contrail.shop/products/drzewiecki-design-epwa-warsaw-chopin-msfs?" },
+    { icao: "EPWR", name: "Wroclaw Airport", rwy: "JET", lat: 51.103, lon: 16.886, source: "Core", tag: "Third Party", linkText: "Drzewiecki Design via Contrail", url: "https://contrail.shop/products/epwr-wroclaw-airport-msfs?" },
+    { icao: "ESNQ", name: "Kiruna Airport", rwy: "JET", lat: 67.822, lon: 20.337, source: "Core", tag: "Hand-Crafted" },
+    { icao: "ESSA", name: "Stockholm Arlanda Airport", rwy: "JET", lat: 59.652, lon: 17.919, source: "Core", tag: "Hand-Crafted" },
+    { icao: "EVRA", name: "Riga", rwy: "JET", lat: 56.924, lon: 23.971, source: "Core", tag: "Third Party", linkText: "Lisium Design via Contrail", url: "https://contrail.shop/products/lisium-design-evra-riga-airport-msfs?" },
+    { icao: "EYVI", name: "Vilnius", rwy: "JET", lat: 54.634, lon: 25.286, source: "Core", tag: "Third Party", linkText: "MMSimulations or Lisium Design via Contrail", url: "https://contrail.shop/search?q=eyvi" },
+    { icao: "FACT", name: "Cape Town International", rwy: "JET", lat: -33.975, lon: 18.602, source: "Core", tag: "Hand-Crafted" },
+    { icao: "FAWC", name: "Worcester Gape Gliding", rwy: "GA", lat: -33.667, lon: 19.417, source: "Core", tag: "Hand-Crafted" },
+    { icao: "FYVF", name: "Veronica Flying", rwy: "BIZ JET", lat: -23.851, lon: 18.005, source: "Core", tag: "Hand-Crafted" },
+    { icao: "HECA", name: "Cairo International Airport", rwy: "JET", lat: 30.122, lon: 31.406, source: "Core", tag: "Hand-Crafted" },
+    { icao: "HUEN", name: "Entebbe International Airport", rwy: "JET", lat: 0.042, lon: 32.443, source: "Core", tag: "Hand-Crafted" },
+    { icao: "IDJ93", name: "Johnson Gulch Airstrip", rwy: "GA", lat: 45.452, lon: -113.882, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/90502/lost-trail-pass-idaho-ids93-idj93" },
+    { icao: "IDS93", name: "Lost Trail Pass Airstrip", rwy: "GA", lat: 45.692, lon: -113.951, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/90502/lost-trail-pass-idaho-ids93-idj93" },
+    { icao: "JP-0052", name: "Hokkaido Spaceport", rwy: "BIZ JET", lat: 42.502, lon: 143.431, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KALW", name: "Walla Walla", rwy: "JET", lat: 46.094, lon: -118.288, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/71205/kalw-walla-walla-regional-airport" },
+    { icao: "KASE", name: "Aspen-Pitkin County", rwy: "JET", lat: 39.223, lon: -106.869, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KATL", name: "Hartsfield-Jackson Atlanta", rwy: "JET", lat: 33.641, lon: -84.428, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KAVX", name: "Catalina Airport", rwy: "BIZ JET", lat: 33.405, lon: -118.416, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KBFI", name: "Boeing Field", rwy: "JET", lat: 47.530, lon: -122.302, source: "Core", tag: "Third Party", linkText: "Drzewiecki Design via Contrail", url: "https://contrail.shop/products/kbfi-boeing-field-msfs?" },
+    { icao: "KBID", name: "Block Island Airport", rwy: "GA", lat: 41.168, lon: -71.578, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KBOK", name: "Brookings State Municipal", rwy: "BIZ JET", lat: 42.074, lon: -124.290, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/73283/kbok-brookings-state-airport" },
+    { icao: "KCGX", name: "Meigs Field", rwy: "BIZ JET", lat: 41.859, lon: -87.609, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KCOF", name: "Patrick Space Force Base", rwy: "JET", lat: 28.235, lon: -80.610, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KDEN", name: "Denver International", rwy: "JET", lat: 39.856, lon: -104.674, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KDFW", name: "Dallas-Fort Worth", rwy: "JET", lat: 32.899, lon: -97.040, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KEB", name: "Nanwalek Airport", rwy: "GA", lat: 59.349, lon: -151.922, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KEUG", name: "Eugene Airport", rwy: "JET", lat: 44.125, lon: -123.219, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/17244/keug-eugene-mahlon-sweet-field" },
+    { icao: "KFFA", name: "First Flight Airport", rwy: "BIZ JET", lat: 36.018, lon: -75.672, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KFHR", name: "Friday Harbor Airport", rwy: "BIZ JET", lat: 48.522, lon: -123.024, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KGPT", name: "Gulfport-Biloxi", rwy: "JET", lat: 30.412, lon: -89.070, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/store/product/kgpt-gulfport-biloxi-inlt-airport-msfs" },
+    { icao: "KHOC", name: "Highland Co. Airport", rwy: "BIZ JET", lat: 39.182, lon: -83.535, source: "Core", tag: "Third Party", linkText: "EMBCreations via Flightsim.to", url: "https://flightsim.to/addon/79009/khoc-highland-co-airport-ohio" },
+    { icao: "KJAC", name: "Jackson Hole Airport", rwy: "JET", lat: 43.607, lon: -110.738, source: "Core", tag: "Third Party", linkText: "Dreamflight via Contrail", url: "https://contrail.shop/products/dreamflight-kjac-jackson-hole-airport-msfs" },
+    { icao: "KJFK", name: "John F. Kennedy International", rwy: "JET", lat: 40.640, lon: -73.779, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KLAX", name: "Los Angeles International", rwy: "JET", lat: 33.942, lon: -118.408, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KLSE", name: "La Crosse Regional", rwy: "JET", lat: 43.879, lon: -91.256, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/83452/klse-la-crosse-regional-airport" },
+    { icao: "KLWS", name: "Lewiston-Nez Perce", rwy: "JET", lat: 46.374, lon: -117.015, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/51099/klws-lewiston-nez-perce-county-airport" },
+    { icao: "KMCO", name: "Orlando International", rwy: "JET", lat: 28.429, lon: -81.309, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KMFR", name: "Rogue Valley International", rwy: "JET", lat: 42.374, lon: -122.873, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/14457/kmfr-rogue-valley-medford-airport" },
+    { icao: "KMKE", name: "Milwaukee Mitchell", rwy: "JET", lat: 42.947, lon: -87.897, source: "Core", tag: "Third Party", linkText: "IniBuilds via SimMarket - Free!", url: "https://secure.simmarket.com/inibuilds-inibuilds-milwaukee-mitchell-kmke-msfs-free.phtml" },
+    { icao: "KMLB", name: "Melbourne Orlando", rwy: "JET", lat: 28.103, lon: -80.645, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/24559/kmlb-melbourne-orlando-int-airport" },
+    { icao: "KMMH", name: "Mammoth Yosemite", rwy: "BIZ JET", lat: 37.624, lon: -118.838, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/53462/kmmh-mammoth-yosemite-airport" },
+    { icao: "KMTP", name: "Montauk Airport", rwy: "BIZ JET", lat: 41.077, lon: -71.921, source: "Core", tag: "Third Party", linkText: "EMBCreations via Flightsim.to", url: "https://flightsim.to/addon/63211/kmtp-montauk-airport" },
+    { icao: "KNKX", name: "Marine Corps Air Station Miramar", rwy: "JET", lat: 32.868, lon: -117.143, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KORD", name: "O'Hare International", rwy: "JET", lat: 41.974, lon: -87.907, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KPAE", name: "Paine Field", rwy: "JET", lat: 47.907, lon: -122.282, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/1136/paine-field-everett-wa-usa-kpae" },
+    { icao: "KPDX", name: "Portland v2", rwy: "JET", lat: 45.589, lon: -122.597, source: "Core", tag: "Third Party", linkText: "Contrail", url: "https://contrail.shop/products/iblueyonder-kpdx-portland-intl-v2-msfs?" },
+    { icao: "KRDM", name: "Redmond Municipal", rwy: "JET", lat: 44.254, lon: -121.150, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/33017/krdm-roberts-field-redmond-municipal-airport" },
+    { icao: "KRVL", name: "Mifflin County", rwy: "BIZ JET", lat: 40.677, lon: -77.627, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KSBP", name: "San Luis Obispo Regional", rwy: "BIZ JET", lat: 35.237, lon: -120.642, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/28485/ksbp-san-luis-obispo-reginal-airport" },
+    { icao: "KSEA", name: "Seattle-Tacoma", rwy: "JET", lat: 47.449, lon: -122.309, source: "Core", tag: "Third Party", linkText: "MK Studios via Contrail", url: "https://contrail.shop/products/mk-studios-ksea-seattle-tacoma-airport-msfs-2020-2024?" },
+    { icao: "KSFO", name: "San Francisco International", rwy: "JET", lat: 37.619, lon: -122.375, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KSMO", name: "Santa Monica Airport", rwy: "BIZ JET", lat: 34.016, lon: -118.451, source: "Core", tag: "Third Party", linkText: "AG Sim via Contrail", url: "https://contrail.shop/products/ksmo-santa-monica-airport-msfs?" },
+    { icao: "KSWF", name: "Stewart International", rwy: "JET", lat: 41.504, lon: -74.105, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KTEX", name: "Telluride Regional", rwy: "JET", lat: 37.954, lon: -107.908, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KTUS", name: "Tucson International", rwy: "JET", lat: 32.116, lon: -110.941, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/20641/ktus-tucson-international-airport" },
+    { icao: "KTVL", name: "Lake Tahoe Airport", rwy: "JET", lat: 38.894, lon: -119.995, source: "Core", tag: "Hand-Crafted" },
+    { icao: "KXHD", name: "Hilton Head Airport", rwy: "BIZ JET", lat: 32.224, lon: -80.697, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/15634/khxd-hilton-head-airport" },
+    { icao: "LATI", name: "Tirana International", rwy: "JET", lat: 41.415, lon: 19.721, source: "Core", tag: "Third Party", linkText: "Salvuz via SimMarket", url: "https://secure.simmarket.com/salvuz-lati-tirana-international-airport-msfs.phtml" },
+    { icao: "LDPL", name: "Pula Airport", rwy: "JET", lat: 44.894, lon: 13.922, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/55825/ldpl-pula-airport" },
+    { icao: "LDRI", name: "Rijeka International", rwy: "JET", lat: 45.217, lon: 14.570, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LDSP", name: "Split Airport", rwy: "JET", lat: 43.539, lon: 16.298, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/ldsp-msfs?" },
+    { icao: "LDZD", name: "Zadar", rwy: "JET", lat: 44.108, lon: 15.347, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/ldzd-msfs?" },
+    { icao: "LEBB", name: "Bilbao Airport", rwy: "JET", lat: 43.301, lon: -2.911, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LECO", name: "La Coruña Airport", rwy: "JET", lat: 43.302, lon: -8.377, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LEMD", name: "Adolfo Suárez Madrid-Barajas", rwy: "JET", lat: 40.472, lon: -3.561, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LEPA", name: "Palma de Mallorca", rwy: "JET", lat: 39.551, lon: 2.739, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/84186/lepa-palma-de-mallorca-airport" },
+    { icao: "LESU", name: "Andorra-La Seu d'Urgell", rwy: "BIZ JET", lat: 42.339, lon: 1.409, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LFAC", name: "Calais", rwy: "BIZ JET", lat: 50.962, lon: 1.955, source: "Core", tag: "Third Party", linkText: "AG Sim via Contrail", url: "https://contrail.shop/products/ag-sim-lfac-calais-dunkerque-airport-msfs?" },
+    { icao: "LFBD", name: "Bordeaux", rwy: "JET", lat: 44.828, lon: -0.716, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/48574/airport-lfbd-bordeaux-merignac" },
+    { icao: "LFBO", name: "Toulouse-Blagnac", rwy: "JET", lat: 43.635, lon: 1.368, source: "Core", tag: "Third Party", linkText: "Flightbeam via Contrail", url: "https://contrail.shop/products/lfbo-toulouse-blagnac-msfs?" },
+    { icao: "LFHM", name: "Megève Altiport", rwy: "GA", lat: 45.854, lon: 6.647, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LFLJ", name: "Courchevel Altiport", rwy: "GA", lat: 45.397, lon: 6.635, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LFLL", name: "Lyon-Saint Exupery", rwy: "JET", lat: 45.726, lon: 5.090, source: "Core", tag: "Third Party", linkText: "Digital Design via Contrail", url: "https://contrail.shop/products/lfll-lyon-intl-airport-msfs?" },
+    { icao: "LFMN", name: "Nice Côte d'Azur", rwy: "JET", lat: 43.665, lon: 7.215, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LFNC", name: "St. Crepin", rwy: "GA", lat: 44.700, lon: 6.600, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LFPB", name: "Le Bourget Airport", rwy: "JET", lat: 48.970, lon: 2.441, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LFPG", name: "Charles de Gaulle", rwy: "JET", lat: 49.009, lon: 2.548, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LFRS", name: "Nantes", rwy: "JET", lat: 47.153, lon: -1.611, source: "Core", tag: "Third Party", linkText: "Jetstream via Contrail", url: "https://contrail.shop/products/lfrs-nantes-atlantique-intl?" },
+    { icao: "LGAL", name: "Alexandroupoli Airport", rwy: "JET", lat: 40.856, lon: 25.956, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/9552/lgal-airport-alexandroupoli-greece" },
+    { icao: "LGAV", name: "Athens", rwy: "JET", lat: 37.936, lon: 23.944, source: "Core", tag: "Third Party", linkText: "Fly Tampa - Contrail", url: "https://contrail.shop/products/lgav-athens-msfs?" },
+    { icao: "LGHI", name: "Chios Omiros", rwy: "BIZ JET", lat: 38.341, lon: 26.141, source: "Core", tag: "Third Party", linkText: "Inibuilds via SimMarket", url: "https://secure.simmarket.com/inibuilds-iniscene-chios-island-national-lghi-msfs.phtml" },
+    { icao: "LGIK", name: "Ikaros Airport", rwy: "GA", lat: 37.600, lon: 26.100, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/61629/lgik" },
+    { icao: "LGKF", name: "Kefalonia Airport", rwy: "JET", lat: 38.120, lon: 20.500, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/87098/lgkf-kefalonia-airport-anna-pollatou" },
+    { icao: "LGKO", name: "Kos", rwy: "JET", lat: 36.793, lon: 27.092, source: "Core", tag: "Third Party", linkText: "Atelic via Contrail", url: "https://contrail.shop/products/atelic-lgko-kos-airport-msfs?" },
+    { icao: "LGSO", name: "Syros Airport", rwy: "BIZ JET", lat: 37.422, lon: 24.950, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/86456/lgso-syros-airport-dimitrios-vikelas" },
+    { icao: "LGSR", name: "Santorini", rwy: "JET", lat: 36.400, lon: 25.479, source: "Core", tag: "Third Party", linkText: "29 Palms via Contrail", url: "https://contrail.shop/products/29palms-lgsr-santorini-airport-island-msfs?" },
+    { icao: "LHPP", name: "Pécs-Pogány Airport", rwy: "BIZ JET", lat: 46.002, lon: 18.243, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LICJ", name: "Falcone Borsellino", rwy: "JET", lat: 38.176, lon: 13.091, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LIEE", name: "Cagliari Elmas", rwy: "JET", lat: 39.251, lon: 9.054, source: "Core", tag: "Third Party", linkText: "Amsim via ORBX", url: "https://orbxdirect.com/product/amsim-liee-msfs?" },
+    { icao: "LIEO", name: "Olbia Costa Smeralda", rwy: "JET", lat: 40.899, lon: 9.518, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/lieo-v2-msfs?" },
+    { icao: "LILC", name: "Calcinate Del Pesce", rwy: "GA", lat: 45.811, lon: 8.767, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LILO", name: "Iloilo International", rwy: "JET", lat: 10.833, lon: 122.493, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LIMJ", name: "Genova", rwy: "JET", lat: 44.413, lon: 8.842, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/13868/genova-cristoforo-colombo-international-airport-limj-italy" },
+    { icao: "LIML", name: "Linate", rwy: "JET", lat: 45.445, lon: 9.278, source: "Core", tag: "Third Party", linkText: "Jetsream via Contrail", url: "https://contrail.shop/products/liml-milan-linate-intl?" },
+    { icao: "LIMP", name: "Parma", rwy: "JET", lat: 44.827, lon: 10.295, source: "Core", tag: "Third Party", linkText: "MM Simulations via Contrail", url: "https://contrail.shop/products/limp-parma-airport-msfs?" },
+    { icao: "LIPB", name: "Bolzano Airport", rwy: "BIZ JET", lat: 46.460, lon: 11.326, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LIPK", name: "Forli", rwy: "JET", lat: 44.206, lon: 12.070, source: "Core", tag: "Third Party", linkText: "Amsim via ORBX", url: "https://orbxdirect.com/product/amsim-lipk-msfs?" },
+    { icao: "LIPY", name: "Ancona International", rwy: "JET", lat: 43.617, lon: 13.360, source: "Core", tag: "Third Party", linkText: "Barelli via SimMarket", url: "https://secure.simmarket.com/barelli-msfs-addon-lipy-ancona-intl-airport-v2.0-msfs.phtml" },
+    { icao: "LIPZ", name: "Venice International", rwy: "JET", lat: 45.505, lon: 12.352, source: "Core", tag: "Third Party", linkText: "BMOTW via ORBX - Unavailable", url: "https://forum.orbxdirect.com/topic/222861-orbx-and-bmw/" },
+    { icao: "LIRJ", name: "Marina di Campo Airport", rwy: "BIZ JET", lat: 42.761, lon: 10.239, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LIRP", name: "Pisa", rwy: "JET", lat: 43.684, lon: 10.393, source: "Core", tag: "Third Party", linkText: "Amsim via ORBX", url: "https://orbxdirect.com/product/amsim-lirp-msfs?" },
+    { icao: "LIRZ", name: "Perugia", rwy: "JET", lat: 43.096, lon: 12.513, source: "Core", tag: "Third Party", linkText: "Salvuz via SimMarket", url: "https://secure.simmarket.com/salvuz-lirz-perugia-int.-airport-msfs24.phtml" },
+    { icao: "LKPR", name: "Prague Airport", rwy: "JET", lat: 50.101, lon: 14.260, source: "Core", tag: "Third Party", linkText: "Tailstrike via Contrail", url: "https://contrail.shop/products/lkpr-prague-airport-msfs?" },
+    { icao: "LKKV", name: "Karlovy Vary Airport", rwy: "JET", lat: 50.203, lon: 12.915, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LOGI", name: "Trieben Airfield", rwy: "GA", lat: 47.491, lon: 14.502, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LOWK", name: "Klagenfurt Airport", rwy: "JET", lat: 46.643, lon: 14.338, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LOWS", name: "Salzburg Airport", rwy: "JET", lat: 47.793, lon: 13.004, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LOWW", name: "Vienna", rwy: "JET", lat: 48.110, lon: 16.570, source: "Core", tag: "Third Party", linkText: "Gaya Simulations via ORBX", url: "https://orbxdirect.com/product/gaya-loww-msfs?" },
+    { icao: "LPFR", name: "Faro Airport", rwy: "JET", lat: 37.014, lon: -7.965, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LPMA", name: "Madeira International", rwy: "JET", lat: 32.698, lon: -16.774, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LPPI", name: "Pico Airport", rwy: "BIZ JET", lat: 38.554, lon: -28.441, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LPPT", name: "Lisbon Airport", rwy: "JET", lat: 38.774, lon: -9.134, source: "Core", tag: "Third Party", linkText: "MK Studios via Contrail", url: "https://contrail.shop/products/mk-studios-lppt-lisbon-airport-rebooted-msfs?" },
+    { icao: "LQPD", name: "Prijedor Urije Airport", rwy: "GA", lat: 44.991, lon: 16.712, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LRBC", name: "George Enescu International", rwy: "JET", lat: 46.522, lon: 26.910, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/discover/LRBChttps://flightsim.to/addon/15165/lrbc-george-enescu-international" },
+    { icao: "LRBM", name: "Maramures Airport", rwy: "JET", lat: 47.658, lon: 23.470, source: "Core", tag: "Third Party", linkText: "Freeware", url: "https://flightsim.to/addon/7537/lrbm-baia-mare-maramures-international-airport" },
+    { icao: "LROP", name: "Bucharest Otopeni", rwy: "JET", lat: 44.572, lon: 26.102, source: "Core", tag: "Third Party", linkText: "Barelli via SimMarket", url: "https://secure.simmarket.com/barelli-msfs-addon-bucharest-otopeni-lrop-v2-msfs2024.phtml" },
+    { icao: "LSGC", name: "Les Eplatures", rwy: "BIZ JET", lat: 47.084, lon: 6.793, source: "Core", tag: "Third Party", linkText: "Mailsoft via SimMarket", url: "https://secure.simmarket.com/mailsoft-gmbh-flylogic-les-eplatures-lsgc-msfs2024.phtml" },
+    { icao: "LSGG", name: "Geneva", rwy: "JET", lat: 46.238, lon: 6.109, source: "Core", tag: "Third Party", linkText: "Jetsream via Contrail", url: "https://contrail.shop/products/jetstream-designs-lsgg-geneva-airport-msfs?" },
+    { icao: "LSZA", name: "Lugano Airport", rwy: "BIZ JET", lat: 45.997, lon: 8.910, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LSZB", name: "Bern Airport", rwy: "BIZ JET", lat: 46.914, lon: 7.497, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LSZG", name: "Grenchen", rwy: "BIZ JET", lat: 47.182, lon: 7.417, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LSZH", name: "Zurich Airport", rwy: "JET", lat: 47.458, lon: 8.548, source: "Core", tag: "Third Party", linkText: "MK Studios via Contrail", url: "https://contrail.shop/products/mk-studios-lszh-zurich-airport-msfs?" },
+    { icao: "LSZI", name: "Fricktal Schupfart", rwy: "GA", lat: 47.506, lon: 7.949, source: "Core", tag: "Third Party", linkText: "AG Sim via SimMarket", url: "https://secure.simmarket.com/ag-sim-fricktal-schupfart-lszi-switzerland-msfs.phtml" },
+    { icao: "LSZM", name: "Mollis Airfield", rwy: "JET", lat: 47.079, lon: 9.065, source: "Core", tag: "Third Party", linkText: "AG Sim via Contrail", url: "https://contrail.shop/products/lszm-mollis-airport-msfs?" },
+    { icao: "LSZN", name: "Hausen Am Albis", rwy: "GA", lat: 47.275, lon: 8.511, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LSZO", name: "Luzern-Beromunster", rwy: "GA", lat: 47.189, lon: 8.204, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LSZP", name: "Biel Kappelen Airfield", rwy: "GA", lat: -47.091, lon: 7.293, source: "Core", tag: "Third Party", linkText: "AG Sim via Contrail", url: "https://contrail.shop/products/lszp-biel-kappelen-airfield-msfs?_pos=1&_sid=6b2cb3aa4&_ss=r" },
+    { icao: "LSZR", name: "St. Gallen-Altenrhein", rwy: "BIZ JET", lat: 47.485, lon: 9.561, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LSZT", name: "Lommis Airfield", rwy: "GA", lat: 47.525, lon: 8.991, source: "Core", tag: "Third Party", linkText: "AG Sim via Contrail", url: "https://contrail.shop/products/lszt-lommis-airfield-msfs?" },
+    { icao: "LWOH", name: "Ohrid St. Paul", rwy: "JET", lat: 41.180, lon: 20.742, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/lwoh-msfs?" },
+    { icao: "LXGB", name: "Gibraltar International", rwy: "BIZ JET", lat: 36.151, lon: -5.350, source: "Core", tag: "Hand-Crafted" },
+    { icao: "LYBE", name: "Nikola Tesla Belgrade", rwy: "JET", lat: 44.818, lon: 20.309, source: "Core", tag: "Third Party", linkText: "Freeware  via Flightsim.to", url: "https://flightsim.to/addon/41863/airport-nikola-tesla-belgrade-aerodrom-nikola-tesla-beograd" },
+    { icao: "LYNI", name: "Niš Constantine", rwy: "JET", lat: 43.337, lon: 21.854, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com/product/lyni-msfs?" },
+    { icao: "LYTV", name: "Tivat Airport", rwy: "JET", lat: 42.405, lon: 18.723, source: "Core", tag: "Third Party", linkText: "Pyreegue via Contrail", url: "https://contrail.shop/products/lytv-tivat-airport-msfs?" },
+    { icao: "LZTT", name: "Poprad-Tatry Airport", rwy: "JET", lat: 49.074, lon: 20.241, source: "Core", tag: "Hand-Crafted" },
+    { icao: "MDPP", name: "Gregorio Luperón International", rwy: "JET", lat: 19.758, lon: -70.570, source: "Core", tag: "Hand-Crafted" },
+    { icao: "MHTG", name: "Toncontin International", rwy: "JET", lat: 14.061, lon: -87.217, source: "Core", tag: "Hand-Crafted" },
+    { icao: "MKJS", name: "Sangster International", rwy: "JET", lat: 18.504, lon: -77.913, source: "Core", tag: "Hand-Crafted" },
+    { icao: "MRSN", name: "Sirena Aerodrome", rwy: "GA", lat: 8.481, lon: -83.591, source: "Core", tag: "Hand-Crafted" },
+    { icao: "MTCA", name: "Antoine-Simon Airport", rwy: "BIZ JET", lat: 18.271, lon: -73.693, source: "Core", tag: "Hand-Crafted" },
+    { icao: "MUCL", name: "Cato Largo Del Sur", rwy: "JET", lat: 21.616, lon: -81.544, source: "Core", tag: "Hand-Crafted" },
+    { icao: "MYEH", name: "North Eleuthera Airport", rwy: "JET", lat: 25.474, lon: -76.681, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NCAI", name: "Aitutaki Airport", rwy: "BIZ JET", lat: -18.831, lon: -159.764, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NTTB", name: "Bora Bora Airport", rwy: "BIZ JET", lat: -16.444, lon: -151.751, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NTTM", name: "Moorea Airport", rwy: "BIZ JET", lat: -17.489, lon: -149.811, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NZGS", name: "Gisborne Airport", rwy: "BIZ JET", lat: -38.663, lon: 177.978, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NZMF", name: "Milford Sound Airport", rwy: "GA", lat: -44.673, lon: 167.923, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NZMJ", name: "Martins Bay Aerodrome", rwy: "GA", lat: -44.367, lon: 167.983, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NZNR", name: "Napier Airport", rwy: "BIZ JET", lat: -39.466, lon: 176.870, source: "Core", tag: "Third Party", linkText: "NZA Simulations via Flightsim.to", url: "https://flightsim.to/addon/698/napier-nznr-nz-custom-airport-napier-scenery-fix" },
+    { icao: "NZQE", name: "Gorge River Airstrip", rwy: "GA", lat: -44.195, lon: 168.187, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NZQN", name: "Queenstown Airport", rwy: "JET", lat: -45.021, lon: 168.739, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NZRO", name: "Rotorua Airport", rwy: "BIZ JET", lat: -38.109, lon: 176.317, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NZTL", name: "Lake Tekapo Airport", rwy: "GA", lat: -44.004, lon: 170.441, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NZWR", name: "Whangarei Airport", rwy: "BIZ JET", lat: -35.769, lon: 174.365, source: "Core", tag: "Hand-Crafted" },
+    { icao: "NZWS", name: "Westport Airport", rwy: "BIZ JET", lat: -41.738, lon: 171.581, source: "Core", tag: "Hand-Crafted" },
+    { icao: "OMDB", name: "Dubai International Airport", rwy: "JET", lat: 25.253, lon: 55.364, source: "Core", tag: "Hand-Crafted" },
+    { icao: "OVJF", name: "Johnson's Farm", rwy: "GA", lat: 44.500, lon: -123.000, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/56160/0vjf-johnsons-farm" },
+    { icao: "PAFR", name: "Bryant Army Airfield", rwy: "BIZ JET", lat: 61.266, lon: -149.653, source: "Core", tag: "Hand-Crafted" },
+    { icao: "PAKT", name: "Ketchikan", rwy: "JET", lat: 55.354, lon: -131.714, source: "Core", tag: "Third Party", linkText: "ORBX via MSFS", url: "https://orbxdirect.com/product/pakt-msfs2024?" },
+    { icao: "PAVD", name: "Valdez Airport", rwy: "BIZ JET", lat: 61.134, lon: -146.248, source: "Core", tag: "Hand-Crafted" },
+    { icao: "PHKO", name: "Kona International Airport", rwy: "JET", lat: 19.739, lon: -156.046, source: "Core", tag: "Hand-Crafted" },
+    { icao: "PTPN", name: "Pohnpei International", rwy: "BIZ JET", lat: 6.985, lon: 158.209, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RJCK", name: "Kushiro Airport", rwy: "JET", lat: 43.041, lon: 144.193, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RJER", name: "Rishiri Airport", rwy: "BIZ JET", lat: 45.242, lon: 141.186, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RJFR", name: "Kitakyushu Airport", rwy: "JET", lat: 33.846, lon: 131.035, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RJFU", name: "Nagasaki Airport", rwy: "JET", lat: 32.917, lon: 129.914, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RJSD", name: "Sado Airport", rwy: "GA", lat: 38.064, lon: 138.415, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RJT1", name: "Itakura Gliderport", rwy: "GA", lat: 36.222, lon: 139.632, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RJTH", name: "Hachijojima Airport", rwy: "JET", lat: 33.115, lon: 139.786, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RJTT", name: "Haneda Airport", rwy: "JET", lat: 35.552, lon: 139.780, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RJX7", name: "Satsuma Iōjima Airport", rwy: "GA", lat: 30.796, lon: 130.275, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RJX8", name: "Suwanosejima Airport", rwy: "GA", lat: 29.637, lon: 129.715, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RNSF", name: "Snowflake Lake", rwy: "GA", lat: 48.000, lon: -120.000, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/3418/snowflake-lake-airstrip-alaska" },
+    { icao: "ROKR", name: "Kerama Airport", rwy: "GA", lat: 26.168, lon: 127.311, source: "Core", tag: "Hand-Crafted" },
+    { icao: "RORS", name: "Shimojishima Airport", rwy: "JET", lat: 24.826, lon: 125.145, source: "Core", tag: "Hand-Crafted" },
+    { icao: "MX-0012", name: "MSFS Handcrafted Hub Alpha", rwy: "JET", lat: 19.436, lon: -99.072, source: "Core", tag: "Hand-Crafted" }
+];
+const coreFleetSpecs = {
+    "PA24": { name: "A2A Comanche (PA24)", maxPax: 3, maxCargo: 150, minD: 60, maxD: 80, minAlt: 4000, maxAlt: 9500, rwys: ["GA", "TURBO", "JET"], rules: "VFR/Scenic", minRunwayLength: 1200, class: "GA" },
+    "AEST": { name: "A2A Aerostar 600 (AEST)", maxPax: 5, maxCargo: 250, minD: 80, maxD: 120, minAlt: 5000, maxAlt: 9500, rwys: ["GA", "TURBO", "JET"], rules: "VFR/Scenic", minRunwayLength: 2000, class: "GA" },
+    "BE60": { name: "Black Square Piston Grand Duke (BE60)", maxPax: 5, maxCargo: 380, minD: 80, maxD: 100, minAlt: 10000, maxAlt: 20000, rwys: ["GA", "TURBO", "JET"], rules: "IFR", minRunwayLength: 1500, class: "GA" },
+    "B60T": { name: "Black Square Turbine Duke (B60T)", maxPax: 5, maxCargo: 380, minD: 100, maxD: 150, minAlt: 15000, maxAlt: 28000, rwys: ["GA", "TURBO", "JET"], rules: "IFR", minRunwayLength: 1000, class: "TURBO" },
+    "B06T": { name: "Black Square Caravan (B06T)", maxPax: 12, maxCargo: 1200, minD: 40, maxD: 80, minAlt: 5000, maxAlt: 9500, rwys: ["GA", "TURBO", "JET"], rules: "VFR/Scenic", minRunwayLength: 2500, class: "TURBO" },
+"SF50": { name: "FlightFX Vision Jet G2+ (SF50)", maxPax: 4, maxCargo: 300, minD: 100, maxD: 150, minAlt: 15000, maxAlt: 20000, rwys: ["BIZ JET", "JET"], rules: "IFR", minRunwayLength: 3100, class: "BIZ JET" },
+    "TBM8": { name: "Black Square TBM850 (TBM8)", maxPax: 5, maxCargo: 420, minD: 120, maxD: 180, minAlt: 15000, maxAlt: 31000, rwys: ["TURBO", "JET"], rules: "IFR", minRunwayLength: 2380, class: "TURBO" },
+    "STAR": { name: "Black Square Starship (STAR)", maxPax: 8, maxCargo: 650, minD: 120, maxD: 180, minAlt: 15000, maxAlt: 35000, rwys: ["TURBO", "JET"], rules: "IFR", minRunwayLength: 3112, class: "TURBO" },
+    "P180": { name: "FlightFX P180 Avanti (P180)", maxPax: 7, maxCargo: 500, minD: 120, maxD: 180, minAlt: 15000, maxAlt: 41000, rwys: ["BIZ JET", "TURBO", "JET"], rules: "IFR", minRunwayLength: 3300, class: "BIZ JET" },
+    "SPIT": { name: "Flying Iron Spitfire (SPIT)", maxPax: 0, maxCargo: 80, minD: 120, maxD: 180, minAlt: 15000, maxAlt: 20000, rwys: ["GA", "TURBO", "JET"], rules: "IFR", minRunwayLength: 1000, class: "GA" },
+    "HDJT": { name: "Honda Jet (HDJT)", maxPax: 5, maxCargo: 350, minD: 200, maxD: 320, minAlt: 25000, maxAlt: 40000, rwys: ["BIZ JET", "TURBO", "JET"], rules: "IFR", minRunwayLength: 3500, class: "BIZ JET" },
+    "E55P": { name: "FSReborn Phenom 300 (E55P)", maxPax: 7, maxCargo: 550, minD: 200, maxD: 320, minAlt: 25000, maxAlt: 40000, rwys: ["BIZ JET", "TURBO", "JET"], rules: "IFR", minRunwayLength: 3209, class: "BIZ JET" },
+    "C750": { name: "FlightFX Citation X (C750)", maxPax: 9, maxCargo: 850, minD: 200, maxD: 320, minAlt: 25000, maxAlt: 40000, rwys: ["BIZ JET", "TURBO", "JET"], rules: "IFR", minRunwayLength: 3600, class: "BIZ JET" },
+    "A320": { name: "Fenix Airbus A320 (A320)", maxPax: 160, maxCargo: 2200, minD: 200, maxD: 320, minAlt: 30000, maxAlt: 39800, rwys: ["JET"], rules: "IFR", minRunwayLength: 6000, class: "JET" },
+    "B736": { name: "PMDG Boeing 737-600 (B736)", maxPax: 110, maxCargo: 1800, minD: 200, maxD: 320, minAlt: 30000, maxAlt: 41000, rwys: ["JET"], rules: "IFR", minRunwayLength: 6000, class: "JET" },
+    "PC12": { name: "SWS PC-12/47 (PC12)", maxPax: 9, maxCargo: 600, minD: 200, maxD: 320, minAlt: 15000, maxAlt: 25000, rwys: ["GA", "TURBO", "JET"], rules: "IFR", minRunwayLength: 1475, class: "TURBO" },
+    "C172": { name: "MSFS C172 G1000 (C172)", maxPax: 3, maxCargo: 120, minD: 60, maxD: 80, minAlt: 3000, maxAlt: 9500, rwys: ["GA", "TURBO", "JET"], rules: "VFR/Scenic", minRunwayLength: 1630, class: "GA" },
+    "H145": { name: "HPG H145 Helicopter (H145)", maxPax: 8, maxCargo: 400, minD: 15, maxD: 40, minAlt: 1000, maxAlt: 5000, rwys: ["GA", "TURBO", "JET", "HELI"], rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+    "LAMA": { name: "Llama Helicopter (LAMA)", maxPax: 4, maxCargo: 300, minD: 15, maxD: 40, minAlt: 1000, maxAlt: 5000, rwys: ["GA", "TURBO", "JET", "HELI"], rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+    "ALO3": { name: "Alouette Helicopter (ALO3)", maxPax: 6, maxCargo: 350, minD: 15, maxD: 40, minAlt: 1000, maxAlt: 5000, rwys: ["GA", "TURBO", "JET", "HELI"], rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+    "R22":  { name: "R22 Helicopter (R22)", maxPax: 1, maxCargo: 50, minD: 15, maxD: 40, minAlt: 1000, maxAlt: 4000, rwys: ["GA", "TURBO", "JET", "HELI"], rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" }
+};
+const missionMatrix = [
+    { type: 1, name: "Medical Research", desc: "transporting rare serum samples", detail: "These unstable cultures require a strictly regulated cabin and careful transport.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 2, name: "Medical Transport", desc: "rushing specialized surgical equipment", detail: "A remote clinic needs this equipment immediately to stabilize a patient.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 3, name: "Military Research", desc: "transferring top-secret flight data", detail: "The encrypted drives contain telemetry logs from a prototype aircraft.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 4, name: "Military Transport", desc: "moving heavy tactical components", detail: "These parts are required for an immediate defensive fortification.", weight: 8, allowedClasses: ["JET"] },
+    { type: 5, name: "Emergency Relief", desc: "delivering life-saving nutrition packs", detail: "Flooding has cut off the local supply chain; these are desperately needed.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 6, name: "Celebrity Charter", desc: "accommodating superstar {name} on tour", detail: "{name} is exhausted and has requested a silent, luxury cabin.", weight: 7, allowedClasses: ["BIZ JET", "JET", "HELI"] },
+    { type: 7, name: "Propaganda Ops", desc: "dropping localized awareness flyers", detail: "The goal is to inform the local populace of upcoming policy changes.", weight: 5, allowedClasses: ["GA", "TURBO", "HELI"] },
+    { type: 8, name: "Government Documents", desc: "securing urgent diplomatic files", detail: "These are the final signed peace treaties for the summit.", weight: 8, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 9, name: "Endangered Animal Rescue", desc: "rescuing an endangered animal", detail: "This cub was orphaned by poaching and needs safe transfer to a sanctuary.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 10, name: "Military Hardware", desc: "relocating a modular armored transport unit", detail: "This unit is required at the depot for immediate assembly to ensure readiness.", weight: 3, allowedClasses: ["JET"] },
+    { type: 11, name: "Medevac Mission", desc: "airlifting a critical patient", detail: "The patient requires a smooth flight to prevent further complications.", weight: 8, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 12, name: "Black Ops", desc: "securing extraterrestrial bio-matter", detail: "You are delivering organic remains recovered from a crash site; maintain isolation protocols. You have been warned!", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 13, name: "Luxury Goods", desc: "recovering a lost artifact", detail: "This artifact is a priceless treasure missing for thousands of years. Handle with care and do not let this fall into the wrong hands!", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 14, name: "Tech Delivery", desc: "delivering quantum-processing chips", detail: "These chips are heat-sensitive and must be kept below 5°C throughout the flight.", weight: 4, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 15, name: "Sports Charter", desc: "transporting star athlete {name} for the finals", detail: "{name} needs to arrive in peak condition; please ensure a smooth flight profile.", weight: 3, allowedClasses: ["BIZ JET", "JET", "HELI"] },
+    { type: 16, name: "Botanical Mission", desc: "delivering a rare protected sapling", detail: "This species was thought extinct and is the center-piece of the upcoming conservation summit.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 17, name: "Fashion Logistics", desc: "delivering haute couture for a runway show", detail: "The garments are extremely fragile; ensure cabin pressurization remains perfectly stable.", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 18, name: "Film Production", desc: "transporting original film negatives", detail: "These are the only original master negatives in existence; keep them secure at all times.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 19, name: "Historical Archiving", desc: "relocating ancient scrolls", detail: "The scrolls are degrading rapidly; they must reach the lab before they disintegrate.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET"] },
+    { type: 20, name: "Prototype Testing", desc: "moving a high-performance engine prototype", detail: "This engine is a brand-new design; engineers are waiting on the tarmac to begin testing.", weight: 4, allowedClasses: ["TURBO", "BIZ JET", "JET"] },
+    { type: 21, name: "Culinary Express", desc: "transporting vintage wines for a tasting", detail: "This vintage is highly delicate; minor vibrations could ruin the chemical balance of the wine.", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET"] },
+    { type: 22, name: "Astro-Research", desc: "returning a retired satellite component", detail: "The component is slightly radioactive and must stay inside the provided lead-lined container.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET"] },
+    { type: 23, name: "Corporate Merger", desc: "flying key negotiators to a merger", detail: "The atmosphere in the cabin is expected to be tense; keep the flight efficient and professional.", weight: 5, allowedClasses: ["BIZ JET", "JET", "HELI"] }
+];
+const cargoItems = [
+    "high-end Italian fabrics", "Swiss timepiece mechanisms", "high-capacity solid-state arrays", 
+    "aerospace composite fasteners", "sensitive optical sensors", "automotive ECU diagnostic kits", 
+    "rare vintage collector wines", "medical trial equipment", "marine racing components"
+];
+const names = ["Margot Robbie", "Keanu Reeves", "Zendaya", "Tom Hardy", "Cillian Murphy", "Lara Croft", "Raul from FSReborn", "Taylor Swift", "Brad Pitt", "Lenny Kravitz", "Ellen DeGeneres", "Jennifer Aniston", "Reese Witherspoon", "Cate Blanchett", "Matt Damon", "Robert Downey Jr", "Angelina Jolie", "Monica Lewinsky", "Salma Hayek", "Elizabeth Hurley", "Gillian Anderson"];
+const athletes = ["Lewis Hamilton", "Lionel Messi", "LeBron James", "Serena Williams", "Cristiano Ronaldo", "Simone Biles", "Max Verstappen", "Stephen Curry", "Novak Djokovic", "Usain Bolt"];
+let activeAirportDatabase = [];
+let activeFleetSpecs = {};
+window.onload = function() {
+    loadSettings();
+    rebuildActiveDatabase();
+    rebuildFleetDropdown();
+};
+function saveCallsign() {
+    const cs = document.getElementById("callsignInput").value.trim().toUpperCase();
+    if (cs.length < 3) {
+        alert("Please specify a valid callsign prefix.");
+        return;
+    }
+    localStorage.setItem("dispatcher_saved_callsign", cs);
+    alert(`Callsign ${cs} saved to local memory configuration.`);
+}
+function loadSettings() {
+    const storedColor = localStorage.getItem("dispatcher_accent");
+    if (storedColor) {
+        document.getElementById("colorPicker").value = storedColor;
+        changeAccentColor(storedColor);
+    }
+    const savedCallsign = localStorage.getItem("dispatcher_saved_callsign");
+    if (savedCallsign) {
+        document.getElementById("callsignInput").value = savedCallsign;
+    }
+}
+function saveCustomAirport() {
+    const icao = document.getElementById("newIcao").value.trim().toUpperCase();
+    const name = document.getElementById("newName").value.trim();
+    const rwy = document.getElementById("newRwyType").value;
+    const source = document.getElementById("newSource").value;
+    if(icao.length !== 4 || name === "") {
+        alert("Please enter a valid 4-character ICAO code and Airport Name.");
+        return;
+    }
+    let customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_airports")) || [];
+    customAirports = customAirports.filter(ap => ap.icao !== icao);
+    
+    // Evaluate if the selected source is MSFS or a Third Party store
+    let determinedTag = source === "MSFS hand-crafted airport" ? "Hand-Crafted" : "Third Party";
+    let determinedLinkText = source === "MSFS hand-crafted airport" ? undefined : source;
+    customAirports.push({
+        icao: icao,
+        name: name,
+        rwy: rwy,
+        lat: 51.5 + (Math.random() - 0.5) * 4, 
+        lon: 0.0 + (Math.random() - 0.5) * 4,
+        source: source,
+        tag: determinedTag,
+        linkText: determinedLinkText
+    });
+    localStorage.setItem("dispatcher_custom_airports", JSON.stringify(customAirports));
+    alert(`${icao} added successfully to local memory!`);
+    document.getElementById("newIcao").value = "";
+    document.getElementById("newName").value = "";
+    rebuildActiveDatabase();
+}
+function saveCustomAircraft() {
+    const name = document.getElementById("newAcName").value.trim();
+    const icao = document.getElementById("newAcIcao").value.trim().toUpperCase();
+    const minLength = document.getElementById("newAcLength").value;
+    const acClass = document.getElementById("newAcClass").value;
+    if (!name || icao.length < 2 || !minLength) {
+        alert("Please completely fill out all Aircraft parameter inputs.");
+        return;
+    }
+    let customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
+	
+    customFleet[icao] = {
+        name: `${name} (${icao})`,
+        maxPax: acClass === "JET" ? 140 : (acClass === "HELI" ? 4 : (acClass === "BIZ JET" ? 8 : 5)),
+        maxCargo: acClass === "JET" ? 1800 : (acClass === "HELI" ? 250 : (acClass === "BIZ JET" ? 600 : 300)),
+        minD: acClass === "HELI" ? 15 : (acClass === "JET" ? 120 : (acClass === "BIZ JET" ? 200 : 40)),
+        maxD: acClass === "HELI" ? 50 : (acClass === "JET" ? 1000 : (acClass === "BIZ JET" ? 320 : 350)),
+        minAlt: acClass === "HELI" ? 1000 : (acClass === "JET" ? 28000 : (acClass === "BIZ JET" ? 25000 : 6000)),
+        maxAlt: acClass === "HELI" ? 4000 : (acClass === "JET" ? 39000 : (acClass === "BIZ JET" ? 40000 : 12000)),
+        rwys: acClass === "HELI" ? ["GA", "TURBO", "JET", "HELI"] : (acClass === "BIZ JET" ? ["BIZ JET", "TURBO", "JET"] : (acClass === "TURBO" ? ["GA", "TURBO", "JET"] : [acClass])),
+        rules: acClass === "HELI" ? "VFR Helicopter" : (acClass === "GA" ? "VFR/Scenic" : "IFR"),
+        minRunwayLength: parseInt(minLength),
+        class: acClass 
+    };
+    localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(customFleet));
+    alert(`${icao} updated successfully in local fleet configurations.`);
+    rebuildFleetDropdown();
+}
+function resetToBaselineAirports() {
+    if (confirm("This will overwrite your custom airports with the full original master list. Proceed?")) {
+        localStorage.setItem("dispatcher_custom_airports", JSON.stringify(seedAirportDatabase));
+        rebuildActiveDatabase();
+        alert("System airports registry seeded successfully!");
+    }
+}
+function rebuildActiveDatabase() {
+    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_airports")) || [];
+    if (customAirports.length === 0) {
+        localStorage.setItem("dispatcher_custom_airports", JSON.stringify(seedAirportDatabase));
+        activeAirportDatabase = [...seedAirportDatabase];
+    } else {
+        activeAirportDatabase = [...customAirports];
+    }
+}
+function rebuildFleetDropdown() {
+    const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
+    activeFleetSpecs = { ...coreFleetSpecs, ...customFleet };
+    const sortedFleetEntries = Object.entries(activeFleetSpecs).sort((a, b) => a[1].name.localeCompare(b[1].name));
+    const selectEl = document.getElementById("aircraftSelect");
+    selectEl.innerHTML = ""; 
+    for (const [code, spec] of sortedFleetEntries) {
+        const option = document.createElement("option");
+        option.value = code;
+        option.innerText = spec.name;
+        selectEl.appendChild(option);
+    }
+    document.getElementById("dbCount").innerText = `${Object.keys(activeFleetSpecs).length} Airframes Ready`;
+}
+function exportDatabaseBackup() {
+    const backupObject = {
+        airports: JSON.parse(localStorage.getItem("dispatcher_custom_airports") || "[]"),
+        fleet: JSON.parse(localStorage.getItem("dispatcher_custom_fleet") || "{}")
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObject, null, 2));
+    const a = document.createElement('a');
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", "dispatcher_backup.json");
+    a.click();
+}
+function importDatabaseBackup(inputElement) {
+    const file = inputElement.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const d = JSON.parse(e.target.result);
+        if (d.airports) localStorage.setItem("dispatcher_custom_airports", JSON.stringify(d.airports));
+        if (d.fleet) localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(d.fleet));
+        rebuildActiveDatabase();
+        rebuildFleetDropdown();
+        alert("Backup imported successfully!");
+    };
+    reader.readAsText(file);
+}
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 3440.065; 
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * R;
+}
+function changeAccentColor(colorHex) {
+    document.documentElement.style.setProperty('--accent-color', colorHex);
+    document.documentElement.style.setProperty('--accent-hover', colorHex);
+    localStorage.setItem("dispatcher_accent", colorHex);
+}
+function calculateBearing(lat1, lon1, lat2, lon2) {
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
+    const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) - Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon);
+    return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
+}
+function dispatchFlight() {
+    const callsignRaw = document.getElementById("callsignInput").value.trim().toUpperCase();
+    const depOverride = document.getElementById("depOverrideInput").value.trim().toUpperCase();
+    if (!callsignRaw) {
+        alert("Please supply an operational callsign parameter.");
+        return;
+    }
+    const type = document.getElementById("aircraftSelect").value;
+    const spec = activeFleetSpecs[type]; 
+    const validAirports = activeAirportDatabase.filter(ap => spec.rwys.includes(ap.rwy));
+    if (depOverride && !activeAirportDatabase.some(ap => ap.icao === depOverride)) {
+        alert(`Departure override airport ${depOverride} was not found in your database.`);
+        return;
+    }
+    let candidatePairs = [];
+    for (let src of validAirports) {
+        if (depOverride && src.icao !== depOverride) continue;
+        for (let dst of validAirports) {
+            if (src.icao === dst.icao) continue;
+            const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
+            if (dist >= spec.minD && dist <= spec.maxD) {
+                candidatePairs.push({ src, dst, dist });
+            }
+        }
+    }
+    if (candidatePairs.length === 0) {
+        alert(`No valid routes found matching current physical fleet configurations.`);
+        return;
+    }
+    const selectedRoute = candidatePairs[Math.floor(Math.random() * candidatePairs.length)];
+    const origin = selectedRoute.src;
+    const destination = selectedRoute.dst;
+    const distanceNm = Math.round(selectedRoute.dist);
+    const bearing = calculateBearing(origin.lat, origin.lon, destination.lat, destination.lon);
+    const isEasterly = (bearing >= 0 && bearing < 180);
+    let altValue = spec.rules.includes("VFR") ? (isEasterly ? 5500 : 6500) : (isEasterly ? 170 : 160);
+let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
+    
+    // Calculate how full the passenger cabin is as a percentage (0.0 to 1.0)
+    let paxLoadFactor = spec.maxPax > 0 ? (pax / spec.maxPax) : 0;
+    
+    // Scale down the max allowed cargo based on the passenger load.
+    // E.g., if the cabin is 100% full, cargo capacity is reduced by 80% to prevent MTOW errors.
+    let maxAvailableCargo = spec.maxCargo * (1 - (paxLoadFactor * 0.8)); 
+    
+    // Ensure cargo doesn't drop below the base 40kg minimum
+    let cargoKg = Math.floor(Math.random() * maxAvailableCargo) + 40;
+    const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
+    const selectedItem = cargoItems[Math.floor(Math.random() * cargoItems.length)];
+    // --- Dynamic Aircraft-Specific Filter Logic ---
+    const currentClass = spec.class || "GA"; 
+    const filteredMissions = missionMatrix.filter(m => m.allowedClasses.includes(currentClass));
+    // Fallback switch in case custom structural data drops parameters unexpectedly
+    const finalSelectionPool = filteredMissions.length > 0 ? filteredMissions : missionMatrix;
+    const totalWeight = finalSelectionPool.reduce((sum, m) => sum + m.weight, 0);
+    let randomNum = Math.random() * totalWeight;
+    let chosenMission = finalSelectionPool[0];
+    for (let m of finalSelectionPool) {
+        if (randomNum < m.weight) {
+            chosenMission = m;
+            break;
+        }
+        randomNum -= m.weight;
+    }
+    let randomName = names[Math.floor(Math.random() * names.length)];
+    let randomAthlete = athletes[Math.floor(Math.random() * athletes.length)];
+    let processedDesc = chosenMission.desc.replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName);
+    let processedDetail = chosenMission.detail.replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName);
+    let jobTicket = "";
+    if (spec.rules.includes("VFR")) {
+        jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name} (Visual Flight Profile)<br><strong>Manifest:</strong> ${processedDesc} (${pax} Pass / Baggage limits applied)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Good day, Captain. This is a visual low-level run tracking out from ${origin.name} toward ${destination.name}. ${processedDetail} Keep your eyes open for points of interest along the route and keep clear of cloud decks.`;
+    } else {
+        jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name}<br><strong>Manifest:</strong> ${processedDesc} (${cargoKg} kg load block)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Welcome to the cockpit, Captain. Airway logs are locked down for this transit across the network from ${origin.icao} to ${destination.icao}. ${processedDetail} Follow standard transitions, watch your spacing tags, and stick exactly to assigned vertical profiles.`;
+    }
+// Scenery Link Formatting
+    function formatScenery(apt) {
+        // If a custom URL exists in the database, use it. Otherwise, default to contrail.shop
+        const productUrl = apt.url ? apt.url : "https://contrail.shop/";
+
+        if (apt.tag === 'Both') {
+            return `${apt.icao} - Hand-crafted / <a href="${productUrl}" target="_blank" class="scenery-link">${apt.linkText}</a>`;
+        } else if (apt.tag === 'Third Party') {
+            return `${apt.icao} - <a href="${productUrl}" target="_blank" class="scenery-link">${apt.linkText}</a>`;
+        } else {
+            return `${apt.icao} - Hand-Crafted`;
+        }
+    }
+    // UI Updates
+    document.getElementById("outCallsign").innerText = callsignRaw;
+    document.getElementById("outAirframe").innerText = spec.name;
+    document.getElementById("outRules").innerText = spec.rules;
+    document.getElementById("outOrig").innerText = `${origin.icao} (${origin.name})`;
+    document.getElementById("outDest").innerText = `${destination.icao} (${destination.name})`;
+    document.getElementById("outDist").innerText = `${distanceNm} nm`;
+    document.getElementById("outAlt").innerText = spec.rules.includes("VFR") ? altValue + " ft" : "FL" + altValue;
+    document.getElementById("outTrack").innerText = Math.round(bearing) + "°";
+    document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
+    document.getElementById("outPax").innerText = pax > 0 ? `${pax} pax` : "0 (Solo)";
+    document.getElementById("outCargo").innerText = cargoKg;
+    document.getElementById("outTicket").innerHTML = jobTicket;
+    const cleanAlt = altValue.toString().replace(/[^0-9]/g, ''); 
+    const cargoParam = (cargoKg / 1000).toFixed(3);
+    const simbriefUrl = `https://www.simbrief.com/system/dispatch.php?share=1&type=${type}&orig=${origin.icao}&dest=${destination.icao}&callsign=${callsignRaw}&fl=${cleanAlt}&pax=${pax}&cargo=${cargoParam}&units=KGS`;
+    const linkEl = document.getElementById("outLink");
+    linkEl.href = simbriefUrl;
+    document.getElementById("outRawUrl").innerText = simbriefUrl;
+    document.getElementById("dispatchRelease").style.display = "block";
+}
+</script>
+</body>
+</html>
