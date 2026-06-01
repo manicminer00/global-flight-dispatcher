@@ -2,7 +2,7 @@
 
 > *'Don't know where to fly but know what you want to fly? Just select your aircraft and click Generate Flight and off you go!'*
 
-The Global Flight Dispatcher is a lightweight, browser-based tool designed to guarantee a 40–60 minute flight between high-quality destinations. It completely removes the guesswork of planning your next session while adding immersion through dynamic, aircraft-specific missions.
+The **Dynamic Global Flight Dispatcher** is a lightweight, browser-based tool designed to guarantee a 40–60 minute flight in aircraft, or a 20 minute job for helicopters, between high-quality destinations. It completely removes the guesswork of planning your next session while adding immersion through dynamic, aircraft-specific missions.
 
 This is not a career add-on. This is a 'simple' flight dispatch tool to take the guesswork out of flying. My goal creating this add-on was to ensure that I can just click and fly without worrying if the runway is long enough or suitable, or if I've overloaded the aircraft, or if the airport actually even exists in MSFS. Life is too short, enjoy flying!
 
@@ -17,9 +17,15 @@ This is not a career add-on. This is a 'simple' flight dispatch tool to take the
 * **Curated Aircraft Database:** Comes pre-loaded with a diverse fleet of popular, high-fidelity airframes, from helicopters and light GA to business jets and airliners, ensuring your job tickets perfectly match the aircraft you love to fly.
 * **Fully Customisable:** Want to fly an aircraft not on the list? You can easily add your own custom airframes to your local database. 
 * **Customisable UI:** Choose a colour to suit your mood.
+### **Current Database includes:**
+* **MSFS Hand-Crafted Airport Database - 124 Airports
+* **Contrail MSFS 2024 Airport Database - Total 338 Airports
+* **A selection of Freeware, ORBX and SimMarket Airports - Total 119 Airport
+
 
 ---
 
 &copy; 2026 manicminer
 
 *Created and maintained by manicminer. This is a free tool provided for the flight simulation community.*
+<a href="https://buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" style="color: #2596be; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 6px;">
