@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Global Flight Dispatcher</title>
+    <title>Dynamic Global Flight Dispatcher for MSFS 2024</title>
     <style>
         :root {
             --accent-color: #2196f3; 
@@ -196,14 +196,6 @@
             background-color: #333;
             width: 25%;
         }
-        .db-count-badge {
-            font-size: 12px;
-            background: #444;
-            padding: 3px 8px;
-            border-radius: 10px;
-            color: #ccc;
-            margin-left: 10px;
-        }
         a.scenery-link {
             color: #00bcd4;
             text-decoration: underline;
@@ -211,12 +203,37 @@
         a.scenery-link:hover {
             color: #fff;
         }
+        .db-stats-container { margin-bottom: 15px; }
+        .db-stat-item {
+            background-color: #2a2a2a;
+            color: var(--accent-color);
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .db-stat-item:hover { background-color: #333; }
+        .db-dropdown {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .db-dropdown ul { margin: 0; padding-left: 20px; color: #ccc; font-size: 13px; }
+        .db-dropdown li { margin-bottom: 4px; }
     </style>
     <script type="text/javascript" src="simbrief.apiv1.js"></script>
 </head>
 <body>
 <div class="container">
-    <h1>Dynamic Global Flight Dispatcher <span id="dbCount" class="db-count-badge">0 Airframes</span></h1>
+    <h1>Dynamic Global Flight Dispatcher</h1>
     
     <div class="important-box">
         <h3>⚠️ Pre-Flight Reminders</h3>
@@ -226,13 +243,53 @@
     </div>
     <button type="button" class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Toggle Settings & Database Tools</button>
     <div id="settingsPanel" class="settings-panel settings-group">
-        <h3>Local Database Backup Control</h3>
+        
+        <h3>Custom Database Backup</h3>
         <div class="backup-btn-container">
             <button type="button" class="backup-btn" onclick="exportDatabaseBackup()">📥 Export Backup (.json)</button>
             <button type="button" class="backup-btn" onclick="document.getElementById('importFileInput').click()">📤 Import Backup File</button>
             <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
         </div>
+        
+        <div class="db-stats-container">
+            <div class="db-stat-item" onclick="toggleDropdown('customAirportsList')">
+                <span>📍 Saved Airports</span>
+                <span id="customAirportsCount">0</span>
+            </div>
+            <div id="customAirportsList" class="db-dropdown" style="display:none;"></div>
+            
+            <div class="db-stat-item" onclick="toggleDropdown('customAircraftList')">
+                <span>✈️ Saved Aircraft</span>
+                <span id="customAircraftCount">0</span>
+            </div>
+            <div id="customAircraftList" class="db-dropdown" style="display:none;"></div>
+        </div>
+
         <hr style="border-color: #444; margin: 15px 0;">
+
+        <h3>Permanent Database</h3>
+        <div class="db-stats-container">
+            <div class="db-stat-item" onclick="toggleDropdown('coreAircraftList')">
+                <span>✈️ Aircraft</span>
+                <span id="coreAircraftCount">0</span>
+            </div>
+            <div id="coreAircraftList" class="db-dropdown" style="display:none;"></div>
+            
+            <div class="db-stat-item" onclick="toggleDropdown('coreHandcraftedList')">
+                <span>🛠️ Hand-Crafted Airports</span>
+                <span id="coreHandcraftedCount">0</span>
+            </div>
+            <div id="coreHandcraftedList" class="db-dropdown" style="display:none;"></div>
+
+            <div class="db-stat-item" onclick="toggleDropdown('coreThirdPartyList')">
+                <span>🛒 Third Party Airports</span>
+                <span id="coreThirdPartyCount">0</span>
+            </div>
+            <div id="coreThirdPartyList" class="db-dropdown" style="display:none;"></div>
+        </div>
+        
+        <hr style="border-color: #444; margin: 15px 0;">
+
         <h3>Dispatcher Configuration</h3>
         <label for="colorPicker">Interface Accent Color:</label>
         <select id="colorPicker" onchange="changeAccentColor(this.value)">
@@ -329,8 +386,6 @@
     </div>
     <div id="dispatchRelease" class="dispatch-release">
         <h2>Flight Dispatch Details</h2>
-        <!-- <hr style="border-color: #444;"> -->
-        
         <div id="partnerAdBox" class="partner-link-box" style="display:none;">
             ℹ️ <span id="partnerLink">Scenery availability update metadata details display frame block.</span>
         </div>
@@ -365,7 +420,7 @@
 	<div style="margin-top: 35px; text-align: center; font-size: 11px; color: #888;">
         <strong>Disclaimer:</strong> This tool is strictly for flight simulation purposes only and must NOT be used for real-world aviation or dispatching. Third-party product names and links remain the property of their respective owners.
     </div>
-	<div style="margin-top: 15px; text-align: right; font-size: 11px; color: #888;">Version 0.9</span>
+	<div style="margin-top: 15px; text-align: right; font-size: 11px; color: #888;">Version 1.0</span>
     </div>
 </div>
 <script>
@@ -373,6 +428,44 @@ function toggleSettingsPanel() {
     const p = document.getElementById("settingsPanel");
     p.style.display = (p.style.display === "block") ? "none" : "block";
 }
+
+function toggleDropdown(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateDatabaseStats() {
+    const coreAcHtml = Object.values(coreFleetSpecs).map(a => `<li>${a.name}</li>`).join('');
+    document.getElementById('coreAircraftCount').innerText = Object.keys(coreFleetSpecs).length;
+    document.getElementById('coreAircraftList').innerHTML = `<ul>${coreAcHtml}</ul>`;
+
+    const coreHandcrafted = seedAirportDatabase.filter(a => a.tag === 'Hand-Crafted' || a.tag === 'Both');
+    const coreThirdParty = seedAirportDatabase.filter(a => a.tag === 'Third Party' || a.tag === 'Both');
+    
+    document.getElementById('coreHandcraftedCount').innerText = coreHandcrafted.length;
+    document.getElementById('coreHandcraftedList').innerHTML = `<ul>${coreHandcrafted.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`;
+    
+    document.getElementById('coreThirdPartyCount').innerText = coreThirdParty.length;
+    document.getElementById('coreThirdPartyList').innerHTML = `<ul>${coreThirdParty.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`;
+
+    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_airports")) || [];
+    const seedIcaos = seedAirportDatabase.map(a => a.icao);
+    const actualCustomAirports = customAirports.filter(a => !seedIcaos.includes(a.icao));
+    
+    document.getElementById('customAirportsCount').innerText = actualCustomAirports.length;
+    document.getElementById('customAirportsList').innerHTML = actualCustomAirports.length > 0 
+        ? `<ul>${actualCustomAirports.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>` 
+        : `<ul><li>No custom airports saved.</li></ul>`;
+
+    const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
+    const customAcKeys = Object.keys(customFleet);
+    
+    document.getElementById('customAircraftCount').innerText = customAcKeys.length;
+    document.getElementById('customAircraftList').innerHTML = customAcKeys.length > 0
+        ? `<ul>${Object.values(customFleet).map(a => `<li>${a.name}</li>`).join('')}</ul>`
+        : `<ul><li>No custom aircraft saved.</li></ul>`;
+}
+
 // Memory variable to prevent repetition
 let lastMissionType = null;
 const seedAirportDatabase = [
@@ -664,7 +757,6 @@ const seedAirportDatabase = [
     { icao: "RNSF", name: "Snowflake Lake", rwy: "GA", length: 2000, lat: 48.000, lon: -120.000, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/3418/snowflake-lake-airstrip-alaska" },
     { icao: "ROKR", name: "Kerama Airport", rwy: "GA", length: 2600, lat: 26.168, lon: 127.311, source: "Core", tag: "Hand-Crafted" },
     { icao: "RORS", name: "Shimojishima Airport", rwy: "JET", length: 9800, lat: 24.826, lon: 125.145, source: "Core", tag: "Hand-Crafted" },
-    { icao: "MX-0012", name: "MSFS Handcrafted Hub Alpha", rwy: "JET", length: 13000, lat: 19.436, lon: -99.072, source: "Core", tag: "Hand-Crafted" },
     { icao: "ZSPD", name: "Shanghai Pudong International Airport", rwy: "JET", length: 13100, lat: 31.1443, lon: 121.8083, source: "Core", tag: "Third Party", linkText: "Dreamflight via Contrail", url: "https://contrail.shop/products/zspd-shanghai-pudong-msfs?" }
 ];
 const coreFleetSpecs = {
@@ -728,6 +820,7 @@ window.onload = function() {
     loadSettings();
     rebuildActiveDatabase();
     rebuildFleetDropdown();
+    updateDatabaseStats();
 };
 function saveCallsign() {
     const cs = document.getElementById("callsignInput").value.trim().toUpperCase();
@@ -779,6 +872,7 @@ function saveCustomAirport() {
     document.getElementById("newIcao").value = "";
     document.getElementById("newName").value = "";
     rebuildActiveDatabase();
+    updateDatabaseStats();
 }
 function saveCustomAircraft() {
     const name = document.getElementById("newAcName").value.trim();
@@ -807,11 +901,13 @@ function saveCustomAircraft() {
     localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(customFleet));
     alert(`${icao} updated successfully in local fleet configurations.`);
     rebuildFleetDropdown();
+    updateDatabaseStats();
 }
 function resetToBaselineAirports() {
     if (confirm("This will overwrite your custom airports with the full original master list. Proceed?")) {
         localStorage.setItem("dispatcher_custom_airports", JSON.stringify(seedAirportDatabase));
         rebuildActiveDatabase();
+        updateDatabaseStats();
         alert("System airports registry seeded successfully!");
     }
 }
@@ -836,7 +932,6 @@ function rebuildFleetDropdown() {
         option.innerText = spec.name;
         selectEl.appendChild(option);
     }
-    document.getElementById("dbCount").innerText = `${Object.keys(activeFleetSpecs).length} Airframes Ready`;
 }
 function exportDatabaseBackup() {
     const backupObject = {
@@ -859,6 +954,7 @@ function importDatabaseBackup(inputElement) {
         if (d.fleet) localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(d.fleet));
         rebuildActiveDatabase();
         rebuildFleetDropdown();
+        updateDatabaseStats();
         alert("Backup imported successfully!");
     };
     reader.readAsText(file);
