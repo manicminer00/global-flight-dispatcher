@@ -13,7 +13,7 @@ This is not a career add-on. This is a 'simple' flight dispatch tool to take the
 ### **Key Features:**
 * **Immersive Job Tickets:** Every generated flight includes a custom manifest suited to your airframe. Transport quantum chips to a lab in a helicopter, rush emergency medical supplies in a GA aircraft, haul military-grade hardware in a jet, or fly a VIP in a business jet. 
 * **One-Click SimBrief Integration:** The dispatcher automatically generates a custom SimBrief link. Just click, review your paperwork, and fly. 
-* **Curated Scenery Database:** Built around a hand-picked database of 286 premium destinations (featuring 183 hand-crafted and 146 payware airports). Store links are included so you can easily check out new sceneries.
+* **Curated Scenery Database:** Built around a hand-picked database of premium destinations (featuring 140 hand-crafted and over 150 payware airports). Store links are included so you can easily check out new sceneries.
 * **Curated Aircraft Database:** Comes pre-loaded with a diverse fleet of popular, high-fidelity airframes, from helicopters and light GA to business jets and airliners, ensuring your job tickets perfectly match the aircraft you love to fly.
 * **Fully Customisable:** Want to start from a specific location? Enter a custom departure ICAO. Want to fly an aircraft not on the list? You can easily add your own custom airframes and airports to your local database. 
 * **Customisable UI:** Choose a colour to suit your mood.
