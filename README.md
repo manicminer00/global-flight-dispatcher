@@ -23,4 +23,5 @@ This is not a career add-on. This is a 'simple' flight dispatch tool to take the
 Have fun!
 
 &copy; 2026 manicminer
+
 *Created and maintained by manicminer. This is a free tool provided for the flight simulation community.*
