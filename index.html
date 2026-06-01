@@ -1237,16 +1237,14 @@ function saveCustomAircraft() {
         return;
     }
     let customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
-    
-    customFleet[icao] = {
+	customFleet[icao] = {
         name: `${name} (${icao})`,
         maxPax: acClass === "JET" ? 140 : (acClass === "HELI" ? 4 : (acClass === "BIZ JET" ? 8 : 5)),
         maxCargo: acClass === "JET" ? 1800 : (acClass === "HELI" ? 250 : (acClass === "BIZ JET" ? 600 : 300)),
-		minD: acClass === "HELI" ? 5 : (acClass === "JET" ? 150 : (acClass === "BIZ JET" ? 150 : 20)),
+        minD: acClass === "HELI" ? 5 : (acClass === "JET" ? 150 : (acClass === "BIZ JET" ? 150 : 20)),
         maxD: acClass === "HELI" ? 40 : (acClass === "JET" ? 320 : (acClass === "BIZ JET" ? 320 : 350)),
         minAlt: acClass === "HELI" ? 500 : (acClass === "JET" ? 28000 : (acClass === "BIZ JET" ? 25000 : 6000)),
         maxAlt: acClass === "HELI" ? 4000 : (acClass === "JET" ? 40000 : (acClass === "BIZ JET" ? 45000 : 12000)),
-        rwys: acClass === "HELI" ? ["GA", "TURBO", "JET", "HELI"] : (acClass === "BIZ JET" ? ["BIZ JET", "TURBO", "JET"] : (acClass === "TURBO" ? ["GA", "TURBO", "JET"] : [acClass])),
         rules: acClass === "HELI" ? "VFR Helicopter" : (acClass === "GA" ? "VFR/Scenic" : "IFR"),
         minRunwayLength: parseInt(minLength),
         class: acClass 
