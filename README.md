@@ -4,7 +4,7 @@
 
 The Global Flight Dispatcher is a lightweight, browser-based tool designed to guarantee a 40–60 minute flight between high-quality destinations. It completely removes the guesswork of planning your next session while adding immersion through dynamic, aircraft-specific missions.
 
-This is not a career add-on. This is a 'simple' flight dispatch tool to take the guesswork out of flying. My goal creating this add-on was to ensure that I can just click and fly without worrying if the runway is long enough or suitable, or if I've overloaded the aircraft, or if the airport actually even exists in MSFS. There are too many variables and life is too short, enjoy flying!
+This is not a career add-on. This is a 'simple' flight dispatch tool to take the guesswork out of flying. My goal creating this add-on was to ensure that I can just click and fly without worrying if the runway is long enough or suitable, or if I've overloaded the aircraft, or if the airport actually even exists in MSFS. Life is too short, enjoy flying!
 
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
