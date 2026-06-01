@@ -30,16 +30,24 @@
             padding-bottom: 10px;
             margin-top: 0;
         }
-        .important-box {
-            background-color: #3e2723;
-            border-left: 5px solid #ff5722;
-            padding: 15px;
+		.important-box {
+            background-color: #222;
+            padding: 10px;
             margin-bottom: 20px;
             border-radius: 4px;
+            border: 1px solid #444;
+            border-left: 5px solid #ff5722;  /* Overrides the left side border to be a thicker stripe */
+            display: flex;
+            align-items: center;       
+            justify-content: center;   
+            min-height: 80px;
         }
-        .important-box h3 {
-            margin: 0 0 5px 0;
-            color: #ff5722;
+        #quoteDisplay {
+            text-align: center;
+            margin: 0; 
+            font-style: italic;
+			color: #777;
+            line-height: 1.5;
         }
         .control-group, .settings-group {
             margin-bottom: 20px;
@@ -235,11 +243,8 @@
 <div class="container">
     <h1>Dynamic Global Flight Dispatcher (for MSFS 2024)</h1>
     
-    <div class="important-box">
-        <h3>⚠️ Pre-Flight Reminders</h3>
-        <ul>
-            <h4>"I fly because it releases my mind from the tyranny of petty things." - <strong>Antoine de Saint-Exupéry</strong></h4>
-        </ul>
+<div class="important-box">
+        <p id="quoteDisplay"></p>
     </div>
     <button type="button" class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Toggle Settings & Database Tools</button>
     <div id="settingsPanel" class="settings-panel settings-group">
@@ -419,10 +424,47 @@
         <strong>Disclaimer:</strong> This tool is strictly for flight simulation purposes only and must NOT be used for real-world aviation or dispatching. Third-party product names and links remain the property of their respective owners.
     </div>
 <div style="margin-top: 15px; text-align: right; font-size: 11px; color: #888;">
-    &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v1.2
+    &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v1.3
 </div>
 </div>
 <script>
+const preFlightQuotes = [
+    { text: "When once you have tasted flight, you will forever walk the earth with your eyes turned skyward, for there you have been, and there you will always long to return.", author: "Leonardo DaVinci" },
+    { text: "Man must rise above the Earth, to the top of the atmosphere and beyond, for only thus will he fully understand the world in which he lives.", author: "Socrates" },
+    { text: "I fly because it releases my mind from the tyranny of petty things.", author: "Antoine de Saint-Exupery" },
+    { text: "The desire to fly is an idea handed down to us by our ancestors who, in their grueling travels across trackless lands in prehistoric times, looked enviously on the birds soaring freely through space, at full speed, above all obstacles, on the infinite highway of the air.", author: "Wilbur Wright" },
+    { text: "Sometimes, flying feels too God-like to be attained by man. Sometimes, the world from above seems too beautiful, too wonderful, too distant for human eyes to see.", author: "Charles A. Lindbergh" },
+    { text: "Pilots are a rare kind of human. They leave the ordinary surface of the word, to purify their soul in the sky, and they come down to earth, only after receiving the communion of the infinite.", author: "Jose Maria Velasco Ibarra" },
+    { text: "Airspeed, altitude, and brains. Two are always needed to successfully complete the flight.", author: null },
+    { text: "Both optimists and pessimists contribute to our society. The optimist invents the airplane and the pessimist the parachute.", author: "Gil Stern" },
+    { text: "If black boxes survive air crashes, why don’t they make the whole plane out of that stuff?", author: "George Carlin" },
+    { text: "You’ve never been lost until you’ve been lost at Mach 3.", author: "Paul F. Crickmore" },
+    { text: "Learn from the mistakes of others. You won’t live long enough to make all of them yourself.", author: null },
+    { text: "You start with a bag full of luck and an empty bag of experience. The trick is to fill the bag of experience before you empty the bag of luck.", author: null },
+    { text: "Good judgment comes from experience. Unfortunately, the experience usually comes from bad judgment.", author: null },
+    { text: "There are old pilots and there are bold pilots. However, there are no old, bold pilots.", author: null },
+    { text: "The engine is the heart of an airplane, but the pilot is its soul.", author: "Walter Raleigh" },
+    { text: "Aviation is proof that given the will, we have the capacity to achieve the impossible.", author: "Eddie Rickenbacker" },
+    { text: "Flying is more than a sport and more than a job; flying is pure passion and desire.", author: "General Adolf Galland" },
+    { text: "The airplane stands for freedom, for joy, for the power to understand.", author: "Richard Bach" },
+    { text: "We who fly do so for the love of flying.", author: "Cecil Day-Lewis" },
+    { text: "Adventure is worthwhile in itself.", author: "Amelia Earhart" },
+    { text: "Flying is hypnotic and all pilots are victims to the spell.", author: "Ernest K. Gann" },
+    { text: "Life is like a landscape. You live in the midst of it but can describe it only from the vantage point of distance.", author: "Charles Lindbergh" },
+    { text: "I owned the world that hour as I rode over it – free of the earth, free of the mountains, free of the clouds, but how inseparably I was bound to them.", author: "Charles Lindbergh" },
+    { text: "Real freedom lies in wildness, not in civilization.", author: "Charles Lindbergh" },
+    { text: "Flying is learning how to throw yourself at the ground and miss.", author: "Douglas Adams" }
+];
+
+function displayRandomQuote() {
+    const quoteObj = preFlightQuotes[Math.floor(Math.random() * preFlightQuotes.length)];
+    const displayEl = document.getElementById("quoteDisplay");
+    if (quoteObj.author) {
+        displayEl.innerHTML = `"${quoteObj.text}" - <strong>${quoteObj.author}</strong>`;
+    } else {
+        displayEl.innerHTML = `"${quoteObj.text}"`;
+    }
+}
 function toggleSettingsPanel() {
     const p = document.getElementById("settingsPanel");
     p.style.display = (p.style.display === "block") ? "none" : "block";
@@ -821,6 +863,7 @@ window.onload = function() {
     rebuildActiveDatabase();
     rebuildFleetDropdown();
     updateDatabaseStats();
+    displayRandomQuote();
 };
 function saveCallsign() {
     const cs = document.getElementById("callsignInput").value.trim().toUpperCase();
