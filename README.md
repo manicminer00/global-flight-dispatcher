@@ -20,7 +20,7 @@ This is not a career add-on. This is a 'simple' flight dispatch tool to take the
 ### **Current Database includes:**
 * MSFS Hand-Crafted Airports - 124 Airports
 * Contrail MSFS 2024 Airports - 338 Airports
-* A selection of Flightsim.to, ORBX and SimMarket Airports - 119 Airports
+* A selection of other Freeware and Payware Airports - 119 Airports
 
 
 ---
