@@ -428,7 +428,7 @@
         <strong>Disclaimer:</strong> This tool is strictly for flight simulation purposes only and must NOT be used for real-world aviation or dispatching. Third-party product names and links remain the property of their respective owners.
     </div>
 <div style="margin-top: 15px; text-align: right; font-size: 11px; color: #888;">
-    &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v1.8
+    &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v1.9
 </div>
 </div>
 <script>
@@ -1139,12 +1139,16 @@ const missionMatrix = [
     { type: 15, name: "Sports Charter", desc: "transporting star athlete {name} for the finals", detail: "{name} needs to arrive in peak condition; please ensure a smooth flight profile.", weight: 3, allowedClasses: ["BIZ JET", "JET", "HELI"] },
     { type: 16, name: "Botanical Mission", desc: "delivering a rare protected sapling", detail: "This species was thought extinct and is the center-piece of the upcoming conservation summit.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
     { type: 17, name: "Fashion Logistics", desc: "delivering haute couture for a runway show", detail: "The garments are extremely fragile; ensure cabin pressurization remains perfectly stable.", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
-    { type: 18, name: "Film Production", desc: "transporting original film negatives", detail: "These are the only original master negatives in existence; keep them secure at all times.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 18, name: "Film Production", desc: "transporting original film negatives", detail: "These are the only original master master negatives in existence; keep them secure at all times.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
     { type: 19, name: "Historical Archiving", desc: "relocating ancient scrolls", detail: "The scrolls are degrading rapidly; they must reach the lab before they disintegrate.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET"] },
     { type: 20, name: "Prototype Testing", desc: "moving a high-performance engine prototype", detail: "This engine is a brand-new design; engineers are waiting on the tarmac to begin testing.", weight: 4, allowedClasses: ["TURBO", "BIZ JET", "JET"] },
     { type: 21, name: "Culinary Express", desc: "transporting vintage wines for a tasting", detail: "This vintage is highly delicate; minor vibrations could ruin the chemical balance of the wine.", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET"] },
     { type: 22, name: "Astro-Research", desc: "returning a retired satellite component", detail: "The component is slightly radioactive and must stay inside the provided lead-lined container.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET"] },
-    { type: 23, name: "Corporate Merger", desc: "flying key negotiators to a merger", detail: "The atmosphere in the cabin is expected to be tense; keep the flight efficient and professional.", weight: 5, allowedClasses: ["BIZ JET", "JET", "HELI"] }
+    { type: 23, name: "Corporate Merger", desc: "flying key negotiators to a merger", detail: "The atmosphere in the cabin is expected to be tense; keep the flight efficient and professional.", weight: 5, allowedClasses: ["BIZ JET", "JET", "HELI"] },
+    { type: 24, name: "City Sightseeing Tour", desc: "conducting a local aerial tour", detail: "Passengers are eager to see the local landmarks from above.", weight: 15, allowedClasses: ["GA", "HELI"], isLocal: true },
+    { type: 25, name: "Aerial Photography", desc: "providing an aerial platform for a local photographer", detail: "The photographer needs smooth orbits around key points of interest.", weight: 10, allowedClasses: ["GA", "HELI"], isLocal: true },
+    { type: 26, name: "Traffic & News Patrol", desc: "monitoring local rush hour conditions", detail: "Fly a steady local circuit so the onboard reporter can broadcast traffic updates.", weight: 10, allowedClasses: ["HELI"], isLocal: true },
+    { type: 27, name: "Pipeline/Powerline Inspection", desc: "surveying local infrastructure grids", detail: "Maintain low altitude along the designated inspection corridor and report any structural anomalies.", weight: 8, allowedClasses: ["HELI"], isLocal: true }
 ];
 const cargoItems = [
     "high-end Italian fabrics", "Swiss timepiece mechanisms", "high-capacity solid-state arrays", 
@@ -1354,11 +1358,21 @@ const validAirports = activeAirportDatabase.filter(ap => {
         alert(`Custom Departure Airport ${depOverride} is not currently included in the master database. You can add it manually in Settings.`);
         return;
     }
-    let candidatePairs = [];
+let candidatePairs = [];
     for (let src of validAirports) {
         if (depOverride && src.icao !== depOverride) continue;
         for (let dst of validAirports) {
+            
+            // If it's a Helicopter, allow local round-trip flights (A to A)
+            if (src.icao === dst.icao && spec.class === "HELI") {
+                // Assign a fake round-trip distance of 25nm (approx 15-20 mins)
+                candidatePairs.push({ src: src, dst: src, dist: 25 });
+                continue; 
+            }
+            
+            // Standard Fixed-Wing logic (A to B) - Do not allow same airport
             if (src.icao === dst.icao) continue;
+            
             const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
             if (dist >= spec.minD && dist <= spec.maxD) {
                 candidatePairs.push({ src, dst, dist });
@@ -1404,11 +1418,26 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     let cargoKg = Math.floor(Math.random() * Math.max(0, maxAvailableCargo - 40)) + 40;
     const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
     const selectedItem = cargoItems[Math.floor(Math.random() * cargoItems.length)];
-    // --- Dynamic Aircraft-Specific Filter Logic ---
+	
+// --- Dynamic Aircraft-Specific Filter Logic ---
     const currentClass = spec.class || "GA"; 
-    const filteredMissions = missionMatrix.filter(m => m.allowedClasses.includes(currentClass));
+    const isLocalFlight = (origin.icao === destination.icao);
+    
+    let filteredMissions = missionMatrix.filter(m => m.allowedClasses.includes(currentClass));
+    
+    // Filter for local vs A-to-B missions
+    if (isLocalFlight) {
+        const localMissions = filteredMissions.filter(m => m.isLocal);
+        if (localMissions.length > 0) {
+            filteredMissions = localMissions;
+        }
+    } else {
+        filteredMissions = filteredMissions.filter(m => !m.isLocal);
+    }
+
     // Fallback switch in case custom structural data drops parameters unexpectedly
-    const finalSelectionPool = filteredMissions.length > 0 ? filteredMissions : missionMatrix;
+    const finalSelectionPool = filteredMissions.length > 0 ? filteredMissions : missionMatrix.filter(m => !m.isLocal);
+    
     const totalWeight = finalSelectionPool.reduce((sum, m) => sum + m.weight, 0);
     let randomNum = Math.random() * totalWeight;
     let chosenMission = finalSelectionPool[0];
@@ -1419,16 +1448,24 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
         }
         randomNum -= m.weight;
     }
+    
     let randomName = names[Math.floor(Math.random() * names.length)];
     let randomAthlete = athletes[Math.floor(Math.random() * athletes.length)];
     let processedDesc = chosenMission.desc.replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName);
     let processedDetail = chosenMission.detail.replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName);
     let jobTicket = "";
+    
     if (spec.rules.includes("VFR")) {
-        jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name} (Visual Flight Profile)<br><strong>Manifest:</strong> ${processedDesc} (${pax} Pass / Baggage limits applied)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Good day, Captain. This is a visual low-level run tracking out from ${origin.name} toward ${destination.name}. ${processedDetail} Keep your eyes open for points of interest along the route and keep clear of cloud decks.`;
+        if (isLocalFlight) {
+            jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name} (Local Visual Flight)<br><strong>Manifest:</strong> ${processedDesc} (${pax} Pass / Baggage limits applied)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Good day, Captain. This is a local operations flight operating out of ${origin.name}. ${processedDetail} Maintain a safe altitude, keep clear of restricted airspace, and return to base when the block time is up.`;
+        } else {
+            jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name} (Visual Flight Profile)<br><strong>Manifest:</strong> ${processedDesc} (${pax} Pass / Baggage limits applied)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Good day, Captain. This is a visual low-level run tracking out from ${origin.name} toward ${destination.name}. ${processedDetail} Keep your eyes open for points of interest along the route and keep clear of cloud decks.`;
+        }
     } else {
         jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name}<br><strong>Manifest:</strong> ${processedDesc} (${cargoKg} kg load block)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Welcome to the cockpit, Captain. Airway logs are locked down for this transit across the network from ${origin.icao} to ${destination.icao}. ${processedDetail} Follow standard transitions, watch your spacing tags, and stick exactly to assigned vertical profiles.`;
     }
+    
+    // UI Updates
     
     // UI Updates
     document.getElementById("outCallsign").innerText = callsignRaw;
