@@ -1,4 +1,4 @@
-# **Global Flight Dispatcher (for MSFS 2024)**
+# **Dynamic Global Flight Dispatcher (for MSFS 2024)**
 
 > *'Don't know where to fly but know what you want to fly? Just select your aircraft and click Generate Flight and off you go!'*
 
