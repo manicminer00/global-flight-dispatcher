@@ -15,7 +15,7 @@ This is not a career add-on. This is a 'simple' flight dispatch tool to take the
 * **One-Click SimBrief Integration:** The dispatcher automatically generates a custom SimBrief link. Just click, review your paperwork, and fly. 
 * **Curated Scenery Database:** Built around a hand-picked database of premium destinations (featuring 140 hand-crafted and over 150 payware airports). Store links are included so you can easily check out new sceneries.
 * **Curated Aircraft Database:** Comes pre-loaded with a diverse fleet of popular, high-fidelity airframes, from helicopters and light GA to business jets and airliners, ensuring your job tickets perfectly match the aircraft you love to fly.
-* **Fully Customisable:** Want to start from a specific location? Enter a custom departure ICAO. Want to fly an aircraft not on the list? You can easily add your own custom airframes and airports to your local database. 
+* **Fully Customisable:** Want to start from a specific location? Enter a custom departure ICAO and save it to your local database. Want to fly an aircraft not on the list? You can easily add your own custom airframes and airports to your local database. 
 * **Customisable UI:** Choose a colour to suit your mood.
 
 ---
