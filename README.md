@@ -28,4 +28,5 @@ This is not a career add-on. This is a 'simple' flight dispatch tool to take the
 &copy; 2026 manicminer
 
 *Created and maintained by manicminer. This is a free tool provided for the flight simulation community.*
-<a href="https://buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" style="color: #2596be; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+[Support my work](https://buymeacoffee.com/manicminer/) at buymeacoffee.
+
