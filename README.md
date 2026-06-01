@@ -18,9 +18,9 @@ This is not a career add-on. This is a 'simple' flight dispatch tool to take the
 * **Fully Customisable:** Want to fly an aircraft not on the list? You can easily add your own custom airframes to your local database. 
 * **Customisable UI:** Choose a colour to suit your mood.
 ### **Current Database includes:**
-* **MSFS Hand-Crafted Airport Database - 124 Airports
-* **Contrail MSFS 2024 Airport Database - Total 338 Airports
-* **A selection of Freeware, ORBX and SimMarket Airports - Total 119 Airport
+* **MSFS Hand-Crafted Airports - 124 Airports
+* **Contrail MSFS 2024 Airports - 338 Airports
+* **A selection of Freeware, ORBX and SimMarket Airports - 119 Airports
 
 
 ---
