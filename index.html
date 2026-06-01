@@ -375,12 +375,13 @@
         </div>
     </div>
     <div class="control-group">
-        <label for="callsignInput">Enter Assigned Operational Callsign (6 Characters): <span class="field-hint"><a onclick="event.preventDefault(); saveCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Save Callsign</a></span></label>
+        <label for="callsignInput">Enter Callsign (6 Characters): <span class="field-hint"><a onclick="event.preventDefault(); saveCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Save Callsign</a></span></label>
         <input type="text" id="callsignInput" placeholder="e.g. AMA275" value="AMA275" maxlength="6" required>
-        <label for="aircraftSelect">Select Fleet Airframe Type:</label>
+        <label for="aircraftSelect">Select Aircraft Type:</label>
         <select id="aircraftSelect">
             </select>
-        <label for="depOverrideInput">Custom Departure Airport ICAO (Optional - Must be in Database):</label>
+        <label for="depOverrideInput">Custom Departure Airport ICAO (Optional)</label>
+			<div style="margin-top: 5px; text-align: left; font-size: 14px; color: #888;">N.B. If the airport is not already in the Permanent Database, you need to 'Add New Airport (to Local DB)' in Settings</span>
         <input type="text" id="depOverrideInput" placeholder="e.g. EGLL (Leave blank for random selection)" maxlength="4">
         <button onclick="dispatchFlight()">🎲 Dynamically Generate Flightplan</button>
     </div>
@@ -420,7 +421,7 @@
 	<div style="margin-top: 35px; text-align: center; font-size: 11px; color: #888;">
         <strong>Disclaimer:</strong> This tool is strictly for flight simulation purposes only and must NOT be used for real-world aviation or dispatching. Third-party product names and links remain the property of their respective owners.
     </div>
-	<div style="margin-top: 15px; text-align: right; font-size: 11px; color: #888;">Version 1.0</span>
+	<div style="margin-top: 15px; text-align: right; font-size: 11px; color: #888;">Version 1.01</span>
     </div>
 </div>
 <script>
