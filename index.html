@@ -435,7 +435,7 @@
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v2.4
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v2.5
     </div>
 </div>
 </div>
@@ -501,13 +501,11 @@ function updateDatabaseStats() {
     document.getElementById('coreThirdPartyCount').innerText = coreThirdParty.length;
     document.getElementById('coreThirdPartyList').innerHTML = `<ul>${coreThirdParty.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`;
 
-    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_airports")) || [];
-    const seedIcaos = seedAirportDatabase.map(a => a.icao);
-    const actualCustomAirports = customAirports.filter(a => !seedIcaos.includes(a.icao));
-    
-    document.getElementById('customAirportsCount').innerText = actualCustomAirports.length;
-    document.getElementById('customAirportsList').innerHTML = actualCustomAirports.length > 0 
-        ? `<ul>${actualCustomAirports.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>` 
+    // Updated to pull strictly from the new user-only storage key
+    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
+    document.getElementById('customAirportsCount').innerText = customAirports.length;
+    document.getElementById('customAirportsList').innerHTML = customAirports.length > 0 
+        ? `<ul>${customAirports.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>` 
         : `<ul><li>No custom airports saved.</li></ul>`;
 
     const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
@@ -1200,16 +1198,19 @@ function saveCustomAirport() {
     const name = document.getElementById("newName").value.trim();
     const rwy = document.getElementById("newRwyType").value;
     const source = document.getElementById("newSource").value;
+    
     if(icao.length !== 4 || name === "") {
         alert("Please enter a valid 4-character ICAO code and Airport Name.");
         return;
     }
-    let customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_airports")) || [];
+    
+    let customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
+    // Remove if already exists to allow updating
     customAirports = customAirports.filter(ap => ap.icao !== icao);
     
-    // Evaluate if the selected source is MSFS or a Third Party store
     let determinedTag = source === "MSFS hand-crafted airport" ? "Hand-Crafted" : "Third Party";
     let determinedLinkText = source === "MSFS hand-crafted airport" ? undefined : source;
+    
     customAirports.push({
         icao: icao,
         name: name,
@@ -1220,13 +1221,16 @@ function saveCustomAirport() {
         tag: determinedTag,
         linkText: determinedLinkText
     });
-    localStorage.setItem("dispatcher_custom_airports", JSON.stringify(customAirports));
+    
+    localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(customAirports));
     alert(`${icao} added successfully to local memory!`);
     document.getElementById("newIcao").value = "";
     document.getElementById("newName").value = "";
+    
     rebuildActiveDatabase();
     updateDatabaseStats();
 }
+    
 function saveCustomAircraft() {
     const name = document.getElementById("newAcName").value.trim();
     const icao = document.getElementById("newAcIcao").value.trim().toUpperCase();
@@ -1263,14 +1267,25 @@ function resetToBaselineAirports() {
     }
 }
 function rebuildActiveDatabase() {
-    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_airports")) || [];
-    if (customAirports.length === 0) {
-        localStorage.setItem("dispatcher_custom_airports", JSON.stringify(seedAirportDatabase));
-        activeAirportDatabase = [...seedAirportDatabase];
-    } else {
-        activeAirportDatabase = [...customAirports];
+    // 1. Migration: Extract true custom airports from old legacy storage
+    const legacyData = localStorage.getItem("dispatcher_custom_airports");
+    if (legacyData) {
+        const parsedLegacy = JSON.parse(legacyData);
+        const seedIcaos = seedAirportDatabase.map(a => a.icao);
+        const pureCustom = parsedLegacy.filter(a => !seedIcaos.includes(a.icao));
+        localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(pureCustom));
+        localStorage.removeItem("dispatcher_custom_airports"); // Clear legacy cache
     }
+
+    // 2. Load pure custom airports
+    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
+    const customIcaos = customAirports.map(a => a.icao);
+    
+    // 3. Filter out any core airports the user might have custom-overwritten, then merge
+    const activeSeed = seedAirportDatabase.filter(a => !customIcaos.includes(a.icao));
+    activeAirportDatabase = [...activeSeed, ...customAirports];
 }
+
 function rebuildFleetDropdown() {
     const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
     activeFleetSpecs = { ...coreFleetSpecs, ...customFleet };
