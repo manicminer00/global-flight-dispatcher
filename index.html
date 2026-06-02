@@ -373,11 +373,6 @@
             <button type="button" onclick="saveCustomAircraft()">Save Airframe</button>
         </div>
         <hr style="border-color: #444; margin: 20px 0;">
-        <div>
-            <button type="button" style="background-color: #bd1c11;" onclick="resetToBaselineAirports()">⚠️ Update default database and clear custom database - Export Backup first!⚠️</button>
-        </div>
-        <div style="display: flex; gap: 10px; margin-top: 10px;">
-        </div>
     </div>
     <div class="control-group">
         <label for="callsignInput">Enter Callsign (6 Characters): <span class="field-hint"><a onclick="event.preventDefault(); saveCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Save Callsign</a></span></label>
@@ -435,7 +430,7 @@
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v2.5
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v2.6
     </div>
 </div>
 </div>
@@ -1257,14 +1252,6 @@ function saveCustomAircraft() {
     alert(`${icao} updated successfully in local fleet configurations.`);
     rebuildFleetDropdown();
     updateDatabaseStats();
-}
-function resetToBaselineAirports() {
-    if (confirm("This will overwrite your custom airports with the full original master list. Proceed?")) {
-        localStorage.setItem("dispatcher_custom_airports", JSON.stringify(seedAirportDatabase));
-        rebuildActiveDatabase();
-        updateDatabaseStats();
-        alert("System airports registry seeded successfully!");
-    }
 }
 function rebuildActiveDatabase() {
     // 1. Migration: Extract true custom airports from old legacy storage
