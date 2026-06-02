@@ -451,7 +451,7 @@
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v3.6
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v3.7
     </div>
 </div>
 </div>
@@ -1145,6 +1145,8 @@ const coreFleetSpecs = {
 "KODI": { name: "SWS - Quest Kodiak 100 Series II", maxPax: 9, maxCargo: 1219, minD: 30, maxD: 80, minAlt: 5000, maxAlt: 12000, rules: "VFR/Scenic", minRunwayLength: 1467, class: "GA" },
 "LAMA": { name: "Taog's Hangar - Llama Helicopter", maxPax: 4, maxCargo: 300, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
 "LJ35": { name: "Flysimware - Bombardier Lear Jet 35A", maxPax: 8, maxCargo: 1450, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 45000, rules: "IFR", minRunwayLength: 4972, class: "BIZ JET" },
+"MD82": { name: "Leonardo - McDonnell Douglas MD-82", maxPax: 172, maxCargo: 6670, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 7450, class: "JET" },
+"MD88": { name: "Leonardo - McDonnell Douglas MD-88", maxPax: 172, maxCargo: 6670, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 7850, class: "JET" },
 "P180": { name: "FlightFX - P180 Avanti", maxPax: 7, maxCargo: 500, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 41000, rules: "IFR", minRunwayLength: 3300, class: "BIZ JET" },
 "PA24": { name: "A2A - Comanche", maxPax: 3, maxCargo: 150, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 1200, class: "GA" },
 "PA38": { name: "Just Flight - PA38 Tomahawk", maxPax: 1, maxCargo: 45, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 13000, rules: "VFR/Scenic", minRunwayLength: 1460, class: "GA" },
@@ -1153,7 +1155,7 @@ const coreFleetSpecs = {
 "SF50": { name: "FlightFX - Vision Jet G2+", maxPax: 4, maxCargo: 300, minD: 70, maxD: 150, minAlt: 15000, maxAlt: 20000, rules: "IFR", minRunwayLength: 3100, class: "BIZ JET" },
 "SPIT": { name: "Flying Iron - Spitfire", maxPax: 0, maxCargo: 80, minD: 60, maxD: 180, minAlt: 15000, maxAlt: 20000, rules: "VFR/Scenic", minRunwayLength: 1000, class: "GA" },
 "STAR": { name: "Black Square - Starship", maxPax: 8, maxCargo: 650, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 35000, rules: "IFR", minRunwayLength: 3112, class: "TURBO" },
-"TBM8": { name: "Black Square - TBM850", maxPax: 5, maxCargo: 420, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 31000, rules: "IFR", minRunwayLength: 2380, class: "TURBO" },
+"TBM8": { name: "Black Square - TBM850", maxPax: 5, maxCargo: 420, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 31000, rules: "IFR", minRunwayLength: 2380, class: "TURBO" }
 };
 const missionMatrix = [
     { type: 1, name: "Medical Research", desc: "transporting rare serum samples", detail: "These unstable cultures require a strictly regulated cabin and careful transport.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
