@@ -12,7 +12,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 
 ### **Key Features**
 
-* **Extensive Scenery Database:** Built around a massive hand-picked database. Includes the full Contrail MSFS 2024 catalogue, Asobo hand-crafted airports, and a curated selection of top-tier 3rd-party and freeware airports. Direct store links are provided.
+* **Extensive Scenery Database:** Built around a massive hand-picked database. Includes the full Contrail and ORBX MSFS 2024 catalogues, Asobo hand-crafted airports, and a curated selection of top-tier 3rd-party and freeware airports. Direct store links are provided.
 * **Curated Aircraft Fleet:** Pre-loaded with popular, high-fidelity airframes ranging from helicopters and light GA to business jets and wide-body airliners.
 * **Dynamic Job Tickets & Loadsheets:** Every flight includes a custom mission manifest suited to your airframe's operational class. Passenger and cargo loads are dynamically calculated to ensure you strictly adhere to MTOW limits.
 * **Advanced Flight Profiling:** Automatically calculates safe cruising altitudes based on route distance climb caps and a built-in global mountain range safety floor to ensure safe transit over terrain.
