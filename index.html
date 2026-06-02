@@ -1115,27 +1115,45 @@ const seedAirportDatabase = [
 { icao: "ZYHB", name: "Harbin Taiping International ", rwy: "JET", length: 10500, elev: 457, lat: 45.6233, lon: 126.2500, source: "Core", tag: "Third Party", linkText: "SamScene3D via Contrail", url: "https://contrail.shop/search?q=ZYHB" }
 ];
 const coreFleetSpecs = {
-    "PA24": { name: "A2A - Comanche", maxPax: 3, maxCargo: 150, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 1200, class: "GA" },
-    "AEST": { name: "A2A - Aerostar 600", maxPax: 5, maxCargo: 250, minD: 60, maxD: 120, minAlt: 5000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 2000, class: "GA" },
-    "BE60": { name: "Black Square - Piston Grand Duke", maxPax: 5, maxCargo: 380, minD: 60, maxD: 100, minAlt: 10000, maxAlt: 20000, rules: "IFR", minRunwayLength: 1500, class: "GA" },
-    "B60T": { name: "Black Square - Turbine Duke", maxPax: 5, maxCargo: 380, minD: 70, maxD: 150, minAlt: 15000, maxAlt: 28000, rules: "IFR", minRunwayLength: 1000, class: "TURBO" },
-    "B06T": { name: "Black Square - Caravan", maxPax: 12, maxCargo: 1200, minD: 30, maxD: 80, minAlt: 5000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 2500, class: "TURBO" },
-    "SF50": { name: "FlightFX - Vision Jet G2+", maxPax: 4, maxCargo: 300, minD: 70, maxD: 150, minAlt: 15000, maxAlt: 20000, rules: "IFR", minRunwayLength: 3100, class: "BIZ JET" },
-    "TBM8": { name: "Black Square - TBM850", maxPax: 5, maxCargo: 420, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 31000, rules: "IFR", minRunwayLength: 2380, class: "TURBO" },
-    "STAR": { name: "Black Square - Starship", maxPax: 8, maxCargo: 650, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 35000, rules: "IFR", minRunwayLength: 3112, class: "TURBO" },
-    "P180": { name: "FlightFX - P180 Avanti", maxPax: 7, maxCargo: 500, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 41000, rules: "IFR", minRunwayLength: 3300, class: "BIZ JET" },
-    "SPIT": { name: "Flying Iron - Spitfire", maxPax: 0, maxCargo: 80, minD: 60, maxD: 180, minAlt: 15000, maxAlt: 20000, rules: "IFR", minRunwayLength: 1000, class: "GA" },
-    "HDJT": { name: "FlightFX - Honda Jet", maxPax: 5, maxCargo: 350, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 3500, class: "BIZ JET" },
-    "E55P": { name: "FSReborn - Phenom 300", maxPax: 7, maxCargo: 550, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 3209, class: "BIZ JET" },
-    "C750": { name: "FlightFX - Citation X", maxPax: 9, maxCargo: 850, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 5200, class: "BIZ JET" },
-    "A320": { name: "Fenix - Airbus A320", maxPax: 160, maxCargo: 2200, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 6000, class: "JET" },
-    "B736": { name: "PMDG - Boeing 737-600", maxPax: 110, maxCargo: 1800, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 6000, class: "JET" },
-    "PC12": { name: "SWS - PC-12/47", maxPax: 9, maxCargo: 600, minD: 100, maxD: 280, minAlt: 15000, maxAlt: 25000, rules: "IFR", minRunwayLength: 1475, class: "TURBO" },
-    "C172": { name: "Asobo - C172 G1000", maxPax: 3, maxCargo: 120, minD: 20, maxD: 80, minAlt: 3000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 1630, class: "GA" },
-    "H145": { name: "HPG - H145 Helicopter", maxPax: 8, maxCargo: 400, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
-    "LAMA": { name: "Taog - Llama Helicopter", maxPax: 4, maxCargo: 300, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
-    "ALO3": { name: "Taog - Alouette Helicopter", maxPax: 6, maxCargo: 350, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
-    "R22":  { name: "Cowansim - R22 Helicopter", maxPax: 1, maxCargo: 50, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 4000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" }
+"A320": { name: "Fenix - Airbus A320", maxPax: 160, maxCargo: 2200, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 6000, class: "JET" },
+"A359": { name: "Inibuilds - Airbus A350", maxPax: 440, maxCargo: 43500, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 43000, rules: "IFR", minRunwayLength: 8000, class: "JET" },
+"A388": { name: "FlyByWire - Airbus A380-800", maxPax: 853, maxCargo: 83000, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 43000, rules: "IFR", minRunwayLength: 6725, class: "JET" },
+"AEST": { name: "A2A - Aerostar 600", maxPax: 5, maxCargo: 250, minD: 60, maxD: 120, minAlt: 5000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 2000, class: "GA" },
+"ALO3": { name: "Taog - Alouette Helicopter", maxPax: 6, maxCargo: 350, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+"B146": { name: "Just Flight - BAe 146", maxPax: 112, maxCargo: 9500, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 31000, rules: "IFR", minRunwayLength: 4500, class: "JET" },
+"B36P": { name: "Black Square - Beechcraft Bonanza", maxPax: 5, maxCargo: 544, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 17500, rules: "VFR/Scenic", minRunwayLength: 2180, class: "GA" },
+"B58P": { name: "Black Square - Beechcraft Baron", maxPax: 5, maxCargo: 649, minD: 60, maxD: 120, minAlt: 5000, maxAlt: 20000, rules: "VFR/Scenic", minRunwayLength: 2345, class: "GA" },
+"B60T": { name: "Black Square - Turbine Duke", maxPax: 5, maxCargo: 380, minD: 70, maxD: 150, minAlt: 15000, maxAlt: 28000, rules: "IFR", minRunwayLength: 1000, class: "TURBO" },
+"B736": { name: "PMDG - Boeing 737-600", maxPax: 110, maxCargo: 1800, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 6000, class: "JET" },
+"B737": { name: "PMDG - Boeing 737-700", maxPax: 148, maxCargo: 4400, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 41000, rules: "IFR", minRunwayLength: 6699, class: "JET" },
+"B738": { name: "PMDG - Boeing 737-800", maxPax: 189, maxCargo: 8000, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 41000, rules: "IFR", minRunwayLength: 7598, class: "JET" },
+"B77W": { name: "PMDG - Boeing 777-300ER", maxPax: 550, maxCargo: 24500, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 43100, rules: "IFR", minRunwayLength: 9200, class: "JET" },
+"BE60": { name: "Black Square - Piston Grand Duke", maxPax: 5, maxCargo: 380, minD: 60, maxD: 100, minAlt: 10000, maxAlt: 20000, rules: "IFR", minRunwayLength: 1500, class: "GA" },
+"C172": { name: "Asobo - C172 G1000", maxPax: 3, maxCargo: 120, minD: 20, maxD: 80, minAlt: 3000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 1630, class: "GA" },
+"C208": { name: "Black Square - Cessna C208B Caravan", maxPax: 13, maxCargo: 1590, minD: 30, maxD: 80, minAlt: 5000, maxAlt: 9500, rules: "IFR", minRunwayLength: 2160, class: "GA" },
+"C414": { name: "Flysimware - Cessna 414 AW Chancellor", maxPax: 7, maxCargo: 1102, minD: 60, maxD: 120, minAlt: 5000, maxAlt: 25000, rules: "VFR/Scenic", minRunwayLength: 2595, class: "GA" },
+"C680": { name: "Skyward Simulations - Citation C680 Sovereign+", maxPax: 9, maxCargo: 651, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 47000, rules: "IFR", minRunwayLength: 3530, class: "BIZ JET" },
+"C750": { name: "FlightFX - Citation X", maxPax: 9, maxCargo: 850, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 5200, class: "BIZ JET" },
+"DA40": { name: "COWS - Diamond DA40", maxPax: 3, maxCargo: 407, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 16400, rules: "VFR/Scenic", minRunwayLength: 1935, class: "GA" },
+"DA42": { name: "COWS - Diamond DA42", maxPax: 3, maxCargo: 579, minD: 30, maxD: 100, minAlt: 5000, maxAlt: 18000, rules: "VFR/Scenic", minRunwayLength: 2129, class: "GA" },
+"DC6": { name: "PMDG - Douglas DC-6 Cloudmaster", maxPax: 89, maxCargo: 12786, minD: 150, maxD: 320, minAlt: 15000, maxAlt: 25000, rules: "IFR", minRunwayLength: 4500, class: "TURBO" },
+"E55P": { name: "FSReborn - Phenom 300e", maxPax: 7, maxCargo: 550, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 3209, class: "BIZ JET" },
+"H145": { name: "HPG - H145 Helicopter", maxPax: 8, maxCargo: 400, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+"H500": { name: "Taog's Hangar - OH6A Cayuse/Hughes 500C", maxPax: 4, maxCargo: 816, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+"HDJT": { name: "FlightFX - Honda Jet", maxPax: 5, maxCargo: 350, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 3500, class: "BIZ JET" },
+"HU16": { name: "Asobo - Grumman Amphibian Albatross G111/HU16", maxPax: 28, maxCargo: 4500, minD: 20, maxD: 80, minAlt: 3000, maxAlt: 21000, rules: "VFR/Scenic", minRunwayLength: 2500, class: "GA" },
+"KODI": { name: "SWS - Quest Kodiak 100 Series II", maxPax: 9, maxCargo: 1219, minD: 30, maxD: 80, minAlt: 5000, maxAlt: 12000, rules: "VFR/Scenic", minRunwayLength: 1467, class: "GA" },
+"LAMA": { name: "Taog - Llama Helicopter", maxPax: 4, maxCargo: 300, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+"LJ35": { name: "Flysimware - Bombardier Lear Jet 35A", maxPax: 8, maxCargo: 1450, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 45000, rules: "IFR", minRunwayLength: 4972, class: "BIZ JET" },
+"P180": { name: "FlightFX - P180 Avanti", maxPax: 7, maxCargo: 500, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 41000, rules: "IFR", minRunwayLength: 3300, class: "BIZ JET" },
+"PA24": { name: "A2A - Comanche", maxPax: 3, maxCargo: 150, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 1200, class: "GA" },
+"PA38": { name: "Just Flight - PA38 Tomahawk", maxPax: 1, maxCargo: 45, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 13000, rules: "VFR/Scenic", minRunwayLength: 1460, class: "GA" },
+"PC12": { name: "SWS - PC-12/47", maxPax: 9, maxCargo: 600, minD: 100, maxD: 280, minAlt: 15000, maxAlt: 25000, rules: "IFR", minRunwayLength: 1475, class: "TURBO" },
+"R22":  { name: "Cowansim - R22 Helicopter", maxPax: 1, maxCargo: 50, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 4000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+"SF50": { name: "FlightFX - Vision Jet G2+", maxPax: 4, maxCargo: 300, minD: 70, maxD: 150, minAlt: 15000, maxAlt: 20000, rules: "IFR", minRunwayLength: 3100, class: "BIZ JET" },
+"SPIT": { name: "Flying Iron - Spitfire", maxPax: 0, maxCargo: 80, minD: 60, maxD: 180, minAlt: 15000, maxAlt: 20000, rules: "VFR/Scenic", minRunwayLength: 1000, class: "GA" },
+"STAR": { name: "Black Square - Starship", maxPax: 8, maxCargo: 650, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 35000, rules: "IFR", minRunwayLength: 3112, class: "TURBO" },
+"TBM8": { name: "Black Square - TBM850", maxPax: 5, maxCargo: 420, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 31000, rules: "IFR", minRunwayLength: 2380, class: "TURBO" },
 };
 const missionMatrix = [
     { type: 1, name: "Medical Research", desc: "transporting rare serum samples", detail: "These unstable cultures require a strictly regulated cabin and careful transport.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
@@ -1494,7 +1512,7 @@ const safeMaxAlt = Math.max(effectiveMaxAlt, finalMinAlt);
     } else {
         if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
         if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
-        altValue = baseThousands * 100;
+        altValue = baseThousands * 10;
     }
     // --------------------------------------------------
     
@@ -1575,7 +1593,7 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     document.getElementById("outDist").innerText = `${distanceNm} nm`;
 document.getElementById("outAlt").innerText = spec.rules.includes("VFR") 
     ? altValue.toLocaleString('en-US') + " ft" 
-    : "FL" + altValue.toLocaleString('en-US');
+	: "FL" + altValue;
     document.getElementById("outTrack").innerText = Math.round(bearing) + "°";
     document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
     document.getElementById("outPax").innerText = pax > 0 ? `${pax} pax` : "0 (Solo)";
