@@ -1333,7 +1333,7 @@ function formatScenery(apt) {
     const formattedLink = apt.url ? `<a href="${apt.url}" target="_blank" class="scenery-link">${linkText}</a>` : linkText;
 
     if (apt.tag === 'Both') {
-        return `${apt.icao} - Hand-crafted / ${formattedLink}`;
+        return `${apt.icao} - Hand-Crafted / ${formattedLink}`;
     } else if (apt.tag === 'Third Party') {
         return `${apt.icao} - ${formattedLink}`;
     } else {
