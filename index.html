@@ -450,7 +450,7 @@
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v3.3
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v3.4
     </div>
 </div>
 </div>
@@ -1361,6 +1361,7 @@ function formatScenery(apt) {
         return `${apt.icao} - Hand-Crafted`;
     }
 }
+// DISPATCH FLIGHT FUNCTION
 function dispatchFlight() {
     const callsignRaw = document.getElementById("callsignInput").value.trim().toUpperCase();
     const depOverride = document.getElementById("depOverrideInput").value.trim().toUpperCase();
@@ -1373,7 +1374,7 @@ function dispatchFlight() {
 const validAirports = activeAirportDatabase.filter(ap => {
     let allowedClasses = [];
     
-    // Map airport category to allowed aircraft classes
+// Map airport category to allowed aircraft classes
     switch(ap.rwy) {
         case "GA":
             allowedClasses = ["GA", "HELI"];
@@ -1391,10 +1392,10 @@ const validAirports = activeAirportDatabase.filter(ap => {
             allowedClasses = ["HELI"];
             break;
     }
-    // 1. Check if the aircraft's class is allowed at this airport category
+// 1. Check if the aircraft's class is allowed at this airport category
     const isAllowedType = allowedClasses.includes(spec.class);
     
-    // 2. Enforce the runway length safeguard limit
+// 2. Enforce the runway length safeguard limit
     const meetsLength = ap.length ? (ap.length >= spec.minRunwayLength) : true;
     
     return isAllowedType && meetsLength;
@@ -1409,14 +1410,14 @@ let candidatePairs = [];
         if (depOverride && src.icao !== depOverride) continue;
         for (let dst of validAirports) {
             
-            // If it's a Helicopter, allow local round-trip flights (A to A)
+// If it's a Helicopter, allow local round-trip flights (A to A)
             if (src.icao === dst.icao && spec.class === "HELI") {
                 // Assign a fake round-trip distance of 25nm (approx 15-20 mins)
                 candidatePairs.push({ src: src, dst: src, dist: 25 });
                 continue; 
             }
             
-            // Standard Fixed-Wing logic (A to B) - Do not allow same airport
+// Standard Fixed-Wing logic (A to B) - Do not allow same airport
             if (src.icao === dst.icao) continue;
             
             const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
@@ -1425,6 +1426,7 @@ let candidatePairs = [];
             }
         }
     }
+	
     if (candidatePairs.length === 0) {
         alert(`No valid routes found matching current physical fleet configurations.`);
         return;
@@ -1440,17 +1442,45 @@ let candidatePairs = [];
 const depElev = origin.elev || 0;
 const arrElev = destination.elev || 0;
 
-// 1. Terrain Floor (Highest airport + 3,000ft safety margin)
-const terrainSafetyFloor = Math.max(depElev, arrElev) + 3000;
+// 1. Calculate the baseline safety floor from endpoints
+let terrainSafetyFloor = Math.max(depElev, arrElev) + 3000;
 
-// 2. Distance Climb Cap (300ft per NM)
+// 2. --- GLOBAL MOUNTAIN RANGE SAFETY INJECTION ---
+let midLat = (origin.lat + destination.lat) / 2;
+let midLon = (origin.lon + destination.lon) / 2;
+
+// Master matrix of global mountain ranges with their required minimum safe transit altitudes (ft)
+const globalRanges = [
+    { name: "Alps", latMin: 45.0, latMax: 48.0, lonMin: 5.0, lonMax: 15.0, safeFloor: 11500 },
+    { name: "Pyrenees", latMin: 42.0, latMax: 43.3, lonMin: -2.0, lonMax: 3.3, safeFloor: 9500 },
+    { name: "North American Rockies", latMin: 35.0, latMax: 60.0, lonMin: -125.0, lonMax: -105.0, safeFloor: 14500 },
+    { name: "South American Andes", latMin: -55.0, latMax: 10.0, lonMin: -76.0, lonMax: -65.0, safeFloor: 15500 },
+    { name: "Himalayas / Tibetan Plateau", latMin: 26.0, latMax: 38.0, lonMin: 70.0, lonMax: 105.0, safeFloor: 21500 },
+    { name: "Japanese Alps / Central Ranges", latMin: 34.5, latMax: 37.5, lonMin: 136.0, lonMax: 139.5, safeFloor: 10500 }
+];
+
+// Verify if departure, destination, OR the flight path midpoint cuts through a mountain grid range
+for (let range of globalRanges) {
+    let depMatch = (origin.lat >= range.latMin && origin.lat <= range.latMax && origin.lon >= range.lonMin && origin.lon <= range.lonMax);
+    let arrMatch = (destination.lat >= range.latMin && destination.lat <= range.latMax && destination.lon >= range.lonMin && destination.lon <= range.lonMax);
+    let midMatch = (midLat >= range.latMin && midLat <= range.latMax && midLon >= range.lonMin && midLon <= range.lonMax);
+
+    if (depMatch || arrMatch || midMatch) {
+        if (spec.class !== "HELI") {
+            terrainSafetyFloor = Math.max(terrainSafetyFloor, range.safeFloor);
+        }
+        break; // Range matched, exit loop to preserve maximum floor parameters
+    }
+}
+
+// 3. Distance Climb Cap (300ft per NM)
 const distanceAltCap = distanceNm * 300;
 
-// 3. Establish absolute limits for this specific flight
+// 4. Establish absolute limits for this specific flight
 const finalMinAlt = Math.max(spec.minAlt, terrainSafetyFloor);
 const effectiveMaxAlt = Math.min(spec.maxAlt, distanceAltCap);
 
-// 4. Fallback: Lock to terrain floor if limits conflict
+// 5. Final fallback verification
 const safeMaxAlt = Math.max(effectiveMaxAlt, finalMinAlt);
 	
 // ------------------------
