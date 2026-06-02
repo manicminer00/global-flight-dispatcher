@@ -2,30 +2,38 @@
 
 > *'Don't know where to fly but know what you want to fly? Just select your aircraft and click Generate Flight and off you go!'*
 
-The **Dynamic Global Flight Dispatcher** is a lightweight, browser-based tool designed to guarantee a 40–60 minute flight in aircraft, or a 20 minute job for helicopters, between high-quality destinations. It completely removes the guesswork of planning your next session while adding immersion through dynamic, aircraft-specific missions.
+The **Dynamic Global Flight Dispatcher** is a lightweight, browser-based tool designed to generate a 40–60 minute fixed-wing flight, or a 20-minute helicopter job, between high-quality destinations. It removes the guesswork of planning your next session while adding immersion through dynamic, aircraft-specific missions.
 
-This is not a career add-on. This is a 'simple' flight dispatch tool to take the guesswork out of flying. My goal creating this add-on was to ensure that I can just click and fly without worrying if the runway is long enough or suitable, or if I've overloaded the aircraft, or if the airport actually even exists in MSFS. Life is too short, enjoy flying!
+This tool takes the friction out of flight simulation. It ensures you can jump into the cockpit without worrying if the runway is suitable, if you've overloaded the airframe, or if the destination exists in MSFS 2024.
 
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
 ---
 
-### **Key Features:**
-* **Immersive Job Tickets:** Every generated flight includes a custom manifest suited to your airframe. Transport quantum chips to a lab in a helicopter, rush emergency medical supplies in a GA aircraft, haul military-grade hardware in a jet, or fly a VIP in a business jet. 
-* **One-Click SimBrief Integration:** The dispatcher automatically generates a custom SimBrief link. Just click, review your paperwork, and fly. 
-* **Curated Scenery Database:** Built around a hand-picked database of premium destinations (featuring 140 hand-crafted and over 200 payware airports). Store links are included so you can easily check out new sceneries.
-* **Curated Aircraft Database:** Comes pre-loaded with a diverse fleet of popular, high-fidelity airframes, from helicopters and light GA to business jets and airliners, ensuring your job tickets perfectly match the aircraft you love to fly.
-* **Fully Customisable:** Want to fly an aircraft not on the list? You can easily add your own custom airframes to your local database. 
-* **Customisable UI:** Choose a colour to suit your mood.
-### **Current Database includes:**
-* MSFS Hand-Crafted Airports - 124 Airports
-* Contrail MSFS 2024 Airports - 338 Airports
-* A selection of other Freeware and Payware Airports - 119 Airports
+### **Key Features**
 
+* **Extensive Scenery Database:** Built around a massive hand-picked database. Includes the full Contrail MSFS 2024 catalogue, Asobo hand-crafted airports, and a curated selection of top-tier 3rd-party and freeware airports. Direct store links are provided.
+* **Curated Aircraft Fleet:** Pre-loaded with popular, high-fidelity airframes ranging from helicopters and light GA to business jets and wide-body airliners.
+* **Dynamic Job Tickets & Loadsheets:** Every flight includes a custom mission manifest suited to your airframe's operational class. Passenger and cargo loads are dynamically calculated to ensure you strictly adhere to MTOW limits.
+* **Advanced Flight Profiling:** Automatically calculates safe cruising altitudes based on route distance climb caps and a built-in global mountain range safety floor to ensure safe transit over terrain.
+* **Custom Departure Override:** Leave the departure blank for a completely random route, or enter a specific ICAO to generate a valid flight departing from your current location.
+* **Helicopter Operations:** Full support for rotary-wing operations, including helipad-to-helipad dispatch and local A-to-A sightseeing, news, and patrol missions.
+* **One-Click SimBrief Integration:** Automatically pushes your generated flight plan, weight, and balance parameters directly into SimBrief. *(Note: SimBrief dispatch is disabled for helicopters).*
+* **Custom Database & Backups:** Expand the tool yourself. Add your own custom airframes and airports directly via the UI. Export and import your custom database configuration as a `.json` backup file.
+* **Customisable Interface:** Save your preferred ATC callsign for future sessions and adjust the UI accent colour to suit your setup.
 
 ---
 
-&copy; 2026 manicminer - [Support my work](https://buymeacoffee.com/manicminer/) at buymeacoffee.
+### **Current Core Database Includes:**
+
+* Full Contrail MSFS 2024 Airport Catalogue
+* MSFS Hand-Crafted Airports
+* Curated 3rd Party Payware & Freeware Airports
+
+---
+
+© 2026 manicminer - [Support my work](https://buymeacoffee.com/manicminer/) at buymeacoffee.
 
 *Created and maintained by manicminer. This is a free tool provided for the flight simulation community.*
 
+[2026-06-02 16:02:05]
