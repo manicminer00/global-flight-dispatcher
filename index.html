@@ -1,3 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Global Flight Dispatcher</title>
+    <style>
+        :root {
+            --accent-color: #2196f3; 
+            --accent-hover: #0b7dda;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .container {
+            background-color: #2d2d2d;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: var(--accent-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+			text-align: center;
+        }
+		.important-box {
+            background-color: #222;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            border-left: 5px solid #ff5722;  /* Overrides the left side border to be a thicker stripe */
+            display: flex;
+            align-items: center;       
+            justify-content: center;   
+            min-height: 80px;
+        }
+        #quoteDisplay {
+            text-align: center;
+            margin: 0; 
+            font-style: italic;
+			color: #777;
+            line-height: 1.5;
+        }
+        .control-group, .settings-group {
+            margin-bottom: 20px;
+            background: #222;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+        .settings-toggle-btn {
+            background-color: #555;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: inline-block;
+            width: auto;
+        }
+        .settings-panel {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #555;
+        }
+        .backup-btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .backup-btn {
+            background-color: #444;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .backup-btn:hover {
+            background-color: #555;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+        .field-hint {
+            font-size: 12px;
+            color: #aaa;
+            font-weight: normal;
+            display: inline;
+            margin-left: 5px;
+        }
+        .field-hint a {
+            color: #00bcd4;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        select, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-size: 15px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+        input[type="text"]:focus, select:focus, input[type="number"]:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+        .dispatch-release {
+            margin-top: 30px;
+            display: none;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #444;
+        }
+        .ticket-note {
+            background-color: #1b365d;
+            border-left: 5px solid #00bcd4;
+            padding: 15px;
+            margin: 15px 0;
+            font-style: italic;
+        }
+        .partner-link-box {
+            background-color: #2e1a47;
+            border-left: 5px solid #9c27b0;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .url-box {
+            background-color: #111;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            word-break: break-all;
+            border: 1px solid #333;
+            margin-top: 10px;
+        }
+        a.simbrief-btn {
+            display: inline-block;
+            background-color: #008cba;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        a.simbrief-btn:hover {
+            background-color: #007399;
+        }
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #444;
+        }
+        td, th {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #333;
+            width: 25%;
+        }
+        a.scenery-link {
+            color: #00bcd4;
+            text-decoration: underline;
+        }
+        a.scenery-link:hover {
+            color: #fff;
+        }
+        .db-stats-container { margin-bottom: 15px; }
+        .db-stat-item {
+            background-color: #2a2a2a;
+            color: var(--accent-color);
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .db-stat-item:hover { background-color: #333; }
+        .db-dropdown {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .db-dropdown ul { margin: 0; padding-left: 20px; color: #ccc; font-size: 13px; }
+        .db-dropdown li { margin-bottom: 4px; }
+    </style>
+    <script type="text/javascript" src="simbrief.apiv1.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Dynamic Global Flight Dispatcher (for MSFS 2024)</h1>
+    
+<div class="important-box">
+        <p id="quoteDisplay"></p>
+    </div>
+    <button type="button" class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Toggle Settings & Database Tools</button>
+    <div id="settingsPanel" class="settings-panel settings-group">
+        
+        <h3>Custom Database Backup</h3>
+        <div class="backup-btn-container">
+            <button type="button" class="backup-btn" onclick="exportDatabaseBackup()">📥 Export Backup (.json)</button>
+            <button type="button" class="backup-btn" onclick="document.getElementById('importFileInput').click()">📤 Import Backup File</button>
+            <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
+        </div>
+        
+        <div class="db-stats-container">
+            <div class="db-stat-item" onclick="toggleDropdown('customAirportsList')">
+                <span>📍 Saved Airports</span>
+                <span id="customAirportsCount">0</span>
+            </div>
+            <div id="customAirportsList" class="db-dropdown" style="display:none;"></div>
+            
+            <div class="db-stat-item" onclick="toggleDropdown('customAircraftList')">
+                <span>✈️ Saved Aircraft</span>
+                <span id="customAircraftCount">0</span>
+            </div>
+            <div id="customAircraftList" class="db-dropdown" style="display:none;"></div>
+        </div>
+
+        <hr style="border-color: #444; margin: 15px 0;">
+
+        <h3>Permanent Database</h3>
+        <div class="db-stats-container">
+            <div class="db-stat-item" onclick="toggleDropdown('coreAircraftList')">
+                <span>✈️ Aircraft</span>
+                <span id="coreAircraftCount">0</span>
+            </div>
+            <div id="coreAircraftList" class="db-dropdown" style="display:none;"></div>
+            
+            <div class="db-stat-item" onclick="toggleDropdown('coreHandcraftedList')">
+                <span>🛠️ Hand-Crafted Airports</span>
+                <span id="coreHandcraftedCount">0</span>
+            </div>
+            <div id="coreHandcraftedList" class="db-dropdown" style="display:none;"></div>
+
+            <div class="db-stat-item" onclick="toggleDropdown('coreThirdPartyList')">
+                <span>🛒 Third Party Airports</span>
+                <span id="coreThirdPartyCount">0</span>
+            </div>
+            <div id="coreThirdPartyList" class="db-dropdown" style="display:none;"></div>
+        </div>
+        
+        <hr style="border-color: #444; margin: 15px 0;">
+
+        <h3>Dispatcher Configuration</h3>
+        <label for="colorPicker">Interface Accent Color:</label>
+        <select id="colorPicker" onchange="changeAccentColor(this.value)">
+            <option value="#2364A1">Blue</option>
+            <option value="#349138">Green</option>
+            <option value="#C7751E">Orange</option>
+            <option value="#edcf1c">Yellow</option>
+            <option value="#616161">Dark Grey</option>
+        </select>
+        <hr style="border-color: #444; margin: 20px 0;">
+        
+        <h3>Add New Airport (to Local DB)</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newIcao">Airport ICAO:</label>
+                <input type="text" id="newIcao" placeholder="e.g. EGLL" maxlength="4">
+            </div>
+            <div>
+                <label for="newName">Airport Name:</label>
+                <input type="text" id="newName" placeholder="e.g. Heathrow">
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newRwyType">Runway Category / Helipad:</label>
+        <select id="newRwyType">
+            <option value="GA">Small Runway &lt;3000ft</option>
+            <option value="TURBO">Medium Runway 3000-6000ft</option>
+            <option value="BIZ JET">Biz Jet Runway (Specialized/Restricted)</option>
+            <option value="JET">Large Runway &gt;6000ft</option>
+            <option value="HELI">Helipad</option>
+        </select>
+            </div>
+            <div>
+                <label for="newSource">Database Tier Source:</label>
+                <select id="newSource">
+                    <option value="MSFS hand-crafted airport">MSFS hand-crafted airport</option>
+                    <option value="Contrail Store">Contrail Store</option>
+                    <option value="ORBX Store">ORBX Store</option>
+                    <option value="SimMarket Store">SimMarket Store</option>
+                    <option value="MSFS Marketplace">MSFS Marketplace</option>
+                    <option value="Other">Other Retail Channels</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" onclick="saveCustomAirport()" style="margin-bottom: 25px; margin-top: 10px;">Save Airport</button>
+        <hr style="border-color: #444; margin: 20px 0;">
+        <h3>Add New Aircraft (to Local DB)</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newAcName">Aircraft Name:</label>
+                <input type="text" id="newAcName" placeholder="e.g. Guimbal Cabri G2">
+            </div>
+            <div>
+                <label for="newAcIcao">Aircraft ICAO Code: <span class="field-hint">(<a href="https://www.icao.int/operational-safety/doc-8643-aircraft-type-designators/search" target="_blank">Look Up Aircraft</a> / <a href="https://www.helihub.com/data/icao-code/" target="_blank">Look Up Heli</a>)</span></label>
+                <input type="text" id="newAcIcao" placeholder="e.g. CABG" maxlength="4">
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newAcLength">Min Takeoff Distance (ft):</label>
+                <input type="number" id="newAcLength" placeholder="Refer to Aircraft Manual / 500ft for Helicopters">
+            </div>
+            <div>
+                <label for="newAcClass">Aircraft Operational Class:</label>
+                <select id="newAcClass">
+                    <option value="GA">GA / STOL (Short Runway &lt;3000ft)</option>
+                    <option value="TURBO">TURBO (Medium Runway 3000ft - 6000ft)</option>
+                    <option value="BIZ JET">BIZ JET (Medium Runway 3000ft - 6000ft)</option>
+                    <option value="JET">JET (Long Runway &gt;6000ft)</option>
+                    <option value="HELI">HELI (Helicopter / Helipad)</option>
+                </select>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button type="button" onclick="saveCustomAircraft()">Save Airframe</button>
+        </div>
+        <hr style="border-color: #444; margin: 20px 0;">
+        <div>
+            <button type="button" style="background-color: #bd1c11;" onclick="resetToBaselineAirports()">⚠️ Update default database and clear custom database - Export Backup first!⚠️</button>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+        </div>
+    </div>
+    <div class="control-group">
+        <label for="callsignInput">Enter Callsign (6 Characters): <span class="field-hint"><a onclick="event.preventDefault(); saveCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Save Callsign</a></span></label>
+        <input type="text" id="callsignInput" placeholder="e.g. AMA275" value="AMA275" maxlength="6" required>
+        <label for="aircraftSelect">Select Aircraft Type:</label>
+        <select id="aircraftSelect">
+            </select>
+			
+  <div style="display: block;"> <!-- Change to display: none; to hide again -->
+    <label for="depOverrideInput">Custom Departure Airport ICAO (Optional)</label>
+    <div style="margin-top: 5px; margin-bottom: 5px; text-align: left; font-size: 14px; color: #888;">N.B. If the airport is not already in the Permanent Database, you can 'Add New Airport (to Local DB)' in Settings</div>
+    <input type="text" id="depOverrideInput" placeholder="e.g. EGLL (Leave blank for random selection)" maxlength="4">
+</div>
+		
+        <button onclick="dispatchFlight()">🎲 Dynamically Generate Flightplan</button>
+    </div>
+    <div id="dispatchRelease" class="dispatch-release">
+        <h2>Flight Dispatch Details</h2>
+        <div id="partnerAdBox" class="partner-link-box" style="display:none;">
+            ℹ️ <span id="partnerLink">Scenery availability update metadata details display frame block.</span>
+        </div>
+        <table>
+            <tr><th>Callsign</th><td><strong id="outCallsign" style="color:var(--accent-color);">---</strong></td></tr>
+            <tr><th>Airframe Model</th><td id="outAirframe"></td></tr>
+            <tr><th>Flight Rules</th><td id="outRules"></td></tr>
+            <tr><th>Routing Block</th><td><strong id="outOrig"></strong> ➔ <strong id="outDest"></strong></td></tr>
+            <tr><th>Approximate Distance</th><td id="outDist"></td></tr>
+            <tr><th>Cleared Cruise Level</th><td><strong id="outAlt" style="color:#ff5722;"></strong></td></tr>
+            <tr><th>Magnetic Track Profile</th><td id="outTrack"></td></tr>
+            <tr><th>Scenery Links</th><td id="outScenery"></td></tr>
+        </table>
+        <h3>Job Ticket</h3>
+        <div class="ticket-note" id="outTicket"></div>
+<h3>Weight & Balance Loadsheet</h3>
+        <ul>
+            <li><strong>Assigned Passengers:</strong> <span id="outPax"></span></li>
+            <li><strong>Assigned Cargo Payload:</strong> <span id="outCargo"></span> kg</li>
+            <li><strong>Validation:</strong> Payload strictly mapped under limits in Metric KG.</li>
+        </ul>
+<hr style="border-color: #444;">
+<h3>SimBrief Dispatch Processing</h3>
+<p>Click below to pre-fill this dynamic plan into SimBrief:</p>
+<a id="outLink" class="simbrief-btn" target="_blank">Generate Flight Plan via SimBrief</a>
+<p style="margin-top:20px; font-size:12px; color:#aaa;">Manual Copy/Paste Dispatch Link:</p>
+<div class="url-box" id="outRawUrl"></div>
+    </div>
+    <div style="margin-top: 35px; text-align: center; font-size: 11px; color: #888;">
+        <strong>Disclaimer:</strong> This tool is strictly for flight simulation purposes only and must NOT be used for real-world aviation or dispatching. Third-party product names and links remain the property of their respective owners.
+    </div>
+<div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #888;">
+    <div style="text-align: left;">
+       <a href="https://buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" style="color: #2596be; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+            <img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="Buy Me A Coffee" style="height: 16px; width: auto;">
+            Show your Support - Buy Me A Coffee!
+        </a>
+    </div>
+    <div style="text-align: right;">
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v2.4
+    </div>
+</div>
+</div>
+<script>
+const preFlightQuotes = [
+    { text: "When once you have tasted flight, you will forever walk the earth with your eyes turned skyward, for there you have been, and there you will always long to return.", author: "Leonardo DaVinci" },
+    { text: "Man must rise above the Earth, to the top of the atmosphere and beyond, for only thus will he fully understand the world in which he lives.", author: "Socrates" },
+    { text: "I fly because it releases my mind from the tyranny of petty things.", author: "Antoine de Saint-Exupery" },
+    { text: "The desire to fly is an idea handed down to us by our ancestors who, in their grueling travels across trackless lands in prehistoric times, looked enviously on the birds soaring freely through space, at full speed, above all obstacles, on the infinite highway of the air.", author: "Wilbur Wright" },
+    { text: "Sometimes, flying feels too God-like to be attained by man. Sometimes, the world from above seems too beautiful, too wonderful, too distant for human eyes to see.", author: "Charles A. Lindbergh" },
+    { text: "Pilots are a rare kind of human. They leave the ordinary surface of the word, to purify their soul in the sky, and they come down to earth, only after receiving the communion of the infinite.", author: "Jose Maria Velasco Ibarra" },
+    { text: "Airspeed, altitude, and brains. Two are always needed to successfully complete the flight.", author: null },
+    { text: "Both optimists and pessimists contribute to our society. The optimist invents the airplane and the pessimist the parachute.", author: "Gil Stern" },
+    { text: "If black boxes survive air crashes, why don’t they make the whole plane out of that stuff?", author: "George Carlin" },
+    { text: "You’ve never been lost until you’ve been lost at Mach 3.", author: "Paul F. Crickmore" },
+    { text: "Learn from the mistakes of others. You won’t live long enough to make all of them yourself.", author: null },
+    { text: "You start with a bag full of luck and an empty bag of experience. The trick is to fill the bag of experience before you empty the bag of luck.", author: null },
+    { text: "Good judgment comes from experience. Unfortunately, the experience usually comes from bad judgment.", author: null },
+    { text: "There are old pilots and there are bold pilots. However, there are no old, bold pilots.", author: null },
+    { text: "The engine is the heart of an airplane, but the pilot is its soul.", author: "Walter Raleigh" },
+    { text: "Aviation is proof that given the will, we have the capacity to achieve the impossible.", author: "Eddie Rickenbacker" },
+    { text: "Flying is more than a sport and more than a job; flying is pure passion and desire.", author: "General Adolf Galland" },
+    { text: "The airplane stands for freedom, for joy, for the power to understand.", author: "Richard Bach" },
+    { text: "We who fly do so for the love of flying.", author: "Cecil Day-Lewis" },
+    { text: "Adventure is worthwhile in itself.", author: "Amelia Earhart" },
+    { text: "Flying is hypnotic and all pilots are victims to the spell.", author: "Ernest K. Gann" },
+    { text: "Life is like a landscape. You live in the midst of it but can describe it only from the vantage point of distance.", author: "Charles Lindbergh" },
+    { text: "I owned the world that hour as I rode over it – free of the earth, free of the mountains, free of the clouds, but how inseparably I was bound to them.", author: "Charles Lindbergh" },
+    { text: "Real freedom lies in wildness, not in civilization.", author: "Charles Lindbergh" },
+    { text: "Flying is learning how to throw yourself at the ground and miss.", author: "Douglas Adams" }
+];
+
+function displayRandomQuote() {
+    const quoteObj = preFlightQuotes[Math.floor(Math.random() * preFlightQuotes.length)];
+    const displayEl = document.getElementById("quoteDisplay");
+    if (quoteObj.author) {
+        displayEl.innerHTML = `"${quoteObj.text}" - <strong>${quoteObj.author}</strong>`;
+    } else {
+        displayEl.innerHTML = `"${quoteObj.text}"`;
+    }
+}
+function toggleSettingsPanel() {
+    const p = document.getElementById("settingsPanel");
+    p.style.display = (p.style.display === "block") ? "none" : "block";
+}
+
+function toggleDropdown(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateDatabaseStats() {
+    const coreAcHtml = Object.values(coreFleetSpecs).map(a => `<li>${a.name}</li>`).join('');
+    document.getElementById('coreAircraftCount').innerText = Object.keys(coreFleetSpecs).length;
+    document.getElementById('coreAircraftList').innerHTML = `<ul>${coreAcHtml}</ul>`;
+
+    const coreHandcrafted = seedAirportDatabase.filter(a => a.tag === 'Hand-Crafted' || a.tag === 'Both');
+    const coreThirdParty = seedAirportDatabase.filter(a => a.tag === 'Third Party' || a.tag === 'Both');
+    
+    document.getElementById('coreHandcraftedCount').innerText = coreHandcrafted.length;
+    document.getElementById('coreHandcraftedList').innerHTML = `<ul>${coreHandcrafted.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`;
+    
+    document.getElementById('coreThirdPartyCount').innerText = coreThirdParty.length;
+    document.getElementById('coreThirdPartyList').innerHTML = `<ul>${coreThirdParty.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`;
+
+    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_airports")) || [];
+    const seedIcaos = seedAirportDatabase.map(a => a.icao);
+    const actualCustomAirports = customAirports.filter(a => !seedIcaos.includes(a.icao));
+    
+    document.getElementById('customAirportsCount').innerText = actualCustomAirports.length;
+    document.getElementById('customAirportsList').innerHTML = actualCustomAirports.length > 0 
+        ? `<ul>${actualCustomAirports.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>` 
+        : `<ul><li>No custom airports saved.</li></ul>`;
+
+    const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
+    const customAcKeys = Object.keys(customFleet);
+    
+    document.getElementById('customAircraftCount').innerText = customAcKeys.length;
+    document.getElementById('customAircraftList').innerHTML = customAcKeys.length > 0
+        ? `<ul>${Object.values(customFleet).map(a => `<li>${a.name}</li>`).join('')}</ul>`
+        : `<ul><li>No custom aircraft saved.</li></ul>`;
+}
+
+// Memory variable to prevent repetition
+let lastMissionType = null;
+const seedAirportDatabase = [
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "TURBO", length: 4300, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
 { icao: "0CN2", name: "Sutter Butte Dusters Airport", rwy: "GA", length: 2000, lat: 39.119, lon: -121.652, source: "Core", tag: "Third Party", linkText: "Backwood Studios via Contrail", url: "https://contrail.shop/search?q=0CN2" },
 { icao: "0OR8", name: "Sutton On Rogue Airport", rwy: "GA", length: 2000, lat: 42.593, lon: -122.781, source: "Core", tag: "Third Party", linkText: "Backwood Studios via Contrail", url: "https://contrail.shop/search?q=0OR8" },
@@ -581,3 +1105,414 @@
 { icao: "ZUGY", name: "Guiyang Longdongbao Airport & City", rwy: "JET", length: 10500, lat: 26.538, lon: 106.800, source: "Core", tag: "Third Party", linkText: "SamScene3D via Contrail", url: "https://contrail.shop/search?q=ZUGY" },
 { icao: "ZULS", name: "Tibet Lhasa Gonggar Airport", rwy: "JET", length: 13123, lat: 29.297, lon: 90.912, source: "Core", tag: "Third Party", linkText: "SamScene3D via Contrail", url: "https://contrail.shop/search?q=ZULS" },
 { icao: "ZYHB", name: "Harbin Taiping Airport & City", rwy: "JET", length: 10500, lat: 45.623, lon: 126.250, source: "Core", tag: "Third Party", linkText: "SamScene3D via Contrail", url: "https://contrail.shop/search?q=ZYHB" }
+];
+
+const coreFleetSpecs = {
+    "PA24": { name: "A2A Comanche (PA24)", maxPax: 3, maxCargo: 150, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 1200, class: "GA" },
+    "AEST": { name: "A2A Aerostar 600 (AEST)", maxPax: 5, maxCargo: 250, minD: 60, maxD: 120, minAlt: 5000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 2000, class: "GA" },
+    "BE60": { name: "Black Square Piston Grand Duke (BE60)", maxPax: 5, maxCargo: 380, minD: 60, maxD: 100, minAlt: 10000, maxAlt: 20000, rules: "IFR", minRunwayLength: 1500, class: "GA" },
+    "B60T": { name: "Black Square Turbine Duke (B60T)", maxPax: 5, maxCargo: 380, minD: 70, maxD: 150, minAlt: 15000, maxAlt: 28000, rules: "IFR", minRunwayLength: 1000, class: "TURBO" },
+    "B06T": { name: "Black Square Caravan (B06T)", maxPax: 12, maxCargo: 1200, minD: 30, maxD: 80, minAlt: 5000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 2500, class: "TURBO" },
+    "SF50": { name: "FlightFX Vision Jet G2+ (SF50)", maxPax: 4, maxCargo: 300, minD: 70, maxD: 150, minAlt: 15000, maxAlt: 20000, rules: "IFR", minRunwayLength: 3100, class: "BIZ JET" },
+    "TBM8": { name: "Black Square TBM850 (TBM8)", maxPax: 5, maxCargo: 420, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 31000, rules: "IFR", minRunwayLength: 2380, class: "TURBO" },
+    "STAR": { name: "Black Square Starship (STAR)", maxPax: 8, maxCargo: 650, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 35000, rules: "IFR", minRunwayLength: 3112, class: "TURBO" },
+    "P180": { name: "FlightFX P180 Avanti (P180)", maxPax: 7, maxCargo: 500, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 41000, rules: "IFR", minRunwayLength: 3300, class: "BIZ JET" },
+    "SPIT": { name: "Flying Iron Spitfire (SPIT)", maxPax: 0, maxCargo: 80, minD: 60, maxD: 180, minAlt: 15000, maxAlt: 20000, rules: "IFR", minRunwayLength: 1000, class: "GA" },
+    "HDJT": { name: "Honda Jet (HDJT)", maxPax: 5, maxCargo: 350, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 3500, class: "BIZ JET" },
+    "E55P": { name: "FSReborn Phenom 300 (E55P)", maxPax: 7, maxCargo: 550, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 3209, class: "BIZ JET" },
+    "C750": { name: "FlightFX Citation X (C750)", maxPax: 9, maxCargo: 850, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 5200, class: "BIZ JET" },
+    "A320": { name: "Fenix Airbus A320 (A320)", maxPax: 160, maxCargo: 2200, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 6000, class: "JET" },
+    "B736": { name: "PMDG Boeing 737-600 (B736)", maxPax: 110, maxCargo: 1800, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 6000, class: "JET" },
+    "PC12": { name: "SWS PC-12/47 (PC12)", maxPax: 9, maxCargo: 600, minD: 100, maxD: 280, minAlt: 15000, maxAlt: 25000, rules: "IFR", minRunwayLength: 1475, class: "TURBO" },
+    "C172": { name: "MSFS C172 G1000 (C172)", maxPax: 3, maxCargo: 120, minD: 20, maxD: 80, minAlt: 3000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 1630, class: "GA" },
+    "H145": { name: "HPG H145 Helicopter (H145)", maxPax: 8, maxCargo: 400, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+    "LAMA": { name: "Llama Helicopter (LAMA)", maxPax: 4, maxCargo: 300, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+    "ALO3": { name: "Alouette Helicopter (ALO3)", maxPax: 6, maxCargo: 350, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+    "R22":  { name: "R22 Helicopter (R22)", maxPax: 1, maxCargo: 50, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 4000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" }
+};
+const missionMatrix = [
+    { type: 1, name: "Medical Research", desc: "transporting rare serum samples", detail: "These unstable cultures require a strictly regulated cabin and careful transport.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 2, name: "Medical Transport", desc: "rushing specialized surgical equipment", detail: "A remote clinic needs this equipment immediately to stabilize a patient.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 3, name: "Military Research", desc: "transferring top-secret flight data", detail: "The encrypted drives contain telemetry logs from a prototype aircraft.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 4, name: "Military Transport", desc: "moving heavy tactical components", detail: "These parts are required for an immediate defensive fortification.", weight: 8, allowedClasses: ["JET"] },
+    { type: 5, name: "Emergency Relief", desc: "delivering life-saving nutrition packs", detail: "Flooding has cut off the local supply chain; these are desperately needed.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 6, name: "Celebrity Charter", desc: "accommodating superstar {name} on tour", detail: "{name} is exhausted and has requested a silent, luxury cabin.", weight: 7, allowedClasses: ["BIZ JET", "JET", "HELI"] },
+    { type: 7, name: "Propaganda Ops", desc: "dropping localized awareness flyers", detail: "The goal is to inform the local populace of upcoming policy changes.", weight: 5, allowedClasses: ["GA", "TURBO", "HELI"] },
+    { type: 8, name: "Government Documents", desc: "securing urgent diplomatic files", detail: "These are the final signed peace treaties for the summit.", weight: 8, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 9, name: "Endangered Animal Rescue", desc: "rescuing an endangered animal", detail: "This cub was orphaned by poaching and needs safe transfer to a sanctuary.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 10, name: "Military Hardware", desc: "relocating a modular armored transport unit", detail: "This unit is required at the depot for immediate assembly to ensure readiness.", weight: 3, allowedClasses: ["JET"] },
+    { type: 11, name: "Medevac Mission", desc: "airlifting a critical patient", detail: "The patient requires a smooth flight to prevent further complications.", weight: 8, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 12, name: "Black Ops", desc: "securing extraterrestrial bio-matter", detail: "You are delivering organic remains recovered from a crash site; maintain isolation protocols. You have been warned!", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 13, name: "Luxury Goods", desc: "recovering a lost artifact", detail: "This artifact is a priceless treasure missing for thousands of years. Handle with care and do not let this fall into the wrong hands!", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
+    { type: 14, name: "Tech Delivery", desc: "delivering quantum-processing chips", detail: "These chips are heat-sensitive and must be kept below 5°C throughout the flight.", weight: 4, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 15, name: "Sports Charter", desc: "transporting star athlete {name} for the finals", detail: "{name} needs to arrive in peak condition; please ensure a smooth flight profile.", weight: 3, allowedClasses: ["BIZ JET", "JET", "HELI"] },
+    { type: 16, name: "Botanical Mission", desc: "delivering a rare protected sapling", detail: "This species was thought extinct and is the center-piece of the upcoming conservation summit.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 17, name: "Fashion Logistics", desc: "delivering haute couture for a runway show", detail: "The garments are extremely fragile; ensure cabin pressurization remains perfectly stable.", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 18, name: "Film Production", desc: "transporting original film negatives", detail: "These are the only original master master negatives in existence; keep them secure at all times.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
+    { type: 19, name: "Historical Archiving", desc: "relocating ancient scrolls", detail: "The scrolls are degrading rapidly; they must reach the lab before they disintegrate.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET"] },
+    { type: 20, name: "Prototype Testing", desc: "moving a high-performance engine prototype", detail: "This engine is a brand-new design; engineers are waiting on the tarmac to begin testing.", weight: 4, allowedClasses: ["TURBO", "BIZ JET", "JET"] },
+    { type: 21, name: "Culinary Express", desc: "transporting vintage wines for a tasting", detail: "This vintage is highly delicate; minor vibrations could ruin the chemical balance of the wine.", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET"] },
+    { type: 22, name: "Astro-Research", desc: "returning a retired satellite component", detail: "The component is slightly radioactive and must stay inside the provided lead-lined container.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET"] },
+    { type: 23, name: "Corporate Merger", desc: "flying key negotiators to a merger", detail: "The atmosphere in the cabin is expected to be tense; keep the flight efficient and professional.", weight: 5, allowedClasses: ["BIZ JET", "JET", "HELI"] },
+    { type: 24, name: "City Sightseeing Tour", desc: "conducting a local aerial tour", detail: "Passengers are eager to see the local landmarks from above.", weight: 15, allowedClasses: ["GA", "HELI"], isLocal: true },
+    { type: 25, name: "Aerial Photography", desc: "providing an aerial platform for a local photographer", detail: "The photographer needs smooth orbits around key points of interest.", weight: 10, allowedClasses: ["GA", "HELI"], isLocal: true },
+    { type: 26, name: "Traffic & News Patrol", desc: "monitoring local rush hour conditions", detail: "Fly a steady local circuit so the onboard reporter can broadcast traffic updates.", weight: 10, allowedClasses: ["HELI"], isLocal: true },
+    { type: 27, name: "Pipeline/Powerline Inspection", desc: "surveying local infrastructure grids", detail: "Maintain low altitude along the designated inspection corridor and report any structural anomalies.", weight: 8, allowedClasses: ["HELI"], isLocal: true }
+];
+const cargoItems = [
+    "high-end Italian fabrics", "Swiss timepiece mechanisms", "high-capacity solid-state arrays", 
+    "aerospace composite fasteners", "sensitive optical sensors", "automotive ECU diagnostic kits", 
+    "rare vintage collector wines", "medical trial equipment", "marine racing components"
+];
+const names = ["Margot Robbie", "Keanu Reeves", "Zendaya", "Tom Hardy", "Cillian Murphy", "Lara Croft", "Raul from FSReborn", "Taylor Swift", "Brad Pitt", "Lenny Kravitz", "Ellen DeGeneres", "Jennifer Aniston", "Reese Witherspoon", "Cate Blanchett", "Matt Damon", "Robert Downey Jr", "Angelina Jolie", "Monica Lewinsky", "Salma Hayek", "Elizabeth Hurley", "Gillian Anderson"];
+const athletes = ["Lewis Hamilton", "Lionel Messi", "LeBron James", "Serena Williams", "Cristiano Ronaldo", "Simone Biles", "Max Verstappen", "Stephen Curry", "Novak Djokovic", "Usain Bolt"];
+let activeAirportDatabase = [];
+let activeFleetSpecs = {};
+window.onload = function() {
+    loadSettings();
+    rebuildActiveDatabase();
+    rebuildFleetDropdown();
+    updateDatabaseStats();
+    displayRandomQuote();
+};
+function saveCallsign() {
+    const cs = document.getElementById("callsignInput").value.trim().toUpperCase();
+    if (cs.length < 3) {
+        alert("Please specify a valid callsign prefix.");
+        return;
+    }
+    localStorage.setItem("dispatcher_saved_callsign", cs);
+    alert(`Callsign ${cs} saved to local memory configuration.`);
+}
+function loadSettings() {
+    const storedColor = localStorage.getItem("dispatcher_accent");
+    if (storedColor) {
+        document.getElementById("colorPicker").value = storedColor;
+        changeAccentColor(storedColor);
+    }
+    const savedCallsign = localStorage.getItem("dispatcher_saved_callsign");
+    if (savedCallsign) {
+        document.getElementById("callsignInput").value = savedCallsign;
+    }
+}
+function saveCustomAirport() {
+    const icao = document.getElementById("newIcao").value.trim().toUpperCase();
+    const name = document.getElementById("newName").value.trim();
+    const rwy = document.getElementById("newRwyType").value;
+    const source = document.getElementById("newSource").value;
+    if(icao.length !== 4 || name === "") {
+        alert("Please enter a valid 4-character ICAO code and Airport Name.");
+        return;
+    }
+    let customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_airports")) || [];
+    customAirports = customAirports.filter(ap => ap.icao !== icao);
+    
+    // Evaluate if the selected source is MSFS or a Third Party store
+    let determinedTag = source === "MSFS hand-crafted airport" ? "Hand-Crafted" : "Third Party";
+    let determinedLinkText = source === "MSFS hand-crafted airport" ? undefined : source;
+    customAirports.push({
+        icao: icao,
+        name: name,
+        rwy: rwy,
+        lat: 51.5 + (Math.random() - 0.5) * 4, 
+        lon: 0.0 + (Math.random() - 0.5) * 4,
+        source: source,
+        tag: determinedTag,
+        linkText: determinedLinkText
+    });
+    localStorage.setItem("dispatcher_custom_airports", JSON.stringify(customAirports));
+    alert(`${icao} added successfully to local memory!`);
+    document.getElementById("newIcao").value = "";
+    document.getElementById("newName").value = "";
+    rebuildActiveDatabase();
+    updateDatabaseStats();
+}
+function saveCustomAircraft() {
+    const name = document.getElementById("newAcName").value.trim();
+    const icao = document.getElementById("newAcIcao").value.trim().toUpperCase();
+    const minLength = document.getElementById("newAcLength").value;
+    const acClass = document.getElementById("newAcClass").value;
+    if (!name || icao.length < 2 || !minLength) {
+        alert("Please completely fill out all Aircraft parameter inputs.");
+        return;
+    }
+    let customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
+	customFleet[icao] = {
+        name: `${name} (${icao})`,
+        maxPax: acClass === "JET" ? 140 : (acClass === "HELI" ? 4 : (acClass === "BIZ JET" ? 8 : 5)),
+        maxCargo: acClass === "JET" ? 1800 : (acClass === "HELI" ? 250 : (acClass === "BIZ JET" ? 600 : 300)),
+        minD: acClass === "HELI" ? 5 : (acClass === "JET" ? 150 : (acClass === "BIZ JET" ? 150 : 20)),
+        maxD: acClass === "HELI" ? 40 : (acClass === "JET" ? 320 : (acClass === "BIZ JET" ? 320 : 350)),
+        minAlt: acClass === "HELI" ? 500 : (acClass === "JET" ? 28000 : (acClass === "BIZ JET" ? 25000 : 6000)),
+        maxAlt: acClass === "HELI" ? 4000 : (acClass === "JET" ? 40000 : (acClass === "BIZ JET" ? 45000 : 12000)),
+        rules: acClass === "HELI" ? "VFR Helicopter" : (acClass === "GA" ? "VFR/Scenic" : "IFR"),
+        minRunwayLength: parseInt(minLength),
+        class: acClass 
+    };
+    localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(customFleet));
+    alert(`${icao} updated successfully in local fleet configurations.`);
+    rebuildFleetDropdown();
+    updateDatabaseStats();
+}
+function resetToBaselineAirports() {
+    if (confirm("This will overwrite your custom airports with the full original master list. Proceed?")) {
+        localStorage.setItem("dispatcher_custom_airports", JSON.stringify(seedAirportDatabase));
+        rebuildActiveDatabase();
+        updateDatabaseStats();
+        alert("System airports registry seeded successfully!");
+    }
+}
+function rebuildActiveDatabase() {
+    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_airports")) || [];
+    if (customAirports.length === 0) {
+        localStorage.setItem("dispatcher_custom_airports", JSON.stringify(seedAirportDatabase));
+        activeAirportDatabase = [...seedAirportDatabase];
+    } else {
+        activeAirportDatabase = [...customAirports];
+    }
+}
+function rebuildFleetDropdown() {
+    const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
+    activeFleetSpecs = { ...coreFleetSpecs, ...customFleet };
+    const sortedFleetEntries = Object.entries(activeFleetSpecs).sort((a, b) => a[1].name.localeCompare(b[1].name));
+    const selectEl = document.getElementById("aircraftSelect");
+    selectEl.innerHTML = ""; 
+    for (const [code, spec] of sortedFleetEntries) {
+        const option = document.createElement("option");
+        option.value = code;
+        option.innerText = spec.name;
+        selectEl.appendChild(option);
+    }
+}
+function exportDatabaseBackup() {
+    const backupObject = {
+        airports: JSON.parse(localStorage.getItem("dispatcher_custom_airports") || "[]"),
+        fleet: JSON.parse(localStorage.getItem("dispatcher_custom_fleet") || "{}")
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObject, null, 2));
+    const a = document.createElement('a');
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", "dispatcher_backup.json");
+    a.click();
+}
+function importDatabaseBackup(inputElement) {
+    const file = inputElement.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const d = JSON.parse(e.target.result);
+        if (d.airports) localStorage.setItem("dispatcher_custom_airports", JSON.stringify(d.airports));
+        if (d.fleet) localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(d.fleet));
+        rebuildActiveDatabase();
+        rebuildFleetDropdown();
+        updateDatabaseStats();
+        alert("Backup imported successfully!");
+    };
+    reader.readAsText(file);
+}
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 3440.065; 
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * R;
+}
+function changeAccentColor(colorHex) {
+    document.documentElement.style.setProperty('--accent-color', colorHex);
+    document.documentElement.style.setProperty('--accent-hover', colorHex);
+    localStorage.setItem("dispatcher_accent", colorHex);
+}
+function calculateBearing(lat1, lon1, lat2, lon2) {
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
+    const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) - Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon);
+    return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
+}
+function formatScenery(apt) {
+    const linkText = apt.linkText ? apt.linkText : 'Store';
+    const formattedLink = apt.url ? `<a href="${apt.url}" target="_blank" class="scenery-link">${linkText}</a>` : linkText;
+
+    if (apt.tag === 'Both') {
+        return `${apt.icao} - Hand-crafted / ${formattedLink}`;
+    } else if (apt.tag === 'Third Party') {
+        return `${apt.icao} - ${formattedLink}`;
+    } else {
+        return `${apt.icao} - Hand-Crafted`;
+    }
+}
+function dispatchFlight() {
+    const callsignRaw = document.getElementById("callsignInput").value.trim().toUpperCase();
+    const depOverride = document.getElementById("depOverrideInput").value.trim().toUpperCase();
+    if (!callsignRaw) {
+        alert("Please supply an operational callsign parameter.");
+        return;
+    }
+    const type = document.getElementById("aircraftSelect").value;
+    const spec = activeFleetSpecs[type]; 
+
+const validAirports = activeAirportDatabase.filter(ap => {
+    let allowedClasses = [];
+    
+    // Map airport category to allowed aircraft classes
+    switch(ap.rwy) {
+        case "GA":
+            allowedClasses = ["GA", "HELI"];
+            break;
+        case "TURBO":
+            allowedClasses = ["GA", "TURBO", "HELI"];
+            break;
+        case "BIZ JET":
+            allowedClasses = ["GA", "TURBO", "BIZ JET", "HELI"];
+            break;
+        case "JET":
+            allowedClasses = ["GA", "TURBO", "BIZ JET", "JET", "HELI"];
+            break;
+        case "HELI":
+            allowedClasses = ["HELI"];
+            break;
+    }
+
+    // 1. Check if the aircraft's class is allowed at this airport category
+    const isAllowedType = allowedClasses.includes(spec.class);
+    
+    // 2. Enforce the runway length safeguard limit
+    const meetsLength = ap.length ? (ap.length >= spec.minRunwayLength) : true;
+    
+    return isAllowedType && meetsLength;
+});
+    
+    if (depOverride && !activeAirportDatabase.some(ap => ap.icao === depOverride)) {
+        alert(`Custom Departure Airport ${depOverride} is not currently included in the master database. You can add it manually in Settings.`);
+        return;
+    }
+let candidatePairs = [];
+    for (let src of validAirports) {
+        if (depOverride && src.icao !== depOverride) continue;
+        for (let dst of validAirports) {
+            
+            // If it's a Helicopter, allow local round-trip flights (A to A)
+            if (src.icao === dst.icao && spec.class === "HELI") {
+                // Assign a fake round-trip distance of 25nm (approx 15-20 mins)
+                candidatePairs.push({ src: src, dst: src, dist: 25 });
+                continue; 
+            }
+            
+            // Standard Fixed-Wing logic (A to B) - Do not allow same airport
+            if (src.icao === dst.icao) continue;
+            
+            const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
+            if (dist >= spec.minD && dist <= spec.maxD) {
+                candidatePairs.push({ src, dst, dist });
+            }
+        }
+    }
+    if (candidatePairs.length === 0) {
+        alert(`No valid routes found matching current physical fleet configurations.`);
+        return;
+    }
+    const selectedRoute = candidatePairs[Math.floor(Math.random() * candidatePairs.length)];
+    const origin = selectedRoute.src;
+    const destination = selectedRoute.dst;
+    const distanceNm = Math.round(selectedRoute.dist);
+    const bearing = calculateBearing(origin.lat, origin.lon, destination.lat, destination.lon);
+    const isEasterly = (bearing >= 0 && bearing < 180);
+
+    // --- NEW ALTITUDE LOGIC ---
+let baseThousands = Math.floor((Math.random() * (spec.maxAlt - spec.minAlt + 1) + spec.minAlt) / 1000);
+let altValue;
+
+if (spec.rules.includes("VFR")) {
+    if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
+    if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
+    altValue = (baseThousands * 1000) + 500;
+} else {
+    if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
+    if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
+    altValue = baseThousands * 10;
+}
+// --------------------------
+    
+let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
+    
+    // Calculate how full the passenger cabin is as a percentage (0.0 to 1.0)
+    let paxLoadFactor = spec.maxPax > 0 ? (pax / spec.maxPax) : 0;
+    
+    // Scale down the max allowed cargo based on the passenger load.
+    // E.g., if the cabin is 100% full, cargo capacity is reduced by 80% to prevent MTOW errors.
+    let maxAvailableCargo = spec.maxCargo * (1 - paxLoadFactor);
+    
+    // Ensure cargo doesn't drop below the base 40kg minimum
+    let cargoKg = Math.floor(Math.random() * Math.max(0, maxAvailableCargo - 40)) + 40;
+    const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
+    const selectedItem = cargoItems[Math.floor(Math.random() * cargoItems.length)];
+	
+// --- Dynamic Aircraft-Specific Filter Logic ---
+    const currentClass = spec.class || "GA"; 
+    const isLocalFlight = (origin.icao === destination.icao);
+    
+    let filteredMissions = missionMatrix.filter(m => m.allowedClasses.includes(currentClass));
+    
+    // Filter for local vs A-to-B missions
+    if (isLocalFlight) {
+        const localMissions = filteredMissions.filter(m => m.isLocal);
+        if (localMissions.length > 0) {
+            filteredMissions = localMissions;
+        }
+    } else {
+        filteredMissions = filteredMissions.filter(m => !m.isLocal);
+    }
+
+    // Fallback switch in case custom structural data drops parameters unexpectedly
+    const finalSelectionPool = filteredMissions.length > 0 ? filteredMissions : missionMatrix.filter(m => !m.isLocal);
+    
+    const totalWeight = finalSelectionPool.reduce((sum, m) => sum + m.weight, 0);
+    let randomNum = Math.random() * totalWeight;
+    let chosenMission = finalSelectionPool[0];
+    for (let m of finalSelectionPool) {
+        if (randomNum < m.weight) {
+            chosenMission = m;
+            break;
+        }
+        randomNum -= m.weight;
+    }
+    
+    let randomName = names[Math.floor(Math.random() * names.length)];
+    let randomAthlete = athletes[Math.floor(Math.random() * athletes.length)];
+    let processedDesc = chosenMission.desc.replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName);
+    let processedDetail = chosenMission.detail.replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName);
+    let jobTicket = "";
+    
+    if (spec.rules.includes("VFR")) {
+        if (isLocalFlight) {
+            jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name} (Local Visual Flight)<br><strong>Manifest:</strong> ${processedDesc} (${pax} Pass / Baggage limits applied)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Good day, Captain. This is a local operations flight operating out of ${origin.name}. ${processedDetail} Maintain a safe altitude, keep clear of restricted airspace, and return to base when the block time is up.`;
+        } else {
+            jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name} (Visual Flight Profile)<br><strong>Manifest:</strong> ${processedDesc} (${pax} Pass / Baggage limits applied)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Good day, Captain. This is a visual low-level run tracking out from ${origin.name} toward ${destination.name}. ${processedDetail} Keep your eyes open for points of interest along the route and keep clear of cloud decks.`;
+        }
+    } else {
+        jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name}<br><strong>Manifest:</strong> ${processedDesc} (${cargoKg} kg load block)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Welcome to the cockpit, Captain. Airway logs are locked down for this transit across the network from ${origin.icao} to ${destination.icao}. ${processedDetail} Follow standard transitions, watch your spacing tags, and stick exactly to assigned vertical profiles.`;
+    }
+    
+    // UI Updates
+    document.getElementById("outCallsign").innerText = callsignRaw;
+    document.getElementById("outAirframe").innerText = spec.name;
+    document.getElementById("outRules").innerText = spec.rules;
+    document.getElementById("outOrig").innerText = `${origin.icao} (${origin.name})`;
+    document.getElementById("outDest").innerText = `${destination.icao} (${destination.name})`;
+    document.getElementById("outDist").innerText = `${distanceNm} nm`;
+    document.getElementById("outAlt").innerText = spec.rules.includes("VFR") ? altValue + " ft" : "FL" + altValue;
+    document.getElementById("outTrack").innerText = Math.round(bearing) + "°";
+    document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
+    document.getElementById("outPax").innerText = pax > 0 ? `${pax} pax` : "0 (Solo)";
+    document.getElementById("outCargo").innerText = cargoKg;
+    document.getElementById("outTicket").innerHTML = jobTicket;
+    const cleanAlt = altValue.toString().replace(/[^0-9]/g, ''); 
+    const cargoParam = (cargoKg / 1000).toFixed(3);
+    const simbriefUrl = `https://www.simbrief.com/system/dispatch.php?share=1&type=${type}&orig=${origin.icao}&dest=${destination.icao}&callsign=${callsignRaw}&fl=${cleanAlt}&pax=${pax}&cargo=${cargoParam}&units=KGS`;
+    const linkEl = document.getElementById("outLink");
+    linkEl.href = simbriefUrl;
+    document.getElementById("outRawUrl").innerText = simbriefUrl;
+    document.getElementById("dispatchRelease").style.display = "block";
+}
+</script>
+</body>
+</html>
