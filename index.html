@@ -1532,7 +1532,9 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     document.getElementById("outOrig").innerText = `${origin.icao} (${origin.name})`;
     document.getElementById("outDest").innerText = `${destination.icao} (${destination.name})`;
     document.getElementById("outDist").innerText = `${distanceNm} nm`;
-    document.getElementById("outAlt").innerText = spec.rules.includes("VFR") ? altValue + " ft" : "FL" + altValue;
+document.getElementById("outAlt").innerText = spec.rules.includes("VFR") 
+    ? altValue.toLocaleString('en-US') + " ft" 
+    : "FL" + altValue.toLocaleString('en-US');
     document.getElementById("outTrack").innerText = Math.round(bearing) + "°";
     document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
     document.getElementById("outPax").innerText = pax > 0 ? `${pax} pax` : "0 (Solo)";
