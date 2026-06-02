@@ -160,13 +160,6 @@
             margin: 15px 0;
             font-style: italic;
         }
-        .partner-link-box {
-            background-color: #2e1a47;
-            border-left: 5px solid #9c27b0;
-            padding: 12px;
-            margin: 15px 0;
-            border-radius: 4px;
-        }
         .url-box {
             background-color: #111;
             padding: 10px;
@@ -422,16 +415,13 @@
 <!-- Start of Dispatch -->
     </div> <div id="dispatchRelease" class="dispatch-release">
         <h2>Flight Dispatch Details</h2>
-        <div id="partnerAdBox" class="partner-link-box" style="display:none;">
-            ℹ️ <span id="partnerLink">Scenery availability update metadata details display frame block.</span>
-        </div>
         <table>
             <tr><th>Callsign</th><td><strong id="outCallsign" style="color:var(--accent-color);">---</strong></td></tr>
-            <tr><th>Airframe Model</th><td id="outAirframe"></td></tr>
+            <tr><th>Airframe</th><td id="outAirframe"></td></tr>
             <tr><th>Flight Rules</th><td id="outRules"></td></tr>
-            <tr><th>Routing Block</th><td><strong id="outOrig"></strong> ➔ <strong id="outDest"></strong></td></tr>
-            <tr><th>Approximate Distance</th><td id="outDist"></td></tr>
-            <tr><th>Cleared Cruise Level</th><td><strong id="outAlt" style="color:#ff5722;"></strong></td></tr>
+            <tr><th>Routing</th><td><strong id="outOrig"></strong> ➔ <strong id="outDest"></strong></td></tr>
+            <tr><th>Approx. Distance</th><td id="outDist"></td></tr>
+            <tr><th>Altitude</th><td><strong id="outAlt" style="color:#ff5722;"></strong></td></tr>
             <tr><th>Magnetic Track Profile</th><td id="outTrack"></td></tr>
             <tr><th>Scenery Links</th><td id="outScenery"></td></tr>
         </table>
@@ -463,7 +453,7 @@
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v2.9
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v3.0
     </div>
 </div>
 </div>
@@ -1193,6 +1183,8 @@ const cargoItems = [
 ];
 const names = ["Margot Robbie", "Keanu Reeves", "Zendaya", "Tom Hardy", "Cillian Murphy", "Lara Croft", "Raul from FSReborn", "Taylor Swift", "Brad Pitt", "Lenny Kravitz", "Ellen DeGeneres", "Jennifer Aniston", "Reese Witherspoon", "Cate Blanchett", "Matt Damon", "Robert Downey Jr", "Angelina Jolie", "Monica Lewinsky", "Salma Hayek", "Elizabeth Hurley", "Gillian Anderson"];
 const athletes = ["Lewis Hamilton", "Lionel Messi", "LeBron James", "Serena Williams", "Cristiano Ronaldo", "Simone Biles", "Max Verstappen", "Stephen Curry", "Novak Djokovic", "Usain Bolt"];
+
+<!-- end of missions -->
 let activeAirportDatabase = [];
 let activeFleetSpecs = {};
 window.onload = function() {
@@ -1202,6 +1194,7 @@ window.onload = function() {
     updateDatabaseStats();
     displayRandomQuote();
 };
+
 function saveCallsign() {
     const cs = document.getElementById("callsignInput").value.trim().toUpperCase();
     if (cs.length < 3) {
@@ -1470,14 +1463,14 @@ if (spec.rules.includes("VFR")) {
     
 let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     
-    // Calculate how full the passenger cabin is as a percentage (0.0 to 1.0)
+// Calculate how full the passenger cabin is as a percentage (0.0 to 1.0)
     let paxLoadFactor = spec.maxPax > 0 ? (pax / spec.maxPax) : 0;
     
-    // Scale down the max allowed cargo based on the passenger load.
-    // E.g., if the cabin is 100% full, cargo capacity is reduced by 80% to prevent MTOW errors.
+// Scale down the max allowed cargo based on the passenger load.
+// E.g., if the cabin is 100% full, cargo capacity is reduced by 80% to prevent MTOW errors.
     let maxAvailableCargo = spec.maxCargo * (1 - paxLoadFactor);
     
-    // Ensure cargo doesn't drop below the base 40kg minimum
+// Ensure cargo doesn't drop below the base 40kg minimum
     let cargoKg = Math.floor(Math.random() * Math.max(0, maxAvailableCargo - 40)) + 40;
     const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
     const selectedItem = cargoItems[Math.floor(Math.random() * cargoItems.length)];
@@ -1488,7 +1481,7 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     
     let filteredMissions = missionMatrix.filter(m => m.allowedClasses.includes(currentClass));
     
-    // Filter for local vs A-to-B missions
+// Filter for local vs A-to-B missions
     if (isLocalFlight) {
         const localMissions = filteredMissions.filter(m => m.isLocal);
         if (localMissions.length > 0) {
@@ -1498,19 +1491,29 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
         filteredMissions = filteredMissions.filter(m => !m.isLocal);
     }
 
-    // Fallback switch in case custom structural data drops parameters unexpectedly
+// --- Fallback switch in case custom structural data drops parameters unexpectedly ---
     const finalSelectionPool = filteredMissions.length > 0 ? filteredMissions : missionMatrix.filter(m => !m.isLocal);
     
-    const totalWeight = finalSelectionPool.reduce((sum, m) => sum + m.weight, 0);
+// Filter out the last used mission type if there are other options available
+    let selectionPoolWithGuard = finalSelectionPool.filter(m => m.type !== lastMissionType);
+    if (selectionPoolWithGuard.length === 0) {
+        selectionPoolWithGuard = finalSelectionPool; // Fallback if it's the only mission that fits the aircraft class
+    }
+
+    const totalWeight = selectionPoolWithGuard.reduce((sum, m) => sum + m.weight, 0);
     let randomNum = Math.random() * totalWeight;
-    let chosenMission = finalSelectionPool[0];
-    for (let m of finalSelectionPool) {
+    let chosenMission = selectionPoolWithGuard[0];
+    
+    for (let m of selectionPoolWithGuard) {
         if (randomNum < m.weight) {
             chosenMission = m;
             break;
         }
         randomNum -= m.weight;
     }
+    
+    // Store the current mission type in memory for the next generation sequence
+    lastMissionType = chosenMission.type;
     
     let randomName = names[Math.floor(Math.random() * names.length)];
     let randomAthlete = athletes[Math.floor(Math.random() * athletes.length)];
