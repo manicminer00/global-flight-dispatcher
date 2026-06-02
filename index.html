@@ -329,11 +329,11 @@
             
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
-                <label for="newRwyType">Runway Category / Helipad:</label>
+                <label for="newRwyType">Runway Category:</label>
                     <select id="newRwyType">
                         <option value="GA">Small Runway &lt;3000ft</option>
                         <option value="TURBO">Medium Runway 3000-6000ft</option>
-                        <option value="BIZ JET">Biz Jet Runway (Specialized/Restricted)</option>
+                        <option value="BIZ JET">Business Jet Specific Runway 3000-6000ft</option>
                         <option value="JET">Large Runway &gt;6000ft</option>
                         <option value="HELI">Helipad</option>
                     </select>
@@ -364,7 +364,7 @@
                 <input type="text" id="newAcName" placeholder="e.g. Guimbal Cabri G2">
             </div>
             <div>
-                <label for="newAcIcao">Aircraft ICAO Code: <span class="field-hint">(<a href="https://www.icao.int/operational-safety/doc-8643-aircraft-type-designators/search" target="_blank">Look Up Aircraft</a> / <a href="https://www.helihub.com/data/icao-code/" target="_blank">Look Up Heli</a>)</span></label>
+                <label for="newAcIcao">Aircraft ICAO Code: <span class="field-hint">(<a href="https://www.icao.int/operational-safety/doc-8643-aircraft-type-designators/search" target="_blank">Look Up Aircraft</a> / <a href="https://www.helihub.com/data/icao-code/" target="_blank">Look Up Helicopter</a>)</span></label>
                 <input type="text" id="newAcIcao" placeholder="e.g. CABG" maxlength="4">
             </div>
         </div>
@@ -377,10 +377,10 @@
                 <label for="newAcClass">Aircraft Operational Class:</label>
                 <select id="newAcClass">
                     <option value="GA">GA / STOL (Short Runway &lt;3000ft)</option>
-                    <option value="TURBO">TURBO (Medium Runway 3000ft - 6000ft)</option>
-                    <option value="BIZ JET">BIZ JET (Medium Runway 3000ft - 6000ft)</option>
-                    <option value="JET">JET (Long Runway &gt;6000ft)</option>
-                    <option value="HELI">HELI (Helicopter / Helipad)</option>
+                    <option value="TURBO">Turboprop (Medium Runway 3000ft - 6000ft)</option>
+                    <option value="BIZ JET">Business Jet (Medium Runway 3000ft - 6000ft)</option>
+                    <option value="JET">Jet (Long Runway &gt;6000ft)</option>
+                    <option value="HELI">Helicopter (Helipad)</option>
                 </select>
             </div>
         </div>
