@@ -434,6 +434,7 @@
         </ul>
 <hr style="border-color: #444;">
 <h3>SimBrief Dispatch Processing</h3>
+<p id="heliMessage" style="display: none; color: #ff5722; font-weight: bold; margin-top: 15px;">Simbrief Dispatch is not available for Helicopters currently.</p>
 <p>Click below to pre-fill this dynamic plan into SimBrief:</p>
 <a id="outLink" class="simbrief-btn" target="_blank">Generate Flight Plan via SimBrief</a>
 <p style="margin-top:20px; font-size:12px; color:#aaa;">Manual Copy/Paste Dispatch Link:</p>
@@ -451,7 +452,7 @@
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v3.7
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v3.9
     </div>
 </div>
 </div>
@@ -1607,6 +1608,15 @@ document.getElementById("outAlt").innerText = spec.rules.includes("VFR")
     const linkEl = document.getElementById("outLink");
     linkEl.href = simbriefUrl;
     document.getElementById("outRawUrl").innerText = simbriefUrl;
+	if (spec.class === "HELI") {
+        document.getElementById("outLink").style.display = "none";
+        document.getElementById("outRawUrl").style.display = "none";
+        document.getElementById("heliMessage").style.display = "block";
+    } else {
+        document.getElementById("outLink").style.display = "inline-block";
+        document.getElementById("outRawUrl").style.display = "block";
+        document.getElementById("heliMessage").style.display = "none";
+    }
     document.getElementById("dispatchRelease").style.display = "block";
 }
 </script>
