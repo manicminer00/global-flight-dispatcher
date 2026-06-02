@@ -1,3 +1,11 @@
+The whole reason for the altitude safety guard is to:
+1. Avoid any flights dispatched at an impossible or incorrect altitude.
+2. Allow SimBrief to generate a realistic flight plan
+3. Avoids aircraft not being able to reach the target altitude during a 40-60 minute flight e.g. Heavy Jets like A320.
+
+I want you to double check that the safety guard is working correctly in the code below because it just generated a flight from KTEX (Telluride Regional) ➔ KASE (Aspen-Pitkin County) at 9500ft.
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,9 +36,9 @@
             color: var(--accent-color);
             padding-bottom: 10px;
             margin-top: 0;
-			text-align: center;
+            text-align: center;
         }
-		.important-box {
+        .important-box {
             background-color: #222;
             padding: 10px;
             margin-bottom: 20px;
@@ -46,7 +54,7 @@
             text-align: center;
             margin: 0; 
             font-style: italic;
-			color: #777;
+            color: #777;
             line-height: 1.5;
         }
         .control-group, .settings-group {
@@ -66,7 +74,7 @@
             cursor: pointer;
             margin-bottom: 15px;
             display: block;
-			margin-left: auto;
+            margin-left: auto;
             width: auto;
         }
         .settings-panel {
@@ -87,7 +95,7 @@
             font-size: 14px;
         }
         .backup-btn:hover {
-			background-color: var(--accent-hover);
+            background-color: var(--accent-hover);
         }
         label {
             display: block;
@@ -230,10 +238,10 @@
         }
         .db-dropdown ul { margin: 0; padding-left: 20px; color: #ccc; font-size: 13px; }
         .db-dropdown li { margin-bottom: 4px;
-		}
-		input::placeholder {
-		color: #666;  /* Replaces the default light gray with a darker gray */
-		opacity: 1;      /* Ensures uniform color depth across Chrome, Firefox, and Safari */
+        }
+        input::placeholder {
+        color: #666;  /* Replaces the default light gray with a darker gray */
+        opacity: 1;      /* Ensures uniform color depth across Chrome, Firefox, and Safari */
 }
     </style>
     <script type="text/javascript" src="simbrief.apiv1.js"></script>
@@ -245,9 +253,8 @@
 <div class="important-box">
         <p id="quoteDisplay"></p>
     </div>
-
     <div class="control-group">
-	<!-- Callsign entry -->
+    <!-- Callsign entry -->
 <label for="callsignInput">Enter ATC Callsign: 
     <span class="field-hint">
         <a onclick="event.preventDefault(); saveCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Save Callsign</a>
@@ -255,10 +262,10 @@
         <a href="https://123atc.com/call-signs" target="_blank" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Callsign lookup</a>
     </span>
 </label>
-		
-	<!-- Callsign entry field -->
+        
+    <!-- Callsign entry field -->
         <input type="text" id="callsignInput" placeholder="e.g. MRD275" value="" maxlength="6" required>
-		       
+               
         <label for="aircraftSelect">Select Aircraft Type:</label>
         <select id="aircraftSelect"></select>
             
@@ -268,15 +275,13 @@
         </div>
   
         <button onclick="dispatchFlight()">🎲 Dynamically Generate Flightplan</button>
-
         <div style="margin-top: 10px; margin-bottom: 5px; text-align: center; font-size: 14px; color: #666;">N.B. You can 'Add New Airport and Aircraft (to Local DB)' in Settings if your departure airport or aircraft is not included.</div>
-
     </div>
 <!-- Start of Settings -->
     <button type="button" class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Toggle Settings & Database Tools</button>
-	<!-- Divider under Settings Button -->
-	<hr style="border-color: #444; margin-top: 20px;">
-	<!-- End of Divider under Settings Button -->
+    <!-- Divider under Settings Button -->
+    <hr style="border-color: #444; margin-top: 20px;">
+    <!-- End of Divider under Settings Button -->
     <div id="settingsPanel" class="settings-panel settings-group">
     
         <h3>🔒 Permanent Database</h3>
@@ -292,7 +297,6 @@
                 <span id="coreHandcraftedCount">0</span>
             </div>
             <div id="coreHandcraftedList" class="db-dropdown" style="display:none;"></div>
-
             <div class="db-stat-item" onclick="toggleDropdown('coreThirdPartyList')">
                 <span>🛒 Third Party Airports</span>
                 <span id="coreThirdPartyCount">0</span>
@@ -301,20 +305,18 @@
         </div>
             
         <hr style="border-color: #444; margin: 25px 0;">
-
         <h3>🏳️‍🌈 Dispatcher Configuration</h3>
         <label for="colorPicker">Interface Accent Color:</label>
         <select id="colorPicker" onchange="changeAccentColor(this.value)">
             <option value="#3F69BA">Blue</option>
             <option value="#566685">Blue Grey</option>
-			<option value="#8F8F72">Clay</option>
+            <option value="#8F8F72">Clay</option>
             <option value="#349138">Green</option>
             <option value="#C97120">Orange</option>
             <option value="#D1A602">Yellow</option>
         </select>
             
         <hr style="border-color: #444; margin-top: 10px 0;">
-
         <h3>📍 Add New Airport (to Local DB)</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
@@ -411,7 +413,6 @@
             </div>
             <div id="customAircraftList" class="db-dropdown" style="display:none;"></div>
         </div>
-
 <!-- Start of Dispatch -->
     </div> <div id="dispatchRelease" class="dispatch-release">
         <h2>Flight Dispatch Details</h2>
@@ -421,7 +422,7 @@
             <tr><th>Flight Rules</th><td id="outRules"></td></tr>
             <tr><th>Routing</th><td><strong id="outOrig"></strong> ➔ <strong id="outDest"></strong></td></tr>
             <tr><th>Approx. Distance</th><td id="outDist"></td></tr>
-            <tr><th>Altitude</th><td><strong id="outAlt" style="color:#ff5722;"></strong></td></tr>
+            <tr><th>Altitude MSL</th><td><strong id="outAlt" style="color:#ff5722;"></strong></td></tr>
             <tr><th>Magnetic Track Profile</th><td id="outTrack"></td></tr>
             <tr><th>Scenery Links</th><td id="outScenery"></td></tr>
         </table>
@@ -440,8 +441,7 @@
 <p style="margin-top:20px; font-size:12px; color:#aaa;">Manual Copy/Paste Dispatch Link:</p>
 <div class="url-box" id="outRawUrl"></div>
     </div>
-
-<!-- Start of Footer -->	
+<!-- Start of Footer -->    
     <div style="margin-top: 5px; text-align: center; font-size: 11px; color: #888;">
         <strong>Disclaimer:</strong> For flight simulation use only. Do not use for real-world aviation or dispatch. Third-party names and links belong to their respective owners.
     </div>
@@ -457,7 +457,6 @@
     </div>
 </div>
 </div>
-
 <script>
 const preFlightQuotes = [
     { text: "When once you have tasted flight, you will forever walk the earth with your eyes turned skyward, for there you have been, and there you will always long to return.", author: "Leonardo DaVinci" },
@@ -486,7 +485,6 @@ const preFlightQuotes = [
     { text: "Real freedom lies in wildness, not in civilization.", author: "Charles Lindbergh" },
     { text: "Flying is learning how to throw yourself at the ground and miss.", author: "Douglas Adams" }
 ];
-
 function displayRandomQuote() {
     const quoteObj = preFlightQuotes[Math.floor(Math.random() * preFlightQuotes.length)];
     const displayEl = document.getElementById("quoteDisplay");
@@ -500,17 +498,14 @@ function toggleSettingsPanel() {
     const p = document.getElementById("settingsPanel");
     p.style.display = (p.style.display === "block") ? "none" : "block";
 }
-
 function toggleDropdown(id) {
     const el = document.getElementById(id);
     el.style.display = el.style.display === 'none' ? 'block' : 'none';
 }
-
 function updateDatabaseStats() {
     const coreAcHtml = Object.values(coreFleetSpecs).map(a => `<li>${a.name}</li>`).join('');
     document.getElementById('coreAircraftCount').innerText = Object.keys(coreFleetSpecs).length;
     document.getElementById('coreAircraftList').innerHTML = `<ul>${coreAcHtml}</ul>`;
-
     const coreHandcrafted = seedAirportDatabase.filter(a => a.tag === 'Hand-Crafted' || a.tag === 'Both');
     const coreThirdParty = seedAirportDatabase.filter(a => a.tag === 'Third Party' || a.tag === 'Both');
     
@@ -519,14 +514,12 @@ function updateDatabaseStats() {
     
     document.getElementById('coreThirdPartyCount').innerText = coreThirdParty.length;
     document.getElementById('coreThirdPartyList').innerHTML = `<ul>${coreThirdParty.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`;
-
     // Updated to pull strictly from the new user-only storage key
     const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
     document.getElementById('customAirportsCount').innerText = customAirports.length;
     document.getElementById('customAirportsList').innerHTML = customAirports.length > 0 
         ? `<ul>${customAirports.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>` 
         : `<ul><li>No custom airports saved.</li></ul>`;
-
     const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
     const customAcKeys = Object.keys(customFleet);
     
@@ -535,7 +528,6 @@ function updateDatabaseStats() {
         ? `<ul>${Object.values(customFleet).map(a => `<li>${a.name}</li>`).join('')}</ul>`
         : `<ul><li>No custom aircraft saved.</li></ul>`;
 }
-
 // Memory variable to prevent repetition
 let lastMissionType = null;
 const seedAirportDatabase = [
@@ -1123,7 +1115,6 @@ const seedAirportDatabase = [
 { icao: "ZULS", name: "Tibet Lhasa Gonggar Airport", rwy: "JET", length: 13123, lat: 29.297, lon: 90.912, source: "Core", tag: "Third Party", linkText: "SamScene3D via Contrail", url: "https://contrail.shop/search?q=ZULS" },
 { icao: "ZYHB", name: "Harbin Taiping Airport & City", rwy: "JET", length: 10500, lat: 45.623, lon: 126.250, source: "Core", tag: "Third Party", linkText: "SamScene3D via Contrail", url: "https://contrail.shop/search?q=ZYHB" }
 ];
-
 const coreFleetSpecs = {
     "PA24": { name: "A2A Comanche", maxPax: 3, maxCargo: 150, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 1200, class: "GA" },
     "AEST": { name: "A2A Aerostar 600", maxPax: 5, maxCargo: 250, minD: 60, maxD: 120, minAlt: 5000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 2000, class: "GA" },
@@ -1183,7 +1174,6 @@ const cargoItems = [
 ];
 const names = ["Margot Robbie", "Keanu Reeves", "Zendaya", "Tom Hardy", "Cillian Murphy", "Lara Croft", "Raul from FSReborn", "Taylor Swift", "Brad Pitt", "Lenny Kravitz", "Ellen DeGeneres", "Jennifer Aniston", "Reese Witherspoon", "Cate Blanchett", "Matt Damon", "Robert Downey Jr", "Angelina Jolie", "Monica Lewinsky", "Salma Hayek", "Elizabeth Hurley", "Gillian Anderson"];
 const athletes = ["Lewis Hamilton", "Lionel Messi", "LeBron James", "Serena Williams", "Cristiano Ronaldo", "Simone Biles", "Max Verstappen", "Stephen Curry", "Novak Djokovic", "Usain Bolt"];
-
 <!-- end of missions -->
 let activeAirportDatabase = [];
 let activeFleetSpecs = {};
@@ -1194,7 +1184,6 @@ window.onload = function() {
     updateDatabaseStats();
     displayRandomQuote();
 };
-
 function saveCallsign() {
     const cs = document.getElementById("callsignInput").value.trim().toUpperCase();
     if (cs.length < 3) {
@@ -1263,7 +1252,7 @@ function saveCustomAircraft() {
         return;
     }
     let customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
-	customFleet[icao] = {
+    customFleet[icao] = {
         name: `${name} (${icao})`,
         maxPax: acClass === "JET" ? 140 : (acClass === "HELI" ? 4 : (acClass === "BIZ JET" ? 8 : 5)),
         maxCargo: acClass === "JET" ? 1800 : (acClass === "HELI" ? 250 : (acClass === "BIZ JET" ? 600 : 300)),
@@ -1290,7 +1279,6 @@ function rebuildActiveDatabase() {
         localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(pureCustom));
         localStorage.removeItem("dispatcher_custom_airports"); // Clear legacy cache
     }
-
     // 2. Load pure custom airports
     const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
     const customIcaos = customAirports.map(a => a.icao);
@@ -1299,7 +1287,6 @@ function rebuildActiveDatabase() {
     const activeSeed = seedAirportDatabase.filter(a => !customIcaos.includes(a.icao));
     activeAirportDatabase = [...activeSeed, ...customAirports];
 }
-
 function rebuildFleetDropdown() {
     const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
     activeFleetSpecs = { ...coreFleetSpecs, ...customFleet };
@@ -1360,7 +1347,6 @@ function calculateBearing(lat1, lon1, lat2, lon2) {
 function formatScenery(apt) {
     const linkText = apt.linkText ? apt.linkText : 'Store';
     const formattedLink = apt.url ? `<a href="${apt.url}" target="_blank" class="scenery-link">${linkText}</a>` : linkText;
-
     if (apt.tag === 'Both') {
         return `${apt.icao} - Hand-Crafted / ${formattedLink}`;
     } else if (apt.tag === 'Third Party') {
@@ -1378,7 +1364,6 @@ function dispatchFlight() {
     }
     const type = document.getElementById("aircraftSelect").value;
     const spec = activeFleetSpecs[type]; 
-
 const validAirports = activeAirportDatabase.filter(ap => {
     let allowedClasses = [];
     
@@ -1400,7 +1385,6 @@ const validAirports = activeAirportDatabase.filter(ap => {
             allowedClasses = ["HELI"];
             break;
     }
-
     // 1. Check if the aircraft's class is allowed at this airport category
     const isAllowedType = allowedClasses.includes(spec.class);
     
@@ -1445,21 +1429,41 @@ let candidatePairs = [];
     const distanceNm = Math.round(selectedRoute.dist);
     const bearing = calculateBearing(origin.lat, origin.lon, destination.lat, destination.lon);
     const isEasterly = (bearing >= 0 && bearing < 180);
+	
+// --- NEW ALTITUDE LOGIC WITH TERRAIN & DISTANCE SAFEGUARDS ---
+    const elevationLookup = {
+        "KASE": 7820, "KTEX": 9078, "KMMH": 7135, "LXGB": 0, "LOWI": 1906, "LSGS": 1581, "ZULS": 11811
+    };
+    
+    const depElev = elevationLookup[origin.icao] || 0;
+    const arrElev = elevationLookup[destination.icao] || 0;
+    
+    // 1. Terrain Floor (Highest airport + 3,000ft)
+    const terrainSafetyFloor = Math.max(depElev, arrElev) + 3000;
+    
+    // 2. Distance Climb Cap (Max altitude achievable on short routes, approx 300ft per NM)
+    const distanceAltCap = distanceNm * 300;
+    
+    // 3. Establish absolute limits for this specific flight
+    const finalMinAlt = Math.max(spec.minAlt, terrainSafetyFloor);
+    const effectiveMaxAlt = Math.min(spec.maxAlt, distanceAltCap);
+    
+    // 4. Fallback: If terrain floor exceeds aircraft/distance limits, lock the altitude to the terrain floor
+    const safeMaxAlt = Math.max(effectiveMaxAlt, finalMinAlt);
 
-    // --- NEW ALTITUDE LOGIC ---
-let baseThousands = Math.floor((Math.random() * (spec.maxAlt - spec.minAlt + 1) + spec.minAlt) / 1000);
-let altValue;
+    let baseThousands = Math.floor((Math.random() * (safeMaxAlt - finalMinAlt + 1) + finalMinAlt) / 1000);
+    let altValue;
 
-if (spec.rules.includes("VFR")) {
-    if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
-    if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
-    altValue = (baseThousands * 1000) + 500;
-} else {
-    if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
-    if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
-    altValue = baseThousands * 10;
-}
-// --------------------------
+    if (spec.rules.includes("VFR")) {
+        if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
+        if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
+        altValue = (baseThousands * 1000) + 500;
+    } else {
+        if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
+        if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
+        altValue = baseThousands * 10;
+    }
+    // --------------------------------------------------
     
 let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     
@@ -1474,7 +1478,7 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     let cargoKg = Math.floor(Math.random() * Math.max(0, maxAvailableCargo - 40)) + 40;
     const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
     const selectedItem = cargoItems[Math.floor(Math.random() * cargoItems.length)];
-	
+    
 // --- Dynamic Aircraft-Specific Filter Logic ---
     const currentClass = spec.class || "GA"; 
     const isLocalFlight = (origin.icao === destination.icao);
@@ -1490,7 +1494,6 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     } else {
         filteredMissions = filteredMissions.filter(m => !m.isLocal);
     }
-
 // --- Fallback switch in case custom structural data drops parameters unexpectedly ---
     const finalSelectionPool = filteredMissions.length > 0 ? filteredMissions : missionMatrix.filter(m => !m.isLocal);
     
@@ -1499,7 +1502,6 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     if (selectionPoolWithGuard.length === 0) {
         selectionPoolWithGuard = finalSelectionPool; // Fallback if it's the only mission that fits the aircraft class
     }
-
     const totalWeight = selectionPoolWithGuard.reduce((sum, m) => sum + m.weight, 0);
     let randomNum = Math.random() * totalWeight;
     let chosenMission = selectionPoolWithGuard[0];
