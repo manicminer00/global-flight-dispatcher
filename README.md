@@ -28,7 +28,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 
 * Full Contrail MSFS 2024 Airport Catalogue
 * Full ORBX MSFS 2024 Airport Catalogue
-* MSFS Hand-Crafted Airports
+* All MSFS Hand-Crafted Airports
 * Curated 3rd Party Payware & Freeware Airports
 
 ---
