@@ -20,7 +20,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * **Helicopter Operations:** Full support for rotary-wing operations, including helipad-to-helipad dispatch and local A-to-A sightseeing, news, and patrol missions.
 * **One-Click SimBrief Integration:** Automatically pushes your generated flight plan, weight, and balance parameters directly into SimBrief. *(Note: SimBrief dispatch is disabled for helicopters).*
 * **Custom Database & Backups:** Expand the tool yourself. Add your own custom airframes and airports directly via the UI. Export and import your custom database configuration as a `.json` backup file.
-* **Customisable Interface:** Save your preferred ATC callsign for future sessions and adjust the UI accent colour to suit your setup.
+* **Customisable Interface:** Save your preferred ATC callsign for future sessions and adjust the UI accent colour and select from Light or Dark mode to suit your setup.
 
 ---
 
