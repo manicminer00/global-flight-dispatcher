@@ -966,7 +966,12 @@ function dispatchFlight() {
         if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
         altValue = baseThousands * 10;
     }
-    let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
+let pax = 0;
+if (spec.maxPax > 0) {
+    // Set a minimum 50% load factor for JETs, otherwise minimum is 1
+    let minPax = spec.class === "JET" ? Math.floor(spec.maxPax * 0.5) : 1;
+    pax = Math.floor(Math.random() * (spec.maxPax - minPax + 1)) + minPax;
+}
     // Safety Fallbacks
     const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
     const safeOew = spec.oew || (spec.class === "JET" ? 42000 : 2000);
