@@ -26,6 +26,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 
 ### **Current Core Database Includes:**
 
+* Over 40 popular Aircraft models
 * Full Contrail MSFS 2024 Airport Catalogue
 * Full ORBX MSFS 2024 Airport Catalogue
 * All MSFS Hand-Crafted Airports
