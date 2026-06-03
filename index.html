@@ -259,6 +259,10 @@
         #colorPicker .dark-color { display: block; }
         body.light-mode #colorPicker .light-color { display: block; }
         body.light-mode #colorPicker .dark-color { display: none; }
+#timeVal {
+    color: var(--accent-color);
+    font-weight: bold; /* Optional: makes it pop a bit more against the label text */
+}
         /* --- LIGHT MODE OVERRIDES --- */
         body.light-mode {
             background-color: #ffffff;
@@ -342,6 +346,9 @@
             border-color: #444; 
             margin: 25px 0;
         }
+body.light-mode #timeVal {
+    color: var(--accent-color);
+}
     </style>
 <script type="text/javascript" src="simbrief.apiv1.js"></script>
 <script type="text/javascript" src="airports-db.js"></script>
@@ -367,11 +374,24 @@
         <input type="text" list="aircraftList" id="aircraftInput" placeholder="Type to search or click twice for list..." autocomplete="off">
         <datalist id="aircraftList"></datalist>
         <div style="display: block;">
-            <label for="depOverrideInput">Custom Departure Airport ICAO (Optional)</label>
+            <label for="depOverrideInput">Departure Airport ICAO (Optional)</label>
             <input type="text" id="depOverrideInput" placeholder="e.g. EGLL (Leave blank for random selection)" maxlength="4">
         </div>
+<div style="display: block; margin-top: 10px; margin-bottom: 15px;">
+<label for="timeSlider" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+<span>Target Flight Time: <span id="timeVal">60</span> minutes</span>
+    <span style="font-size: 12px; color: #666; font-weight: normal; font-style: normal;">
+        (N.B. Helicopter missions are unaffected by this slider.)
+    </span>
+</label>
+    <input type="range" id="timeSlider" min="60" max="120" step="30" value="60" list="steplist" oninput="document.getElementById('timeVal').innerText = this.value" style="width: 100%; cursor: pointer;">
+    <datalist id="steplist">
+        <option value="60"></option>
+        <option value="90"></option>
+        <option value="120"></option>
+    </datalist>
+</div>
         <button onclick="dispatchFlight()">🎲 Dynamically Generate Flightplan</button>
-        <div style="margin-top: 10px; margin-bottom: 5px; text-align: center; font-size: 14px; color: #666;">N.B. You can 'Add New Airport and Aircraft (to Local DB)' in Settings if your departure airport or aircraft is not included.</div>
     </div>
     <button type="button" class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Toggle Settings & Database Tools</button>
     <hr style="border-color: #444; margin-top: 20px;">
@@ -393,7 +413,7 @@
                 <span id="coreThirdPartyCount">0</span>
             </div>
             <div id="coreThirdPartyList" class="db-dropdown" style="display:none;"></div>
-            <div style="margin-top: 0px; margin-bottom: 5px; text-align: left; font-size: 14px; color: #888;">N.B. Some airports appear in this list more than once when they available from multiple sources e.g. Contrail and ORBX.
+            <div style="margin-top: 10px; margin-bottom: 5px; text-align: left; font-size: 12px; color: #888;">N.B. Airports may be listed multiple times if available from different sources (e.g., Contrail and ORBX).
             </div>
         </div>
         <hr class="config-separator">
@@ -443,18 +463,18 @@
             <div>
                 <label for="newSource">Database Tier Source:</label>
                 <select id="newSource">
-                    <option value="MSFS hand-crafted airport">MSFS hand-crafted airport</option>
-                    <option value="Contrail Store">Contrail Store</option>
-                    <option value="ORBX Store">ORBX Store</option>
-                    <option value="SimMarket Store">SimMarket Store</option>
+                    <option value="Contrail Store">Contrail</option>
+	                 <option value="Flightsim.to">Flightsim.to</option>			
                     <option value="MSFS Marketplace">MSFS Marketplace</option>
+					 <option value="ORBX Store">ORBX</option>
+                    <option value="SimMarket Store">SimMarket</option>
                     <option value="Other">Other Retail Channels</option>
                 </select>
             </div>
         </div>
         <div style="display: flex; gap: 10px; margin-top: 10px;">
             <button type="button" onclick="saveCustomAirport()">Save Airport</button>
-        </div>     
+        </div>
         <hr class="config-separator">
         <h3>🛩️ Add New Aircraft (to Local DB)</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -486,6 +506,19 @@
         <div style="display: flex; gap: 10px; margin-top: 10px;">
             <button type="button" onclick="saveCustomAircraft()">Save Airframe</button>
         </div>
+			<details style="text-align: left; margin-top: 20px; font-size: 12px; color: #666; cursor: pointer;">
+                <summary style="text-decoration: underline; margin-bottom:0px;">What does Add New Airport (to Local DB) or Add New Aircraft (to Local DB) do?</summary>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #444; margin-top: 5px; line-height: 1.4;">
+                    <strong>📍 Add New Airport (to Local DB):</strong>
+                    <ul style="padding-left: 20px; margin: 5px 0 20px 0;">
+                        <li>If your desired departure airport is not in the main database, you can add it manually and save it to your local browser cache.</li>
+                    </ul>
+					<strong>🛩️ Add New Aircraft (to Local DB):</strong>
+                    <ul style="padding-left: 20px; margin: 5px 0 0 0;">
+                        <li>If your desired aircraft is not in the main database, you can add it manually and save it to your local browser cache.</li>
+                    </ul>
+                </div>
+            </details>
         <hr class="config-separator">
 <h3>💾 Custom Database Backup</h3>
         <div style="margin-top: 0px; margin-bottom: 10px; text-align: left; font-size: 14px; color: #888;">N.B. Any custom aircraft and airports that you have added to your local database will be removed if you empty your browser cache. Use the buttons below to create and restore a local backup of your custom airports before emptying your browser cache.
@@ -497,8 +530,8 @@
         </div>
         <div style="text-align: right; margin-bottom: 20px; margin-top: -5px;">
             <a href="#" onclick="event.preventDefault(); resetCustomDatabase();" style="color: #ff5722; text-decoration: underline; font-size: 13px;">Reset Custom Database</a>
-            <details style="text-align: left; margin-top: 10px; font-size: 12px; color: #888; cursor: pointer;">
-                <summary style="text-decoration: underline; margin-bottom: 5px;">What does Reset Custom Database do?</summary>
+            <details style="text-align: left; margin-top: 0px; font-size: 12px; color: #666; cursor: pointer;">
+                <summary style="text-decoration: underline; margin-bottom: 0px;">What does Reset Custom Database do?</summary>
                 <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #444; margin-top: 5px; line-height: 1.4;">
                     <strong>Step-by-Step Reset Process:</strong>
                     <ul style="padding-left: 20px; margin: 5px 0 0 0;">
@@ -529,9 +562,7 @@
             <tr><th>Airframe</th><td id="outAirframe"></td></tr>
             <tr><th>Flight Rules</th><td id="outRules"></td></tr>
             <tr><th>Routing</th><td><strong id="outOrig"></strong> ➔ <strong id="outDest"></strong></td></tr>
-            <tr><th>Approx. Distance</th><td id="outDist"></td></tr>
-            <tr><th>Altitude MSL</th><td><strong id="outAlt" style="color:#ff5722;"></strong></td></tr>
-            <tr><th>Magnetic Track Profile</th><td id="outTrack"></td></tr>
+            <tr><th>Cruise Altitude</th><td><strong id="outAlt" style="color:#ff5722;"></strong></td></tr>
             <tr><th>Scenery Links</th><td id="outScenery"></td></tr>
         </table>
         <h3>Job Ticket</h3>
@@ -561,7 +592,7 @@
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v7.2
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v7.5
     </div>
 </div>
 </div>
@@ -870,39 +901,53 @@ function dispatchFlight() {
     }
     const selectedName = document.getElementById("aircraftInput").value.trim();
     const type = Object.keys(activeFleetSpecs).find(key => activeFleetSpecs[key].name === selectedName);
+    const targetMins = parseInt(document.getElementById("timeSlider").value);
+
     if (!type) {
         alert("Please select a valid aircraft from the searchable list.");
         return;
     }
     const spec = activeFleetSpecs[type];
+
     const validAirports = activeAirportDatabase.filter(ap => {
         let allowedClasses = [];
         switch(ap.rwy) {
-            case "GA":
-                allowedClasses = ["GA", "HELI"];
-                break;
-            case "TURBO":
-                allowedClasses = ["GA", "TURBO", "HELI"];
-                break;
-            case "BIZ JET":
-                allowedClasses = ["GA", "TURBO", "BIZ JET", "HELI"];
-                break;
-            case "JET":
-                allowedClasses = ["GA", "TURBO", "BIZ JET", "JET", "HELI"];
-                break;
-            case "HELI":
-                allowedClasses = ["HELI"];
-                break;
+            case "GA": allowedClasses = ["GA", "HELI"]; break;
+            case "TURBO": allowedClasses = ["GA", "TURBO", "HELI"]; break;
+            case "BIZ JET": allowedClasses = ["GA", "TURBO", "BIZ JET", "HELI"]; break;
+            case "JET": allowedClasses = ["GA", "TURBO", "BIZ JET", "JET", "HELI"]; break;
+            case "HELI": allowedClasses = ["HELI"]; break;
         }
         const isAllowedType = allowedClasses.includes(spec.class);
         const meetsLength = ap.length ? (ap.length >= spec.minRunwayLength) : true;
         return isAllowedType && meetsLength;
     });
+
     if (depOverride && !activeAirportDatabase.some(ap => ap.icao === depOverride)) {
         alert(`Custom Departure Airport ${depOverride} is not currently included in the master database. You can add it manually in Settings.`);
         return;
     }
+
+    let blockSpeed = 90; 
+    if (spec.class === "JET") blockSpeed = 380;
+    else if (spec.class === "BIZ JET") blockSpeed = 340;
+    else if (spec.class === "TURBO") blockSpeed = 220;
+    else if (spec.class === "HELI") blockSpeed = 80;
+    else if (spec.class === "GA" && spec.maxAlt >= 15000) blockSpeed = 160;
+
+    // FIX: Lock helicopters to a strict 20-minute profile for math uniformity.
+    let effectiveMins = (spec.class === "HELI") ? 20 : Math.max(10, targetMins - 30);
+    
+    const targetDist = (blockSpeed * effectiveMins) / 60;
+    
+    // FIX: Loosen the tight 15% filter threshold window ONLY for helicopters.
+    // This allows the 25 NM cross-country routes to slip through alongside local 25 NM tours.
+    const minTarget = (spec.class === "HELI") ? 5 : Math.max(spec.minD, targetDist * 0.85);
+    const maxTarget = (spec.class === "HELI") ? 35 : Math.min(spec.maxD, targetDist * 1.15);
+
     let candidatePairs = [];
+    
+    // PRIMARY PASS: Attempt to strictly honor the time slider
     for (let src of validAirports) {
         if (depOverride && src.icao !== depOverride) continue;
         for (let dst of validAirports) {
@@ -912,15 +957,33 @@ function dispatchFlight() {
             }
             if (src.icao === dst.icao) continue;
             const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
-            if (dist >= spec.minD && dist <= spec.maxD) {
+            if (dist >= minTarget && dist <= maxTarget) {
                 candidatePairs.push({ src, dst, dist });
             }
         }
     }
+
+    // FALLBACK PASS: If the local database is too sparse for the requested time, ignore the slider and find any valid flight
+    if (candidatePairs.length === 0) {
+        for (let src of validAirports) {
+            if (depOverride && src.icao !== depOverride) continue;
+            for (let dst of validAirports) {
+                if (src.icao === dst.icao && spec.class === "HELI") continue;
+                if (src.icao === dst.icao) continue;
+                const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
+                if (dist >= spec.minD && dist <= spec.maxD) {
+                    candidatePairs.push({ src, dst, dist });
+                }
+            }
+        }
+    }
+
     if (candidatePairs.length === 0) {
         alert(`No valid routes found matching current physical fleet configurations.`);
         return;
     }
+
+    // Randomly select from ALL valid pairs to restore global variety
     const selectedRoute = candidatePairs[Math.floor(Math.random() * candidatePairs.length)];
     const origin = selectedRoute.src;
     const destination = selectedRoute.dst;
@@ -941,17 +1004,18 @@ function dispatchFlight() {
         { name: "Japanese Alps / Central Ranges", latMin: 34.5, latMax: 37.5, lonMin: 136.0, lonMax: 139.5, safeFloor: 10500 }
     ];
     for (let range of globalRanges) {
-        let depMatch = (origin.lat >= range.latMin && origin.lat <= range.latMax && origin.lon >= range.lonMin && origin.lon <= range.lonMax);
-        let arrMatch = (destination.lat >= range.latMin && destination.lat <= range.latMax && destination.lon >= range.lonMin && destination.lon <= range.lonMax);
-        let midMatch = (midLat >= range.latMin && midLat <= range.latMax && midLon >= range.lonMin && midLon <= range.lonMax);
-        if (depMatch || arrMatch || midMatch) {
+        let dMatch = (origin.lat >= range.latMin && origin.lat <= range.latMax && origin.lon >= range.lonMin && origin.lon <= range.lonMax);
+        let aMatch = (destination.lat >= range.latMin && destination.lat <= range.latMax && destination.lon >= range.lonMin && destination.lon <= range.lonMax);
+        let mMatch = (midLat >= range.latMin && midLat <= range.latMax && midLon >= range.lonMin && midLon <= range.lonMax);
+        if (dMatch || aMatch || mMatch) {
             if (spec.class !== "HELI") {
                 terrainSafetyFloor = Math.max(terrainSafetyFloor, range.safeFloor);
             }
             break; 
         }
     }
-    const distanceAltCap = distanceNm * 300;
+    const climbProfile = (spec.class === "GA" || spec.class === "HELI") ? 100 : 300;
+    const distanceAltCap = distanceNm * climbProfile;
     const finalMinAlt = Math.max(spec.minAlt, terrainSafetyFloor);
     const effectiveMaxAlt = Math.min(spec.maxAlt, distanceAltCap);
     const safeMaxAlt = Math.max(effectiveMaxAlt, finalMinAlt);
@@ -968,20 +1032,16 @@ function dispatchFlight() {
     }
 let pax = 0;
 if (spec.maxPax > 0) {
-    // Set a minimum 50% load factor for JETs, otherwise minimum is 1
     let minPax = spec.class === "JET" ? Math.floor(spec.maxPax * 0.5) : 1;
     pax = Math.floor(Math.random() * (spec.maxPax - minPax + 1)) + minPax;
 }
-    // Safety Fallbacks
     const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
     const safeOew = spec.oew || (spec.class === "JET" ? 42000 : 2000);
     const safeFuelPerNm = spec.fuelPerNm || (spec.class === "JET" ? 6 : 0.5);
-    // Strict Weight Validation 
     const paxWeight = pax * 104;
     const estimatedBlockFuel = distanceNm * safeFuelPerNm;
     const maxStructuralPayload = safeMtow - safeOew - estimatedBlockFuel;
     const remainingPayload = Math.max(0, maxStructuralPayload - paxWeight);
-    // Respects BOTH the physical cargo bay volume limit AND the structural limit left
     const hardCargoLimit = Math.min(spec.maxCargo, remainingPayload);
     let cargoKg = hardCargoLimit > 0 ? Math.floor(Math.random() * hardCargoLimit) : 0;
     const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
@@ -1045,11 +1105,9 @@ lastMissionType = chosenMission.type;
     document.getElementById("outRules").innerText = spec.rules;
     document.getElementById("outOrig").innerText = `${origin.icao} (${origin.name})`;
     document.getElementById("outDest").innerText = `${destination.icao} (${destination.name})`;
-    document.getElementById("outDist").innerText = `${distanceNm} nm`;
     document.getElementById("outAlt").innerText = spec.rules.includes("VFR") 
         ? altValue.toLocaleString('en-US') + " ft" 
         : "FL" + altValue;
-    document.getElementById("outTrack").innerText = Math.round(bearing) + "°";
     document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
     document.getElementById("outPax").innerText = pax > 0 ? `${pax} pax` : "0 (Solo)";
     document.getElementById("outCargo").innerText = cargoKg;
