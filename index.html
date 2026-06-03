@@ -154,12 +154,13 @@
             border-radius: 6px;
             border: 1px solid #444;
         }
-        .ticket-note {
+.ticket-note {
             background-color: #1b365d;
             border-left: 5px solid #00bcd4;
             padding: 15px;
             margin: 15px 0;
             font-style: italic;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); /* Adds dark theme shadow */
         }
         .url-box {
             background-color: #111;
@@ -170,6 +171,9 @@
             border: 1px solid #333;
             margin-top: 10px;
         }
+		.url-box-label {
+            color: #aaa;
+        }
         a.simbrief-btn {
             display: inline-block;
             background-color: #008cba;
@@ -178,7 +182,7 @@
             padding: 10px 20px;
             border-radius: 4px;
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 0-px;
         }
         a.simbrief-btn:hover {
             background-color: #007399;
@@ -236,8 +240,97 @@
         color: #666;  /* Replaces the default light gray with a darker gray */
         opacity: 1;      /* Ensures uniform color depth across Chrome, Firefox, and Safari */
 }
-    </style>
-    <script type="text/javascript" src="simbrief.apiv1.js"></script>
+/* --- ACCENT COLOR PICKER VISIBILITY MANAGEMENT --- */
+/* Default (Dark Mode) State */
+#colorPicker .light-color { display: none; }
+#colorPicker .dark-color { display: block; }
+
+/* Light Mode Overrides State */
+body.light-mode #colorPicker .light-color { display: block; }
+body.light-mode #colorPicker .dark-color { display: none; }
+
+/* --- LIGHT MODE OVERRIDES --- */
+body.light-mode {
+    background-color: #ffffff;
+    color: #111111;
+}
+body.light-mode .container {
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+body.light-mode .control-group, 
+body.light-mode .settings-group, 
+body.light-mode .important-box, 
+body.light-mode .dispatch-release {
+    background: #f0f4f8; 
+    border-color: #d1d9e0;
+}
+body.light-mode input[type="text"], 
+body.light-mode input[type="number"], 
+body.light-mode select {
+    background-color: #ffffff;
+    color: #111111;
+    border-color: #b0bec5;
+}
+body.light-mode table, 
+body.light-mode th, 
+body.light-mode td {
+    border-color: #cfd8dc;
+}
+body.light-mode th {
+    background-color: #e0e6ed;
+}
+body.light-mode .db-stat-item {
+    background-color: #e8eaf6;
+    border-color: #c5cae9;
+    /* Uses dynamic color picker choice for text in light mode */
+    color: var(--accent-color); 
+}
+body.light-mode .db-stat-item:hover {
+    background-color: #d0dce7;
+}
+body.light-mode .db-dropdown {
+    background-color: #ffffff;
+    border-color: #c5cae9;
+}
+body.light-mode .db-dropdown ul {
+    color: #333;
+}
+body.light-mode input::placeholder {
+    color: #888;
+}
+body.light-mode .ticket-note {
+    background-color: #F7F6F0;  /* Change this for the background color */
+    border-left-color: #E89546; /* Change this for the left-hand side stripe color */
+    color: #42423F;             /* Text color */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Adds a softer shadow for white backgrounds */
+}
+body.light-mode .url-box {
+    background-color: #eceff1;
+    border-color: #cfd8dc;
+}
+body.light-mode .settings-toggle-btn, 
+body.light-mode .backup-btn {
+    background-color: #cfd8dc;
+    color: #111;
+}
+body.light-mode .backup-btn:hover {
+    /* Uses dynamic color picker choice on hover state */
+    background-color: var(--accent-hover);
+    color: #fff;
+}
+body.light-mode hr {
+    border-color: #cfd8dc !important;
+}
+body.light-mode div style a[href*="README.md"],
+body.light-mode a[href*="README.md"] {
+    color: var(--accent-color) !important;
+}
+body.light-mode .url-box-label {
+    color: #111111;
+}
+</style>
+<script type="text/javascript" src="simbrief.apiv1.js"></script>
 </head>
 <body>
 <div class="container">
@@ -255,7 +348,6 @@
         <a href="https://123atc.com/call-signs" target="_blank" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Callsign lookup</a>
     </span>
 </label>
-        
     <!-- Callsign entry field -->
         <input type="text" id="callsignInput" placeholder="e.g. MRD275" maxlength="6" required>
                
@@ -299,19 +391,28 @@
 			</div>
 		</div>
             
-        <hr style="border-color: #444; margin: 25px;">
-        <h3>🏳️‍🌈 Dispatcher Configuration</h3>
-        <label for="colorPicker">Interface Accent Color:</label>
-        <select id="colorPicker" onchange="changeAccentColor(this.value)">
-            <option value="#3F69BA">Blue</option>
-            <option value="#566685">Blue Grey</option>
-            <option value="#8F8F72">Clay</option>
-            <option value="#349138">Green</option>
-            <option value="#C97120">Orange</option>
-            <option value="#D1A602">Yellow</option>
-        </select>
+        <hr id="configSeparator" style="border-color: #444; margin: 25px 0;">
+<h3>🏳️‍🌈 Dispatcher Configuration</h3>
+<div style="display: flex; gap: 10px; margin-bottom: 15px;">
+    <button type="button" onclick="setMode('light')" style="background-color: #f0f4f8; color: #111; border: 1px solid #b0bec5; font-weight: normal;">☀️ Light Mode</button>
+    <button type="button" onclick="setMode('dark')" style="background-color: #333; color: #fff; border: 1px solid #555; font-weight: normal;">🌙 Dark Mode</button>
+</div>
+<label for="colorPicker">Interface Accent Color:</label>
+<select id="colorPicker" onchange="changeAccentColor(this.value)">
+
+    <option value="#3F69BA" class="light-color">Blue</option>
+    <option value="#566685" class="light-color">Blue Grey</option>
+    <option value="#349138" class="light-color">Green</option>
+    <option value="#777" class="light-color">Grey</option>
+	
+    <option value="#3F69BA" class="dark-color">Blue</option>
+    <option value="#8F8F72" class="dark-color">Clay</option>
+    <option value="#C97120" class="dark-color">Orange</option>	
+    <option value="#D1A602" class="dark-color">Yellow</option>	
+	
+	</select>
             
-        <hr style="border-color: #444; margin-top: 10px;">
+        <hr id="configSeparator" style="border-color: #444; margin: 25px 0;">
 		
 		<h3>📍 Add New Airport (to Local DB)</h3>
 		<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
@@ -355,10 +456,8 @@
             
         <div style="display: flex; gap: 10px; margin-top: 10px;">
             <button type="button" onclick="saveCustomAirport()">Save Airport</button>
-        </div>
-            
-        <hr style="border-color: #444; margin: 25px;">
-            
+        </div>     
+        <hr id="configSeparator" style="border-color: #444; margin: 25px 0;">
         <h3>🛩️ Add New Aircraft (to Local DB)</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
@@ -389,8 +488,7 @@
         <div style="display: flex; gap: 10px; margin-top: 10px;">
             <button type="button" onclick="saveCustomAircraft()">Save Airframe</button>
         </div>
-        <hr style="border-color: #444; margin: 25px;">
-        
+        <hr id="configSeparator" style="border-color: #444; margin: 25px 0;">
         <h3>💾 Custom Database Backup</h3>
         <div style="margin-top: 0px; margin-bottom: 5px; text-align: left; font-size: 14px; color: #888;">N.B. Use these options to create a local backup of your custom airports and aircraft before clearing browser cache.
         </div>
@@ -434,12 +532,13 @@
             <li><strong>Assigned Cargo Payload:</strong> <span id="outCargo"></span> kg</li>
             <li><strong>Validation:</strong> Payload strictly mapped under limits in Metric KG.</li>
         </ul>
+<!-- horizontal divider above footer -->
 <hr style="border-color: #444;">
 <h3>SimBrief Dispatch Processing</h3>
 <p id="heliMessage" style="display: none; color: #ff5722; font-weight: bold; margin-top: 15px;">Simbrief Dispatch is not available for Helicopters currently.</p>
 <p>Click below to pre-fill this dynamic plan into SimBrief:</p>
 <a id="outLink" class="simbrief-btn" target="_blank">Generate Flight Plan via SimBrief</a>
-<p style="margin-top:20px; font-size:12px; color:#aaa;">Manual Copy/Paste Dispatch Link:</p>
+<p class="url-box-label" style="margin-top:20px; font-size:12px;">Manual Copy/Paste Dispatch Link:</p>
 <div class="url-box" id="outRawUrl"></div>
     </div>
 <!-- Start of Footer -->    
@@ -454,7 +553,7 @@
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v5.0
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v5.2
     </div>
 </div>
 </div>
@@ -502,6 +601,29 @@ function toggleSettingsPanel() {
 function toggleDropdown(id) {
     const el = document.getElementById(id);
     el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+function setMode(mode) {
+    const picker = document.getElementById("colorPicker");
+    
+    if (mode === 'light') {
+        document.body.classList.add('light-mode');
+        localStorage.setItem("dispatcher_theme", "light");
+        
+        // Auto-select Color 1 (Blue) if the active choice is a dark-only color
+        if (picker.selectedOptions[0] && picker.selectedOptions[0].classList.contains('dark-color')) {
+            picker.value = "#3F69BA"; 
+            changeAccentColor("#3F69BA");
+        }
+    } else {
+        document.body.classList.remove('light-mode');
+        localStorage.setItem("dispatcher_theme", "dark");
+        
+        // Auto-select Dark Mode Blue if the active choice is a light-only color
+        if (picker.selectedOptions[0] && picker.selectedOptions[0].classList.contains('light-color')) {
+            picker.value = "#3F69BA"; // Changed from #D1A602 to target the Blue hex code
+            changeAccentColor("#3F69BA"); // Updates CSS variable to render Blue layout accents
+        }
+    }
 }
 function updateDatabaseStats() {
     const coreAcHtml = Object.values(coreFleetSpecs).map(a => `<li>${a.name}</li>`).join('');
@@ -1417,6 +1539,10 @@ function loadSettings() {
     if (savedCallsign) {
         document.getElementById("callsignInput").value = savedCallsign;
     }
+    
+    // NEW: Load Theme Preference
+    const storedTheme = localStorage.getItem("dispatcher_theme");
+    if (storedTheme) setMode(storedTheme);
 }
 
 // start custom airport
@@ -1602,7 +1728,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 function changeAccentColor(colorHex) {
     document.documentElement.style.setProperty('--accent-color', colorHex);
-    document.documentElement.style.setProperty('--accent-hover', colorHex);
+    // Dynamically generates a slightly darker shade for hover states automatically
+    document.documentElement.style.setProperty('--accent-hover', `${colorHex}cc`); 
     localStorage.setItem("dispatcher_accent", colorHex);
 }
 function calculateBearing(lat1, lon1, lat2, lon2) {
