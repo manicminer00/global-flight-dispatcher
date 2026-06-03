@@ -576,22 +576,28 @@
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v6.0
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v6.1
     </div>
 </div>
 </div>
 <script>
 // --- GLOBAL STATIC SPEC DATA STRUCTS FIRST ---
 const coreFleetSpecs = {
-"A320": { name: "Fenix - Airbus A320", maxPax: 160, maxCargo: 2200, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 6000, class: "JET" },
+"A319": { "name": "Fenix - A319", "maxPax": 156, "maxCargo": 4000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET" },
+"A320": { "name": "Fenix - A320", "maxPax": 180, "maxCargo": 6000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 6000, "class": "JET" },
+"A321": { "name": "Fenix - A321", "maxPax": 236, "maxCargo": 10000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 7500, "class": "JET" },
+"A346": { "name": "Aerosoft - A340-600 Pro", "maxPax": 475, "maxCargo": 42000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 11200, "class": "JET" },
 "A359": { name: "Inibuilds - Airbus A350", maxPax: 440, maxCargo: 43500, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 43000, rules: "IFR", minRunwayLength: 8000, class: "JET" },
 "A388": { name: "FlyByWire - Airbus A380-800", maxPax: 853, maxCargo: 83000, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 43000, rules: "IFR", minRunwayLength: 6725, class: "JET" },
 "AEST": { name: "A2A - Aerostar 600", maxPax: 5, maxCargo: 250, minD: 60, maxD: 120, minAlt: 5000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 2000, class: "GA" },
 "ALO3": { name: "Taog's Hangar - Alouette Helicopter", maxPax: 6, maxCargo: 350, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
 "B146": { name: "Just Flight - BAe 146", maxPax: 112, maxCargo: 9500, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 31000, rules: "IFR", minRunwayLength: 4500, class: "JET" },
+"B200": { "name": "Carenado - Beechcraft King Air B200", "maxPax": 10, "maxCargo": 900, "minD": 70, "maxD": 180, "minAlt": 15000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 2110, "class": "TURBO" },
 "B36T": { name: "Black Square - Beechcraft Bonanza (Turboprop)", maxPax: 5, maxCargo: 544, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 17500, rules: "VFR/Scenic", minRunwayLength: 2180, class: "GA" },
 "B58P": { name: "Black Square - Beechcraft Baron (Pressurized)", maxPax: 5, maxCargo: 649, minD: 60, maxD: 120, minAlt: 5000, maxAlt: 20000, rules: "VFR/Scenic", minRunwayLength: 2345, class: "GA" },
 "B60T": { name: "Black Square - Turbine Duke", maxPax: 5, maxCargo: 380, minD: 70, maxD: 150, minAlt: 15000, maxAlt: 28000, rules: "IFR", minRunwayLength: 1000, class: "TURBO" },
+"B722": { "name": "FlightSimStudio - 727-200 Passenger", "maxPax": 189, "maxCargo": 4000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 42000, "rules": "IFR", "minRunwayLength": 8300, "class": "JET" },
+"B72F": { "name": "FlightSimStudio - 727-200 Freighter", "maxPax": 0, "maxCargo": 26300, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 42000, "rules": "IFR", "minRunwayLength": 8300, "class": "JET" },
 "B736": { name: "PMDG - Boeing 737-600", maxPax: 110, maxCargo: 1800, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 6000, class: "JET" },
 "B737": { name: "PMDG - Boeing 737-700", maxPax: 148, maxCargo: 4400, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 41000, rules: "IFR", minRunwayLength: 6699, class: "JET" },
 "B738": { name: "PMDG - Boeing 737-800", maxPax: 189, maxCargo: 8000, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 41000, rules: "IFR", minRunwayLength: 7598, class: "JET" },
@@ -602,10 +608,14 @@ const coreFleetSpecs = {
 "C414": { name: "Flysimware - Cessna 414 AW Chancellor", maxPax: 7, maxCargo: 1102, minD: 60, maxD: 120, minAlt: 5000, maxAlt: 25000, rules: "VFR/Scenic", minRunwayLength: 2595, class: "GA" },
 "C680": { name: "Skyward Simulations - Citation C680 Sovereign+", maxPax: 9, maxCargo: 651, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 47000, rules: "IFR", minRunwayLength: 3530, class: "BIZ JET" },
 "C750": { name: "FlightFX - Citation X", maxPax: 9, maxCargo: 850, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 5200, class: "BIZ JET" },
+"CRJ7": { "name": "Aerosoft - CRJ v2", "maxPax": 78, "maxCargo": 2400, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 5280, "class": "JET" },
 "DA40": { name: "COWS - Diamond DA40", maxPax: 3, maxCargo: 407, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 16400, rules: "VFR/Scenic", minRunwayLength: 1935, class: "GA" },
 "DA42": { name: "COWS - Diamond DA42", maxPax: 3, maxCargo: 579, minD: 30, maxD: 100, minAlt: 5000, maxAlt: 18000, rules: "VFR/Scenic", minRunwayLength: 2129, class: "GA" },
 "DC6": { name: "PMDG - Douglas DC-6 Cloudmaster", maxPax: 89, maxCargo: 12786, minD: 150, maxD: 320, minAlt: 15000, maxAlt: 25000, rules: "IFR", minRunwayLength: 4500, class: "TURBO" },
+"E190": { "name": "FlightSimStudio - E-Jets 190", "maxPax": 114, "maxCargo": 2800, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 5300, "class": "JET" },
+"E195": { "name": "FlightSimStudio - E-Jets 195", "maxPax": 124, "maxCargo": 3300, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 7000, "class": "JET" },
 "E55P": { name: "FSReborn - Phenom 300e", maxPax: 7, maxCargo: 550, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 3209, class: "BIZ JET" },
+"F028": { "name": "Just Flight - Fokker F28 Professional", "maxPax": 85, "maxCargo": 2000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 5500, "class": "JET" },
 "H145": { name: "HPG - H145 Helicopter", maxPax: 8, maxCargo: 400, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
 "H500": { name: "Taog's Hangar - OH6A Cayuse/Hughes 500C", maxPax: 4, maxCargo: 816, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
 "HDJT": { name: "FlightFX - Honda Jet", maxPax: 5, maxCargo: 350, minD: 150, maxD: 320, minAlt: 25000, maxAlt: 40000, rules: "IFR", minRunwayLength: 3500, class: "BIZ JET" },
@@ -613,17 +623,26 @@ const coreFleetSpecs = {
 "KODI": { name: "SWS - Quest Kodiak 100 Series II", maxPax: 9, maxCargo: 1219, minD: 30, maxD: 80, minAlt: 5000, maxAlt: 12000, rules: "VFR/Scenic", minRunwayLength: 1467, class: "GA" },
 "LAMA": { name: "Taog's Hangar - Llama Helicopter", maxPax: 4, maxCargo: 300, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 5000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
 "LJ35": { name: "Flysimware - Bombardier Lear Jet 35A", maxPax: 8, maxCargo: 1450, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 45000, rules: "IFR", minRunwayLength: 4972, class: "BIZ JET" },
+"MD11": { "name": "TFDi Design - Boeing MD-11", "maxPax": 410, "maxCargo": 28600, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 43000, "rules": "IFR", "minRunwayLength": 10300, "class": "JET" },
 "MD82": { name: "Leonardo - McDonnell Douglas MD-82", maxPax: 172, maxCargo: 6670, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 7450, class: "JET" },
 "MD88": { name: "Leonardo - McDonnell Douglas MD-88", maxPax: 172, maxCargo: 6670, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 7850, class: "JET" },
 "P180": { name: "FlightFX - P180 Avanti", maxPax: 7, maxCargo: 500, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 41000, rules: "IFR", minRunwayLength: 3300, class: "BIZ JET" },
+"P28A": { "name": "Just Flight - PA-28R Turbo Arrow IV", "maxPax": 4, "maxCargo": 100, "minD": 30, "maxD": 80, "minAlt": 4000, "maxAlt": 14000, "rules": "VFR/Scenic", "minRunwayLength": 1600, "class": "GA" },
 "PA24": { name: "A2A - Comanche", maxPax: 3, maxCargo: 150, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 9500, rules: "VFR/Scenic", minRunwayLength: 1200, class: "GA" },
+"PA28": { "name": "Just Flight - PA-28R Turbo Arrow III", "maxPax": 4, "maxCargo": 100, "minD": 20, "maxD": 80, "minAlt": 4000, "maxAlt": 12000, "rules": "VFR/Scenic", "minRunwayLength": 1600, "class": "GA" },
 "PA38": { name: "Just Flight - PA38 Tomahawk", maxPax: 1, maxCargo: 45, minD: 20, maxD: 80, minAlt: 4000, maxAlt: 13000, rules: "VFR/Scenic", minRunwayLength: 1460, class: "GA" },
 "PC12": { name: "SWS - PC-12/47", maxPax: 9, maxCargo: 600, minD: 100, maxD: 280, minAlt: 15000, maxAlt: 25000, rules: "IFR", minRunwayLength: 1475, class: "TURBO" },
 "R22":  { name: "Cowansim - R22 Helicopter", maxPax: 1, maxCargo: 50, minD: 5, maxD: 40, minAlt: 1000, maxAlt: 4000, rules: "VFR Helicopter", minRunwayLength: 0, class: "HELI" },
+"RJ10": { "name": "Just Flight - BAe 146 Professional RJ100", "maxPax": 128, "maxCargo": 2500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET" },
+"RJ1F": { "name": "Just Flight - BAe 146 Professional RJ100 QT Freighter", "maxPax": 0, "maxCargo": 11500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET" },
+"RJ70": { "name": "Just Flight - BAe 146 Professional RJ70", "maxPax": 94, "maxCargo": 1500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 4000, "class": "JET" },
+"RJ85": { "name": "Just Flight - BAe 146 Professional RJ85", "maxPax": 112, "maxCargo": 2000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 4500, "class": "JET" },
 "SF50": { name: "FlightFX - Vision Jet G2+", maxPax: 4, maxCargo: 300, minD: 70, maxD: 150, minAlt: 15000, maxAlt: 20000, rules: "IFR", minRunwayLength: 3100, class: "BIZ JET" },
 "SPIT": { name: "Flying Iron - Spitfire", maxPax: 0, maxCargo: 80, minD: 60, maxD: 180, minAlt: 15000, maxAlt: 20000, rules: "VFR/Scenic", minRunwayLength: 1000, class: "GA" },
 "STAR": { name: "Black Square - Starship", maxPax: 8, maxCargo: 650, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 35000, rules: "IFR", minRunwayLength: 3112, class: "TURBO" },
+"T210": { "name": "Carenado - Cessna CT210N", "maxPax": 6, "maxCargo": 300, "minD": 20, "maxD": 80, "minAlt": 4000, "maxAlt": 27000, "rules": "VFR/Scenic", "minRunwayLength": 2160, "class": "GA" }
 "TBM8": { name: "Black Square - TBM850", maxPax: 5, maxCargo: 420, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 31000, rules: "IFR", minRunwayLength: 2380, class: "TURBO" }
+"VULC": { "name": "Just Flight - Vulcan B Mk. 2", "maxPax": 5, "maxCargo": 9500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 55000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET" },
 };
 
 const missionMatrix = [
