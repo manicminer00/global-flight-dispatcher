@@ -16,6 +16,7 @@
             padding: 20px;
             max-width: 900px;
             margin: 0 auto;
+            color-scheme: dark;
         }
         .container {
             background-color: #2d2d2d;
@@ -36,7 +37,7 @@
             margin-bottom: 20px;
             border-radius: 4px;
             border: 1px solid #444;
-            border-left: 5px solid #ff5722;  /* Overrides the left side border to be a thicker stripe */
+            border-left: 5px solid #ff5722; 
             display: flex;
             align-items: center;       
             justify-content: center;   
@@ -79,7 +80,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .backup-btn {
             background-color: #555;
@@ -107,27 +108,32 @@
             text-decoration: underline;
             cursor: pointer;
         }
-		select, input[type="text"], input[type="number"] {
-			width: 100%;
-			padding: 10px;
-			background-color: #333;
-			color: #fff;
-			border: 1px solid #555;
-			border-radius: 4px;
-			font-size: 15px;
-			margin-bottom: 15px;
-			box-sizing: border-box;
-		}
-		input[type="number"] {
-			-moz-appearance: textfield;
-			appearance: textfield;
-		}
-		input[type="number"]::-webkit-outer-spin-button,
-		input[type="number"]::-webkit-inner-spin-button {
-			-webkit-appearance: none;
-			margin: 0;
-		}
-		input[type="text"]:focus, select:focus, input[type="number"]:focus {
+        select, input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-size: 15px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            color-scheme: dark;
+        }
+        #aircraftInput {
+            font-size: 15px;
+            font-weight: normal;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="text"]:focus, select:focus, input[type="number"]:focus {
             border-color: var(--accent-color);
             outline: none;
         }
@@ -154,13 +160,13 @@
             border-radius: 6px;
             border: 1px solid #444;
         }
-.ticket-note {
+        .ticket-note {
             background-color: #1b365d;
             border-left: 5px solid #00bcd4;
             padding: 15px;
             margin: 15px 0;
             font-style: italic;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); /* Adds dark theme shadow */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); 
         }
         .url-box {
             background-color: #111;
@@ -171,7 +177,7 @@
             border: 1px solid #333;
             margin-top: 10px;
         }
-		.url-box-label {
+        .url-box-label {
             color: #aaa;
         }
         a.simbrief-btn {
@@ -182,7 +188,7 @@
             padding: 10px 20px;
             border-radius: 4px;
             font-weight: bold;
-            margin-top: 0-px;
+            margin-top: 0px;
         }
         a.simbrief-btn:hover {
             background-color: #007399;
@@ -234,126 +240,135 @@
             overflow-y: auto;
         }
         .db-dropdown ul { margin: 0; padding-left: 20px; color: #ccc; font-size: 13px; }
-        .db-dropdown li { margin-bottom: 4px;
-        }
+        .db-dropdown li { margin-bottom: 4px; }
         input::placeholder {
-        color: #666;  /* Replaces the default light gray with a darker gray */
-        opacity: 1;      /* Ensures uniform color depth across Chrome, Firefox, and Safari */
-}
-/* --- ACCENT COLOR PICKER VISIBILITY MANAGEMENT --- */
-/* Default (Dark Mode) State */
-#colorPicker .light-color { display: none; }
-#colorPicker .dark-color { display: block; }
+            color: #666; 
+            opacity: 1;      
+        }
+        optgroup {
+            color: #ff5722; 
+            text-transform: uppercase; 
+            font-style: normal;
+            font-weight: bold;
+        }
+        optgroup option {
+            color: #fff;
+            text-transform: none;
+        }
+        
+        #colorPicker .light-color { display: none; }
+        #colorPicker .dark-color { display: block; }
+        body.light-mode #colorPicker .light-color { display: block; }
+        body.light-mode #colorPicker .dark-color { display: none; }
 
-/* Light Mode Overrides State */
-body.light-mode #colorPicker .light-color { display: block; }
-body.light-mode #colorPicker .dark-color { display: none; }
-
-/* --- LIGHT MODE OVERRIDES --- */
-body.light-mode {
-    background-color: #ffffff;
-    color: #111111;
-}
-body.light-mode .container {
-    background-color: #f8f9fa;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-body.light-mode .control-group, 
-body.light-mode .settings-group, 
-body.light-mode .important-box, 
-body.light-mode .dispatch-release {
-    background: #f0f4f8; 
-    border-color: #d1d9e0;
-}
-body.light-mode input[type="text"], 
-body.light-mode input[type="number"], 
-body.light-mode select {
-    background-color: #ffffff;
-    color: #111111;
-    border-color: #b0bec5;
-}
-body.light-mode table, 
-body.light-mode th, 
-body.light-mode td {
-    border-color: #cfd8dc;
-}
-body.light-mode th {
-    background-color: #e0e6ed;
-}
-body.light-mode .db-stat-item {
-    background-color: #e8eaf6;
-    border-color: #c5cae9;
-    /* Uses dynamic color picker choice for text in light mode */
-    color: var(--accent-color); 
-}
-body.light-mode .db-stat-item:hover {
-    background-color: #d0dce7;
-}
-body.light-mode .db-dropdown {
-    background-color: #ffffff;
-    border-color: #c5cae9;
-}
-body.light-mode .db-dropdown ul {
-    color: #333;
-}
-body.light-mode input::placeholder {
-    color: #888;
-}
-body.light-mode .ticket-note {
-    background-color: #F7F6F0;  /* Change this for the background color */
-    border-left-color: #E89546; /* Change this for the left-hand side stripe color */
-    color: #42423F;             /* Text color */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Adds a softer shadow for white backgrounds */
-}
-body.light-mode .url-box {
-    background-color: #eceff1;
-    border-color: #cfd8dc;
-}
-body.light-mode .settings-toggle-btn, 
-body.light-mode .backup-btn {
-    background-color: #cfd8dc;
-    color: #111;
-}
-body.light-mode .backup-btn:hover {
-    /* Uses dynamic color picker choice on hover state */
-    background-color: var(--accent-hover);
-    color: #fff;
-}
-body.light-mode hr {
-    border-color: #cfd8dc !important;
-}
-body.light-mode div style a[href*="README.md"],
-body.light-mode a[href*="README.md"] {
-    color: var(--accent-color) !important;
-}
-body.light-mode .url-box-label {
-    color: #111111;
-}
-</style>
-<script type="text/javascript" src="simbrief.apiv1.js"></script>
-<script type="text/javascript" src="airports-db.js"></script>
+        /* --- LIGHT MODE OVERRIDES --- */
+        body.light-mode {
+            background-color: #ffffff;
+            color: #111111;
+            color-scheme: light;
+        }
+        body.light-mode .container {
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        body.light-mode .control-group, 
+        body.light-mode .settings-group, 
+        body.light-mode .important-box, 
+        body.light-mode .dispatch-release {
+            background: #f0f4f8; 
+            border-color: #d1d9e0;
+        }
+        body.light-mode input[type="text"], 
+        body.light-mode input[type="number"], 
+        body.light-mode select {
+            background-color: #ffffff;
+            color: #111111;
+            border-color: #b0bec5;
+        }
+        body.light-mode table, 
+        body.light-mode th, 
+        body.light-mode td {
+            border-color: #cfd8dc;
+        }
+        body.light-mode th {
+            background-color: #e0e6ed;
+        }
+        body.light-mode .db-stat-item {
+            background-color: #e8eaf6;
+            border-color: #c5cae9;
+            color: var(--accent-color); 
+        }
+        body.light-mode .db-stat-item:hover {
+            background-color: #d0dce7;
+        }
+        body.light-mode .db-dropdown {
+            background-color: #ffffff;
+            border-color: #c5cae9;
+        }
+        body.light-mode .db-dropdown ul {
+            color: #333;
+        }
+        body.light-mode input::placeholder {
+            color: #888;
+        }
+        body.light-mode .ticket-note {
+            background-color: #F7F6F0; 
+            border-left-color: #E89546; 
+            color: #42423F;             
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+        }
+        body.light-mode .url-box {
+            background-color: #eceff1;
+            border-color: #cfd8dc;
+        }
+        body.light-mode .settings-toggle-btn, 
+        body.light-mode .backup-btn {
+            background-color: #cfd8dc;
+            color: #111;
+        }
+        body.light-mode .backup-btn:hover {
+            background-color: var(--accent-hover);
+            color: #fff;
+        }
+        body.light-mode hr {
+            border-color: #cfd8dc !important;
+        }
+        body.light-mode div style a[href*="README.md"],
+        body.light-mode a[href*="README.md"] {
+            color: var(--accent-color) !important;
+        }
+        body.light-mode .url-box-label {
+            color: #111111;
+        }
+        
+        .config-separator {
+            border-color: #444; 
+            margin: 25px 0;
+        }
+    </style>
+    <script type="text/javascript" src="simbrief.apiv1.js"></script>
+    <script type="text/javascript" src="airports-db.js"></script>
 </head>
 <body>
 <div class="container">
     <h1>Dynamic Global Flight Dispatcher (for MSFS 2024)</h1>
     
-<div class="important-box">
+    <div class="important-box">
         <p id="quoteDisplay"></p>
     </div>
     <div class="control-group">
-    <!-- Callsign entry -->
-<label for="callsignInput">Enter ATC Callsign: 
-    <span class="field-hint">
-        <a onclick="event.preventDefault(); saveCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Save Callsign</a>
-        <span style="color: #666; margin: 0 3px;">/</span>
-        <a href="https://123atc.com/call-signs" target="_blank" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Callsign lookup</a>
-    </span>
-</label>
-    <!-- Callsign entry field -->
+        <label for="callsignInput">Enter ATC Callsign: 
+            <span class="field-hint">
+                <a onclick="event.preventDefault(); saveCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Save Callsign</a>
+                <span style="color: #666; margin: 0 3px;">/</span>
+                <a href="https://123atc.com/call-signs" target="_blank" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Callsign lookup</a>
+            </span>
+        </label>
         <input type="text" id="callsignInput" placeholder="e.g. MRD275" maxlength="6" required>
-               
-        <label for="aircraftSelect">Select Aircraft Type:</label>
-        <select id="aircraftSelect"></select>
+                
+        <label for="aircraftInput">Select Aircraft Type:</label>
+        <input type="text" list="aircraftList" id="aircraftInput" placeholder="Type to search or click twice for list..." autocomplete="off">
+        <datalist id="aircraftList"></datalist>
             
         <div style="display: block;">
             <label for="depOverrideInput">Custom Departure Airport ICAO (Optional)</label>
@@ -363,11 +378,8 @@ body.light-mode .url-box-label {
         <button onclick="dispatchFlight()">🎲 Dynamically Generate Flightplan</button>
         <div style="margin-top: 10px; margin-bottom: 5px; text-align: center; font-size: 14px; color: #666;">N.B. You can 'Add New Airport and Aircraft (to Local DB)' in Settings if your departure airport or aircraft is not included.</div>
     </div>
-<!-- Start of Settings -->
     <button type="button" class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Toggle Settings & Database Tools</button>
-    <!-- Divider under Settings Button -->
     <hr style="border-color: #444; margin-top: 20px;">
-    <!-- End of Divider under Settings Button -->
     <div id="settingsPanel" class="settings-panel settings-group">
     
         <h3>🔒 Permanent Database</h3>
@@ -388,77 +400,75 @@ body.light-mode .url-box-label {
                 <span id="coreThirdPartyCount">0</span>
             </div>
             <div id="coreThirdPartyList" class="db-dropdown" style="display:none;"></div>
-                <div style="margin-top: 0px; margin-bottom: 5px; text-align: left; font-size: 14px; color: #888;">N.B. Some airports appear in this list more than once when they are available from multiple sources e.g. Contrail and ORBX.
-			</div>
-		</div>
+            <div style="margin-top: 0px; margin-bottom: 5px; text-align: left; font-size: 14px; color: #888;">N.B. Some airports appear in this list more than once when they available from multiple sources e.g. Contrail and ORBX.
+            </div>
+        </div>
             
-        <hr id="configSeparator" style="border-color: #444; margin: 25px 0;">
-<h3>🏳️‍🌈 Dispatcher Configuration</h3>
-<div style="display: flex; gap: 10px; margin-bottom: 15px;">
-    <button type="button" onclick="setMode('light')" style="background-color: #f0f4f8; color: #111; border: 1px solid #b0bec5; font-weight: normal;">☀️ Light Mode</button>
-    <button type="button" onclick="setMode('dark')" style="background-color: #333; color: #fff; border: 1px solid #555; font-weight: normal;">🌙 Dark Mode</button>
-</div>
-<label for="colorPicker">Interface Accent Color:</label>
-<select id="colorPicker" onchange="changeAccentColor(this.value)">
-
-    <option value="#3F69BA" class="light-color">Blue</option>
-    <option value="#566685" class="light-color">Blue Grey</option>
-    <option value="#349138" class="light-color">Green</option>
-    <option value="#777" class="light-color">Grey</option>
-	
-    <option value="#3F69BA" class="dark-color">Blue</option>
-    <option value="#8F8F72" class="dark-color">Clay</option>
-    <option value="#C97120" class="dark-color">Orange</option>	
-    <option value="#D1A602" class="dark-color">Yellow</option>	
-	
-	</select>
+        <hr class="config-separator">
+        <h3>🏳️‍🌈 Dispatcher Configuration</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button type="button" onclick="setMode('light')" style="background-color: #f0f4f8; color: #111; border: 1px solid #b0bec5; font-weight: normal;">☀️ Light Mode</button>
+            <button type="button" onclick="setMode('dark')" style="background-color: #333; color: #fff; border: 1px solid #555; font-weight: normal;">🌙 Dark Mode</button>
+        </div>
+        <label for="colorPicker">Interface Accent Color:</label>
+        <select id="colorPicker" onchange="changeAccentColor(this.value)">
+            <option value="#3F69BA" class="light-color">Blue</option>
+            <option value="#566685" class="light-color">Blue Grey</option>
+            <option value="#349138" class="light-color">Green</option>
+            <option value="#777" class="light-color">Grey</option>
             
-        <hr id="configSeparator" style="border-color: #444; margin: 25px 0;">
-		
-		<h3>📍 Add New Airport (to Local DB)</h3>
-		<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-			<div>
-				<label for="newIcao">Airport ICAO:</label>
-				<input type="text" id="newIcao" placeholder="e.g. EGLL" maxlength="4">
-			</div>
-			<div>
-				<label for="newName">Airport Name:</label>
-				<input type="text" id="newName" placeholder="e.g. Heathrow">
-			</div>
-			<div>
-				<label for="newElev">Elevation (ft):</label>
-				<input type="number" id="newElev" placeholder="e.g. 83">
-			</div>
-		</div>
+            <option value="#3F69BA" class="dark-color">Blue</option>
+            <option value="#8F8F72" class="dark-color">Clay</option>
+            <option value="#C97120" class="dark-color">Orange</option>   
+            <option value="#D1A602" class="dark-color">Yellow</option>    
+        </select>
+            
+        <hr class="config-separator">
+        
+        <h3>📍 Add New Airport (to Local DB)</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newIcao">Airport ICAO:</label>
+                <input type="text" id="newIcao" placeholder="e.g. EGLL" maxlength="4">
+            </div>
+            <div>
+                <label for="newName">Airport Name:</label>
+                <input type="text" id="newName" placeholder="e.g. Heathrow">
+            </div>
+            <div>
+                <label for="newElev">Elevation (ft):</label>
+                <input type="number" id="newElev" placeholder="e.g. 83">
+            </div>
+        </div>
             
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
                 <label for="newRwyType">Runway Category:</label>
-                    <select id="newRwyType">
-                        <option value="GA">Small Runway &lt;3000ft</option>
-                        <option value="TURBO">Medium Runway 3000-6000ft</option>
-                        <option value="BIZ JET">Business Jet Specific Runway 3000-6000ft</option>
-                        <option value="JET">Large Runway &gt;6000ft</option>
-                        <option value="HELI">Helipad</option>
-                    </select>
+                <select id="newRwyType">
+                    <option value="GA">Small Runway &lt;3000ft</option>
+                    <option value="TURBO">Medium Runway 3000-6000ft</option>
+                    <option value="BIZ JET">Business Jet Specific Runway 3000-6000ft</option>
+                    <option value="JET">Large Runway &gt;6000ft</option>
+                    <option value="HELI">Helipad</option>
+                </select>
             </div>
             <div>
                 <label for="newSource">Database Tier Source:</label>
-                    <select id="newSource">
-                        <option value="MSFS hand-crafted airport">MSFS hand-crafted airport</option>
-                        <option value="Contrail Store">Contrail Store</option>
-                        <option value="ORBX Store">ORBX Store</option>
-                        <option value="SimMarket Store">SimMarket Store</option>
-                        <option value="MSFS Marketplace">MSFS Marketplace</option>
-                        <option value="Other">Other Retail Channels</option>
-                    </select>
+                <select id="newSource">
+                    <option value="MSFS hand-crafted airport">MSFS hand-crafted airport</option>
+                    <option value="Contrail Store">Contrail Store</option>
+                    <option value="ORBX Store">ORBX Store</option>
+                    <option value="SimMarket Store">SimMarket Store</option>
+                    <option value="MSFS Marketplace">MSFS Marketplace</option>
+                    <option value="Other">Other Retail Channels</option>
+                </select>
             </div>
         </div>
             
         <div style="display: flex; gap: 10px; margin-top: 10px;">
             <button type="button" onclick="saveCustomAirport()">Save Airport</button>
         </div>     
-        <hr id="configSeparator" style="border-color: #444; margin: 25px 0;">
+        <hr class="config-separator">
         <h3>🛩️ Add New Aircraft (to Local DB)</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
             <div>
@@ -489,8 +499,8 @@ body.light-mode .url-box-label {
         <div style="display: flex; gap: 10px; margin-top: 10px;">
             <button type="button" onclick="saveCustomAircraft()">Save Airframe</button>
         </div>
-        <hr id="configSeparator" style="border-color: #444; margin: 25px 0;">
-        <h3>💾 Custom Database Backup</h3>
+        <hr class="config-separator">
+<h3>💾 Custom Database Backup</h3>
         <div style="margin-top: 0px; margin-bottom: 10px; text-align: left; font-size: 14px; color: #888;">N.B. Any custom aircraft and airports that you have added to your local database will be removed if you empty your browser cache. Use the buttons below to create and restore a local backup of your custom airports before emptying your browser cache.
         </div>
         <div class="backup-btn-container">
@@ -498,7 +508,22 @@ body.light-mode .url-box-label {
             <button type="button" class="backup-btn" onclick="document.getElementById('importFileInput').click()">📤 Import Backup File</button>
             <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
         </div>
-            
+
+        <div style="text-align: right; margin-bottom: 20px; margin-top: -5px;">
+            <a href="#" onclick="event.preventDefault(); resetCustomDatabase();" style="color: #ff5722; text-decoration: underline; font-size: 13px;">Reset Custom Database</a>
+            <details style="text-align: left; margin-top: 10px; font-size: 12px; color: #888; cursor: pointer;">
+                <summary style="text-decoration: underline; margin-bottom: 5px;">What does Reset Custom Database do?</summary>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #444; margin-top: 5px; line-height: 1.4;">
+                    <strong>Step-by-Step Reset Process:</strong>
+                    <ul style="padding-left: 20px; margin: 5px 0 0 0;">
+                        <li><strong>Confirmation:</strong> A dialog asks for permission to wipe custom data.</li>
+                        <li><strong>Targeted Deletion:</strong> Only the specific keys (<code>dispatcher_custom_user_airports</code>, <code>dispatcher_custom_airports</code>, and <code>dispatcher_custom_fleet</code>) are removed from your browser's local memory.</li>
+                        <li><strong>Scope:</strong> This <strong>does not</strong> clear cookies, bookmarks, or browsing history; it only affects this specific dispatcher tool.</li>
+                        <li><strong>Refresh:</strong> The interface instantly updates to reflect the empty database.</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
         <div class="db-stats-container">
             <div class="db-stat-item" onclick="toggleDropdown('customAirportsList')">
                 <span>📍 Saved Airports</span>
@@ -512,8 +537,7 @@ body.light-mode .url-box-label {
             </div>
             <div id="customAircraftList" class="db-dropdown" style="display:none;"></div>
         </div>
-<!-- Start of Dispatch -->
-    </div> <div id="dispatchRelease" class="dispatch-release">
+</div> <div id="dispatchRelease" class="dispatch-release">
         <h2>Flight Dispatch Details</h2>
         <table>
             <tr><th>Callsign</th><td><strong id="outCallsign" style="color:var(--accent-color);">---</strong></td></tr>
@@ -527,13 +551,12 @@ body.light-mode .url-box-label {
         </table>
         <h3>Job Ticket</h3>
         <div class="ticket-note" id="outTicket"></div>
-<h3>Weight & Balance Loadsheet</h3>
+        <h3>Weight & Balance Loadsheet</h3>
         <ul>
             <li><strong>Assigned Passengers:</strong> <span id="outPax"></span></li>
             <li><strong>Assigned Cargo Payload:</strong> <span id="outCargo"></span> kg</li>
             <li><strong>Validation:</strong> Payload strictly mapped under limits in Metric KG.</li>
         </ul>
-<!-- horizontal divider above footer -->
 <hr style="border-color: #444;">
 <h3>SimBrief Dispatch Processing</h3>
 <p id="heliMessage" style="display: none; color: #ff5722; font-weight: bold; margin-top: 15px;">Simbrief Dispatch is not available for Helicopters currently.</p>
@@ -542,8 +565,7 @@ body.light-mode .url-box-label {
 <p class="url-box-label" style="margin-top:20px; font-size:12px;">Manual Copy/Paste Dispatch Link:</p>
 <div class="url-box" id="outRawUrl"></div>
     </div>
-<!-- Start of Footer -->    
-    <div style="margin-top: 5px; text-align: center; font-size: 11px; color: #888;">
+<div style="margin-top: 5px; text-align: center; font-size: 11px; color: #888;">
         <strong>Disclaimer:</strong> For flight simulation use only. Do not use for real-world aviation or dispatch. Third-party names and links belong to their respective owners.
     </div>
 <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #888;">
@@ -554,106 +576,12 @@ body.light-mode .url-box-label {
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v5.3
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v6.0
     </div>
 </div>
 </div>
 <script>
-const preFlightQuotes = [
-    { text: "When once you have tasted flight, you will forever walk the earth with your eyes turned skyward, for there you have been, and there you will always long to return.", author: "Leonardo DaVinci" },
-    { text: "Man must rise above the Earth, to the top of the atmosphere and beyond, for only thus will he fully understand the world in which he lives.", author: "Socrates" },
-    { text: "I fly because it releases my mind from the tyranny of petty things.", author: "Antoine de Saint-Exupery" },
-    { text: "The desire to fly is an idea handed down to us by our ancestors who, in their grueling travels across trackless lands in prehistoric times, looked enviously on the birds soaring freely through space, at full speed, above all obstacles, on the infinite highway of the air.", author: "Wilbur Wright" },
-    { text: "Sometimes, flying feels too God-like to be attained by man. Sometimes, the world from above seems too beautiful, too wonderful, too distant for human eyes to see.", author: "Charles A. Lindbergh" },
-    { text: "Pilots are a rare kind of human. They leave the ordinary surface of the word, to purify their soul in the sky, and they come down to earth, only after receiving the communion of the infinite.", author: "Jose Maria Velasco Ibarra" },
-    { text: "Airspeed, altitude, and brains. Two are always needed to successfully complete the flight.", author: null },
-    { text: "Both optimists and pessimists contribute to our society. The optimist invents the airplane and the pessimist the parachute.", author: "Gil Stern" },
-    { text: "If black boxes survive air crashes, why don’t they make the whole plane out of that stuff?", author: "George Carlin" },
-    { text: "You’ve never been lost until you’ve been lost at Mach 3.", author: "Paul F. Crickmore" },
-    { text: "Learn from the mistakes of others. You won’t live long enough to make all of them yourself.", author: null },
-    { text: "You start with a bag full of luck and an empty bag of experience. The trick is to fill the bag of experience before you empty the bag of luck.", author: null },
-    { text: "Good judgment comes from experience. Unfortunately, the experience usually comes from bad judgment.", author: null },
-    { text: "There are old pilots and there are bold pilots. However, there are no old, bold pilots.", author: null },
-    { text: "The engine is the heart of an airplane, but the pilot is its soul.", author: "Walter Raleigh" },
-    { text: "Aviation is proof that given the will, we have the capacity to achieve the impossible.", author: "Eddie Rickenbacker" },
-    { text: "Flying is more than a sport and more than a job; flying is pure passion and desire.", author: "General Adolf Galland" },
-    { text: "The airplane stands for freedom, for joy, for the power to understand.", author: "Richard Bach" },
-    { text: "We who fly do so for the love of flying.", author: "Cecil Day-Lewis" },
-    { text: "Adventure is worthwhile in itself.", author: "Amelia Earhart" },
-    { text: "Flying is hypnotic and all pilots are victims to the spell.", author: "Ernest K. Gann" },
-    { text: "Life is like a landscape. You live in the midst of it but can describe it only from the vantage point of distance.", author: "Charles Lindbergh" },
-    { text: "I owned the world that hour as I rode over it – free of the earth, free of the mountains, free of the clouds, but how inseparably I was bound to them.", author: "Charles Lindbergh" },
-    { text: "Real freedom lies in wildness, not in civilization.", author: "Charles Lindbergh" },
-    { text: "Flying is learning how to throw yourself at the ground and miss.", author: "Douglas Adams" }
-];
-function displayRandomQuote() {
-    const quoteObj = preFlightQuotes[Math.floor(Math.random() * preFlightQuotes.length)];
-    const displayEl = document.getElementById("quoteDisplay");
-    if (quoteObj.author) {
-        displayEl.innerHTML = `"${quoteObj.text}" - <strong>${quoteObj.author}</strong>`;
-    } else {
-        displayEl.innerHTML = `"${quoteObj.text}"`;
-    }
-}
-function toggleSettingsPanel() {
-    const p = document.getElementById("settingsPanel");
-    p.style.display = (p.style.display === "block") ? "none" : "block";
-}
-function toggleDropdown(id) {
-    const el = document.getElementById(id);
-    el.style.display = el.style.display === 'none' ? 'block' : 'none';
-}
-function setMode(mode) {
-    const picker = document.getElementById("colorPicker");
-    
-    if (mode === 'light') {
-        document.body.classList.add('light-mode');
-        localStorage.setItem("dispatcher_theme", "light");
-        
-        // Auto-select Color 1 (Blue) if the active choice is a dark-only color
-        if (picker.selectedOptions[0] && picker.selectedOptions[0].classList.contains('dark-color')) {
-            picker.value = "#3F69BA"; 
-            changeAccentColor("#3F69BA");
-        }
-    } else {
-        document.body.classList.remove('light-mode');
-        localStorage.setItem("dispatcher_theme", "dark");
-        
-        // Auto-select Dark Mode Blue if the active choice is a light-only color
-        if (picker.selectedOptions[0] && picker.selectedOptions[0].classList.contains('light-color')) {
-            picker.value = "#3F69BA"; // Changed from #D1A602 to target the Blue hex code
-            changeAccentColor("#3F69BA"); // Updates CSS variable to render Blue layout accents
-        }
-    }
-}
-function updateDatabaseStats() {
-    const coreAcHtml = Object.values(coreFleetSpecs).map(a => `<li>${a.name}</li>`).join('');
-    document.getElementById('coreAircraftCount').innerText = Object.keys(coreFleetSpecs).length;
-    document.getElementById('coreAircraftList').innerHTML = `<ul>${coreAcHtml}</ul>`;
-    const coreHandcrafted = seedAirportDatabase.filter(a => a.tag === 'Hand-Crafted' || a.tag === 'Both');
-    const coreThirdParty = seedAirportDatabase.filter(a => a.tag === 'Third Party' || a.tag === 'Both');
-    
-    document.getElementById('coreHandcraftedCount').innerText = coreHandcrafted.length;
-    document.getElementById('coreHandcraftedList').innerHTML = `<ul>${coreHandcrafted.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`;
-    
-    document.getElementById('coreThirdPartyCount').innerText = coreThirdParty.length;
-    document.getElementById('coreThirdPartyList').innerHTML = `<ul>${coreThirdParty.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`;
-    // Updated to pull strictly from the new user-only storage key
-    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
-    document.getElementById('customAirportsCount').innerText = customAirports.length;
-    document.getElementById('customAirportsList').innerHTML = customAirports.length > 0 
-        ? `<ul>${customAirports.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>` 
-        : `<ul><li>No custom airports saved.</li></ul>`;
-    const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
-    const customAcKeys = Object.keys(customFleet);
-    
-    document.getElementById('customAircraftCount').innerText = customAcKeys.length;
-    document.getElementById('customAircraftList').innerHTML = customAcKeys.length > 0
-        ? `<ul>${Object.values(customFleet).map(a => `<li>${a.name}</li>`).join('')}</ul>`
-        : `<ul><li>No custom aircraft saved.</li></ul>`;
-}
-// Memory variable to prevent repetition
-let lastMissionType = null;
+// --- GLOBAL STATIC SPEC DATA STRUCTS FIRST ---
 const coreFleetSpecs = {
 "A320": { name: "Fenix - Airbus A320", maxPax: 160, maxCargo: 2200, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 33000, rules: "IFR", minRunwayLength: 6000, class: "JET" },
 "A359": { name: "Inibuilds - Airbus A350", maxPax: 440, maxCargo: 43500, minD: 150, maxD: 320, minAlt: 24000, maxAlt: 43000, rules: "IFR", minRunwayLength: 8000, class: "JET" },
@@ -697,6 +625,7 @@ const coreFleetSpecs = {
 "STAR": { name: "Black Square - Starship", maxPax: 8, maxCargo: 650, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 35000, rules: "IFR", minRunwayLength: 3112, class: "TURBO" },
 "TBM8": { name: "Black Square - TBM850", maxPax: 5, maxCargo: 420, minD: 70, maxD: 180, minAlt: 15000, maxAlt: 31000, rules: "IFR", minRunwayLength: 2380, class: "TURBO" }
 };
+
 const missionMatrix = [
     { type: 1, name: "Medical Research", desc: "transporting rare serum samples", detail: "These unstable cultures require a strictly regulated cabin and careful transport.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
     { type: 2, name: "Medical Transport", desc: "rushing specialized surgical equipment", detail: "A remote clinic needs this equipment immediately to stabilize a patient.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
@@ -731,18 +660,48 @@ const cargoItems = [
     "aerospace composite fasteners", "sensitive optical sensors", "automotive ECU diagnostic kits", 
     "rare vintage collector wines", "medical trial equipment", "marine racing components"
 ];
+const fleetCategories = {
+    "Single Engine Prop": ["PA24", "PA38", "C172", "DA40", "KODI", "SPIT"],
+    "Twin Engine Prop": ["AEST", "B58P", "BE60", "C414", "DA42", "HU16"],
+    "Turboprop": ["B36T", "B60T", "C208", "DC6", "PC12", "STAR", "TBM8"],
+    "Business Jet": ["C680", "C750", "E55P", "HDJT", "LJ35", "P180", "SF50"],
+    "Jet": ["A320", "A359", "A388", "B146", "B736", "B737", "B738", "B77W", "MD82", "MD88"],
+    "Helicopter": ["ALO3", "H145", "H500", "LAMA", "R22"]
+};
 const names = ["Margot Robbie", "Keanu Reeves", "Zendaya", "Tom Hardy", "Cillian Murphy", "Lara Croft", "Raul from FSReborn", "Taylor Swift", "Brad Pitt", "Lenny Kravitz", "Ellen DeGeneres", "Jennifer Aniston", "Reese Witherspoon", "Cate Blanchett", "Matt Damon", "Robert Downey Jr", "Angelina Jolie", "Monica Lewinsky", "Salma Hayek", "Elizabeth Hurley", "Gillian Anderson"];
 const athletes = ["Lewis Hamilton", "Lionel Messi", "LeBron James", "Serena Williams", "Cristiano Ronaldo", "Simone Biles", "Max Verstappen", "Stephen Curry", "Novak Djokovic", "Usain Bolt"];
-<!-- end of missions -->
+const preFlightQuotes = [
+    { text: "When once you have tasted flight, you will forever walk the earth with your eyes turned skyward, for there you have been, and there you will always long to return.", author: "Leonardo DaVinci" },
+    { text: "Man must rise above the Earth, to the top of the atmosphere and beyond, for only thus will he fully understand the world in which he lives.", author: "Socrates" },
+    { text: "I fly because it releases my mind from the tyranny of petty things.", author: "Antoine de Saint-Exupery" },
+    { text: "The desire to fly is an idea handed down to us by our ancestors who, in their grueling travels across trackless lands in prehistoric times, looked enviously on the birds soaring freely through space, at full speed, above all obstacles, on the infinite highway of the air.", author: "Wilbur Wright" },
+    { text: "Sometimes, flying feels too God-like to be attained by man. Sometimes, the world from above seems too beautiful, too wonderful, too distant for human eyes to see.", author: "Charles A. Lindbergh" },
+    { text: "Pilots are a rare kind of human. They leave the ordinary surface of the word, to purify their soul in the sky, and they come down to earth, only after receiving the communion of the infinite.", author: "Jose Maria Velasco Ibarra" },
+    { text: "Airspeed, altitude, and brains. Two are always needed to successfully complete the flight.", author: null },
+    { text: "Both optimists and pessimists contribute to our society. The optimist invents the airplane and the pessimist the parachute.", author: "Gil Stern" },
+    { text: "If black boxes survive air crashes, why don’t they make the whole plane out of that stuff?", author: "George Carlin" },
+    { text: "You’ve never been lost until you’ve been lost at Mach 3.", author: "Paul F. Crickmore" },
+    { text: "Learn from the mistakes of others. You won’t live long enough to make all of them yourself.", author: null },
+    { text: "You start with a bag full of luck and an empty bag of experience. The trick is to fill the bag of experience before you empty the bag of luck.", author: null },
+    { text: "Good judgment comes from experience. Unfortunately, the experience usually comes from bad judgment.", author: null },
+    { text: "There are old pilots and there are bold pilots. However, there are no old, bold pilots.", author: null },
+    { text: "The engine is the heart of an airplane, but the pilot is its soul.", author: "Walter Raleigh" },
+    { text: "Aviation is proof that given the will, we have the capacity to achieve the impossible.", author: "Eddie Rickenbacker" },
+    { text: "Flying is more than a sport and more than a job; flying is pure passion and desire.", author: "General Adolf Galland" },
+    { text: "The airplane stands for freedom, for joy, for the power to understand.", author: "Richard Bach" },
+    { text: "We who fly do so for the love of flying.", author: "Cecil Day-Lewis" },
+    { text: "Adventure is worthwhile in itself.", author: "Amelia Earhart" },
+    { text: "Flying is hypnotic and all pilots are victims to the spell.", author: "Ernest K. Gann" },
+    { text: "Life is like a landscape. You live in the midst of it but can describe it only from the vantage point of distance.", author: "Charles Lindbergh" },
+    { text: "I owned the world that hour as I rode over it – free of the earth, free of the mountains, free of the clouds, but how inseparably I was bound to them.", author: "Charles Lindbergh" },
+    { text: "Real freedom lies in wildness, not in civilization.", author: "Charles Lindbergh" },
+    { text: "Flying is learning how to throw yourself at the ground and miss.", author: "Douglas Adams" }
+];
+
+let lastMissionType = null;
 let activeAirportDatabase = [];
 let activeFleetSpecs = {};
-window.onload = function() {
-    loadSettings();
-    rebuildActiveDatabase();
-    rebuildFleetDropdown();
-    updateDatabaseStats();
-    displayRandomQuote();
-};
+
 function saveCallsign() {
     const cs = document.getElementById("callsignInput").value.trim().toUpperCase();
     if (cs.length < 3) {
@@ -752,6 +711,7 @@ function saveCallsign() {
     localStorage.setItem("dispatcher_saved_callsign", cs);
     alert(`Callsign ${cs} saved to local memory configuration.`);
 }
+
 function loadSettings() {
     const storedColor = localStorage.getItem("dispatcher_accent");
     if (storedColor) {
@@ -762,13 +722,90 @@ function loadSettings() {
     if (savedCallsign) {
         document.getElementById("callsignInput").value = savedCallsign;
     }
-    
-    // NEW: Load Theme Preference
     const storedTheme = localStorage.getItem("dispatcher_theme");
     if (storedTheme) setMode(storedTheme);
 }
+function displayRandomQuote() {
+    const quoteObj = preFlightQuotes[Math.floor(Math.random() * preFlightQuotes.length)];
+    const displayEl = document.getElementById("quoteDisplay");
+    if (quoteObj.author) {
+        displayEl.innerHTML = `"${quoteObj.text}" - <strong>${quoteObj.author}</strong>`;
+    } else {
+        displayEl.innerHTML = `"${quoteObj.text}"`;
+    }
+}
+function toggleSettingsPanel() {
+    const p = document.getElementById("settingsPanel");
+    p.style.display = (p.style.display === "block") ? "none" : "block";
+}
+function toggleDropdown(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+function setMode(mode) {
+    const picker = document.getElementById("colorPicker");
+    
+    if (mode === 'light') {
+        document.body.classList.add('light-mode');
+        localStorage.setItem("dispatcher_theme", "light");
+        
+        if (picker.selectedOptions[0] && picker.selectedOptions[0].classList.contains('dark-color')) {
+            picker.value = "#3F69BA"; 
+            changeAccentColor("#3F69BA");
+        }
+    } else {
+        document.body.classList.remove('light-mode');
+        localStorage.setItem("dispatcher_theme", "dark");
+        
+        if (picker.selectedOptions[0] && picker.selectedOptions[0].classList.contains('light-color')) {
+            picker.value = "#3F69BA"; 
+            changeAccentColor("#3F69BA"); 
+        }
+    }
+}
 
-// start custom airport
+function updateDatabaseStats() {
+    const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
+    const totalActiveFleet = { ...coreFleetSpecs, ...customFleet };
+
+    let coreAcHtml = "";
+
+    const sortedFleet = Object.values(totalActiveFleet).sort((a, b) => a.name.localeCompare(b.name));
+    sortedFleet.forEach(aircraft => {
+        coreAcHtml += `<li style="margin-bottom: 2px;">${aircraft.name}</li>`;
+    });
+
+    document.getElementById('coreAircraftCount').innerText = Object.keys(coreFleetSpecs).length;
+    document.getElementById('coreAircraftList').innerHTML = `<ul>${coreAcHtml}</ul>`;
+    
+    const liveAirportsDB = (typeof seedAirportDatabase !== 'undefined' && Array.isArray(seedAirportDatabase)) ? seedAirportDatabase : [];
+    
+    const coreHandcrafted = liveAirportsDB.filter(a => a.tag === 'Hand-Crafted' || a.tag === 'Both');
+    const coreThirdParty = liveAirportsDB.filter(a => a.tag === 'Third Party' || a.tag === 'Both');
+    
+    document.getElementById('coreHandcraftedCount').innerText = coreHandcrafted.length;
+    document.getElementById('coreHandcraftedList').innerHTML = coreHandcrafted.length > 0
+        ? `<ul>${coreHandcrafted.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`
+        : `<ul><li>Loading permanent database array records...</li></ul>`;
+    
+    document.getElementById('coreThirdPartyCount').innerText = coreThirdParty.length;
+    document.getElementById('coreThirdPartyList').innerHTML = coreThirdParty.length > 0
+        ? `<ul>${coreThirdParty.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`
+        : `<ul><li>Loading permanent database array records...</li></ul>`;
+    
+    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
+    document.getElementById('customAirportsCount').innerText = customAirports.length;
+    document.getElementById('customAirportsList').innerHTML = customAirports.length > 0 
+        ? `<ul>${customAirports.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>` 
+        : `<ul><li>No custom airports saved.</li></ul>`;
+        
+    const customAcKeys = Object.keys(customFleet);
+    document.getElementById('customAircraftCount').innerText = customAcKeys.length;
+    document.getElementById('customAircraftList').innerHTML = customAcKeys.length > 0
+        ? `<ul>${Object.values(customFleet).map(a => `<li>${a.name}</li>`).join('')}</ul>`
+        : `<ul><li>No custom aircraft saved.</li></ul>`;
+}
+
 function saveCustomAirport() {
     const icao = document.getElementById("newIcao").value.trim().toUpperCase();
     const name = document.getElementById("newName").value.trim();
@@ -791,7 +828,7 @@ function saveCustomAirport() {
         icao: icao,
         name: name,
         rwy: rwy,
-        elev: elev, // Saved natively to database object
+        elev: elev,
         lat: 51.5 + (Math.random() - 0.5) * 4, 
         lon: 0.0 + (Math.random() - 0.5) * 4,
         source: source,
@@ -808,8 +845,6 @@ function saveCustomAirport() {
     rebuildActiveDatabase();
     updateDatabaseStats();
 }
-
-// end custom airport
     
 function saveCustomAircraft() {
     const name = document.getElementById("newAcName").value.trim();
@@ -839,34 +874,31 @@ function saveCustomAircraft() {
     updateDatabaseStats();
 }
 function rebuildActiveDatabase() {
-    // 1. Migration logic for legacy storage
+    const liveSeedDB = (typeof seedAirportDatabase !== 'undefined' && Array.isArray(seedAirportDatabase)) ? seedAirportDatabase : [];
+
     const legacyData = localStorage.getItem("dispatcher_custom_airports");
     if (legacyData) {
         const parsedLegacy = JSON.parse(legacyData);
-        const seedIcaos = seedAirportDatabase.map(a => a.icao);
+        const seedIcaos = liveSeedDB.map(a => a.icao);
         const pureCustom = parsedLegacy.filter(a => !seedIcaos.includes(a.icao));
         localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(pureCustom));
         localStorage.removeItem("dispatcher_custom_airports"); 
     }
 
-    // 2. Load custom user airports
     const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
-    const allEntries = [...seedAirportDatabase, ...customAirports];
+    const allEntries = [...liveSeedDB, ...customAirports];
 
-    // Group items by ICAO code and automatically filter out exact provider duplicates
     const grouped = {};
     allEntries.forEach(entry => {
         if (!grouped[entry.icao]) {
             grouped[entry.icao] = [];
         }
         
-        // DEDUPLICATION STEP: Check if we already added a variant with the exact same link text
         const isDuplicateLink = grouped[entry.icao].some(existing => 
             existing.linkText && entry.linkText && 
             existing.linkText.toLowerCase() === entry.linkText.toLowerCase()
         );
 
-        // If it's a duplicate vendor entry, make sure we upgrade the existing entry's tag to "Both" if applicable
         if (isDuplicateLink) {
             const existingEntry = grouped[entry.icao].find(existing => 
                 existing.linkText.toLowerCase() === entry.linkText.toLowerCase()
@@ -875,20 +907,16 @@ function rebuildActiveDatabase() {
                 existingEntry.tag = "Both";
             }
         } else {
-            // Otherwise, it's a unique option (like ORBX vs Contrail), so add it
             grouped[entry.icao].push(entry);
         }
     });
 
-    // 3. Build finalized database electing the priority record
     activeAirportDatabase = Object.keys(grouped).map(icao => {
         const variants = grouped[icao];
         if (variants.length === 1) return variants[0];
 
-        // Prioritize Contrail links first
         let priorityCandidate = variants.find(v => v.linkText && v.linkText.toLowerCase().includes("contrail"));
         
-        // Fallback rules
         if (!priorityCandidate) {
             priorityCandidate = variants.find(v => v.tag === "Third Party" || v.tag === "Both");
         }
@@ -896,7 +924,6 @@ function rebuildActiveDatabase() {
             priorityCandidate = variants[0];
         }
 
-        // Deep copy and bundle distinct remaining variants as choices
         const finalAirport = { ...priorityCandidate };
         finalAirport.allOptions = variants; 
 
@@ -906,16 +933,19 @@ function rebuildActiveDatabase() {
 function rebuildFleetDropdown() {
     const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
     activeFleetSpecs = { ...coreFleetSpecs, ...customFleet };
+    
+    const dataListEl = document.getElementById("aircraftList");
+    dataListEl.innerHTML = ""; 
+
     const sortedFleetEntries = Object.entries(activeFleetSpecs).sort((a, b) => a[1].name.localeCompare(b[1].name));
-    const selectEl = document.getElementById("aircraftSelect");
-    selectEl.innerHTML = ""; 
+    
     for (const [code, spec] of sortedFleetEntries) {
         const option = document.createElement("option");
-        option.value = code;
-        option.innerText = spec.name;
-        selectEl.appendChild(option);
+        option.value = spec.name; 
+        dataListEl.appendChild(option);
     }
 }
+
 function exportDatabaseBackup() {
     const backupObject = {
         airports: JSON.parse(localStorage.getItem("dispatcher_custom_airports") || "[]"),
@@ -933,7 +963,7 @@ function importDatabaseBackup(inputElement) {
     const reader = new FileReader();
     reader.onload = function(e) {
         const d = JSON.parse(e.target.result);
-        if (d.airports) localStorage.setItem("dispatcher_custom_airports", JSON.stringify(d.airports));
+        if (d.airports) localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(d.airports));
         if (d.fleet) localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(d.fleet));
         rebuildActiveDatabase();
         rebuildFleetDropdown();
@@ -942,6 +972,19 @@ function importDatabaseBackup(inputElement) {
     };
     reader.readAsText(file);
 }
+
+function resetCustomDatabase() {
+    if (confirm("Are you sure you want to completely wipe all custom airports and aircraft from your local database? This cannot be undone.")) {
+        localStorage.removeItem("dispatcher_custom_user_airports");
+        localStorage.removeItem("dispatcher_custom_airports");
+        localStorage.removeItem("dispatcher_custom_fleet");
+        rebuildActiveDatabase();
+        rebuildFleetDropdown();
+        updateDatabaseStats();
+        alert("Custom database has been successfully reset.");
+    }
+}
+
 function calculateDistance(lat1, lon1, lat2, lon2) {
     const R = 3440.065; 
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -951,7 +994,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 function changeAccentColor(colorHex) {
     document.documentElement.style.setProperty('--accent-color', colorHex);
-    // Dynamically generates a slightly darker shade for hover states automatically
     document.documentElement.style.setProperty('--accent-hover', `${colorHex}cc`); 
     localStorage.setItem("dispatcher_accent", colorHex);
 }
@@ -962,21 +1004,17 @@ function calculateBearing(lat1, lon1, lat2, lon2) {
     return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
 }
 function formatScenery(apt) {
-    // Helper function to build anchor layout strings safely
     function makeLink(item) {
         const text = item.linkText ? item.linkText : 'Store';
         return item.url ? `<a href="${item.url}" target="_blank" class="scenery-link">${text}</a>` : text;
     }
 
-    // Determine if any version within our bundled variants represents a Hand-Crafted element
     const holdsHandcrafted = apt.allOptions 
         ? apt.allOptions.some(v => v.tag === 'Hand-Crafted' || v.tag === 'Both')
         : (apt.tag === 'Hand-Crafted' || apt.tag === 'Both');
 
-    // Extract all distinct valid third-party vendor links across alternative objects
     let thirdPartyLinks = [];
     if (apt.allOptions) {
-        // Collect formatting strings from items marked as Third Party or Both
         apt.allOptions.forEach(v => {
             if (v.tag === 'Third Party' || v.tag === 'Both') {
                 thirdPartyLinks.push(makeLink(v));
@@ -986,7 +1024,6 @@ function formatScenery(apt) {
         thirdPartyLinks.push(makeLink(apt));
     }
 
-    // Format output dynamically mapping strings out to the release sheet view
     if (holdsHandcrafted && thirdPartyLinks.length > 0) {
         return `${apt.icao} - Hand-Crafted / ${thirdPartyLinks.join(' OR ')}`;
     } else if (thirdPartyLinks.length > 0) {
@@ -995,7 +1032,6 @@ function formatScenery(apt) {
         return `${apt.icao} - Hand-Crafted`;
     }
 }
-// DISPATCH FLIGHT FUNCTION
 function dispatchFlight() {
     const callsignRaw = document.getElementById("callsignInput").value.trim().toUpperCase();
     const depOverride = document.getElementById("depOverrideInput").value.trim().toUpperCase();
@@ -1003,55 +1039,56 @@ function dispatchFlight() {
         alert("Please supply a Callsign to proceed.");
         return;
     }
-    const type = document.getElementById("aircraftSelect").value;
-    const spec = activeFleetSpecs[type]; 
-const validAirports = activeAirportDatabase.filter(ap => {
-    let allowedClasses = [];
+    const selectedName = document.getElementById("aircraftInput").value.trim();
     
-// Map airport category to allowed aircraft classes
-    switch(ap.rwy) {
-        case "GA":
-            allowedClasses = ["GA", "HELI"];
-            break;
-        case "TURBO":
-            allowedClasses = ["GA", "TURBO", "HELI"];
-            break;
-        case "BIZ JET":
-            allowedClasses = ["GA", "TURBO", "BIZ JET", "HELI"];
-            break;
-        case "JET":
-            allowedClasses = ["GA", "TURBO", "BIZ JET", "JET", "HELI"];
-            break;
-        case "HELI":
-            allowedClasses = ["HELI"];
-            break;
+    const type = Object.keys(activeFleetSpecs).find(key => activeFleetSpecs[key].name === selectedName);
+    
+    if (!type) {
+        alert("Please select a valid aircraft from the searchable list.");
+        return;
     }
-// 1. Check if the aircraft's class is allowed at this airport category
-    const isAllowedType = allowedClasses.includes(spec.class);
     
-// 2. Enforce the runway length safeguard limit
-    const meetsLength = ap.length ? (ap.length >= spec.minRunwayLength) : true;
-    
-    return isAllowedType && meetsLength;
-});
-    
+    const spec = activeFleetSpecs[type];
+    const validAirports = activeAirportDatabase.filter(ap => {
+        let allowedClasses = [];
+        
+        switch(ap.rwy) {
+            case "GA":
+                allowedClasses = ["GA", "HELI"];
+                break;
+            case "TURBO":
+                allowedClasses = ["GA", "TURBO", "HELI"];
+                break;
+            case "BIZ JET":
+                allowedClasses = ["GA", "TURBO", "BIZ JET", "HELI"];
+                break;
+            case "JET":
+                allowedClasses = ["GA", "TURBO", "BIZ JET", "JET", "HELI"];
+                break;
+            case "HELI":
+                allowedClasses = ["HELI"];
+                break;
+        }
+        const isAllowedType = allowedClasses.includes(spec.class);
+        const meetsLength = ap.length ? (ap.length >= spec.minRunwayLength) : true;
+        
+        return isAllowedType && meetsLength;
+    });
+        
     if (depOverride && !activeAirportDatabase.some(ap => ap.icao === depOverride)) {
         alert(`Custom Departure Airport ${depOverride} is not currently included in the master database. You can add it manually in Settings.`);
         return;
     }
-let candidatePairs = [];
+    let candidatePairs = [];
     for (let src of validAirports) {
         if (depOverride && src.icao !== depOverride) continue;
         for (let dst of validAirports) {
-            
-// If it's a Helicopter, allow local round-trip flights (A to A)
+                
             if (src.icao === dst.icao && spec.class === "HELI") {
-                // Assign a fake round-trip distance of 25nm (approx 15-20 mins)
                 candidatePairs.push({ src: src, dst: src, dist: 25 });
                 continue; 
             }
-            
-// Standard Fixed-Wing logic (A to B) - Do not allow same airport
+                
             if (src.icao === dst.icao) continue;
             
             const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
@@ -1060,7 +1097,7 @@ let candidatePairs = [];
             }
         }
     }
-	
+        
     if (candidatePairs.length === 0) {
         alert(`No valid routes found matching current physical fleet configurations.`);
         return;
@@ -1071,54 +1108,42 @@ let candidatePairs = [];
     const distanceNm = Math.round(selectedRoute.dist);
     const bearing = calculateBearing(origin.lat, origin.lon, destination.lat, destination.lon);
     const isEasterly = (bearing >= 0 && bearing < 180);
-	
-// --- NEW AUTOMATED ALTITUDE LOGIC USING OBJECT PROPERTIES ---
-const depElev = origin.elev || 0;
-const arrElev = destination.elev || 0;
+        
+    const depElev = origin.elev || 0;
+    const arrElev = destination.elev || 0;
 
-// 1. Calculate the baseline safety floor from endpoints
-let terrainSafetyFloor = Math.max(depElev, arrElev) + 3000;
+    let terrainSafetyFloor = Math.max(depElev, arrElev) + 3000;
 
-// 2. --- GLOBAL MOUNTAIN RANGE SAFETY INJECTION ---
-let midLat = (origin.lat + destination.lat) / 2;
-let midLon = (origin.lon + destination.lon) / 2;
+    let midLat = (origin.lat + destination.lat) / 2;
+    let midLon = (origin.lon + destination.lon) / 2;
 
-// Master matrix of global mountain ranges with their required minimum safe transit altitudes (ft)
-const globalRanges = [
-    { name: "Alps", latMin: 45.0, latMax: 48.0, lonMin: 5.0, lonMax: 15.0, safeFloor: 11500 },
-    { name: "Pyrenees", latMin: 42.0, latMax: 43.3, lonMin: -2.0, lonMax: 3.3, safeFloor: 9500 },
-    { name: "North American Rockies", latMin: 35.0, latMax: 60.0, lonMin: -125.0, lonMax: -105.0, safeFloor: 14500 },
-    { name: "South American Andes", latMin: -55.0, latMax: 10.0, lonMin: -76.0, lonMax: -65.0, safeFloor: 15500 },
-    { name: "Himalayas / Tibetan Plateau", latMin: 26.0, latMax: 38.0, lonMin: 70.0, lonMax: 105.0, safeFloor: 21500 },
-    { name: "Japanese Alps / Central Ranges", latMin: 34.5, latMax: 37.5, lonMin: 136.0, lonMax: 139.5, safeFloor: 10500 }
-];
+    const globalRanges = [
+        { name: "Alps", latMin: 45.0, latMax: 48.0, lonMin: 5.0, lonMax: 15.0, safeFloor: 11500 },
+        { name: "Pyrenees", latMin: 42.0, latMax: 43.3, lonMin: -2.0, lonMax: 3.3, safeFloor: 9500 },
+        { name: "North American Rockies", latMin: 35.0, latMax: 60.0, lonMin: -125.0, lonMax: -105.0, safeFloor: 14500 },
+        { name: "South American Andes", latMin: -55.0, latMax: 10.0, lonMin: -76.0, lonMax: -65.0, safeFloor: 15500 },
+        { name: "Himalayas / Tibetan Plateau", latMin: 26.0, latMax: 38.0, lonMin: 70.0, lonMax: 105.0, safeFloor: 21500 },
+        { name: "Japanese Alps / Central Ranges", latMin: 34.5, latMax: 37.5, lonMin: 136.0, lonMax: 139.5, safeFloor: 10500 }
+    ];
 
-// Verify if departure, destination, OR the flight path midpoint cuts through a mountain grid range
-for (let range of globalRanges) {
-    let depMatch = (origin.lat >= range.latMin && origin.lat <= range.latMax && origin.lon >= range.lonMin && origin.lon <= range.lonMax);
-    let arrMatch = (destination.lat >= range.latMin && destination.lat <= range.latMax && destination.lon >= range.lonMin && destination.lon <= range.lonMax);
-    let midMatch = (midLat >= range.latMin && midLat <= range.latMax && midLon >= range.lonMin && midLon <= range.lonMax);
+    for (let range of globalRanges) {
+        let depMatch = (origin.lat >= range.latMin && origin.lat <= range.latMax && origin.lon >= range.lonMin && origin.lon <= range.lonMax);
+        let arrMatch = (destination.lat >= range.latMin && destination.lat <= range.latMax && destination.lon >= range.lonMin && destination.lon <= range.lonMax);
+        let midMatch = (midLat >= range.latMin && midLat <= range.latMax && midLon >= range.lonMin && midLon <= range.lonMax);
 
-    if (depMatch || arrMatch || midMatch) {
-        if (spec.class !== "HELI") {
-            terrainSafetyFloor = Math.max(terrainSafetyFloor, range.safeFloor);
+        if (depMatch || arrMatch || midMatch) {
+            if (spec.class !== "HELI") {
+                terrainSafetyFloor = Math.max(terrainSafetyFloor, range.safeFloor);
+            }
+            break; 
         }
-        break; // Range matched, exit loop to preserve maximum floor parameters
     }
-}
 
-// 3. Distance Climb Cap (300ft per NM)
-const distanceAltCap = distanceNm * 300;
-
-// 4. Establish absolute limits for this specific flight
-const finalMinAlt = Math.max(spec.minAlt, terrainSafetyFloor);
-const effectiveMaxAlt = Math.min(spec.maxAlt, distanceAltCap);
-
-// 5. Final fallback verification
-const safeMaxAlt = Math.max(effectiveMaxAlt, finalMinAlt);
-	
-// ------------------------
-
+    const distanceAltCap = distanceNm * 300;
+    const finalMinAlt = Math.max(spec.minAlt, terrainSafetyFloor);
+    const effectiveMaxAlt = Math.min(spec.maxAlt, distanceAltCap);
+    const safeMaxAlt = Math.max(effectiveMaxAlt, finalMinAlt);
+        
     let baseThousands = Math.floor((Math.random() * (safeMaxAlt - finalMinAlt + 1) + finalMinAlt) / 1000);
     let altValue;
 
@@ -1131,29 +1156,19 @@ const safeMaxAlt = Math.max(effectiveMaxAlt, finalMinAlt);
         if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
         altValue = baseThousands * 10;
     }
-    // --------------------------------------------------
-    
-let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
-    
-// Calculate how full the passenger cabin is as a percentage (0.0 to 1.0)
+        
+    let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     let paxLoadFactor = spec.maxPax > 0 ? (pax / spec.maxPax) : 0;
-    
-// Scale down the max allowed cargo based on the passenger load.
-// E.g., if the cabin is 100% full, cargo capacity is reduced by 80% to prevent MTOW errors.
     let maxAvailableCargo = spec.maxCargo * (1 - paxLoadFactor);
-    
-// Ensure cargo doesn't drop below the base 40kg minimum
     let cargoKg = Math.floor(Math.random() * Math.max(0, maxAvailableCargo - 40)) + 40;
     const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
     const selectedItem = cargoItems[Math.floor(Math.random() * cargoItems.length)];
-    
-// --- Dynamic Aircraft-Specific Filter Logic ---
+        
     const currentClass = spec.class || "GA"; 
     const isLocalFlight = (origin.icao === destination.icao);
-    
+        
     let filteredMissions = missionMatrix.filter(m => m.allowedClasses.includes(currentClass));
-    
-// Filter for local vs A-to-B missions
+        
     if (isLocalFlight) {
         const localMissions = filteredMissions.filter(m => m.isLocal);
         if (localMissions.length > 0) {
@@ -1162,18 +1177,16 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     } else {
         filteredMissions = filteredMissions.filter(m => !m.isLocal);
     }
-// --- Fallback switch in case custom structural data drops parameters unexpectedly ---
     const finalSelectionPool = filteredMissions.length > 0 ? filteredMissions : missionMatrix.filter(m => !m.isLocal);
-    
-// Filter out the last used mission type if there are other options available
+        
     let selectionPoolWithGuard = finalSelectionPool.filter(m => m.type !== lastMissionType);
     if (selectionPoolWithGuard.length === 0) {
-        selectionPoolWithGuard = finalSelectionPool; // Fallback if it's the only mission that fits the aircraft class
+        selectionPoolWithGuard = finalSelectionPool; 
     }
     const totalWeight = selectionPoolWithGuard.reduce((sum, m) => sum + m.weight, 0);
     let randomNum = Math.random() * totalWeight;
     let chosenMission = selectionPoolWithGuard[0];
-    
+        
     for (let m of selectionPoolWithGuard) {
         if (randomNum < m.weight) {
             chosenMission = m;
@@ -1181,16 +1194,15 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
         }
         randomNum -= m.weight;
     }
-    
-    // Store the current mission type in memory for the next generation sequence
+        
     lastMissionType = chosenMission.type;
-    
+        
     let randomName = names[Math.floor(Math.random() * names.length)];
     let randomAthlete = athletes[Math.floor(Math.random() * athletes.length)];
     let processedDesc = chosenMission.desc.replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName);
     let processedDetail = chosenMission.detail.replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName);
     let jobTicket = "";
-    
+        
     if (spec.rules.includes("VFR")) {
         if (isLocalFlight) {
             jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name} (Local Visual Flight)<br><strong>Manifest:</strong> ${processedDesc} (${pax} Pass / Baggage limits applied)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Good day, Captain. This is a local operations flight operating out of ${origin.name}. ${processedDetail} Maintain a safe altitude, keep clear of restricted airspace, and return to base when the block time is up.`;
@@ -1200,17 +1212,16 @@ let pax = spec.maxPax > 0 ? Math.floor(Math.random() * spec.maxPax) + 1 : 0;
     } else {
         jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name}<br><strong>Manifest:</strong> ${processedDesc} (${cargoKg} kg load block)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Welcome to the cockpit, Captain. Airway logs are locked down for this transit across the network from ${origin.icao} to ${destination.icao}. ${processedDetail} Follow standard transitions, watch your spacing tags, and stick exactly to assigned vertical profiles.`;
     }
-    
-    // UI Updates
+        
     document.getElementById("outCallsign").innerText = callsignRaw;
     document.getElementById("outAirframe").innerText = spec.name;
     document.getElementById("outRules").innerText = spec.rules;
     document.getElementById("outOrig").innerText = `${origin.icao} (${origin.name})`;
     document.getElementById("outDest").innerText = `${destination.icao} (${destination.name})`;
     document.getElementById("outDist").innerText = `${distanceNm} nm`;
-document.getElementById("outAlt").innerText = spec.rules.includes("VFR") 
-    ? altValue.toLocaleString('en-US') + " ft" 
-	: "FL" + altValue;
+    document.getElementById("outAlt").innerText = spec.rules.includes("VFR") 
+        ? altValue.toLocaleString('en-US') + " ft" 
+        : "FL" + altValue;
     document.getElementById("outTrack").innerText = Math.round(bearing) + "°";
     document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
     document.getElementById("outPax").innerText = pax > 0 ? `${pax} pax` : "0 (Solo)";
@@ -1222,7 +1233,7 @@ document.getElementById("outAlt").innerText = spec.rules.includes("VFR")
     const linkEl = document.getElementById("outLink");
     linkEl.href = simbriefUrl;
     document.getElementById("outRawUrl").innerText = simbriefUrl;
-	if (spec.class === "HELI") {
+    if (spec.class === "HELI") {
         document.getElementById("outLink").style.display = "none";
         document.getElementById("outRawUrl").style.display = "none";
         document.getElementById("heliMessage").style.display = "block";
@@ -1233,6 +1244,14 @@ document.getElementById("outAlt").innerText = spec.rules.includes("VFR")
     }
     document.getElementById("dispatchRelease").style.display = "block";
 }
+
+window.onload = function() {
+    loadSettings();
+    rebuildActiveDatabase();
+    rebuildFleetDropdown();
+    updateDatabaseStats();
+    displayRandomQuote();
+};
 </script>
 </body>
 </html>
