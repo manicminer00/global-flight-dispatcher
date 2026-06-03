@@ -20,12 +20,11 @@ overloaded the airframe, or if the destination exists in MSFS 2024.
 ### **Key Features**
 
 * **Adjustable Flight Duration Slider:** (New!) Customise your route generation based on your real-world schedule. Select from 60, 90, or 120 minutes to get a rough duration guide for your planned flight (Helicopter operations default to a 20-minute mission profile).
-* **Extensive, Decoupled Scenery Database:** The airport database has been
-decoupled from the main file for easier management. It features a massive
+* **Extensive Scenery Database:** The airport database features a massive
 hand-picked database, including the full Contrail and ORBX MSFS 2024
 catalogues, Asobo hand-crafted airports, and curated 3rd-party/freeware
 locations. Store links are provided.
-* **Curated & Searchable Aircraft Fleet:** Now supporting 60 aircraft.
+* **Searchable Aircraft Fleet:** Now supporting 60+ aircraft.
 Select your airframe via the dropdown menu or text search, ranging from
 helicopters and light GA to business jets, narrow and wide-body airliners.
 * **Airframe-Specific Missions & Job Tickets:** Flight generation tailored
