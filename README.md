@@ -12,7 +12,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 
 ### **Key Features**
 
-* **Extensive, Decoupled Scenery Database:** The airport database has been decoupled from the main file for easier management. It features a massive hand-picked database, including the full Contrail and ORBX MSFS 2024 catalogues, Asobo hand-crafted airports, and curated 3rd-party/freeware locations. Store links are provided.
+* **Extensive Scenery Database:** The airport database has been decoupled from the main file for easier management. It features a massive hand-picked database, including the full Contrail and ORBX MSFS 2024 catalogues, Asobo hand-crafted airports, and curated 3rd-party/freeware locations. Store links are provided.
 * **Curated & Searchable Aircraft Fleet:** Now supporting 60 aircraft. Select your airframe via the dropdown menu or text search, ranging from helicopters and light GA to business jets, narrow and wide-body airliners.
 * **Airframe-Specific Missions & Job Tickets:** Flight generation tailored to your aircraft type (GA, Business Jet, Turboprop, Passenger, Cargo, or Helicopter). Includes 32 General Missions as well as 10 Helicopter, 11 Passenger, 7 Cargo Jet, 6 Business Jet, 6 GA, and 5 Turboprop exclusive mission types.
 * **Automated MTOW Logic & Loadsheets:** Passenger and cargo loads are dynamically calculated with automated payload checks to ensure you never exceed maximum takeoff weight.
