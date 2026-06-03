@@ -54,3 +54,18 @@ custom database configuration as a `.json` backup file.
 * **Customisable Interface:** Toggle between Light and Dark mode. Save your
 preferred ATC callsign for future sessions and adjust the UI accent colour to
 suit your setup.
+
+
+### **Current Core Database Includes:**
+
+* 60+ Supported Aircraft Models
+* 330 Contrail MSFS 2024 Airports
+* 210 ORBX MSFS 2024 Airports
+* 133 MSFS Hand-Crafted Airports
+* 93 Curated 3rd Party Payware & Freeware Airports
+
+---
+
+© 2026 manicminer - [Support my work](https://buymeacoffee.com/manicminer/) at buymeacoffee.
+
+*Created and maintained by manicminer. This is a free tool provided for the flight simulation community.*
