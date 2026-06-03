@@ -343,8 +343,10 @@
             margin: 25px 0;
         }
     </style>
-    <script type="text/javascript" src="simbrief.apiv1.js"></script>
-    <script type="text/javascript" src="airports-db.js"></script>
+<script type="text/javascript" src="simbrief.apiv1.js"></script>
+<script type="text/javascript" src="airports-db.js"></script>
+<script type="text/javascript" src="fleet-db.js"></script>
+<script type="text/javascript" src="missions-db.js"></script>
 </head>
 <body>
 <div class="container">
@@ -559,183 +561,11 @@
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v7.1
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v7.2
     </div>
 </div>
 </div>
 <script>
-const coreFleetSpecs = {
-"A319": { "name": "Fenix - A319", "maxPax": 156, "maxCargo": 4000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET", "mtow": 75500, "oew": 40800, "fuelPerNm": 5.0 },
-"A320": { "name": "Fenix - A320", "maxPax": 180, "maxCargo": 6000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 6000, "class": "JET", "mtow": 78000, "oew": 42600, "fuelPerNm": 6.0 },
-"A321": { "name": "Fenix - A321", "maxPax": 236, "maxCargo": 10000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 7500, "class": "JET", "mtow": 93500, "oew": 48500, "fuelPerNm": 7.0 },
-"A346": { "name": "Aerosoft - A340-600 Pro", "maxPax": 475, "maxCargo": 42000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 11200, "class": "JET", "mtow": 368000, "oew": 177800, "fuelPerNm": 18.0 },
-"A359": { "name": "Inibuilds - Airbus A350", "maxPax": 440, "maxCargo": 43500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 43000, "rules": "IFR", "minRunwayLength": 8000, "class": "JET", "mtow": 280000, "oew": 142400, "fuelPerNm": 12.0 },
-"A388": { "name": "FlyByWire - Airbus A380-800", "maxPax": 853, "maxCargo": 83000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 43000, "rules": "IFR", "minRunwayLength": 6725, "class": "JET", "mtow": 575000, "oew": 276800, "fuelPerNm": 25.0 },
-"AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 120, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
-"ALO3": { "name": "Taog's Hangar - Alouette Helicopter", "maxPax": 6, "maxCargo": 350, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 5000, "rules": "VFR Helicopter", "minRunwayLength": 0, "class": "HELI", "mtow": 2200, "oew": 1143, "fuelPerNm": 0.8 },
-"B146": { "name": "Just Flight - BAe 146", "maxPax": 112, "maxCargo": 9500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 31000, "rules": "IFR", "minRunwayLength": 4500, "class": "JET", "mtow": 42184, "oew": 23897, "fuelPerNm": 4.0 },
-"B200": { "name": "Carenado - Beechcraft King Air B200", "maxPax": 10, "maxCargo": 900, "minD": 70, "maxD": 180, "minAlt": 15000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 2110, "class": "TURBO", "mtow": 5670, "oew": 3520, "fuelPerNm": 1.0 },
-"B36T": { "name": "Black Square - Beechcraft Bonanza (Turboprop)", "maxPax": 5, "maxCargo": 544, "minD": 20, "maxD": 80, "minAlt": 4000, "maxAlt": 17500, "rules": "VFR/Scenic", "minRunwayLength": 2180, "class": "GA", "mtow": 1746, "oew": 1140, "fuelPerNm": 0.4 },
-"B58P": { "name": "Black Square - Beechcraft Baron (Pressurized)", "maxPax": 5, "maxCargo": 649, "minD": 60, "maxD": 120, "minAlt": 5000, "maxAlt": 20000, "rules": "VFR/Scenic", "minRunwayLength": 2345, "class": "GA", "mtow": 2812, "oew": 1814, "fuelPerNm": 0.5 },
-"B60T": { "name": "Black Square - Turbine Duke", "maxPax": 5, "maxCargo": 380, "minD": 70, "maxD": 150, "minAlt": 15000, "maxAlt": 28000, "rules": "IFR", "minRunwayLength": 1000, "class": "TURBO", "mtow": 3050, "oew": 1950, "fuelPerNm": 0.6 },
-"B722": { "name": "FlightSimStudio - 727-200 Passenger", "maxPax": 189, "maxCargo": 4000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 42000, "rules": "IFR", "minRunwayLength": 8300, "class": "JET", "mtow": 95200, "oew": 45360, "fuelPerNm": 8.0 },
-"B72F": { "name": "FlightSimStudio - 727-200 Freighter", "maxPax": 0, "maxCargo": 26300, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 42000, "rules": "IFR", "minRunwayLength": 8300, "class": "JET", "mtow": 95200, "oew": 43000, "fuelPerNm": 8.0 },
-"B736": { "name": "PMDG - Boeing 737-600", "maxPax": 110, "maxCargo": 1800, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 33000, "rules": "IFR", "minRunwayLength": 6000, "class": "JET", "mtow": 65500, "oew": 36300, "fuelPerNm": 5.0 },
-"B737": { "name": "PMDG - Boeing 737-700", "maxPax": 148, "maxCargo": 4400, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 6699, "class": "JET", "mtow": 70080, "oew": 37600, "fuelPerNm": 5.0 },
-"B738": { "name": "PMDG - Boeing 737-800", "maxPax": 189, "maxCargo": 8000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 7598, "class": "JET", "mtow": 79015, "oew": 41413, "fuelPerNm": 6.0 },
-"B77W": { "name": "PMDG - Boeing 777-300ER", "maxPax": 550, "maxCargo": 24500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 43100, "rules": "IFR", "minRunwayLength": 9200, "class": "JET", "mtow": 351533, "oew": 167829, "fuelPerNm": 15.0 },
-"BE60": { "name": "Black Square - Piston / Grand Duke", "maxPax": 5, "maxCargo": 380, "minD": 60, "maxD": 100, "minAlt": 10000, "maxAlt": 20000, "rules": "IFR", "minRunwayLength": 1500, "class": "GA", "mtow": 3073, "oew": 1939, "fuelPerNm": 0.5 },
-"C172": { "name": "Asobo - C172 G1000", "maxPax": 3, "maxCargo": 54, "minD": 20, "maxD": 80, "minAlt": 3000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1630, "class": "GA", "mtow": 1157, "oew": 767, "fuelPerNm": 0.2 },
-"C208": { "name": "Black Square - Cessna C208B Caravan", "maxPax": 13, "maxCargo": 1590, "minD": 30, "maxD": 80, "minAlt": 5000, "maxAlt": 9500, "rules": "IFR", "minRunwayLength": 2160, "class": "GA", "mtow": 3969, "oew": 2145, "fuelPerNm": 0.8 },
-"C414": { "name": "Flysimware - Cessna 414 AW Chancellor", "maxPax": 7, "maxCargo": 226, "minD": 60, "maxD": 120, "minAlt": 5000, "maxAlt": 25000, "rules": "VFR/Scenic", "minRunwayLength": 2595, "class": "GA", "mtow": 3062, "oew": 1980, "fuelPerNm": 0.5 },
-"C680": { "name": "Skyward Simulations - Citation C680 Sovereign+", "maxPax": 9, "maxCargo": 651, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 47000, "rules": "IFR", "minRunwayLength": 3530, "class": "BIZ JET", "mtow": 13959, "oew": 8233, "fuelPerNm": 2.0 },
-"C750": { "name": "FlightFX - Citation X", "maxPax": 9, "maxCargo": 850, "minD": 150, "maxD": 320, "minAlt": 25000, "maxAlt": 40000, "rules": "IFR", "minRunwayLength": 5200, "class": "BIZ JET", "mtow": 16375, "oew": 9843, "fuelPerNm": 2.5 },
-"CRJ7": { "name": "Aerosoft - CRJ v2", "maxPax": 78, "maxCargo": 2400, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 5280, "class": "JET", "mtow": 34019, "oew": 19731, "fuelPerNm": 3.5 },
-"DA40": { "name": "COWS - Diamond DA40", "maxPax": 3, "maxCargo": 30, "minD": 20, "maxD": 80, "minAlt": 4000, "maxAlt": 16400, "rules": "VFR/Scenic", "minRunwayLength": 1935, "class": "GA", "mtow": 1310, "oew": 900, "fuelPerNm": 0.15 },
-"DA42": { "name": "COWS - Diamond DA42", "maxPax": 3, "maxCargo": 30, "minD": 30, "maxD": 100, "minAlt": 5000, "maxAlt": 18000, "rules": "VFR/Scenic", "minRunwayLength": 2129, "class": "GA", "mtow": 1900, "oew": 1251, "fuelPerNm": 0.2 },
-"DC6": { "name": "PMDG - Douglas DC-6 Cloudmaster", "maxPax": 89, "maxCargo": 12786, "minD": 150, "maxD": 320, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 4500, "class": "TURBO", "mtow": 44100, "oew": 25100, "fuelPerNm": 4.0 },
-"E190": { "name": "FlightSimStudio - E-Jets 190", "maxPax": 114, "maxCargo": 2800, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 5300, "class": "JET", "mtow": 51800, "oew": 28080, "fuelPerNm": 4.0 },
-"E195": { "name": "FlightSimStudio - E-Jets 195", "maxPax": 124, "maxCargo": 3300, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 7000, "class": "JET", "mtow": 52290, "oew": 28620, "fuelPerNm": 4.2 },
-"E55P": { "name": "FSReborn - Phenom 300e", "maxPax": 7, "maxCargo": 550, "minD": 150, "maxD": 320, "minAlt": 25000, "maxAlt": 40000, "rules": "IFR", "minRunwayLength": 3209, "class": "BIZ JET", "mtow": 8150, "oew": 5200, "fuelPerNm": 1.5 },
-"F028": { "name": "Just Flight - Fokker F28 Professional", "maxPax": 85, "maxCargo": 2000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 5500, "class": "JET", "mtow": 29480, "oew": 16145, "fuelPerNm": 3.5 },
-"H145": { "name": "HPG - H145 Helicopter", "maxPax": 8, "maxCargo": 400, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 5000, "rules": "VFR Helicopter", "minRunwayLength": 0, "class": "HELI", "mtow": 3700, "oew": 1919, "fuelPerNm": 1.0 },
-"H500": { "name": "Taog's Hangar - OH6A Cayuse/Hughes 500C", "maxPax": 4, "maxCargo": 370, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 5000, "rules": "VFR Helicopter", "minRunwayLength": 0, "class": "HELI", "mtow": 1361, "oew": 676, "fuelPerNm": 0.5 },
-"HDJT": { "name": "FlightFX - Honda Jet", "maxPax": 5, "maxCargo": 181, "minD": 150, "maxD": 320, "minAlt": 25000, "maxAlt": 40000, "rules": "IFR", "minRunwayLength": 3500, "class": "BIZ JET", "mtow": 4808, "oew": 3267, "fuelPerNm": 1.0 },
-"HU16": { "name": "Asobo - Grumman Amphibian Albatross G111/HU16", "maxPax": 28, "maxCargo": 4500, "minD": 20, "maxD": 80, "minAlt": 3000, "maxAlt": 21000, "rules": "VFR/Scenic", "minRunwayLength": 2500, "class": "GA", "mtow": 13500, "oew": 9000, "fuelPerNm": 2.5 },
-"KODI": { "name": "SWS - Quest Kodiak 100 Series II", "maxPax": 9, "maxCargo": 1219, "minD": 30, "maxD": 80, "minAlt": 5000, "maxAlt": 12000, "rules": "VFR/Scenic", "minRunwayLength": 1467, "class": "GA", "mtow": 3290, "oew": 1710, "fuelPerNm": 0.6 },
-"LAMA": { "name": "Taog's Hangar - Llama Helicopter", "maxPax": 4, "maxCargo": 300, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 5000, "rules": "VFR Helicopter", "minRunwayLength": 0, "class": "HELI", "mtow": 1950, "oew": 1021, "fuelPerNm": 0.7 },
-"LJ35": { "name": "Flysimware - Bombardier Lear Jet 35A", "maxPax": 8, "maxCargo": 1450, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 45000, "rules": "IFR", "minRunwayLength": 4972, "class": "BIZ JET", "mtow": 8300, "oew": 4590, "fuelPerNm": 1.5 },
-"MD11": { "name": "TFDi Design - Boeing MD-11", "maxPax": 410, "maxCargo": 28600, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 43000, "rules": "IFR", "minRunwayLength": 10300, "class": "JET", "mtow": 285990, "oew": 128800, "fuelPerNm": 12.0 },
-"MD82": { "name": "Leonardo - McDonnell Douglas MD-82", "maxPax": 172, "maxCargo": 6670, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 33000, "rules": "IFR", "minRunwayLength": 7450, "class": "JET", "mtow": 67800, "oew": 35300, "fuelPerNm": 6.0 },
-"MD88": { "name": "Leonardo - McDonnell Douglas MD-88", "maxPax": 172, "maxCargo": 6670, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 33000, "rules": "IFR", "minRunwayLength": 7850, "class": "JET", "mtow": 67800, "oew": 35300, "fuelPerNm": 6.0 },
-"P180": { "name": "FlightFX - P180 Avanti", "maxPax": 7, "maxCargo": 500, "minD": 70, "maxD": 180, "minAlt": 15000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 3300, "class": "BIZ JET", "mtow": 5488, "oew": 3400, "fuelPerNm": 1.2 },
-"P28A": { "name": "Just Flight - PA-28R Turbo Arrow IV", "maxPax": 4, "maxCargo": 100, "minD": 30, "maxD": 80, "minAlt": 4000, "maxAlt": 14000, "rules": "VFR/Scenic", "minRunwayLength": 1600, "class": "GA", "mtow": 1315, "oew": 850, "fuelPerNm": 0.2 },
-"PA24": { "name": "A2A - Comanche", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 80, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.2 },
-"PA28": { "name": "Just Flight - PA-28R Turbo Arrow III", "maxPax": 4, "maxCargo": 100, "minD": 20, "maxD": 80, "minAlt": 4000, "maxAlt": 12000, "rules": "VFR/Scenic", "minRunwayLength": 1600, "class": "GA", "mtow": 1247, "oew": 770, "fuelPerNm": 0.2 },
-"PA38": { "name": "Just Flight - PA38 Tomahawk", "maxPax": 1, "maxCargo": 45, "minD": 20, "maxD": 80, "minAlt": 4000, "maxAlt": 13000, "rules": "VFR/Scenic", "minRunwayLength": 1460, "class": "GA", "mtow": 757, "oew": 512, "fuelPerNm": 0.15 },
-"PC12": { "name": "SWS - PC-12/47", "maxPax": 9, "maxCargo": 600, "minD": 100, "maxD": 280, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 1475, "class": "TURBO", "mtow": 4740, "oew": 2810, "fuelPerNm": 0.8 },
-"R22":  { "name": "Cowansim - R22 Helicopter", "maxPax": 1, "maxCargo": 22, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 4000, "rules": "VFR Helicopter", "minRunwayLength": 0, "class": "HELI", "mtow": 622, "oew": 389, "fuelPerNm": 0.15 },
-"RJ10": { "name": "Just Flight - BAe 146 Professional RJ100", "maxPax": 128, "maxCargo": 2500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET", "mtow": 46000, "oew": 25600, "fuelPerNm": 4.5 },
-"RJ1F": { "name": "Just Flight - BAe 146 Professional RJ100 QT Freighter", "maxPax": 0, "maxCargo": 11500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET", "mtow": 46000, "oew": 24000, "fuelPerNm": 4.5 },
-"RJ70": { "name": "Just Flight - BAe 146 Professional RJ70", "maxPax": 94, "maxCargo": 1500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 4000, "class": "JET", "mtow": 43081, "oew": 23900, "fuelPerNm": 4.0 },
-"RJ85": { "name": "Just Flight - BAe 146 Professional RJ85", "maxPax": 112, "maxCargo": 2000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 4500, "class": "JET", "mtow": 43998, "oew": 24602, "fuelPerNm": 4.2 },
-"SF50": { "name": "FlightFX - Vision Jet G2+", "maxPax": 4, "maxCargo": 136, "minD": 70, "maxD": 150, "minAlt": 15000, "maxAlt": 20000, "rules": "IFR", "minRunwayLength": 3100, "class": "BIZ JET", "mtow": 2721, "oew": 1610, "fuelPerNm": 0.8 },
-"SPIT": { "name": "Flying Iron - Spitfire", "maxPax": 0, "maxCargo": 80, "minD": 60, "maxD": 180, "minAlt": 15000, "maxAlt": 20000, "rules": "VFR/Scenic", "minRunwayLength": 1000, "class": "GA", "mtow": 3000, "oew": 2300, "fuelPerNm": 1.0 },
-"STAR": { "name": "Black Square - Starship", "maxPax": 8, "maxCargo": 650, "minD": 70, "maxD": 180, "minAlt": 15000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 3112, "class": "TURBO", "mtow": 6759, "oew": 4574, "fuelPerNm": 1.5 },
-"T210": { "name": "Carenado - Cessna CT210N", "maxPax": 6, "maxCargo": 300, "minD": 20, "maxD": 80, "minAlt": 4000, "maxAlt": 27000, "rules": "VFR/Scenic", "minRunwayLength": 2160, "class": "GA", "mtow": 1814, "oew": 1050, "fuelPerNm": 0.3 },
-"TBM8": { "name": "Black Square - TBM850", "maxPax": 5, "maxCargo": 420, "minD": 70, "maxD": 180, "minAlt": 15000, "maxAlt": 31000, "rules": "IFR", "minRunwayLength": 2380, "class": "TURBO", "mtow": 3354, "oew": 2132, "fuelPerNm": 0.7 },
-"VULC": { "name": "Just Flight - Vulcan B Mk. 2", "maxPax": 5, "maxCargo": 9500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 55000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET", "mtow": 92500, "oew": 37144, "fuelPerNm": 10.0 }
-};
-const missionMatrix = [
-    { type: 1, name: "Medical Research", desc: "transporting rare serum samples", detail: "These unstable cultures require a strictly regulated cabin and careful transport.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
-    { type: 2, name: "Medical Transport", desc: "rushing specialized surgical equipment", detail: "A remote clinic needs this equipment immediately to stabilize a patient.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
-    { type: 3, name: "Military Research", desc: "transferring top-secret flight data", detail: "The encrypted drives contain telemetry logs from a prototype aircraft.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
-    { type: 4, name: "Military Transport", desc: "moving heavy tactical components", detail: "These parts are required for an immediate defensive fortification.", weight: 8, allowedClasses: ["JET"], minCargo: 6000, cargoOnly: true },
-    { type: 5, name: "Emergency Relief", desc: "delivering life-saving nutrition packs", detail: "Flooding has cut off the local supply chain; these are desperately needed.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
-    { type: 6, name: "Celebrity Charter", desc: "accommodating superstar {name} on tour", detail: "{name} is exhausted and has requested a silent, luxury cabin.", weight: 7, allowedClasses: ["BIZ JET", "JET", "HELI"], paxOnly: true },
-    { type: 7, name: "Propaganda Ops", desc: "dropping localized awareness flyers", detail: "The goal is to inform the local populace of upcoming policy changes.", weight: 5, allowedClasses: ["GA", "TURBO", "HELI"] },
-    { type: 8, name: "Government Documents", desc: "securing urgent diplomatic files", detail: "These are the final signed peace treaties for the summit.", weight: 8, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
-    { type: 9, name: "Endangered Animal Rescue", desc: "rescuing an endangered animal", detail: "This cub was orphaned by poaching and needs safe transfer to a sanctuary.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
-    { type: 10, name: "Military Hardware", desc: "relocating a modular armored transport unit", detail: "This unit is required at the depot for immediate assembly to ensure readiness.", weight: 3, allowedClasses: ["JET"], minCargo: 6000, cargoOnly: true },
-    { type: 11, name: "Medevac Mission", desc: "airlifting a critical patient", detail: "The patient requires a smooth flight to prevent further complications.", weight: 8, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"], paxOnly: true },
-    { type: 12, name: "Black Ops", desc: "securing extraterrestrial bio-matter", detail: "You are delivering organic remains recovered from a crash site; maintain isolation protocols. You have been warned!", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
-    { type: 13, name: "Luxury Goods", desc: "recovering a lost artifact", detail: "This artifact is a priceless treasure missing for thousands of years. Handle with care and do not let this fall into the wrong hands!", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
-    { type: 14, name: "Tech Delivery", desc: "delivering quantum-processing chips", detail: "These chips are heat-sensitive and must be kept below 5°C throughout the flight.", weight: 4, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
-    { type: 15, name: "Sports Charter", desc: "transporting star athlete {name} for the finals", detail: "{name} needs to arrive in peak condition; please ensure a smooth flight profile.", weight: 3, allowedClasses: ["BIZ JET", "JET", "HELI"], paxOnly: true },
-    { type: 16, name: "Botanical Mission", desc: "delivering a rare protected sapling", detail: "This species was thought extinct and is the center-piece of the upcoming conservation summit.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
-    { type: 17, name: "Fashion Logistics", desc: "delivering haute couture for a runway show", detail: "The garments are extremely fragile; ensure cabin pressurization remains perfectly stable.", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
-    { type: 18, name: "Film Production", desc: "transporting original film negatives", detail: "These are the only original master master negatives in existence; keep them secure at all times.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "HELI"] },
-    { type: 19, name: "Historical Archiving", desc: "relocating ancient scrolls", detail: "The scrolls are degrading rapidly; they must reach the lab before they disintegrate.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET"] },
-    { type: 20, name: "Prototype Testing", desc: "moving a high-performance engine prototype", detail: "This engine is a brand-new design; engineers are waiting on the tarmac to begin testing.", weight: 4, allowedClasses: ["TURBO", "BIZ JET", "JET"] },
-    { type: 21, name: "Culinary Express", desc: "transporting vintage wines for a tasting", detail: "This vintage is highly delicate; minor vibrations could ruin the chemical balance of the wine.", weight: 2, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET"] },
-    { type: 22, name: "Astro-Research", desc: "returning a retired satellite component", detail: "The component is slightly radioactive and must stay inside the provided lead-lined container.", weight: 3, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET"] },
-    { type: 23, name: "Corporate Merger", desc: "flying key negotiators to a merger", detail: "The atmosphere in the cabin is expected to be tense; keep the flight efficient and professional.", weight: 5, allowedClasses: ["BIZ JET", "JET", "HELI"], paxOnly: true },
-    { type: 24, name: "City Sightseeing Tour", desc: "conducting a local aerial tour", detail: "Passengers are eager to see the local landmarks from above.", weight: 15, allowedClasses: ["GA", "HELI"], isLocal: true },
-    { type: 25, name: "Aerial Photography", desc: "providing an aerial platform for a local photographer", detail: "The photographer needs smooth orbits around key points of interest.", weight: 10, allowedClasses: ["GA", "HELI"], isLocal: true },
-    { type: 26, name: "Traffic & News Patrol", desc: "monitoring local rush hour conditions", detail: "Fly a steady local circuit so the onboard reporter can broadcast traffic updates.", weight: 10, allowedClasses: ["HELI"], isLocal: true },
-    { type: 27, name: "Pipeline/Powerline Inspection", desc: "surveying local infrastructure grids", detail: "Maintain low altitude along the designated inspection corridor and report any structural anomalies.", weight: 8, allowedClasses: ["HELI"], isLocal: true },
-    { type: 28, name: "Global Grocery Supply", desc: "transporting palletized perishables", detail: "Supermarket distribution centers are awaiting this bulk delivery to restock empty shelves.", weight: 8, allowedClasses: ["JET"], cargoOnly: true },
-    { type: 29, name: "Express Courier Network", desc: "moving international parcels and priority mail", detail: "You are the backbone of the global supply chain tonight. Ensure these time-sensitive packages arrive on schedule.", weight: 10, allowedClasses: ["JET"], minCargo: 5000, cargoOnly: true },
-    { type: 30, name: "Heavy Automotive Transit", desc: "delivering luxury vehicles and mechanical parts", detail: "The cargo hold contains high-end custom cars and heavy industrial components bound for international buyers. Watch your sink rate on landing.", weight: 5, allowedClasses: ["JET"], minCargo: 4500, cargoOnly: true },
-    { type: 31, name: "Secure Asset Relocation", desc: "transporting heavy gold bullion", detail: "This is a highly classified central bank transfer of extremely high value. Security teams are on standby at the destination. Keep the flight profile smooth.", weight: 3, allowedClasses: ["JET"], minCargo: 2000, cargoOnly: true },
-    { type: 32, name: "Classified Tech Transfer", desc: "moving sensitive government technology", detail: "The manifests are sealed. This high-clearance cargo contains experimental hardware that must not be compromised.", weight: 4, allowedClasses: ["JET"], minCargo: 4000, cargoOnly: true },
-    // --- 7 PASSENGER JET EXCLUSIVE MISSIONS ---
-    { type: 33, name: "Scheduled Commercial Route", desc: "flying a dense commercial passenger route", detail: "Hundreds of travelers are counting on you for an on-time arrival. Maintain standard airline procedures.", weight: 10, allowedClasses: ["JET"], paxOnly: true },
-    { type: 34, name: "Corporate Roadshow", desc: "transporting executives on a global tour", detail: "The cabin is configured for VIPs holding meetings mid-air. Ensure a smooth ride for their presentations.", weight: 6, allowedClasses: ["JET"], paxOnly: true },
-    { type: 35, name: "Major League Transport", desc: "flying a professional sports team to the playoffs", detail: "The athletes need maximum rest before the big game; avoid turbulence at all costs.", weight: 7, allowedClasses: ["JET"], paxOnly: true },
-    { type: 36, name: "Diplomatic Delegation", desc: "transporting a government delegation to a summit", detail: "High-level state representatives are onboard. Security is tight and punctuality is mandated.", weight: 5, allowedClasses: ["JET"], paxOnly: true },
-    { type: 37, name: "Mass Evacuation", desc: "evacuating citizens from a disaster zone", detail: "The aircraft is packed to maximum capacity. Get these people to a safe haven quickly and safely.", weight: 1, allowedClasses: ["JET"], paxOnly: true },
-    { type: 38, name: "Troop Transport Charter", desc: "relocating a military battalion", detail: "Contracted by the defense department to move personnel. Maintain strict schedule adherence.", weight: 3, allowedClasses: ["JET"], paxOnly: true },
-    { type: 39, name: "Leisure Charter", desc: "flying vacationers to a resort", detail: "Passengers are eager to start their holidays. Keep the flight pleasant and enjoyable.", weight: 10, allowedClasses: ["JET"], paxOnly: true },
-    // --- 6 BIZ JET EXCLUSIVE MISSIONS ---
-    { type: 40, name: "C-Suite Commute", desc: "shuttling executives to a manufacturing plant", detail: "The board of directors needs to inspect a new facility. Time is highly critical for this corporate transit.", weight: 7, allowedClasses: ["BIZ JET"]},
-    { type: 41, name: "AOG Part Relay", desc: "rushing a critical replacement component", detail: "An assembly line is shut down waiting for this exact part. Fly as directly and quickly as possible.", weight: 5, allowedClasses: ["BIZ JET"] },
-    { type: 42, name: "Fractional Owner Flight", desc: "flying a premium fractional owner", detail: "The client pays top tier for absolute perfection. Deliver a flawless, quiet, and comfortable journey.", weight: 4, allowedClasses: ["BIZ JET"] },
-    { type: 43, name: "Client Hosting Trip", desc: "taking prospective buyers on a site tour", detail: "Sales teams are closing a massive deal. Impress the clients with luxury service and smooth flying.", weight: 8, allowedClasses: ["BIZ JET"] },
-    { type: 44, name: "Organ Transplant Relay", desc: "transporting an organ for immediate surgery", detail: "A patient is prepped in the OR. Every single minute counts to preserve tissue viability.", weight: 6, allowedClasses: ["BIZ JET"] },
-    { type: 45, name: "High-Profile Escort", desc: "transporting a key trial witness", detail: "Security protocols are in full effect. Maintain absolute discretion and a direct flight path.", weight: 5, allowedClasses: ["BIZ JET"] },
-    // --- 5 TURBOPROP EXCLUSIVE MISSIONS ---
-    { type: 46, name: "Regional Commuter Hop", desc: "flying a short domestic passenger route", detail: "Connecting a smaller regional airport to the main international hub. Ensure a prompt turnaround.", weight: 10, allowedClasses: ["TURBO"] },
-    { type: 47, name: "Overnight Feeder Cargo", desc: "moving local express packages", detail: "These overnight parcels must reach the main sorting facility before dawn to make their delivery windows.", weight: 9, allowedClasses: ["TURBO"] },
-    { type: 48, name: "Remote Medevac Transfer", desc: "airlifting a patient from a short rural runway", detail: "A larger jet cannot land here. Retrieve the critical patient and transfer them to the major hospital network.", weight: 6, allowedClasses: ["TURBO"] },
-    { type: 49, name: "Rural Factory Shuttle", desc: "moving staff between geographically diverse sites", detail: "Engineers are required at the remote processing facility; this runway is too short for commercial jets.", weight: 5, allowedClasses: ["TURBO"] },
-    { type: 50, name: "Cloud Seeding", desc: "deploying weather modification chemicals", detail: "Fly a precise pattern to encourage local precipitation for the agricultural sector.", weight: 2, allowedClasses: ["TURBO"]},
-    // --- 6 GA EXCLUSIVE MISSIONS ---
-    { type: 51, name: "Flight Instruction", desc: "conducting a primary training flight", detail: "A student pilot is practicing basic maneuvers. Ensure safe altitudes and standard traffic patterns.", weight: 7, allowedClasses: ["GA"] },
-    { type: 52, name: "Crop Dusting", desc: "spraying local agricultural fields", detail: "Fly low and level over the designated farmland to apply the treatment evenly and safely.", weight: 3, allowedClasses: ["GA"]},
-    { type: 53, name: "Air Taxi Charter", desc: "flying a short on-demand passenger charter", detail: "A local business owner needs to bypass highway traffic to reach a meeting in the next town.", weight: 9, allowedClasses: ["GA"] },
-    { type: 54, name: "Mail Delivery", desc: "delivering mail to a community", detail: "These people rely entirely on you for their weekly mail and essential light supplies.", weight: 9, allowedClasses: ["GA"] },
-    { type: 55, name: "Land Surveying", desc: "mapping a new property development", detail: "Maintain a steady grid pattern so the onboard optical equipment can capture accurate topology data.", weight: 7, allowedClasses: ["GA"] },
-    { type: 56, name: "Archaeological Surveying", desc: "mapping ancient ruins", detail: "Keep your airspeed steady and altitude consistent so the team can deploy thermal imaging while they search for potential sites.", weight: 5, allowedClasses: ["GA"] },
-    // --- 11 HELICOPTER EXCLUSIVE MISSIONS ---
-    { type: 57, name: "Highway Medevac", desc: "extracting a crash victim from the interstate", detail: "Rush the critical patient directly to the trauma center.", weight: 7, allowedClasses: ["HELI"], isLocal: false },
-    { type: 58, name: "Search and Rescue", desc: "extracting lost hikers", detail: "Escort the injured hikers to safety.", weight: 10, allowedClasses: ["HELI"], isLocal: false },
-    { type: 59, name: "Police Pursuit", desc: "tracking a suspect vehicle from the air", detail: "Keep the spotlight focused on the suspect while coordinating pursuit vectors with ground units.", weight: 8, allowedClasses: ["HELI"], isLocal: true },
-    { type: 60, name: "Aerial Survey", desc: "mapping a new property development", detail: "Maintain a steady grid pattern so the onboard optical equipment can capture accurate topology data.", weight: 7, allowedClasses: ["HELI"], isLocal: true },
-    { type: 61, name: "Sling-Load Construction", desc: "moving heavy HVAC units to a skyscraper roof", detail: "Precision hovering is strictly required to safely position this heavy equipment for the ground crew.", weight: 5, allowedClasses: ["HELI"], isLocal: false },
-    { type: 62, name: "Wildlife Tracking", desc: "darting and tagging a rogue predator", detail: "Fly low and steady over the area so the biologists can safely tag the animal.", weight: 4, allowedClasses: ["HELI"], isLocal: true },
-    { type: 63, name: "VIP Heli-Transfer", desc: "shuttling a VIP from the airport to downtown", detail: "The client demands a quick, smooth transition from their private jet directly to the corporate helipad.", weight: 10, allowedClasses: ["HELI"], isLocal: false },
-    { type: 64, name: "Live News Broadcast", desc: "covering a breaking news event from above", detail: "Establish a steady orbit above the scene so the camera operator can get a clear, stabilized shot.", weight: 8, allowedClasses: ["HELI"], isLocal: true },
-    { type: 65, name: "Cinematic Filming", desc: "filming a high-speed car chase sequence", detail: "Coordinate closely with the director and stunt drivers to capture the perfect dynamic tracking shot.", weight: 6, allowedClasses: ["HELI"], isLocal: true },
-    { type: 66, name: "Tactical Insertion", desc: "dropping a tactical team", detail: "Approach the destination quietly and land carefully for rapid deployment of the ground team.", weight: 4, allowedClasses: ["HELI"], isLocal: false }
-];
-const fleetCategories = {
-    "Single Engine Prop": ["PA24", "PA38", "C172", "DA40", "KODI", "SPIT", "P28A", "PA28", "T210"],
-    "Twin Engine Prop": ["AEST", "B58P", "BE60", "C414", "DA42", "HU16"],
-    "Turboprop": ["B36T", "B60T", "C208", "DC6", "PC12", "STAR", "TBM8", "B200"],
-    "Business Jet": ["C680", "C750", "E55P", "HDJT", "LJ35", "P180", "SF50"],
-    "Jet": ["A319", "A320", "A321", "A346", "A359", "A388", "B146", "B722", "B72F", "B736", "B737", "B738", "B77W", "CRJ7", "E190", "E195", "F028", "MD11", "MD82", "MD88", "RJ10", "RJ1F", "RJ70", "RJ85", "VULC"],
-    "Helicopter": ["ALO3", "H145", "H500", "LAMA", "R22"]
-};
-const names = ["Margot Robbie", "Keanu Reeves", "Zendaya", "Tom Hardy", "Cillian Murphy", "Lara Croft", "Raul from FSReborn", "Taylor Swift", "Brad Pitt", "Lenny Kravitz", "Ellen DeGeneres", "Jennifer Aniston", "Reese Witherspoon", "Cate Blanchett", "Matt Damon", "Robert Downey Jr", "Angelina Jolie", "Monica Lewinsky", "Salma Hayek", "Elizabeth Hurley", "Gillian Anderson"];
-const athletes = ["Lewis Hamilton", "Lionel Messi", "LeBron James", "Serena Williams", "Cristiano Ronaldo", "Simone Biles", "Max Verstappen", "Stephen Curry", "Novak Djokovic", "Usain Bolt"];
-const preFlightQuotes = [
-    { text: "When once you have tasted flight, you will forever walk the earth with your eyes turned skyward, for there you have been, and there you will always long to return.", author: "Leonardo DaVinci" },
-    { text: "Man must rise above the Earth, to the top of the atmosphere and beyond, for only thus will he fully understand the world in which he lives.", author: "Socrates" },
-    { text: "I fly because it releases my mind from the tyranny of petty things.", author: "Antoine de Saint-Exupery" },
-    { text: "The desire to fly is an idea handed down to us by our ancestors who, in their grueling travels across trackless lands in prehistoric times, looked enviously on the birds soaring freely through space, at full speed, above all obstacles, on the infinite highway of the air.", author: "Wilbur Wright" },
-    { text: "Sometimes, flying feels too God-like to be attained by man. Sometimes, the world from above seems too beautiful, too wonderful, too distant for human eyes to see.", author: "Charles A. Lindbergh" },
-    { text: "Pilots are a rare kind of human. They leave the ordinary surface of the word, to purify their soul in the sky, and they come down to earth, only after receiving the communion of the infinite.", author: "Jose Maria Velasco Ibarra" },
-    { text: "Airspeed, altitude, and brains. Two are always needed to successfully complete the flight.", author: null },
-    { text: "Both optimists and pessimists contribute to our society. The optimist invents the airplane and the pessimist the parachute.", author: "Gil Stern" },
-    { text: "If black boxes survive air crashes, why don’t they make the whole plane out of that stuff?", author: "George Carlin" },
-    { text: "You’ve never been lost until you’ve been lost at Mach 3.", author: "Paul F. Crickmore" },
-    { text: "Learn from the mistakes of others. You won’t live long enough to make all of them yourself.", author: null },
-    { text: "You start with a bag full of luck and an empty bag of experience. The trick is to fill the bag of experience before you empty the bag of luck.", author: null },
-    { text: "Good judgment comes from experience. Unfortunately, the experience usually comes from bad judgment.", author: null },
-    { text: "There are old pilots and there are bold pilots. However, there are no old, bold pilots.", author: null },
-    { text: "The engine is the heart of an airplane, but the pilot is its soul.", author: "Walter Raleigh" },
-    { text: "Aviation is proof that given the will, we have the capacity to achieve the impossible.", author: "Eddie Rickenbacker" },
-    { text: "Flying is more than a sport and more than a job; flying is pure passion and desire.", author: "General Adolf Galland" },
-    { text: "The airplane stands for freedom, for joy, for the power to understand.", author: "Richard Bach" },
-    { text: "We who fly do so for the love of flying.", author: "Cecil Day-Lewis" },
-    { text: "Adventure is worthwhile in itself.", author: "Amelia Earhart" },
-    { text: "Flying is hypnotic and all pilots are victims to the spell.", author: "Ernest K. Gann" },
-    { text: "Life is like a landscape. You live in the midst of it but can describe it only from the vantage point of distance.", author: "Charles Lindbergh" },
-    { text: "I owned the world that hour as I rode over it – free of the earth, free of the mountains, free of the clouds, but how inseparably I was bound to them.", author: "Charles Lindbergh" },
-    { text: "Real freedom lies in wildness, not in civilization.", author: "Charles Lindbergh" },
-    { text: "Flying is learning how to throw yourself at the ground and miss.", author: "Douglas Adams" }
-];
 let lastMissionType = null;
 let activeAirportDatabase = [];
 let activeFleetSpecs = {};
@@ -1184,11 +1014,16 @@ let filteredMissions = missionMatrix.filter(m => {
         }
         randomNum -= m.weight;
     }
-    lastMissionType = chosenMission.type;
+lastMissionType = chosenMission.type;
     let randomName = names[Math.floor(Math.random() * names.length)];
     let randomAthlete = athletes[Math.floor(Math.random() * athletes.length)];
-    let processedDesc = chosenMission.desc.replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName);
-    let processedDetail = chosenMission.detail.replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName);
+    let randomTeam = teams[Math.floor(Math.random() * teams.length)];
+    let processedDesc = chosenMission.desc
+        .replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName)
+        .replace("{team}", randomTeam);
+    let processedDetail = chosenMission.detail
+        .replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName)
+        .replace("{team}", randomTeam);
     let jobTicket = "";
     if (spec.rules.includes("VFR")) {
         if (isLocalFlight) {
