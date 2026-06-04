@@ -592,7 +592,7 @@ body.light-mode #timeVal {
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v7.5
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v7.6
     </div>
 </div>
 </div>
@@ -1014,12 +1014,18 @@ function dispatchFlight() {
             break; 
         }
     }
-    const climbProfile = (spec.class === "GA" || spec.class === "HELI") ? 100 : 300;
+let climbProfile = 150; 
+    if (spec.class === "GA" || spec.class === "HELI") climbProfile = 100;
+    if (spec.class === "BIZ JET") climbProfile = 250;
     const distanceAltCap = distanceNm * climbProfile;
-    const finalMinAlt = Math.max(spec.minAlt, terrainSafetyFloor);
-    const effectiveMaxAlt = Math.min(spec.maxAlt, distanceAltCap);
-    const safeMaxAlt = Math.max(effectiveMaxAlt, finalMinAlt);
-    let baseThousands = Math.floor((Math.random() * (safeMaxAlt - finalMinAlt + 1) + finalMinAlt) / 1000);
+const finalMinAlt = Math.max(spec.minAlt, terrainSafetyFloor);
+    const effectiveMaxAlt = Math.max(Math.min(spec.maxAlt, distanceAltCap), terrainSafetyFloor);
+    
+    const safeMaxAlt = effectiveMaxAlt;
+    const dynamicMinAlt = effectiveMaxAlt < finalMinAlt 
+        ? Math.max(terrainSafetyFloor, safeMaxAlt - 4000)
+        : Math.max(finalMinAlt, safeMaxAlt - 4000);
+	let baseThousands = Math.floor((Math.random() * (safeMaxAlt - dynamicMinAlt + 1) + dynamicMinAlt) / 1000);
     let altValue;
     if (spec.rules.includes("VFR")) {
         if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
