@@ -193,7 +193,7 @@ const seedAirportDatabase = [
 { icao: "EGPB", name: "Sumburgh", rwy: "TURBO", length: 4921, lat: 59.879, lon: -1.296, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "EGPE", name: "Inverness", rwy: "JET", length: 6191, lat: 57.543, lon: -4.050, source: "Core", tag: "Third Party", linkText: "UK2000 via SimMarket", url: "https://secure.simmarket.com/uk2000-scenery-inverness-2020hd-msfs.phtml" },
 { icao: "EGPF", name: "Glasgow Airport", rwy: "JET", length: 8743, lat: 55.871, lon: -4.433, source: "Core", tag: "Third Party", linkText: "Pyreegue Dev Co. via Contrail", url: "https://contrail.shop/search?q=EGPF" },
-{ icao: "EGPH", name: "Edinburgh Airport II", rwy: "JET", length: 8399, lat: 55.950, lon: -3.372, source: "Core", tag: "Third Party", linkText: "Pyreegue Dev Co. via Contrail", url: "https://contrail.shop/search?q=EGPH" },
+{ icao: "EGPH", name: "Edinburgh Airport", rwy: "JET", length: 8399, lat: 55.950, lon: -3.372, source: "Core", tag: "Third Party", linkText: "Pyreegue Dev Co. via Contrail", url: "https://contrail.shop/search?q=EGPH" },
 { icao: "EGPK", name: "Glasgow Prestwick", rwy: "JET", length: 9799, lat: 55.509, lon: -4.587, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/44027/egpk-glasgow-prestwick-airport" },
 { icao: "EGPN", name: "Dundee", rwy: "TURBO", length: 4593, lat: 56.453, lon: -3.026, source: "Core", tag: "Third Party", linkText: "ORBX (MSFS 2024 Compatible)", url: "https://orbxdirect.com/product/egpn-msfs?" },
 { icao: "EGPR", name: "Barra Airport", rwy: "GA", length: 2700, lat: 57.025, lon: -7.443, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
