@@ -1153,14 +1153,22 @@ let baseThousands = Math.floor((Math.random() * (safeMaxAlt - dynamicMinAlt + 1)
         pax = Math.floor(Math.random() * (spec.maxPax - minPax + 1)) + minPax;
     }
     
-    const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
+const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
     const safeOew = spec.oew || (spec.class === "JET" ? 42000 : 2000);
     const safeFuelPerNm = spec.fuelPerNm || (spec.class === "JET" ? 6 : 0.5);
     const paxWeight = pax * 104;
     const estimatedBlockFuel = distanceNm * safeFuelPerNm;
+    
+    // Calculate ratio of filled seats to scale down available cargo space proportionally
+    const paxRatio = spec.maxPax > 0 ? (pax / spec.maxPax) : 0;
+    const proportionalCargoLimit = spec.maxCargo * (1 - paxRatio);
+    
+    // Check raw structural weight limit 
     const maxStructuralPayload = safeMtow - safeOew - estimatedBlockFuel;
     const remainingPayload = Math.max(0, maxStructuralPayload - paxWeight);
-    const hardCargoLimit = Math.min(spec.maxCargo, remainingPayload);
+    
+    // Choose the strictest limit: proportional capacity vs raw structural limit
+    const hardCargoLimit = Math.floor(Math.min(proportionalCargoLimit, remainingPayload));
     let cargoKg = hardCargoLimit > 0 ? Math.floor(Math.random() * hardCargoLimit) : 0;
     const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
     
