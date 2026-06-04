@@ -28,6 +28,8 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 ---
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
-© 2026 manicminer - [Support my work](https://www.google.com/search?q=https://buymeacoffee.com/manicminer/) at buymeacoffee.
+© 2026 manicminer - Support my work at buymeacoffee.
+(https://www.google.com/search?q=https://buymeacoffee.com/manicminer/) 
+
 *Created and maintained by manicminer. This is a free tool provided for the flight simulation community.*
 [2026-06-04 21:07:36]
