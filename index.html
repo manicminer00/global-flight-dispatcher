@@ -1180,17 +1180,17 @@ function loadRandomBanner() {
     const bannerAssets = [
         'banner-ga1.png',
         'banner-ga2.png',
-		'banner-turbo1.png',
-		'banner-turbo2.png',
+        'banner-turbo1.png',
+        'banner-turbo2.png',
         'banner-bizjet1.png',
         'banner-bizjet2.png',
-		'banner-jet1.png',
-		'banner-jet2.png',
+        'banner-jet1.png',
+        'banner-jet2.png',
         'banner-warbird1.png',
         'banner-warbird2.png'
-		];
+    ];
     
-    // Pick a random array index integer between 0 and 4
+    // Pick a random array index integer between 0 and 9 (dynamically based on array length)
     const randomIndex = Math.floor(Math.random() * bannerAssets.length);
     
     // Select the HTML element and bind the chosen image string to the src property
