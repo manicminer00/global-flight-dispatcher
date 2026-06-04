@@ -18,12 +18,32 @@
             margin: 0 auto;
             color-scheme: dark;
         }
-        .container {
+		.container {
             background-color: #2d2d2d;
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             margin-bottom: 20px;
+        }
+        .dispatcher-banner-container {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border: 1px solid #444;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .dispatcher-banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 60%;
+            display: block;
+        }
+        body.light-mode .dispatcher-banner-container {
+            border-color: #d1d9e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         h1 {
             color: var(--accent-color);
@@ -260,10 +280,26 @@
         #colorPicker .dark-color { display: block; }
         body.light-mode #colorPicker .light-color { display: block; }
         body.light-mode #colorPicker .dark-color { display: none; }
-#timeVal {
-    color: var(--accent-color);
-    font-weight: bold; /* Optional: makes it pop a bit more against the label text */
-}
+		#timeVal {
+			color: var(--accent-color);
+			font-weight: bold; /* Optional: makes it pop a bit more against the label text */
+		}
+		.dispatcher-banner-container {
+            width: 100%;
+            height: 180px; 
+            overflow: hidden;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border: 1px solid #444;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .dispatcher-banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Retains crop geometry without clipping or warping */
+            object-position: center;
+            display: block;
+        }
         /* --- LIGHT MODE OVERRIDES --- */
         body.light-mode {
             background-color: #ffffff;
@@ -357,7 +393,11 @@ body.light-mode #timeVal {
 <script type="text/javascript" src="missions-db.js"></script>
 </head>
 <body>
+<body>
 <div class="container">
+    <div class="dispatcher-banner-container">
+        <img id="dynamicWorkflowBanner" alt="Dynamic Flight Dispatch Banner" class="dispatcher-banner-img">
+    </div>
     <h1>Dynamic Global Flight Dispatcher (for MSFS 2024)</h1>
     <div class="important-box">
         <p id="quoteDisplay"></p>
@@ -593,7 +633,7 @@ body.light-mode #timeVal {
         </a>
     </div>
     <div style="text-align: right;">
-        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v7.6
+        &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v7.7
     </div>
 </div>
 </div>
@@ -1136,7 +1176,29 @@ lastMissionType = chosenMission.type;
     }
     document.getElementById("dispatchRelease").style.display = "block";
 }
+function loadRandomBanner() {
+    const bannerAssets = [
+        'banner-ga1.png',
+        'banner-ga2.png',
+		'banner-turbo1.png',
+		'banner-turbo2.png',
+        'banner-bizjet1.png',
+        'banner-bizjet2.png',
+		'banner-jet1.png',
+		'banner-jet2.png',
+        'banner-warbird1.png',
+        'banner-warbird2.png'
+		];
+    
+    // Pick a random array index integer between 0 and 4
+    const randomIndex = Math.floor(Math.random() * bannerAssets.length);
+    
+    // Select the HTML element and bind the chosen image string to the src property
+    document.getElementById("dynamicWorkflowBanner").src = bannerAssets[randomIndex];
+}
+
 window.onload = function() {
+    loadRandomBanner(); // Generates and sets a new image on every cold refresh
     loadSettings();
     rebuildActiveDatabase();
     rebuildFleetDropdown();
