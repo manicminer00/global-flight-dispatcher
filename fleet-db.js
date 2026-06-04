@@ -1,4 +1,4 @@
-//fleet-db.js v.0406c
+//fleet-db.js v.0406e
 const coreFleetSpecs = {
 "AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
 "PA24": { "name": "A2A - Piper Comanche 250", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.2 },
@@ -31,7 +31,10 @@ const coreFleetSpecs = {
 "B722": { "name": "FlightSimStudio - 727-200 Passenger", "maxPax": 189, "maxCargo": 4000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 42000, "rules": "IFR", "minRunwayLength": 8300, "class": "JET", "mtow": 95200, "oew": 45360, "fuelPerNm": 8.0 },
 "E190": { "name": "FlightSimStudio - E-Jets 190", "maxPax": 114, "maxCargo": 2800, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 5300, "class": "JET", "mtow": 51800, "oew": 28080, "fuelPerNm": 4.0 },
 "E195": { "name": "FlightSimStudio - E-Jets 195", "maxPax": 124, "maxCargo": 3300, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 7000, "class": "JET", "mtow": 52290, "oew": 28620, "fuelPerNm": 4.2 },
-"SPIT": { "name": "Flying Iron - Spitfire", "maxPax": 0, "maxCargo": 80, "minD": 60, "maxD": 400, "minAlt": 15000, "maxAlt": 20000, "rules": "VFR/Scenic", "minRunwayLength": 1000, "class": "GA", "mtow": 3000, "oew": 2300, "fuelPerNm": 1.0 },
+"BF109": { "name": "Flying Iron - Bf 109G-6", "maxPax": 0, "maxCargo": 500, "minD": 60, "maxD": 400, "minAlt": 4000, "maxAlt": 38000, "rules": "VFR/Scenic", "minRunwayLength": 1300, "class": "WARBIRD", "mtow": 3400, "oew": 2247, "fuelPerNm": 0.5 },
+"F6F": { "name": "Flying Iron - F6F-5 Hellcat", "maxPax": 0, "maxCargo": 1814, "minD": 60, "maxD": 400, "minAlt": 4000, "maxAlt": 36000, "rules": "VFR/Scenic", "minRunwayLength": 800, "class": "WARBIRD", "mtow": 6992, "oew": 4190, "fuelPerNm": 0.8 },
+"P38": { "name": "Flying Iron - P-38 Lightning", "maxPax": 0, "maxCargo": 1814, "minD": 60, "maxD": 400, "minAlt": 4000, "maxAlt": 40000, "rules": "VFR/Scenic", "minRunwayLength": 1800, "class": "WARBIRD", "mtow": 9798, "oew": 5806, "fuelPerNm": 1.1 },
+"SPIT": { "name": "Flying Iron - Spitfire L.F Mk IXc", "maxPax": 0, "maxCargo": 80, "minD": 60, "maxD": 400, "minAlt": 15000, "maxAlt": 20000, "rules": "VFR/Scenic", "minRunwayLength": 1000, "class": "WARBIRD", "mtow": 3000, "oew": 2300, "fuelPerNm": 1.0 },
 "A388": { "name": "FlyByWire - Airbus A380-800", "maxPax": 853, "maxCargo": 83000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 43000, "rules": "IFR", "minRunwayLength": 6725, "class": "JET", "mtow": 575000, "oew": 276800, "fuelPerNm": 25.0 },
 "C414": { "name": "Flysimware - Cessna 414 AW Chancellor", "maxPax": 7, "maxCargo": 226, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 25000, "rules": "VFR/Scenic", "minRunwayLength": 2595, "class": "GA", "mtow": 3062, "oew": 1980, "fuelPerNm": 0.5 },
 "LJ35": { "name": "Flysimware - Bombardier Lear Jet 35A", "maxPax": 8, "maxCargo": 1450, "minD": 150, "maxD": 1500, "minAlt": 24000, "maxAlt": 45000, "rules": "IFR", "minRunwayLength": 4972, "class": "BIZ JET", "mtow": 8300, "oew": 4590, "fuelPerNm": 1.5 },
