@@ -659,7 +659,7 @@ const seedAirportDatabase = [
 { icao: "RNCS", name: "Chunilna Cabin Strip", rwy: "GA", length: 1000, elev: 1100, lat: 62.2472, lon: -150.0886, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "RNSF", name: "Snowflake Lake", rwy: "GA", length: 2000, lat: 48.000, lon: -120.000, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/3418/snowflake-lake-airstrip-alaska" },
 { icao: "ROAH", name: "Naha Airport", rwy: "JET", length: 11811, elev: 12, lat: 26.1958, lon: 127.6458, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
-{ icao: "ROAH", name: "Naha Airport", rwy: "JET", length: 11811, lat: 26.195, lon: 127.645, source: "Core", tag: "Third Party", linkText: "MK Studios or ACO Design Studio via Contrail", url: "https://
+{ icao: "ROAH", name: "Naha Airport", rwy: "JET", length: 11811, lat: 26.195, lon: 127.645, source: "Core", tag: "Third Party", linkText: "MK Studios or ACO Design Studio via Contrail", url: "https://contrail.shop/search?q=ROAH" },
 { icao: "ROKR", name: "Kerama Airport", rwy: "GA", length: 2600, lat: 26.168, lon: 127.311, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "RORS", name: "Shimojishima Airport", rwy: "JET", length: 9800, lat: 24.826, lon: 125.145, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "RPLC", name: "Clark International Airport", rwy: "JET", length: 10499, lat: 15.185, lon: 120.559, source: "Core", tag: "Third Party", linkText: "Cloudsurf Asia Simulations via Contrail", url: "https://contrail.shop/search?q=RPLC" },
