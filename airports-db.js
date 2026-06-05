@@ -1,4 +1,4 @@
-//airports-db.js v0506
+//airports-db.js v0506b
 const seedAirportDatabase = [
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "TURBO", length: 4300, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
 { icao: "0CN2", name: "Sutter Butte Dusters Airport", rwy: "GA", length: 2000, elev: 50, lat: 39.0569, lon: -121.7289, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
@@ -411,7 +411,7 @@ const seedAirportDatabase = [
 { icao: "KSFO", name: "San Francisco International Airport", rwy: "JET", length: 11870, lat: 37.618, lon: -122.375, source: "Core", tag: "Third Party", linkText: "Flightbeam via Contrail", url: "https://contrail.shop/search?q=KSFO" },
 { icao: "KSGU", name: "St. George Municipal Airport", rwy: "JET", length: 9300, elev: 2884, lat: 37.0364, lon: -113.5103, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "KSJC", name: "San Jose International Airport", rwy: "JET", length: 11000, elev: 62, lat: 37.3628, lon: -121.9292, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
-{ icao: "KSLC", name: "Salt Lake City International", rwy: "JET", length: 12000, lat: 40.789, lon: -111.977, source: "Core", tag: "Third Party", linkText: "PacSim", url: "https://www.islandsim.com/salt-lake-city-Internationalhtml" },
+{ icao: "KSLC", name: "Salt Lake City International", rwy: "JET", length: 12000, lat: 40.789, lon: -111.977, source: "Core", tag: "Third Party", linkText: "PacSim", url: "https://www.islandsim.com/salt-lake-city-International.html" },
 { icao: "KSMO", name: "Santa Monica Airport", rwy: "TURBO", length: 3500, lat: 34.015, lon: -118.451, source: "Core", tag: "Third Party", linkText: "AG Sim via Contrail", url: "https://contrail.shop/search?q=KSMO" },
 { icao: "KSNA", name: "John Wayne Airport", rwy: "BIZ JET", length: 5700, lat: 33.675, lon: -117.868, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/4587/john-wayne-international-airport-santa-ana-ca-usa-ksna-v1-0" },
 { icao: "KSQL", name: "San Carlos Airport", rwy: "GA", length: 2600, lat: 37.511, lon: -122.249, source: "Core", tag: "Third Party", linkText: "Inibuilds", url: "https://inibuilds.com/products/spinoza-san-carlos-ksql-msfs" },
@@ -529,7 +529,7 @@ const seedAirportDatabase = [
 { icao: "LPPT", name: "Humberto Delgado Airport", rwy: "JET", length: 12484, elev: 374, lat: 38.7742, lon: -9.1342, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "LPPT", name: "Humberto Delgado Airport", rwy: "JET", length: 12484, lat: 38.774, lon: -9.135, source: "Core", tag: "Third Party", linkText: "MK Studios via Contrail", url: "https://contrail.shop/search?q=LPPT" },
 { icao: "LQPD", name: "Prijedor Urije Airport", rwy: "GA", length: 2600, lat: 44.991, lon: 16.712, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
-{ icao: "LRBC", name: "George Enescu International", rwy: "JET", length: 8200, lat: 46.522, lon: 26.910, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/discover/LRBChttps://flightsim.to/addon/15165/lrbc-george-enescu-international" },
+{ icao: "LRBC", name: "George Enescu International", rwy: "JET", length: 8200, lat: 46.522, lon: 26.910, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/15165/lrbc-george-enescu-international" },
 { icao: "LRBM", name: "Maramures Airport", rwy: "JET", length: 6900, lat: 47.658, lon: 23.470, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/7537/lrbm-baia-mare-maramures-international-airport" },
 { icao: "LRIA", name: "Iasi International Airport", rwy: "JET", length: 7874, lat: 47.178, lon: 27.620, source: "Core", tag: "Third Party", linkText: "MLD Scenery via Contrail", url: "https://contrail.shop/search?q=LRIA" },
 { icao: "LROP", name: "Bucharest Otopeni", rwy: "JET", length: 11400, lat: 44.572, lon: 26.102, source: "Core", tag: "Third Party", linkText: "Barelli via SimMarket", url: "https://secure.simmarket.com/barelli-msfs-addon-bucharest-otopeni-lrop-v2-msfs2024.phtml" },
@@ -681,7 +681,7 @@ const seedAirportDatabase = [
 { icao: "SCIP", name: "Mataveri International Airport", rwy: "JET", length: 10853, lat: -27.164, lon: -109.421, source: "Core", tag: "Third Party", linkText: "SoFly via Contrail", url: "https://contrail.shop/search?q=SCIP" },
 { icao: "SEGU", name: "Jose Joaquin de Olmedo", rwy: "JET", length: 9154, lat: -2.157, lon: -79.883, source: "Core", tag: "Third Party", linkText: "Sierrasim via Flightsim.to", url: "https://flightsim.to/store/product/segu-jose-joaquin-de-olmedo-intl-msfs" },
 { icao: "SEQM", name: "Mariscal Sucre International", rwy: "JET", length: 13444, lat: -0.129, lon: -78.358, source: "Core", tag: "Third Party", linkText: "Coming Soon from Dreamflight Studios", url: "https://www.facebook.com/dreamflightstudios/posts/pfbid027ght689A1weHYwqXkqBYYWwK9kVU7uWW5p5iCdi1NUiiGZhRkRVLCngYoSwpVGzhl" },
-{ icao: "SKBO", name: "El Dorado International", rwy: "JET", length: 12467, lat: 4.701, lon: -74.146, source: "Core", tag: "Third Party", linkText: "Wingsim via SimMarket", url: "https://secure.simmarket.com/wingsim-wingsim-skbo-bogota-el-dorado-Internationalphtml" },
+{ icao: "SKBO", name: "El Dorado International", rwy: "JET", length: 12467, lat: 4.701, lon: -74.146, source: "Core", tag: "Third Party", linkText: "Wingsim via SimMarket", url: "https://secure.simmarket.com/wingsim-wingsim-skbo-bogota-el-dorado-International.phtml" },
 { icao: "SKRG", name: "Jose Maria Cordova", rwy: "JET", length: 11482, lat: 6.164, lon: -75.423, source: "Core", tag: "Third Party", linkText: "V Pilot Designs via MSFS Marketplace", url: "" },
 { icao: "SOCA", name: "Cayenne – Félix Eboué Airport", rwy: "JET", length: 10498, lat: 4.819, lon: -52.361, source: "Core", tag: "Third Party", linkText: "SLH Sim Designs via Contrail", url: "https://contrail.shop/search?q=SOCA" },
 { icao: "SOCA", name: "Cayenne – Félix Eboué Airport", rwy: "JET", length: 10499, elev: 24, lat: 4.8239, lon: -52.3608, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
