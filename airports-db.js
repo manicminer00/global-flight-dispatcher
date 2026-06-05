@@ -1,4 +1,4 @@
-//airports-db.js v0406
+//airports-db.js v0506
 const seedAirportDatabase = [
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "TURBO", length: 4300, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
 { icao: "0CN2", name: "Sutter Butte Dusters Airport", rwy: "GA", length: 2000, elev: 50, lat: 39.0569, lon: -121.7289, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
