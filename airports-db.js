@@ -1,4 +1,4 @@
-//airports-db.js v0506b
+//airports-db.js v0506c
 const seedAirportDatabase = [
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "TURBO", length: 4300, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
 { icao: "0CN2", name: "Sutter Butte Dusters Airport", rwy: "GA", length: 2000, elev: 50, lat: 39.0569, lon: -121.7289, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
@@ -135,7 +135,8 @@ const seedAirportDatabase = [
 { icao: "EGBP", name: "Cotswold Airport (Kemble)", rwy: "JET", length: 6591, elev: 433, lat: 51.6678, lon: -2.0567, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "EGBT", name: "Turweston Aerodrome", rwy: "TURBO", length: 3379, elev: 440, lat: 52.0408, lon: -1.0967, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "EGCB", name: "Manchester City Airport", rwy: "GA", length: 2044, lat: 53.471, lon: -2.390, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
-{ icao: "EGCC", name: "Manchester Airport", rwy: "JET", length: 10000, lat: 53.353, lon: -2.274, source: "Core", tag: "Third Party", linkText: "MaccoSim via Contrail", url: "https://contrail.shop/search?q=EGCC" },
+{ icao: "EGCC", name: "Manchester Airport", rwy: "JET", length: 10000, lat: 53.353, lon: -2.274, source: "Core", tag: "Third Party", linkText: "MaccoSim via Contrail (2021)", url: "https://contrail.shop/search?q=EGCC" },
+{ icao: "EGCC", name: "Manchester Airport", rwy: "JET", length: 10000, lat: 53.353, lon: -2.274, source: "Core", tag: "Third Party", linkText: "Inibuilds (2025)", url: "https://inibuilds.com/products/inibuilds-manchester-egcc-msfs-2024" },
 { icao: "EGCL", name: "Fenland Aerodrome", rwy: "GA", length: 1968, elev: 7, lat: 52.7331, lon: -0.0306, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "EGCW", name: "Welshpool Airport", rwy: "TURBO", length: 3346, elev: 236, lat: 52.6283, lon: -3.1536, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "EGEP", name: "Papa Westray Airport", rwy: "GA", length: 1726, elev: 28, lat: 59.3516, lon: -2.8997, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
