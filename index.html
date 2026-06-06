@@ -1,4 +1,4 @@
-<!-- v8.8 prefer owned airports -->
+<!-- v8.9 prefer owned airports and clear custom db update -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -608,6 +608,10 @@
         </div>
         
         <div class="db-stats-container">
+				<div class="db-stat-item" style="cursor: default;">
+					<span>⭐ Owned Airports</span>
+					<span id="ownedAirportsCount">0</span>
+				</div>
             <div class="db-stat-item" onclick="toggleDropdown('customAirportsList')">
                 <span>📍 Saved Airports</span>
                 <span id="customAirportsCount">0</span>
@@ -669,7 +673,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v8.8
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v8.9
         </div>
     </div>
 </div>
@@ -694,6 +698,10 @@ function saveOwnedAirports() {
     const toggle = document.getElementById("preferOwnedToggle").checked;
     localStorage.setItem("dispatcher_owned_airports", input);
     localStorage.setItem("dispatcher_prefer_owned", toggle ? "true" : "false");
+	
+	// Refresh the stats immediately
+    updateDatabaseStats();
+	
     alert("Owned airports configuration saved to local memory!");
 }
 function loadSettings() {
@@ -790,12 +798,20 @@ function updateDatabaseStats() {
         ? `<ul>${customAirports.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>` 
         : `<ul><li>No custom airports saved.</li></ul>`;
         
-    const customAcKeys = Object.keys(customFleet);
+	const customAcKeys = Object.keys(customFleet);
     document.getElementById('customAircraftCount').innerText = customAcKeys.length;
     document.getElementById('customAircraftList').innerHTML = customAcKeys.length > 0
         ? `<ul>${Object.values(customFleet).map(a => `<li>${a.name}</li>`).join('')}</ul>`
         : `<ul><li>No custom aircraft saved.</li></ul>`;
-}
+
+    // --- Update Owned Airports Count ---
+    const ownedRaw = localStorage.getItem("dispatcher_owned_airports") || "";
+    const ownedList = ownedRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    const ownedCountEl = document.getElementById('ownedAirportsCount');
+    if (ownedCountEl) {
+        ownedCountEl.innerText = ownedList.length;
+    }
+}	
 
 function saveCustomAirport() {
     const icao = document.getElementById("newIcao").value.trim().toUpperCase();
@@ -972,6 +988,18 @@ function resetCustomDatabase() {
         localStorage.removeItem("dispatcher_custom_user_airports");
         localStorage.removeItem("dispatcher_custom_airports");
         localStorage.removeItem("dispatcher_custom_fleet");
+        
+        // --- NEW: Clear Owned Airports configuration ---
+        localStorage.removeItem("dispatcher_owned_airports");
+        localStorage.removeItem("dispatcher_prefer_owned");
+        
+        // Clear the visible text box and checkbox in the UI
+        const ownedInput = document.getElementById("ownedAirportsInput");
+        if (ownedInput) ownedInput.value = "";
+        const ownedToggle = document.getElementById("preferOwnedToggle");
+        if (ownedToggle) ownedToggle.checked = false;
+        // -----------------------------------------------
+        
         rebuildActiveDatabase();
         rebuildFleetDropdown();
         updateDatabaseStats();
