@@ -1,4 +1,4 @@
-<!-- v8.7 -->
+<!-- v8.8 prefer owned airports -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,7 +130,7 @@
             text-decoration: underline;
             cursor: pointer;
         }
-        select, input[type="text"], input[type="number"] {
+		select, input[type="text"], input[type="number"], textarea {
             width: 100%;
             padding: 10px;
             background-color: #333;
@@ -302,9 +302,10 @@
             background: #f0f4f8; 
             border-color: #d1d9e0;
         }
-        body.light-mode input[type="text"], 
-        body.light-mode input[type="number"], 
-        body.light-mode select {
+		body.light-mode input[type="text"], 
+		body.light-mode input[type="number"], 
+		body.light-mode select, 
+		body.light-mode textarea {
             background-color: #ffffff;
             color: #111111;
             border-color: #b0bec5;
@@ -478,6 +479,17 @@
         </select>
         <hr class="config-separator">
         
+        <h3>⭐ Owned Airports Filter</h3>
+        <div style="margin-bottom: 10px; font-size: 13px; color: #888;">
+            Enter your owned airport ICAOs separated by commas. When enabled, the dispatcher will prioritize routes utilizing these airports.
+        </div>
+        <textarea id="ownedAirportsInput" rows="3" placeholder="e.g. EGLL, KJFK, YSSY" style="resize: vertical;"></textarea>
+        
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+            <input type="checkbox" id="preferOwnedToggle" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
+            <label for="preferOwnedToggle" style="margin: 0; font-weight: normal; color: var(--accent-color); cursor: pointer;">Enable Preferred Routing</label>
+        </div>
+        <button type="button" onclick="saveOwnedAirports()">Save Airport Preferences</button>
         <h3>📍 Add New Airport (to Local DB)</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
             <div>
@@ -657,7 +669,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v8.7
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v8.8
         </div>
     </div>
 </div>
@@ -677,6 +689,13 @@ function saveCallsign() {
     alert(`Callsign ${cs} saved to local memory configuration.`);
 }
 
+function saveOwnedAirports() {
+    const input = document.getElementById("ownedAirportsInput").value;
+    const toggle = document.getElementById("preferOwnedToggle").checked;
+    localStorage.setItem("dispatcher_owned_airports", input);
+    localStorage.setItem("dispatcher_prefer_owned", toggle ? "true" : "false");
+    alert("Owned airports configuration saved to local memory!");
+}
 function loadSettings() {
     const storedColor = localStorage.getItem("dispatcher_accent");
     if (storedColor) {
@@ -689,6 +708,14 @@ function loadSettings() {
     }
     const storedTheme = localStorage.getItem("dispatcher_theme");
     if (storedTheme) setMode(storedTheme);
+    
+    // --- New Load Logic ---
+    const ownedList = localStorage.getItem("dispatcher_owned_airports");
+    if (ownedList) {
+        document.getElementById("ownedAirportsInput").value = ownedList;
+    }
+    const preferOwned = localStorage.getItem("dispatcher_prefer_owned") === "true";
+    document.getElementById("preferOwnedToggle").checked = preferOwned;
 }
 
 function displayRandomQuote() {
@@ -1088,6 +1115,31 @@ function dispatchFlight() {
         alert(`No valid routes found matching current physical fleet configurations.`);
         return;
     }
+	// --- OWNED AIRPORTS PREFERENCE LOGIC ---
+    const preferOwned = document.getElementById("preferOwnedToggle").checked;
+    if (preferOwned) {
+        const ownedRaw = document.getElementById("ownedAirportsInput").value;
+        const ownedList = ownedRaw.split(',').map(s => s.trim().toUpperCase()).filter(s => s.length > 0);
+        
+        if (ownedList.length > 0) {
+            candidatePairs.forEach(pair => {
+                let score = 0;
+                // Score +1 for each owned airport in the pairing
+                if (ownedList.includes(pair.src.icao)) score += 1;
+                if (ownedList.includes(pair.dst.icao)) score += 1;
+                pair.ownedScore = score;
+            });
+            
+            // Find the maximum score available in the valid route pool
+            const maxScore = Math.max(...candidatePairs.map(p => p.ownedScore));
+            
+            // Filter down to the highest scored pairs, ONLY if an owned route actually exists within range
+            if (maxScore > 0) {
+                candidatePairs = candidatePairs.filter(p => p.ownedScore === maxScore);
+            }
+        }
+    }
+    // --- END PREFERENCE LOGIC ---
     
     const selectedRoute = candidatePairs[Math.floor(Math.random() * candidatePairs.length)];
     const origin = selectedRoute.src;
