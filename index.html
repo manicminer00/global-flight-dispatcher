@@ -1,3 +1,4 @@
+<!-- v8.7 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -370,9 +371,12 @@
         body.light-mode #timeVal {
             color: var(--accent-color);
         }
+		#actionPrompt {
+			color: yellow; /* Default dark mode color */
+		}
 		body.light-mode #actionPrompt {
-    color: #409444 !important; /* Replace #111111 with your preferred color */
-}
+			color: #409444; /* Light mode color */
+		}
     </style>
 <script type="text/javascript" src="simbrief.apiv1.js"></script>
     <script type="text/javascript" src="airports-db.js?v=0506g"></script>
@@ -632,7 +636,7 @@
 		<h3 style="margin-bottom: 0px;">SimBrief Dispatch / MSFS Flightplan Download</h3>
 		<p id="dispatchActionText" style="margin-top: 5px; margin-bottom: 15px;">
             <span id="heliMessage" style="display: none; color: #ff5722; font-weight: bold; margin-right: 5px;">Simbrief Dispatch is not available for this aircraft type.</span>
-            <span id="actionPrompt" style="color: yellow;"></span>
+			<span id="actionPrompt"></span>
         </p>
         <a id="outLink" class="simbrief-btn" target="_blank" rel="noopener noreferrer">Generate Flight Plan via SimBrief</a>
         <a id="downloadPlnBtn" class="simbrief-btn" style="background-color: #4CAF50; margin-left: 10px; display: none; cursor: pointer;">Download MSFS .PLN</a>
@@ -653,7 +657,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v8.6
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v8.7
         </div>
     </div>
 </div>
@@ -1268,10 +1272,10 @@ const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
     const actionPromptEl = document.getElementById("actionPrompt");
     const heliMessageEl = document.getElementById("heliMessage");
 
-    if (!isSimbriefSupported) {
+	if (!isSimbriefSupported) {
         heliMessageEl.style.display = "inline";
         actionPromptEl.innerText = "Click below to download a .pln file for MSFS 2024.";
-        actionPromptEl.style.color = "#ff5722";
+        actionPromptEl.style.color = "#ff5722"; // Forces orange in both modes
         actionPromptEl.style.fontWeight = "bold";
         document.getElementById("outLink").style.display = "none";
         document.getElementById("outRawUrl").style.display = "none";
@@ -1279,7 +1283,7 @@ const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
     } else {
         heliMessageEl.style.display = "none";
         actionPromptEl.innerText = "Click below to send this plan to SimBrief or download a .pln file for MSFS 2024.";
-        actionPromptEl.style.color = "yellow"; 
+        actionPromptEl.style.color = ""; // Clears inline style, lets CSS handle Light/Dark mode colors
         actionPromptEl.style.fontWeight = "normal";
         document.getElementById("outLink").style.display = "inline-block";
         document.getElementById("outRawUrl").style.display = "block";
