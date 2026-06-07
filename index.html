@@ -1359,7 +1359,7 @@ let jobTicket = "";
     
     if (chosenMission.militaryOnly) {
         // MILITARY / TACTICAL TONE (FRAGO / ATO Style)
-        let manifestText = chosenMission.paxOnly ? `${pax} PERS` : `${cargoKg} KG MATERIEL`;
+        let manifestText = chosenMission.paxOnly ? `${pax} PERS` : `${cargoKg} KG`;
         
         // --- NEW: Branch the military routing text based on local vs transit ---
         let routingText = isLocalFlight 
