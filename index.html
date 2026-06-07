@@ -1359,23 +1359,38 @@ let jobTicket = "";
     
     if (chosenMission.militaryOnly) {
         // MILITARY / TACTICAL TONE (FRAGO / ATO Style)
-        let manifestText = chosenMission.paxOnly ? `${pax} PERS` : `${cargoKg} KG`;
+        let manifestText = chosenMission.paxOnly ? `${pax} PERS` : `${cargoKg} KG MATERIEL`;
+        
+        // --- NEW: Branch the military routing text based on local vs transit ---
+        let routingText = isLocalFlight 
+            ? `Execute local operations originating from ${origin.icao} and return to base.`
+            : `Execute routing from ${origin.icao} to ${destination.icao} strictly as filed.`;
+
         jobTicket = `
             <strong>CLASSIFICATION:</strong> TACTICAL SORTIE (ATO# ${Math.floor(Math.random() * 9000) + 1000})<br>
             <strong>TASKING:</strong> ${chosenMission.name.toUpperCase()}<br>
             <strong>MANIFEST:</strong> ${manifestText} - ${processedDesc.toUpperCase()}<br>
             <br>
-            <strong>COMMANDER'S INTENT:</strong> ${processedDetail} Maintain sterile comms outside of ATC requirements. Execute routing from ${origin.icao} to ${destination.icao} strictly as filed. Check threat and weather scopes prior to engine start. Dismissed.`;
+            <strong>MISSION DIRECTIVES:</strong> ${processedDetail} Maintain sterile comms outside of ATC requirements. ${routingText} Check threat and weather scopes prior to engine start. Dismissed.`;
     } else {
         // CIVILIAN / STORYTELLER TONE
         let manifestText = chosenMission.paxOnly ? `${pax} Passengers` : `${cargoKg} kg Cargo`;
         if (spec.rules.includes("VFR")) {
-            jobTicket = `
-                <strong>Client Assignment:</strong> ${chosenMission.name}<br>
-                <strong>Manifest:</strong> ${processedDesc} (${manifestText})<br>
-                <strong>Contract Value:</strong> ${payout}<br>
-                <br>
-                <strong>Dispatcher Notes:</strong> Good day, Captain. We've got a client relying on us today out of ${origin.name}. ${processedDetail} The visual conditions should be in your favor, so keep your eyes outside the cockpit, watch your altitude over populated areas, and bring the airframe back in one piece.`;
+            if (isLocalFlight) {
+                jobTicket = `
+                    <strong>Client Assignment:</strong> ${chosenMission.name}<br>
+                    <strong>Manifest:</strong> ${processedDesc} (${manifestText})<br>
+                    <strong>Contract Value:</strong> ${payout}<br>
+                    <br>
+                    <strong>Dispatcher Notes:</strong> Good day, Captain. This is a local operations flight operating out of ${origin.name}. ${processedDetail} The visual conditions should be in your favor, so keep your eyes outside the cockpit, watch your altitude over populated areas, and return to base when the block time is up.`;
+            } else {
+                jobTicket = `
+                    <strong>Client Assignment:</strong> ${chosenMission.name}<br>
+                    <strong>Manifest:</strong> ${processedDesc} (${manifestText})<br>
+                    <strong>Contract Value:</strong> ${payout}<br>
+                    <br>
+                    <strong>Dispatcher Notes:</strong> Good day, Captain. This is a visual low-level run tracking out from ${origin.name} toward ${destination.name}. ${processedDetail} Keep your eyes open for points of interest along the route and keep clear of cloud decks.`;
+            }
         } else {
             jobTicket = `
                 <strong>Client Assignment:</strong> ${chosenMission.name}<br>
@@ -1385,7 +1400,6 @@ let jobTicket = "";
                 <strong>Dispatcher Notes:</strong> Welcome to the flight deck, Captain. The airway logs are locked down for this transit from ${origin.icao} to ${destination.icao}. ${processedDetail} Follow standard instrument transitions, watch your spacing tags, and stick exactly to your assigned vertical profiles. Safe flight.`;
         }
     }
-    
     document.getElementById("outCallsign").innerText = callsignRaw;
     document.getElementById("outAirframe").innerText = spec.name;
     document.getElementById("outRules").innerText = spec.rules;
