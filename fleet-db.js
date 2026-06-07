@@ -1,4 +1,4 @@
-//fleet-db.js v.9.6
+//fleet-db.js v.9.5
 const coreFleetSpecs = {
 "AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
 "PA24": { "name": "A2A - Piper Comanche 250", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.2 },
@@ -53,7 +53,7 @@ const coreFleetSpecs = {
 "P28A": { "name": "Just Flight - PA-28R Turbo Arrow IV", "maxPax": 4, "maxCargo": 100, "minD": 30, "maxD": 400, "minAlt": 4000, "maxAlt": 14000, "rules": "VFR/Scenic", "minRunwayLength": 1600, "class": "GA", "mtow": 1315, "oew": 850, "fuelPerNm": 0.2 },
 "PA28": { "name": "Just Flight - PA-28R Turbo Arrow III", "maxPax": 4, "maxCargo": 100, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 12000, "rules": "VFR/Scenic", "minRunwayLength": 1600, "class": "GA", "mtow": 1247, "oew": 770, "fuelPerNm": 0.2 },
 "PA38": { "name": "Just Flight - PA38 Tomahawk", "maxPax": 1, "maxCargo": 45, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 13000, "rules": "VFR/Scenic", "minRunwayLength": 1460, "class": "GA", "mtow": 757, "oew": 512, "fuelPerNm": 0.15 },
-"HAWK": { "name": "Just Flight - Hawk T1/A Advanced Trainer", "isMilitary": true, "maxPax": 0, "maxCargo": 3000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 48000, "rules": "IFR", "minRunwayLength": 1800, "class": "JET", "mtow": 9100, "oew": 4480, "fuelPerNm": 1.0 }
+"HAWK": { "name": "Just Flight - Hawk T1/A Advanced Trainer", "isMilitary": true, "maxPax": 0, "maxCargo": 3000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 48000, "rules": "IFR", "minRunwayLength": 1800, "class": "JET", "mtow": 9100, "oew": 4480, "fuelPerNm": 1.0 },
 "VULC": { "name": "Just Flight - Vulcan B Mk. 2", "isMilitary": true, "maxPax": 0, "maxCargo": 9500, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 55000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET", "mtow": 92500, "oew": 37144, "fuelPerNm": 10.0 },
 "MD82": { "name": "Leonardo - McDonnell Douglas MD-82", "maxPax": 172, "maxCargo": 6670, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 37000, "rules": "IFR", "minRunwayLength": 7450, "class": "JET", "mtow": 67800, "oew": 35300, "fuelPerNm": 6.0 },
 "MD88": { "name": "Leonardo - McDonnell Douglas MD-88", "maxPax": 172, "maxCargo": 6670, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 37000, "rules": "IFR", "minRunwayLength": 7850, "class": "JET", "mtow": 67800, "oew": 35300, "fuelPerNm": 6.0 },
