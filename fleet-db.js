@@ -1,4 +1,4 @@
-//fleet-db.js v.9.6
+//fleet-db.js v.9.7
 const coreFleetSpecs = {
 "AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
 "PA24": { "name": "A2A - Piper Comanche 250", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.2 },
@@ -8,7 +8,7 @@ const coreFleetSpecs = {
 "AT76": { "name": "Asobo - ATR 72-600", "maxPax": 72, "maxCargo": 7550, "minD": 70, "maxD": 800, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 4196, "class": "TURBO", "mtow": 22800, "oew": 13450, "fuelPerNm": 2.8 },
 "C172": { "name": "Asobo - C172 G1000", "maxPax": 3, "maxCargo": 54, "minD": 20, "maxD": 400, "minAlt": 3000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1630, "class": "GA", "mtow": 1157, "oew": 767, "fuelPerNm": 0.2 },
 "U16": { "name": "Asobo - Grumman Amphibian Albatross G111/HU16", "maxPax": 28, "maxCargo": 4500, "minD": 20, "maxD": 400, "minAlt": 3000, "maxAlt": 21000, "rules": "VFR/Scenic", "minRunwayLength": 2500, "class": "GA", "mtow": 13500, "oew": 9000, "fuelPerNm": 2.5 },
-"JAGR": { "name": "AzurPoly Sepecat Jaguar", "isMilitary": true, "maxPax": 0, "maxCargo": 4500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 45000, "rules": "IFR", "minRunwayLength": 3080, "class": "BIZ JET", "mtow": 14800, "oew": 7315 },
+"JAGR": { "name": "AzurPoly Sepecat Jaguar", "isMilitary": true, "maxPax": 0, "maxCargo": 4500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 45000, "rules": "IFR", "minRunwayLength": 3080, "class": "JET", "mtow": 14800, "oew": 7315 },
 "C310": { "name": "Milviz - Cessna C310R", "maxPax": 5, "maxCargo": 431, "minD": 20, "maxD": 150, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1770, "class": "GA", "mtow": 2495, "oew": 1523, "fuelPerNm": 0.5 },
 "B36T": { "name": "Black Square - Beechcraft Bonanza (Turboprop)", "maxPax": 5, "maxCargo": 544, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 17500, "rules": "VFR/Scenic", "minRunwayLength": 2180, "class": "GA", "mtow": 1746, "oew": 1140, "fuelPerNm": 0.4 },
 "B58T": { "name": "Black Square - Beechcraft Baron (Pressurized)", "maxPax": 5, "maxCargo": 649, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 20000, "rules": "VFR/Scenic", "minRunwayLength": 2345, "class": "GA", "mtow": 2812, "oew": 1814, "fuelPerNm": 0.5 },
