@@ -385,9 +385,9 @@
 		}
     </style>
 <script type="text/javascript" src="simbrief.apiv1.js"></script>
-    <script type="text/javascript" src="airports-db.js?v=9.6"></script>
-    <script type="text/javascript" src="fleet-db.js?v=v9.6"></script>
-    <script type="text/javascript" src="missions-db.js?v=9.6"></script>
+    <script type="text/javascript" src="airports-db.js?v=9.7"></script>
+    <script type="text/javascript" src="fleet-db.js?v=v9.7"></script>
+    <script type="text/javascript" src="missions-db.js?v=9.7"></script>
 </head>
 <body>
 <div class="container">
@@ -689,7 +689,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v9.6
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v9.7
         </div>
     </div>
 </div>
@@ -1277,7 +1277,7 @@ const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
     const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
     
     const currentClass = spec.class || "GA"; 
-    const searchClass = currentClass === "WARBIRD" ? "GA" : currentClass;
+	const searchClass = currentClass;
     const isLocalFlight = (origin.icao === destination.icao);
     
 let filteredMissions = missionMatrix.filter(m => {
@@ -1305,7 +1305,12 @@ let filteredMissions = missionMatrix.filter(m => {
         filteredMissions = filteredMissions.filter(m => !m.isLocal);
     }
     
-    const finalSelectionPool = filteredMissions.length > 0 ? filteredMissions : missionMatrix.filter(m => !m.isLocal);
+	if (filteredMissions.length === 0) {
+        alert("No valid military missions found for this routing. Try generating a new route or checking airport sizes.");
+        return;
+    }
+
+    const finalSelectionPool = filteredMissions;
     let selectionPoolWithGuard = finalSelectionPool.filter(m => m.type !== lastMissionType);
     if (selectionPoolWithGuard.length === 0) {
         selectionPoolWithGuard = finalSelectionPool; 
