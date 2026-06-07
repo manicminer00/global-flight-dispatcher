@@ -21,12 +21,13 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * **Customisable Interface:** Toggle between Light and Dark mode, save your preferred ATC callsign, and adjust the UI accent colour.
 ---
 ### **Current Core Database Includes:**
-* 65+ Supported Aircraft Models
+* 70+ Supported Aircraft Models
 * 330 Contrail MSFS 2024 Airports
 * 43 iniBuilds MSFS 2024 Airports
 * 210 ORBX MSFS 2024 Airports
 * 133 MSFS Hand-Crafted Airports
 * 93 Curated 3rd Party Payware & Freeware Airports
+* 96 Missions (25 exclusive missions for Military aircraft)
 ---
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
