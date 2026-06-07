@@ -27,7 +27,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * 210 ORBX MSFS 2024 Airports
 * 133 MSFS Hand-Crafted Airports
 * 93 Curated 3rd Party Payware & Freeware Airports
-* 96 Missions (25 exclusive missions for Military aircraft)
+* 100 Missions (incl. exclusive missions for Military aircraft)
 ---
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
