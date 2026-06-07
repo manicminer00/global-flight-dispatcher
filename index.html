@@ -1288,11 +1288,10 @@ let filteredMissions = missionMatrix.filter(m => {
         if (isFreighter && m.paxOnly) return false;
         if (isPaxAirframe && m.cargoOnly) return false;
         
-        // NEW: Ensure civilian aircraft do not get military-only missions
-        if (m.militaryOnly && !spec.isMilitary) return false;
+        // STRICT FENCE: Dedicated military aircraft ONLY get military missions
+        if (spec.isMilitary && !m.militaryOnly) return false;
         
-        // NEW: Ensure military aircraft ONLY get military missions
-        if (!m.militaryOnly && spec.isMilitary) return false;
+        // Standard planes like the PMDG 737 can now roll both civilian AND military contractor missions.
         
         return true;
     });
