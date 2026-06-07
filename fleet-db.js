@@ -1,4 +1,4 @@
-//fleet-db.js v.9.2
+//fleet-db.js v.9.1
 const coreFleetSpecs = {
 "AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
 "PA24": { "name": "A2A - Piper Comanche 250", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.2 },
@@ -60,8 +60,8 @@ const coreFleetSpecs = {
 "B737": { "name": "PMDG - Boeing 737-700", "maxPax": 148, "maxCargo": 4400, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 6699, "class": "JET", "mtow": 70080, "oew": 37600, "fuelPerNm": 5.0 },
 "B738": { "name": "PMDG - Boeing 737-800", "maxPax": 189, "maxCargo": 8000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 7598, "class": "JET", "mtow": 79015, "oew": 41413, "fuelPerNm": 6.0 },
 "B77W": { "name": "PMDG - Boeing 777-300ER", "maxPax": 550, "maxCargo": 24500, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 43100, "rules": "IFR", "minRunwayLength": 9200, "class": "JET", "mtow": 351533, "oew": 167829, "fuelPerNm": 15.0 },
-"DC6": { "name": "PMDG - Douglas DC-6A Cloudmaster (Cargo)", "maxPax": 0, "maxCargo": 12700, "minD": 70, "maxD": 800, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 4500, "class": "TURBO", "mtow": 48534, "oew": 25110, "fuelPerNm": 3.5 },
-"DC6": { "name": "PMDG - Douglas DC-6B Cloudmaster (Passenger)", "maxPax": 102, "maxCargo": 0, "minD": 70, "maxD": 800, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 4500, "class": "TURBO", "mtow": 48534, "oew": 25110, "fuelPerNm": 3.5 },
+"DC6A": { "name": "PMDG - Douglas DC-6A Cloudmaster (Cargo)", "maxPax": 0, "maxCargo": 12700, "minD": 70, "maxD": 800, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 4500, "class": "TURBO", "mtow": 48534, "oew": 25110, "fuelPerNm": 3.5 },
+"DC6B": { "name": "PMDG - Douglas DC-6B Cloudmaster (Passenger)", "maxPax": 102, "maxCargo": 0, "minD": 70, "maxD": 800, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 4500, "class": "TURBO", "mtow": 48534, "oew": 25110, "fuelPerNm": 3.5 },
 "C680": { "name": "Skyward Simulations - Citation C680 Sovereign+", "maxPax": 9, "maxCargo": 651, "minD": 150, "maxD": 1500, "minAlt": 24000, "maxAlt": 47000, "rules": "IFR", "minRunwayLength": 3530, "class": "BIZ JET", "mtow": 13959, "oew": 8233, "fuelPerNm": 2.0 },
 "KODI": { "name": "SWS - Quest Kodiak 100 Series II", "maxPax": 9, "maxCargo": 1219, "minD": 30, "maxD": 400, "minAlt": 5000, "maxAlt": 25000, "rules": "VFR/Scenic", "minRunwayLength": 1467, "class": "GA", "mtow": 3290, "oew": 1710, "fuelPerNm": 0.6 },
 "PC12": { "name": "SWS - PC-12/47", "maxPax": 9, "maxCargo": 600, "minD": 100, "maxD": 800, "minAlt": 15000, "maxAlt": 30000, "rules": "IFR", "minRunwayLength": 1475, "class": "TURBO", "mtow": 4740, "oew": 2810, "fuelPerNm": 0.8 },
