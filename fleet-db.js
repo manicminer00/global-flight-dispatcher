@@ -1,4 +1,4 @@
-//fleet-db.js v.9.3
+//fleet-db.js v.9.4
 const coreFleetSpecs = {
 "AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
 "PA24": { "name": "A2A - Piper Comanche 250", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.2 },
@@ -19,7 +19,7 @@ const coreFleetSpecs = {
 "BE20": { "name": "Carenado - Beechcraft King Air B200", "maxPax": 10, "maxCargo": 900, "minD": 70, "maxD": 800, "minAlt": 15000, "maxAlt": 35000, "rules": "IFR", "minRunwayLength": 2110, "class": "TURBO", "mtow": 5670, "oew": 3520, "fuelPerNm": 1.0 },
 "T210": { "name": "Carenado - Cessna CT210N", "maxPax": 6, "maxCargo": 300, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 27000, "rules": "VFR/Scenic", "minRunwayLength": 2160, "class": "GA", "mtow": 1814, "oew": 1050, "fuelPerNm": 0.3 },
 "DA42": { "name": "COWS - Diamond DA42", "maxPax": 3, "maxCargo": 30, "minD": 30, "maxD": 400, "minAlt": 5000, "maxAlt": 18000, "rules": "VFR/Scenic", "minRunwayLength": 2129, "class": "GA", "mtow": 1900, "oew": 1251, "fuelPerNm": 0.2 },
-"R22":  { "name": "Cowansim - R22 Helicopter", "maxPax": 1, "maxCargo": 22, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 4000, "rules": "VFR Helicopter", "minRunwayLength": 0, "class": "HELI", "mtow": 622, "oew": 389, "fuelPerNm": 0.15 },
+"R22": { "name": "Cowansim - R22 Helicopter", "maxPax": 1, "maxCargo": 22, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 4000, "rules": "VFR Helicopter", "minRunwayLength": 0, "class": "HELI", "mtow": 622, "oew": 389, "fuelPerNm": 0.15 },
 "A319": { "name": "Fenix - A319", "maxPax": 156, "maxCargo": 4000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET", "mtow": 75500, "oew": 40800, "fuelPerNm": 5.0 },
 "A320": { "name": "Fenix - A320", "maxPax": 180, "maxCargo": 6000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 6000, "class": "JET", "mtow": 78000, "oew": 42600, "fuelPerNm": 6.0 },
 "A321": { "name": "Fenix - A321", "maxPax": 236, "maxCargo": 10000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 7500, "class": "JET", "mtow": 93500, "oew": 48500, "fuelPerNm": 7.0 },
