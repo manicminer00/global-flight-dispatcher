@@ -1,4 +1,4 @@
-<!-- v8.9 prefer owned airports and clear custom db update -->
+<!-- v9 search by variant update -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -673,7 +673,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v8.9
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v9.0
         </div>
     </div>
 </div>
@@ -1341,8 +1341,9 @@ const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
     const cleanAlt = altValue.toString().replace(/[^0-9]/g, ''); 
     const cargoParam = (cargoKg / 1000).toFixed(3);
     const plnAlt = spec.rules.includes("VFR") ? cleanAlt : (parseInt(cleanAlt) * 100).toString();
-    const simbriefUrl = `https://www.simbrief.com/system/dispatch.php?share=1&type=${type}&orig=${origin.icao}&dest=${destination.icao}&callsign=${callsignRaw}&fl=${cleanAlt}&pax=${pax}&cargo=${cargoParam}&units=KGS`;
-    
+	const dispatchType = spec.simbriefIcao || type;
+	const simbriefUrl = `https://www.simbrief.com/system/dispatch.php?share=1&type=${dispatchType}&orig=${origin.icao}&dest=${destination.icao}&callsign=${callsignRaw}&fl=${cleanAlt}&pax=${pax}&cargo=${cargoParam}&units=KGS`;
+	
     const linkEl = document.getElementById("outLink");
     linkEl.href = simbriefUrl;
     document.getElementById("outRawUrl").innerText = simbriefUrl;
