@@ -189,6 +189,21 @@
             font-style: italic;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); 
         }
+		/* Tactical Military Ticket Styles */
+		.ticket-note-military {
+			background-color: #2b332c; /* Tactical Olive Drab */
+			border-left: 5px solid #d4af37; /* Hazard Gold */
+			padding: 15px;
+			margin: 15px 0;
+			font-family: 'Courier New', Courier, monospace; /* Typewriter feel for military */
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); 
+		}
+		body.light-mode .ticket-note-military {
+			background-color: #EDEDE6; /* Muted Khaki */
+			border-left-color: #d4af37; 
+			color: #2e3b32;              
+			box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+		}
         .url-box {
             background-color: #111;
             padding: 10px;
@@ -342,8 +357,8 @@
             color: #888;
         }
         body.light-mode .ticket-note {
-            background-color: #F7F6F0; 
-            border-left-color: #E89546; 
+            background-color: #DCEDFA; 
+            border-left-color: #00bcd4; 
             color: #42423F;              
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
         }
@@ -386,8 +401,8 @@
     </style>
 <script type="text/javascript" src="simbrief.apiv1.js"></script>
     <script type="text/javascript" src="airports-db.js?v=9.7"></script>
-    <script type="text/javascript" src="fleet-db.js?v=v9.8"></script>
-    <script type="text/javascript" src="missions-db.js?v=9.7"></script>
+    <script type="text/javascript" src="fleet-db.js?v=v9.9"></script>
+    <script type="text/javascript" src="missions-db.js?v=9.9"></script>
 </head>
 <body>
 <div class="container">
@@ -689,7 +704,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v9.8
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v9.9
         </div>
     </div>
 </div>
@@ -1340,16 +1355,35 @@ let filteredMissions = missionMatrix.filter(m => {
         .replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName)
         .replace("{team}", randomTeam);
         
-    let jobTicket = "";
-    if (spec.rules.includes("VFR")) {
-        if (isLocalFlight) {
-            jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name} (Local Visual Flight)<br><strong>Manifest:</strong> ${processedDesc} (${pax} Pass / Baggage limits applied)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Good day, Captain. This is a local operations flight operating out of ${origin.name}. ${processedDetail} Maintain a safe altitude, keep clear of restricted airspace, and return to base when the block time is up.`;
-        } else {
-            jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name} (Visual Flight Profile)<br><strong>Manifest:</strong> ${processedDesc} (${pax} Pass / Baggage limits applied)<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Good day, Captain. This is a visual low-level run tracking out from ${origin.name} toward ${destination.name}. ${processedDetail} Keep your eyes open for points of interest along the route and keep clear of cloud decks.`;
-        }
+let jobTicket = "";
+    
+    if (chosenMission.militaryOnly) {
+        // MILITARY / TACTICAL TONE (FRAGO / ATO Style)
+        let manifestText = chosenMission.paxOnly ? `${pax} PERS` : `${cargoKg} KG`;
+        jobTicket = `
+            <strong>CLASSIFICATION:</strong> TACTICAL SORTIE (ATO# ${Math.floor(Math.random() * 9000) + 1000})<br>
+            <strong>TASKING:</strong> ${chosenMission.name.toUpperCase()}<br>
+            <strong>MANIFEST:</strong> ${manifestText} - ${processedDesc.toUpperCase()}<br>
+            <br>
+            <strong>COMMANDER'S INTENT:</strong> ${processedDetail} Maintain sterile comms outside of ATC requirements. Execute routing from ${origin.icao} to ${destination.icao} strictly as filed. Check threat and weather scopes prior to engine start. Dismissed.`;
     } else {
-        let manifestText = chosenMission.paxOnly ? `${pax} assigned pax` : `${cargoKg} kg load block`;
-        jobTicket = `<strong>Client Assignment:</strong> ${chosenMission.name}<br><strong>Manifest:</strong> ${processedDesc} (${manifestText})<br><strong>Contract Value:</strong> ${payout}<br><br><strong>Dispatcher Notes:</strong> Welcome to the cockpit, Captain. Airway logs are locked down for this transit across the network from ${origin.icao} to ${destination.icao}. ${processedDetail} Follow standard transitions, watch your spacing tags, and stick exactly to assigned vertical profiles.`;
+        // CIVILIAN / STORYTELLER TONE
+        let manifestText = chosenMission.paxOnly ? `${pax} Passengers` : `${cargoKg} kg Cargo`;
+        if (spec.rules.includes("VFR")) {
+            jobTicket = `
+                <strong>Client Assignment:</strong> ${chosenMission.name}<br>
+                <strong>Manifest:</strong> ${processedDesc} (${manifestText})<br>
+                <strong>Contract Value:</strong> ${payout}<br>
+                <br>
+                <strong>Dispatcher Notes:</strong> Good day, Captain. We've got a client relying on us today out of ${origin.name}. ${processedDetail} The visual conditions should be in your favor, so keep your eyes outside the cockpit, watch your altitude over populated areas, and bring the airframe back in one piece.`;
+        } else {
+            jobTicket = `
+                <strong>Client Assignment:</strong> ${chosenMission.name}<br>
+                <strong>Manifest:</strong> ${processedDesc} (${manifestText})<br>
+                <strong>Contract Value:</strong> ${payout}<br>
+                <br>
+                <strong>Dispatcher Notes:</strong> Welcome to the flight deck, Captain. The airway logs are locked down for this transit from ${origin.icao} to ${destination.icao}. ${processedDetail} Follow standard instrument transitions, watch your spacing tags, and stick exactly to your assigned vertical profiles. Safe flight.`;
+        }
     }
     
     document.getElementById("outCallsign").innerText = callsignRaw;
@@ -1363,7 +1397,17 @@ let filteredMissions = missionMatrix.filter(m => {
     document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
     document.getElementById("outPax").innerText = pax > 0 ? `${pax} pax` : "0 (Solo)";
     document.getElementById("outCargo").innerText = cargoKg;
-    document.getElementById("outTicket").innerHTML = jobTicket;
+	const ticketEl = document.getElementById("outTicket");
+		ticketEl.innerHTML = jobTicket;
+		
+		// The Switch: Are we military or civilian?
+		if (chosenMission.militaryOnly) {
+			ticketEl.classList.add("ticket-note-military"); // Put on military uniform
+			ticketEl.classList.remove("ticket-note");       // Take off standard uniform
+		} else {
+			ticketEl.classList.add("ticket-note");          // Put on standard uniform
+			ticketEl.classList.remove("ticket-note-military"); // Take off military uniform
+		}
     
     const cleanAlt = altValue.toString().replace(/[^0-9]/g, ''); 
     const cargoParam = (cargoKg / 1000).toFixed(3);
