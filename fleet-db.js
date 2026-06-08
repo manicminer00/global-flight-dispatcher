@@ -1,4 +1,4 @@
-//fleet-db.js v.10.0
+//fleet-db.js v.10.1
 const coreFleetSpecs = {
 "AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
 "PA24": { "name": "A2A - Piper Comanche 250", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.2 },
@@ -42,6 +42,8 @@ const coreFleetSpecs = {
 "LJ35": { "name": "Flysimware - Bombardier Lear Jet 35A", "maxPax": 8, "maxCargo": 1450, "minD": 150, "maxD": 1500, "minAlt": 24000, "maxAlt": 45000, "rules": "IFR", "minRunwayLength": 4972, "class": "BIZ JET", "mtow": 8300, "oew": 4590, "fuelPerNm": 1.5 },
 "E55P": { "name": "FSReborn - Phenom 300e", "maxPax": 7, "maxCargo": 550, "minD": 150, "maxD": 1500, "minAlt": 25000, "maxAlt": 45000, "rules": "IFR", "minRunwayLength": 3209, "class": "BIZ JET", "mtow": 8150, "oew": 5200, "fuelPerNm": 1.5 },
 "H145": { "name": "HPG - H145 Helicopter", "maxPax": 8, "maxCargo": 400, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 5000, "rules": "VFR Helicopter", "minRunwayLength": 0, "class": "HELI", "mtow": 3700, "oew": 1919, "fuelPerNm": 1.0 },
+"F14A": { "name": "IndiaFoxtEcho - F-14A Tomcat", "simbriefIcao": "F14", "isMilitary": true, "maxPax": 0, "maxCargo": 6577, "minD": 150, "maxD": 320, "minAlt": 10000, "maxAlt": 50000, "rules": "IFR", "minRunwayLength": 2500, "class": "JET", "mtow": 33724, "oew": 18191 },
+"F14B": { "name": "IndiaFoxtEcho - F-14B Tomcat", "simbriefIcao": "F14", "isMilitary": true, "maxPax": 0, "maxCargo": 6577, "minD": 150, "maxD": 320, "minAlt": 10000, "maxAlt": 50000, "rules": "IFR", "minRunwayLength": 2500, "class": "JET", "mtow": 33066, "oew": 19050 },
 "TOR": { "name": "IndiaFoxtEcho - Panavia Tornado", "isMilitary": true, "maxPax": 0, "maxCargo": 8165, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 50000, "rules": "IFR", "minRunwayLength": 3000, "class": "JET", "mtow": 28000, "oew": 13890 },
 "B38M": { "name": "iFly - 737 MAX 8", "maxPax": 189, "maxCargo": 5004, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 8300, "class": "JET", "mtow": 82644, "oew": 45070, "fuelPerNm": 5.1 },
 "A359": { "name": "Inibuilds - Airbus A350-900", "maxPax": 440, "maxCargo": 43500, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 43000, "rules": "IFR", "minRunwayLength": 8000, "class": "JET", "mtow": 280000, "oew": 142400, "fuelPerNm": 12.0 },
