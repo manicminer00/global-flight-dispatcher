@@ -536,6 +536,16 @@
             <input type="checkbox" id="newApMilitary" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
             <label for="newApMilitary" style="margin: 0 0 0 8px; cursor: pointer;">Select if adding a Military Airbase</label>
         </div>
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+			<div>
+			<label for="newLat">Latitude (Decimal):</label>
+			<input type="number" id="newLat" placeholder="e.g. 35.214" step="any">
+			</div>
+			<div>
+			<label for="newLon">Longitude (Decimal):</label>
+			<input type="number" id="newLon" placeholder="e.g. -80.943" step="any">
+			</div>
+		</div>
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
             <div>
                 <label for="newIcao">Airport ICAO:</label>
@@ -740,7 +750,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v10.2
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v10.3
         </div>
     </div>
 </div>
@@ -867,7 +877,11 @@ function saveCustomAirport() {
     const rwy = document.getElementById("newRwyType").value;
     const source = document.getElementById("newSource").value;
     const elev = parseInt(document.getElementById("newElev").value) || 0;
-    const isMilitary = document.getElementById("newApMilitary").checked; // Grab the checkbox status
+    const isMilitary = document.getElementById("newApMilitary").checked; 
+    
+    // NEW: Capture Lat/Lon
+    const lat = parseFloat(document.getElementById("newLat").value) || 0;
+    const lon = parseFloat(document.getElementById("newLon").value) || 0;
     
     if(icao.length !== 4 || name === "") {
         alert("Please enter a valid 4-character ICAO code and Airport Name.");
@@ -885,12 +899,12 @@ function saveCustomAirport() {
         name: name,
         rwy: rwy,
         elev: elev,
-        lat: 51.5 + (Math.random() - 0.5) * 4, 
-        lon: 0.0 + (Math.random() - 0.5) * 4,
+        lat: lat, // NEW: Replaced the random math
+        lon: lon, // NEW: Replaced the random math
         source: source,
         tag: determinedTag,
         linkText: determinedLinkText,
-        isMilitary: isMilitary // Save the military status to local memory
+        isMilitary: isMilitary
     });
     
     localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(customAirports));
