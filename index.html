@@ -400,8 +400,8 @@
         }
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
-	<script type="text/javascript" src="airports-db.js?v=c"></script>
-	<script type="text/javascript" src="fleet-db.js?v=f"></script>
+	<script type="text/javascript" src="airports-db.js?v=a"></script>
+	<script type="text/javascript" src="fleet-db.js?v=c"></script>
 	<script type="text/javascript" src="missions-db.js?v=a"></script>
 </head>
 <body>
@@ -431,7 +431,7 @@
 <label for="militaryBaseToggle" style="display: flex; align-items: center; margin: 0; font-weight: normal; cursor: pointer; white-space: nowrap;">
                     <input type="checkbox" id="militaryBaseToggle" style="width: 16px; height: 16px; margin: 0 6px 0 0; cursor: pointer; flex-shrink: 0;">
                     <span class="field-hint" style="font-size: 12px; color: #666; margin-left: 0;">
-                        Select to include military airports.
+                        Select to prefer military airports.
                     </span>
                 </label> 
             </div>
@@ -996,9 +996,9 @@ function rebuildActiveDatabase() {
             existing.linkText.toLowerCase() === entry.linkText.toLowerCase()
         );
         if (isDuplicateLink) {
-            const existingEntry = grouped[entry.icao].find(existing => 
-                existing.linkText.toLowerCase() === entry.linkText.toLowerCase()
-            );
+		const existingEntry = grouped[entry.icao].find(existing => 
+			existing.linkText && existing.linkText.toLowerCase() === entry.linkText.toLowerCase()
+		);
             if (entry.tag === "Both" || existingEntry.tag === "Both") {
                 existingEntry.tag = "Both";
             }
