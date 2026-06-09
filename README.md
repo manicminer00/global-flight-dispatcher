@@ -20,13 +20,13 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * **Custom Database & Backups:** Expand the tool yourself by adding custom airframes and airports directly via the UI. Export and import your custom database configuration as a `.json` backup file.
 * **Customisable Interface:** Toggle between Light and Dark mode, save your preferred ATC callsign, and adjust the UI accent colour.
 ---
-### **Current Core Database Includes:**
+### **Current Core MSFS 2024 Database Includes:**
 * 70+ Supported Aircraft Models
-* 330 Contrail MSFS 2024 Airports
-* 43 iniBuilds MSFS 2024 Airports
-* 210 ORBX MSFS 2024 Airports
+* 330 Contrail Airports
+* 43 iniBuilds Airports
+* 210 ORBX Airports
 * 133 MSFS Hand-Crafted Airports
-* 100+ Curated 3rd Party & Freeware Airports
+* 100+ 3rd Party & Freeware Airports
 * 50+ 3rd Party & Freeware Military Airbases
 * 100 Missions
 ---
