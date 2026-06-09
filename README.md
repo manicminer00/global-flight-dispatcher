@@ -26,7 +26,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * 43 iniBuilds MSFS 2024 Airports
 * 210 ORBX MSFS 2024 Airports
 * 133 MSFS Hand-Crafted Airports
-* 93 Curated 3rd Party Payware & Freeware Airports
+* 100+ Curated 3rd Party & Freeware Airports
 * 50+ 3rd Party & Freeware Military Airbases
 * 100 Missions
 ---
