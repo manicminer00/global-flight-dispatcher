@@ -1,4 +1,4 @@
-//fleet-db.js v.e
+//fleet-db.js v.f
 const coreFleetSpecs = {
 "AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
 "PA24": { "name": "A2A - Piper Comanche 250", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.3 },
