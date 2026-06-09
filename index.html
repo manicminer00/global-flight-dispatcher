@@ -431,7 +431,7 @@
 <label for="militaryBaseToggle" style="display: flex; align-items: center; margin: 0; font-weight: normal; cursor: pointer; white-space: nowrap;">
                     <input type="checkbox" id="militaryBaseToggle" style="width: 16px; height: 16px; margin: 0 6px 0 0; cursor: pointer; flex-shrink: 0;">
                     <span class="field-hint" style="font-size: 12px; color: #666; margin-left: 0;">
-                        Select to prefer military airports.
+                        Select to include military airports.
                     </span>
                 </label> 
             </div>
@@ -1111,7 +1111,15 @@ function dispatchFlight() {
         alert("Please select a valid aircraft from the searchable list.");
         return;
     }
+
+
+//-------------------------------
+		
 const spec = { ...activeFleetSpecs[type] };
+    
+    // Retrieve the toggle state early for filtering
+    const preferMilitary = document.getElementById("militaryBaseToggle").checked;
+
     let validAirports = activeAirportDatabase.filter(ap => {
         let allowedClasses = [];
         switch(ap.rwy) {
@@ -1123,8 +1131,17 @@ const spec = { ...activeFleetSpecs[type] };
         }
         const isAllowedType = allowedClasses.includes(spec.class);
         const meetsLength = ap.length ? (ap.length >= spec.minRunwayLength) : true;
+        
+        // Exclude military airports unless the toggle is selected (bypassed if it's a specific departure override)
+        if (!preferMilitary && ap.isMilitary && ap.icao !== depOverride) {
+            return false;
+        }
+
         return isAllowedType && meetsLength;
     });
+	
+//-------------------------------
+	
     if (depOverride && !activeAirportDatabase.some(ap => ap.icao === depOverride)) {
         alert(`Custom Departure Airport ${depOverride} is not currently included in the master database. You can add it manually in Settings.`);
         return;
@@ -1172,8 +1189,10 @@ const spec = { ...activeFleetSpecs[type] };
         alert(`No valid routes found matching current physical fleet configurations.`);
         return;
     }
-	// --- MILITARY AIRPORT PREFERENCE LOGIC ---
-    const preferMilitary = document.getElementById("militaryBaseToggle").checked;
+	
+// --- MILITARY AIRPORT PREFERENCE LOGIC ---
+    // preferMilitary is already declared above. 
+    // This allows military and civilian airports to mix freely when the toggle is active.
     if (preferMilitary) {
         candidatePairs.forEach(pair => {
             let score = 0;
@@ -1181,11 +1200,8 @@ const spec = { ...activeFleetSpecs[type] };
             if (pair.dst.isMilitary) score += 1;
             pair.milScore = score;
         });
-        const maxMilScore = Math.max(...candidatePairs.map(p => p.milScore || 0));
-        if (maxMilScore > 0) {
-            candidatePairs = candidatePairs.filter(p => p.milScore === maxMilScore);
-        }
     }
+	
     // --- OWNED AIRPORTS PREFERENCE LOGIC ---
     const preferOwned = document.getElementById("preferOwnedToggle").checked;
     if (preferOwned) {
