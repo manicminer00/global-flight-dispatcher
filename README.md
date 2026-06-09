@@ -31,18 +31,18 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * 100 Missions
 ---
 ### **Civilian Missions**
-* General Aviation (GA): Sightseeing tours, flight instruction, agricultural/geological surveys, remote deliveries, and smaller medical/cargo transports.
-* Turboprop (TURBO): Regional commuters, overnight feeders, remote medevacs, and atmospheric sampling.
-* Business Jet (BIZ JET): C-suite commutes, celebrity charters, AOG part relays, and VIP escorts.
-* Jet (JET): Scheduled commercial routes, heavy freighters, mass evacuations, sports charters, and high-value asset relocation.
-* Helicopter (HELI): Search and rescue, traffic/news patrols, simulated sling-load ops, tactical insertions, and local VIP transfers.
-* Warbird (WARBIRD): Heritage flights, airshow displays, formation training, and vintage air races.
+* **General Aviation**: Sightseeing tours, flight instruction, agricultural/geological surveys, remote deliveries, and smaller medical/cargo transports.
+* **Turboprop**: Regional commuters, overnight feeders, remote medevacs, and atmospheric sampling.
+* **Business Jet**: C-suite commutes, celebrity charters, AOG part relays, and VIP escorts.
+* **Jet**: Scheduled commercial routes, heavy freighters, mass evacuations, sports charters, and high-value asset relocation.
+* **Helicopter**: Search and rescue, traffic/news patrols, simulated sling-load ops, tactical insertions, and local VIP transfers.
+* **Warbird**: Heritage flights, airshow displays, formation training, and vintage air races.
 
 ### **Military Missions**
-* WARBIRD / JET / HELI: Border reconnaissance, electronic signals survey, search & rescue support, forward base relocation.
-* HELI: Local aerial overwatch, base perimeter tours, secure mail runs, VIP security transport.
-* JET: Advanced jet familiarization, low-level penetration, "Red Air" aggressor support, strategic deterrence transit, joint interoperability drills.
-* WARBIRD / JET: Radar calibration, formation proficiency checks, tactical navigation familiarization.
+* **WARBIRD / JET / HELI**: Border reconnaissance, electronic signals survey, search & rescue support, forward base relocation.
+*** HELI**: Local aerial overwatch, base perimeter tours, secure mail runs, VIP security transport.
+* **JET**: Advanced jet familiarization, low-level penetration, "Red Air" aggressor support, strategic deterrence transit, joint interoperability drills.
+* **WARBIRD / JET**: Radar calibration, formation proficiency checks, tactical navigation familiarization.
 ---
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
