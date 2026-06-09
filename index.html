@@ -400,7 +400,7 @@
         }
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
-	<script type="text/javascript" src="airports-db.js?v=b"></script>
+	<script type="text/javascript" src="airports-db.js?v=a"></script>
 	<script type="text/javascript" src="fleet-db.js?v=c"></script>
 	<script type="text/javascript" src="missions-db.js?v=a"></script>
 </head>
@@ -493,11 +493,16 @@
                 <span id="coreHandcraftedCount">0</span>
             </div>
             <div id="coreHandcraftedList" class="db-dropdown" style="display:none;"></div>
-            <div class="db-stat-item" onclick="toggleDropdown('coreThirdPartyList')">
+			<div class="db-stat-item" onclick="toggleDropdown('coreThirdPartyList')">
                 <span>🛒 Third Party Airports</span>
                 <span id="coreThirdPartyCount">0</span>
             </div>
             <div id="coreThirdPartyList" class="db-dropdown" style="display:none;"></div>
+            <div class="db-stat-item" onclick="toggleDropdown('coreMilitaryList')">
+                <span>🪖 Military Bases</span>
+                <span id="coreMilitaryCount">0</span>
+            </div>
+            <div id="coreMilitaryList" class="db-dropdown" style="display:none;"></div>
             <div style="margin-top: 10px; margin-bottom: 5px; text-align: left; font-size: 12px; color: #888;">
                 N.B. Airports may be listed multiple times if available from different developers on different stores (e.g., Contrail, iniBuilds and ORBX).
             </div>
@@ -750,7 +755,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v10.3
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v10.4
         </div>
     </div>
 </div>
@@ -849,10 +854,17 @@ function updateDatabaseStats() {
     document.getElementById('coreHandcraftedList').innerHTML = coreHandcrafted.length > 0
         ? `<ul>${coreHandcrafted.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`
         : `<ul><li>Loading permanent database array records...</li></ul>`;
-    document.getElementById('coreThirdPartyCount').innerText = coreThirdParty.length;
+	document.getElementById('coreThirdPartyCount').innerText = coreThirdParty.length;
     document.getElementById('coreThirdPartyList').innerHTML = coreThirdParty.length > 0
         ? `<ul>${coreThirdParty.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`
         : `<ul><li>Loading permanent database array records...</li></ul>`;
+
+    const coreMilitary = liveAirportsDB.filter(a => a.isMilitary === true);
+    document.getElementById('coreMilitaryCount').innerText = coreMilitary.length;
+    document.getElementById('coreMilitaryList').innerHTML = coreMilitary.length > 0
+        ? `<ul>${coreMilitary.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`
+        : `<ul><li>Loading permanent database array records...</li></ul>`;
+
     const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
     document.getElementById('customAirportsCount').innerText = customAirports.length;
     document.getElementById('customAirportsList').innerHTML = customAirports.length > 0 
