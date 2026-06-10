@@ -1,4 +1,4 @@
-//airports-db.js v.h
+//airports-db.js v.i
 const seedAirportDatabase = [
 // ----airport list
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "BIZ JET", length: 4400, elev: 8, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
@@ -109,7 +109,7 @@ const seedAirportDatabase = [
 { icao: "EDDV", name: "Hannover Airport", rwy: "JET", length: 12467, elev: 183, lat: 52.4611, lon: 9.6851, source: "Core", tag: "Third Party", linkText: "SoFly via Contrail", url: "https://contrail.shop/search?q=EDDV" },
 { icao: "EDFH", name: "Frankfurt-Hahn Airport", rwy: "JET", length: 12467, elev: 1649, lat: 49.948, lon: 7.263, source: "Core", tag: "Third Party", linkText: "M'M Simulations via Contrail", url: "https://contrail.shop/search?q=EDFH" },
 { icao: "EDGD", name: "Füssen", rwy: "GA", length: 2600, elev: 2585, lat: 47.575, lon: 10.684, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
-{ icao: "EDHL", name: "Lübeck Airport", rwy: "JET", length: 6896, elev: 53, lat: 53.805, lon: 10.719, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
+{ icao: "EDHL", name: "Lübeck Airport", rwy: "BIZ JET", length: 6896, elev: 53, lat: 53.805, lon: 10.719, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "EDJA", name: "Memmingen Airport", rwy: "JET", length: 9803, elev: 2077, lat: 47.989, lon: 10.239, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "EDKB", name: "Bonn/Hangelar", rwy: "GA", length: 2600, elev: 197, lat: 50.768, lon: 7.164, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/86039/edkb-bonn-hangelar" },
 { icao: "EDLO", name: "Oerlinghausen Airfield", rwy: "GA", length: 1968, elev: 559, lat: 51.931, lon: 8.544, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
