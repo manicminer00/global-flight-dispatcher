@@ -1351,12 +1351,16 @@ let filteredMissions = missionMatrix.filter(m => {
             if (isPaxAirframe && m.cargoOnly) return false;
         }
         
-        // RULE 1: Military aircraft ONLY get military missions
+		// RULE 1: Military aircraft ONLY get military missions
         if (spec.isMilitary && !m.militaryOnly) return false;
         
         // RULE 2: Civilian aircraft ONLY get civilian missions, 
         // UNLESS the military toggle is enabled (Contractor Mode).
         if (!spec.isMilitary && m.militaryOnly && !preferMilitary) return false;
+
+        // RULE 3: Strict Base Matching
+        if (origin.isMilitary && !m.militaryOnly) return false; // Military bases only give military missions
+        if (!origin.isMilitary && m.militaryOnly) return false; // Civilian bases only give civilian missions
         
         return true;
     });
