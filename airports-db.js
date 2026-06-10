@@ -1,4 +1,3 @@
-//airports-db.js v.i
 const seedAirportDatabase = [
 // ----airport list
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "BIZ JET", length: 4400, elev: 8, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
