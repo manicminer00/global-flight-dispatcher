@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- v1.0.6 -->
+<!-- v1.0.7 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1340,15 +1340,23 @@ const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
     const isLocalFlight = (origin.icao === destination.icao);
 let filteredMissions = missionMatrix.filter(m => {
         const classMatch = m.allowedClasses.includes(searchClass);
-        const isFreighter = spec.maxPax === 0;
-        const isPaxAirframe = spec.maxPax > 0;
         if (!classMatch) return false;
-        if (isFreighter && m.paxOnly) return false;
-        if (isPaxAirframe && m.cargoOnly) return false;
+
+        // MULTI-ROLE EXEMPTION: Apply civilian Freighter/Pax rules ONLY to civilian aircraft.
+        // Military tactical lifters ignore these restrictions.
+        if (!spec.isMilitary) {
+            const isFreighter = spec.maxPax === 0;
+            const isPaxAirframe = spec.maxPax > 0;
+            if (isFreighter && m.paxOnly) return false;
+            if (isPaxAirframe && m.cargoOnly) return false;
+        }
         
-        // STRICT FENCE WITH CONTRACTOR BYPASS: 
-        // Military missions require a military airframe OR the military operations toggle to be active.
-        if (m.militaryOnly && !spec.isMilitary && !preferMilitary) return false;
+        // RULE 1: Military aircraft ONLY get military missions
+        if (spec.isMilitary && !m.militaryOnly) return false;
+        
+        // RULE 2: Civilian aircraft ONLY get civilian missions, 
+        // UNLESS the military toggle is enabled (Contractor Mode).
+        if (!spec.isMilitary && m.militaryOnly && !preferMilitary) return false;
         
         return true;
     });
