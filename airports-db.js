@@ -1,4 +1,4 @@
-//airports-db.js v.d
+//airports-db.js v.e
 const seedAirportDatabase = [
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "BIZ JET", length: 4300, elev: 8, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
 { icao: "0CN2", name: "Sutter Butte Dusters Airport", rwy: "GA", length: 2000, elev: 50, lat: 39.0569, lon: -121.7289, source: "Core", tag: "Third Party", linkText: "Backwood Studios via Contrail", url: "https://contrail.shop/search?q=0CN2" },
@@ -213,7 +213,7 @@ const seedAirportDatabase = [
 { icao: "EGSG", name: "Stapleford Airfield", rwy: "TURBO", length: 3533, elev: 185, lat: 51.6547, lon: 0.1561, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "EGSH", name: "Norwich Airport", rwy: "JET", length: 6040, elev: 117, lat: 52.676, lon: 1.283, source: "Core", tag: "Third Party", linkText: "UK2000 via SimMarket", url: "https://secure.simmarket.com/uk2000-scenery-norwich-airport-msfs2420.phtml" },
 { icao: "EGSL", name: "Andrewsfield Aerodrome", rwy: "GA", length: 2592, elev: 285, lat: 51.8844, lon: 0.4489, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
-{ icao: "EGSP", name: "Sibson Aerodrome", rwy: "TURBO", length: 3000, elev: 130, lat: 52.5594, lon: -0.3847, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
+{ icao: "EGSP", name: "Sibson Aerodrome", rwy: "TURBO", length: 3068, elev: 130, lat: 52.5558, lon: -0.3864, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" }
 { icao: "EGSR", name: "Earls Colne Airfield", rwy: "TURBO", length: 3081, elev: 225, lat: 51.9328, lon: 0.6869, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "EGSS", name: "London Stansted Airport", rwy: "JET", length: 10003, elev: 348, lat: 51.8850, lon: 0.2350, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "EGSS", name: "London Stansted Airport", rwy: "JET", length: 10003, elev: 348, lat: 51.8850, lon: 0.2350, source: "Core", tag: "Third Party", linkText: "Inibuilds", url: "https://inibuilds.com/search?q=egss" },
