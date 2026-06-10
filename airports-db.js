@@ -219,7 +219,7 @@ const seedAirportDatabase = [
 { icao: "EGSS", name: "London Stansted Airport", rwy: "JET", length: 10003, elev: 348, lat: 51.8850, lon: 0.2350, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "EGSS", name: "London Stansted Airport", rwy: "JET", length: 10003, elev: 348, lat: 51.8850, lon: 0.2350, source: "Core", tag: "Third Party", linkText: "Inibuilds", url: "https://inibuilds.com/search?q=egss" },
 { icao: "EGSV", name: "Old Buckenham Aerodrome", rwy: "GA", length: 2618, elev: 190, lat: 52.4839, lon: 1.0506, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
-{ icao: "EGSX", name: "North Weald Airfield", rwy: "JET", length: 6300, elev: 321, lat: 51.7219, lon: 0.1539, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
+{ icao: "EGSX", name: "North Weald Airfield", rwy: "BIZ JET", length: 6300, elev: 321, lat: 51.7219, lon: 0.1539, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "EGTB", name: "Wycombe Air Park", rwy: "GA", length: 2400, elev: 520, lat: 51.612, lon: -0.808, source: "Core", tag: "Third Party", linkText: "Pilot Plus via ORBX (not updated for MSFS 2024)", url: "https://orbxdirect.com/product/pilotplus-egtb-msfs?" },
 { icao: "EGTF", name: "Fairoaks Airport", rwy: "GA", length: 2667, elev: 110, lat: 51.3483, lon: -0.5583, source: "Core", tag: "Third Party", linkText: "Burning Blue Design", url: "https://burningbluedesign.com/product/fairoaks/" },
 { icao: "EGTF", name: "Fairoaks Airport", rwy: "GA", length: 2667, elev: 110, lat: 51.3483, lon: -0.5583, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
