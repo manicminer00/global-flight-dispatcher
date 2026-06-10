@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<!-- v1.0.9 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -401,9 +400,9 @@
         }
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
-	<script type="text/javascript" src="airports-db.js?v=c"></script>
-	<script type="text/javascript" src="fleet-db.js?v=i"></script>
-	<script type="text/javascript" src="missions-db.js?v=a"></script>
+	<script type="text/javascript" src="airports-db.js?v=b"></script>
+	<script type="text/javascript" src="fleet-db.js?v=b"></script>
+	<script type="text/javascript" src="missions-db.js?v=b"></script>
 </head>
 <body>
 <div class="container">
@@ -761,7 +760,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v1.0.9
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v1.1.0
         </div>
     </div>
 </div>
@@ -970,11 +969,12 @@ function saveCustomAircraft() {
         maxAlt: acClass === "HELI" ? 4000 : (acClass === "JET" ? 40000 : 12000),
         rules: acClass === "HELI" ? "VFR Helicopter" : ((acClass === "GA" || acClass === "WARBIRD") ? "VFR/Scenic" : "IFR"),
         minRunwayLength: parseInt(minLength),
-        class: acClass,
+		class: acClass,
         mtow: mtow,
         oew: oew,
         fuelPerNm: fuelPerNm,
-        isMilitary: isMilitary
+        isMilitary: isMilitary,
+        isTactical: rawClass === "MIL_JET" || acClass === "WARBIRD"
     };
     localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(customFleet));
     alert(`${icao} updated successfully in local fleet configurations.`);
@@ -1361,6 +1361,9 @@ let filteredMissions = missionMatrix.filter(m => {
 
 		// RULE 3: Strict Base Matching
         if (origin.isMilitary && !m.militaryOnly) return false; // Military bases only give military missions
+        
+        // RULE 4: Fighter / Tactical Separation
+        if (m.tacticalOnly && !spec.isTactical) return false;
         
         return true;
     });
