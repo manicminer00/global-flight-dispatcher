@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- v1.0.6 -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -400,8 +401,8 @@
         }
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
-	<script type="text/javascript" src="airports-db.js?v=a"></script>
-	<script type="text/javascript" src="fleet-db.js?v=c"></script>
+	<script type="text/javascript" src="airports-db.js?v=d"></script>
+	<script type="text/javascript" src="fleet-db.js?v=f"></script>
 	<script type="text/javascript" src="missions-db.js?v=a"></script>
 </head>
 <body>
@@ -551,7 +552,7 @@
 			<input type="number" id="newLon" placeholder="e.g. -80.943" step="any">
 			</div>
 		</div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+		<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
             <div>
                 <label for="newIcao">Airport ICAO:</label>
                 <input type="text" id="newIcao" placeholder="e.g. EGLL" maxlength="4">
@@ -563,6 +564,10 @@
             <div>
                 <label for="newElev">Elevation (ft):</label>
                 <input type="number" id="newElev" placeholder="e.g. 83">
+            </div>
+            <div>
+                <label for="newApLength">Runway Length (ft):</label>
+                <input type="number" id="newApLength" placeholder="e.g. 8000">
             </div>
         </div>
 		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -755,7 +760,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details. v10.4
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color: #fff; text-decoration: underline;">READ ME</a> for details.
         </div>
     </div>
 </div>
@@ -889,8 +894,8 @@ function saveCustomAirport() {
     const rwy = document.getElementById("newRwyType").value;
     const source = document.getElementById("newSource").value;
     const elev = parseInt(document.getElementById("newElev").value) || 0;
-    const isMilitary = document.getElementById("newApMilitary").checked; 
-    
+    const length = parseInt(document.getElementById("newApLength").value) || 0;
+    const isMilitary = document.getElementById("newApMilitary").checked;
     // NEW: Capture Lat/Lon
     const lat = parseFloat(document.getElementById("newLat").value) || 0;
     const lon = parseFloat(document.getElementById("newLon").value) || 0;
@@ -906,13 +911,14 @@ function saveCustomAirport() {
     let determinedTag = source === "MSFS hand-crafted airport" ? "Hand-Crafted" : "Third Party";
     let determinedLinkText = source === "MSFS hand-crafted airport" ? undefined : source;
     
-    customAirports.push({
+customAirports.push({
         icao: icao,
         name: name,
         rwy: rwy,
+        length: length,
         elev: elev,
-        lat: lat, // NEW: Replaced the random math
-        lon: lon, // NEW: Replaced the random math
+        lat: lat, 
+        lon: lon,
         source: source,
         tag: determinedTag,
         linkText: determinedLinkText,
@@ -1339,9 +1345,11 @@ let filteredMissions = missionMatrix.filter(m => {
         if (!classMatch) return false;
         if (isFreighter && m.paxOnly) return false;
         if (isPaxAirframe && m.cargoOnly) return false;
-        // STRICT FENCE: Dedicated military aircraft ONLY get military missions
-        if (spec.isMilitary && !m.militaryOnly) return false;
-        // Standard planes like the PMDG 737 can now roll both civilian AND military contractor missions.
+        
+        // STRICT FENCE WITH CONTRACTOR BYPASS: 
+        // Military missions require a military airframe OR the military operations toggle to be active.
+        if (m.militaryOnly && !spec.isMilitary && !preferMilitary) return false;
+        
         return true;
     });
     if (isLocalFlight) {
