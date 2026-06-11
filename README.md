@@ -39,10 +39,10 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * **Warbird**: Heritage flights, airshow displays, formation training, and vintage air races.
 
 ### **Military Missions**
-* **WARBIRD / JET / HELI**: Border reconnaissance, electronic signals survey, search & rescue support, forward base relocation.
-* **HELI**: Local aerial overwatch, base perimeter tours, secure mail runs, VIP security transport.
-* **JET**: Advanced jet familiarization, low-level penetration, "Red Air" aggressor support, strategic deterrence transit, joint interoperability drills.
-* **WARBIRD / JET**: Radar calibration, formation proficiency checks, tactical navigation familiarization.
+* **Warbird / Jet / Helicopter**: Border reconnaissance, electronic signals survey, search & rescue support, forward base relocation.
+* **Helicopter**: Local aerial overwatch, base perimeter tours, secure mail runs, VIP security transport.
+* **Tactical Jet**: Advanced jet familiarization, low-level penetration, "Red Air" aggressor support, strategic deterrence transit, joint interoperability drills.
+* **Warbird / Tactical Jet / Jet**: Radar calibration, formation proficiency checks, tactical navigation familiarization.
 ---
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
