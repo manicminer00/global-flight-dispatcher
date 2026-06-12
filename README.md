@@ -13,7 +13,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * **Custom Departure Override:** Leave the departure blank for a completely random route, or enter a specific ICAO to generate a flight departing from your current location. *(airports can be added to custom database)*
 
 ### **Persistence**
-* **Flight Persistence:** Keep the journey going by simply clicking 'Continue from last arrival airport?' to chain your flights together, picking up exactly where your last session ended.*
+* **Flight Persistence:** Keep the journey going by simply clicking 'Continue from last arrival airport?' to chain your flights together, picking up exactly where your last session ended.
 * **Pilot Logbook:** Automatically track your flight history with a built-in logbook. You can clear it at any time, export it alongside your custom database backups, and safely reset your custom airport/aircraft databases without losing your logged flight history.
 
 ### **MSFS 2024 Airport & Aircraft Database**
