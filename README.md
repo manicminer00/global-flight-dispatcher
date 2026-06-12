@@ -17,7 +17,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * **Pilot Logbook:** Automatically track your flight history with a built-in logbook. You can clear it at any time, export it alongside your custom database backups, and safely reset your custom airport/aircraft databases without losing your logged flight history.
 
 ### **MSFS 2024 Airport & Aircraft Database**
-* **Extensive Scenery Database:** Features a massive airport database, including the full Contrail and ORBX MSFS 2024 catalogues, Asobo hand-crafted airports, and curated 3rd-party/freeware locations. Store links are provided.
+* **Extensive Scenery Database:** Features a massive airport database, including the full Contrail, iniBuilds and ORBX MSFS 2024 catalogues, Asobo hand-crafted airports, and curated 3rd-party/freeware locations. Store links are provided.
 * **Searchable Aircraft Fleet:** Supports over 80 aircraft ranging from helicopters and light GA to business jets, airliners, Warbirds and Tactical Jets. Select your airframe via the dropdown menu or type to search.
 
 ### **Missions**
