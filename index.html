@@ -51,6 +51,12 @@
             margin-top: 0;
             text-align: center;
         }
+		html {
+			color-scheme: dark;
+		}
+		html.light-mode {
+			color-scheme: light;
+		}
         .important-box {
             background-color: #222;
             padding: 10px;
@@ -334,6 +340,30 @@ body.light-mode #logFlightBtn:hover        { color: #ffffff !important; } /* Sav
             color: var(--accent-color);
             font-weight: bold;
         }
+		.custom-datalist {
+			display: none;
+			position: absolute;
+			top: 100%;
+			left: 0;
+			width: 100%;
+			max-height: 250px;
+			overflow-y: auto;
+			background-color: #333;
+			border: 1px solid #555;
+			border-radius: 4px;
+			z-index: 1000;
+			box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+			margin-top: -10px;
+		}
+		.custom-datalist div {
+			padding: 6px 10px;
+			cursor: pointer;
+			color: #fff;
+			font-size: 15px;
+		}
+		.custom-datalist div:hover {
+			background-color: var(--accent-color);
+		}
         /* --- LIGHT MODE OVERRIDES --- */
         body.light-mode {
             background-color: #ffffff;
@@ -420,6 +450,18 @@ body.light-mode #logFlightBtn:hover        { color: #ffffff !important; } /* Sav
         body.light-mode #actionPrompt {
             color: #409444; /* Light mode color */
         }
+		body.light-mode .custom-datalist {
+			background-color: #ffffff;
+			border-color: #b0bec5;
+			box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+		}
+		body.light-mode .custom-datalist div {
+			color: #111111;
+		}
+		body.light-mode .custom-datalist div:hover {
+			background-color: #e0e6ed;
+			color: var(--accent-color);
+		}
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
 	<script type="text/javascript" src="airports-db.js?v=b"></script>
@@ -445,8 +487,10 @@ body.light-mode #logFlightBtn:hover        { color: #ffffff !important; } /* Sav
         </label>
         <input type="text" id="callsignInput" placeholder="e.g. MRD275" maxlength="6" required>
         <label for="aircraftInput" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">Select Aircraft Type:</label>
-        <input type="text" list="aircraftList" id="aircraftInput" placeholder="Type to search or click twice for list..." autocomplete="off">
-        <datalist id="aircraftList"></datalist>
+		<div style="position: relative; width: 100%;">
+			<input type="text" id="aircraftInput" placeholder="Type to search or click for list..." autocomplete="off">
+			<div id="customAircraftList" class="custom-datalist"></div>
+		</div>
         <div style="display: block;">
 			<div style="display: flex; align-items: center; justify-content: space-between;">
                 <label for="depOverrideInput" style="margin: 0; white-space: nowrap;">Departure Airport ICAO (Optional)</label>
@@ -830,7 +874,7 @@ body.light-mode #logFlightBtn:hover        { color: #ffffff !important; } /* Sav
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color:#318F34; text-decoration: underline; font-weight: bold;">READ ME</a> for details. v1.2.0
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color:#318F34; text-decoration: underline; font-weight: bold;">READ ME</a> for details. v1.2.1
         </div>
     </div>
 </div>
@@ -905,6 +949,7 @@ function setMode(mode) {
     const picker = document.getElementById("colorPicker");
     if (mode === 'light') {
         document.body.classList.add('light-mode');
+        document.documentElement.classList.add('light-mode'); // Forces native UI to light mode
         localStorage.setItem("dispatcher_theme", "light");
         if (picker.selectedOptions[0] && picker.selectedOptions[0].classList.contains('dark-color')) {
             picker.value = "#3F69BA"; 
@@ -912,6 +957,7 @@ function setMode(mode) {
         }
     } else {
         document.body.classList.remove('light-mode');
+        document.documentElement.classList.remove('light-mode'); // Reverts native UI to dark mode
         localStorage.setItem("dispatcher_theme", "dark");
         if (picker.selectedOptions[0] && picker.selectedOptions[0].classList.contains('light-color')) {
             picker.value = "#3F69BA"; 
@@ -1104,14 +1150,45 @@ function rebuildActiveDatabase() {
 function rebuildFleetDropdown() {
     const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
     activeFleetSpecs = { ...coreFleetSpecs, ...customFleet };
-    const dataListEl = document.getElementById("aircraftList");
-    dataListEl.innerHTML = ""; 
+    
+    const inputEl = document.getElementById("aircraftInput");
+    const listEl = document.getElementById("customAircraftList");
+    
     const sortedFleetEntries = Object.entries(activeFleetSpecs).sort((a, b) => a[1].name.localeCompare(b[1].name));
-    for (const [code, spec] of sortedFleetEntries) {
-        const option = document.createElement("option");
-        option.value = spec.name; 
-        dataListEl.appendChild(option);
+    
+    function renderList(filterText = "") {
+        listEl.innerHTML = "";
+        const filtered = sortedFleetEntries.filter(entry => 
+            entry[1].name.toLowerCase().includes(filterText.toLowerCase())
+        );
+        
+        if (filtered.length === 0) {
+            listEl.style.display = "none";
+            return;
+        }
+        
+        filtered.forEach(([code, spec]) => {
+            const item = document.createElement("div");
+            item.textContent = spec.name;
+            item.onclick = function() {
+                inputEl.value = spec.name;
+                listEl.style.display = "none";
+            };
+            listEl.appendChild(item);
+        });
+        
+        listEl.style.display = "block";
     }
+
+    inputEl.onfocus = () => renderList(inputEl.value);
+    inputEl.oninput = (e) => renderList(e.target.value);
+
+    // Close dropdown when clicking outside of it
+    document.addEventListener('click', function(e) {
+        if (e.target !== inputEl && e.target !== listEl) {
+            listEl.style.display = "none";
+        }
+    });
 }
 function exportDatabaseBackup() {
     const backupObject = {
