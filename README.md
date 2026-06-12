@@ -1,6 +1,6 @@
 # **Dynamic Global Flight Dispatcher (for MSFS 2024)**
 > *'Don't know where to fly but know what you want to fly? Just select your aircraft and click Generate Flight and off you go!'*
-> 
+> 
 The **Dynamic Global Flight Dispatcher** is a lightweight, browser-based tool designed to generate a dynamically scaled fixed-wing flight, or a 20-minute helicopter mission, between high-quality destinations. It removes the guesswork of planning your next session while adding immersion through dynamic, aircraft-specific missions.
 
 This tool takes the friction out of flight simulation. It ensures you can jump into the cockpit without worrying if the runway is suitable, if you've overloaded the airframe, or if the destination exists in MSFS 2024.
@@ -20,29 +20,28 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * **Custom Database & Backups:** Expand the tool yourself by adding custom airframes and airports directly via the UI. Export and import your custom database configuration as a `.json` backup file.
 * **Customisable Interface:** Toggle between Light and Dark mode, save your preferred ATC callsign, and adjust the UI accent colour.
 ---
-### **Current Core MSFS 2024 Database Includes:**
-* 80+ Supported Aircraft Models
-* 330 Contrail Airports
-* 43 iniBuilds Airports
-* 210 ORBX Airports
+### **Current Core Database Includes:**
+* 70+ Supported Aircraft Models
+* 330 Contrail MSFS 2024 Airports
+* 43 iniBuilds MSFS 2024 Airports
+* 210 ORBX MSFS 2024 Airports
 * 133 MSFS Hand-Crafted Airports
-* 100+ 3rd Party & Freeware Airports
-* 50+ 3rd Party & Freeware Military Airbases
+* 93 Curated 3rd Party Payware & Freeware Airports
 * 100 Missions
 ---
 ### **Civilian Missions**
-* **General Aviation**: Sightseeing tours, flight instruction, agricultural/geological surveys, remote deliveries, and smaller medical/cargo transports.
-* **Turboprop**: Regional commuters, overnight feeders, remote medevacs, and atmospheric sampling.
-* **Business Jet**: C-suite commutes, celebrity charters, AOG part relays, and VIP escorts.
-* **Jet**: Scheduled commercial routes, heavy freighters, mass evacuations, sports charters, and high-value asset relocation.
-* **Helicopter**: Search and rescue, traffic/news patrols, simulated sling-load ops, tactical insertions, and local VIP transfers.
-* **Warbird**: Heritage flights, airshow displays, formation training, and vintage air races.
+* General Aviation (GA): Sightseeing tours, flight instruction, agricultural/geological surveys, remote deliveries, and smaller medical/cargo transports.
+* Turboprop (TURBO): Regional commuters, overnight feeders, remote medevacs, and atmospheric sampling.
+* Business Jet (BIZ JET): C-suite commutes, celebrity charters, AOG part relays, and VIP escorts.
+* Jet (JET): Scheduled commercial routes, heavy freighters, mass evacuations, sports charters, and high-value asset relocation.
+* Helicopter (HELI): Search and rescue, traffic/news patrols, simulated sling-load ops, tactical insertions, and local VIP transfers.
+* Warbird (WARBIRD): Heritage flights, airshow displays, formation training, and vintage air races.
 
 ### **Military Missions**
-* **Warbird / Jet / Helicopter**: Border reconnaissance, electronic signals survey, search & rescue support, forward base relocation.
-* **Helicopter**: Local aerial overwatch, base perimeter tours, secure mail runs, VIP security transport.
-* **Tactical Jet**: Advanced jet familiarization, low-level penetration, "Red Air" aggressor support, strategic deterrence transit, joint interoperability drills.
-* **Warbird / Tactical Jet / Jet**: Radar calibration, formation proficiency checks, tactical navigation familiarization.
+* WARBIRD / JET / HELI: Border reconnaissance, electronic signals survey, search & rescue support, forward base relocation.
+* HELI: Local aerial overwatch, base perimeter tours, secure mail runs, VIP security transport.
+* JET: Advanced jet familiarization, low-level penetration, "Red Air" aggressor support, strategic deterrence transit, joint interoperability drills.
+* WARBIRD / JET: Radar calibration, formation proficiency checks, tactical navigation familiarization.
 ---
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
