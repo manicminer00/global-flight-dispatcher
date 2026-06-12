@@ -7,10 +7,12 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 
 ---
 ### **Key Features**
-* **Selectable Target Flight Time:** Use the new UI slider to choose a target flight duration of 60, 90, or 120 minutes. The dispatcher automatically scales the route distance and calculates appropriate altitude increases to match your selected timeframe *(Note: Helicopter missions are unaffected by this slider)*.
+* **Selectable Target Flight Time:** Use the UI slider to choose a target flight duration of 60, 90, or 120 minutes. The dispatcher automatically scales the route distance and calculates appropriate altitude increases to match your selected timeframe *(Note: Helicopter missions are unaffected by this slider)*.
+* **Flight Persistence:** Keep the journey going by simply clicking 'Continue from last arrival airport?' to chain your flights together, picking up exactly where your last session ended.*
+* **Pilot Logbook:** Automatically track your flight history with a built-in logbook. You can clear it at any time, export it alongside your custom database backups, and safely reset your custom airport/aircraft databases without losing your logged flight history.
 * **Extensive Scenery Database:** Features a massive airport database, including the full Contrail and ORBX MSFS 2024 catalogues, Asobo hand-crafted airports, and curated 3rd-party/freeware locations. Store links are provided.
-* **Searchable Aircraft Fleet:** Supports over 65 aircraft ranging from helicopters and light GA to business jets, airliners, and Warbirds (including Flying Iron's Bf 109G-6, P-38 Lightning, F6F-5 Hellcat, and Spitfire MkIXc). Select your airframe via the dropdown menu or type to search.
-* **Airframe-Specific Missions & Job Tickets:** Flight generation is tailored to your aircraft type (GA, Warbird, Business Jet, Turboprop, Passenger, Cargo, or Helicopter). It includes 71 diverse mission types such as Medical Transport, VIP Transfers, and Historic/Airshow display flights.
+* **Searchable Aircraft Fleet:** Supports over 80 aircraft ranging from helicopters and light GA to business jets, airliners, Warbirds and Tactical Jets. Select your airframe via the dropdown menu or type to search.
+* **Airframe-Specific Missions & Job Tickets:** Flight generation is tailored to your aircraft type (GA, Warbird, Business Jet, Turboprop, Passenger, Cargo, Tactical Jet or Helicopter). It includes 100 diverse mission types such as Medical Transport, VIP Transfers, and Historic/Airshow display flights.
 * **Automated MTOW Logic & Loadsheets:** Passenger and cargo loads are dynamically calculated with automated payload checks to ensure you never exceed maximum takeoff weight.
 * **Advanced Flight Profiling:** Smart logic calculates safe cruising altitudes based on route distance and a built-in global mountain range safety floor. Flight rules dynamically switch between VFR and IFR depending on the generated cruise altitude.
 * **Custom Departure Override:** Leave the departure blank for a completely random route, or enter a specific ICAO to generate a flight departing from your current location. (*airports can be added to custom database)
@@ -21,27 +23,29 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * **Customisable Interface:** Toggle between Light and Dark mode, save your preferred ATC callsign, and adjust the UI accent colour.
 ---
 ### **Current Core Database Includes:**
-* 70+ Supported Aircraft Models
+* 80+ Supported Aircraft Models
 * 330 Contrail MSFS 2024 Airports
 * 43 iniBuilds MSFS 2024 Airports
 * 210 ORBX MSFS 2024 Airports
 * 133 MSFS Hand-Crafted Airports
-* 93 Curated 3rd Party Payware & Freeware Airports
+* 100+ 3rd Party Payware & Freeware Airports
+* 50+ 3rd Party & Freeware Military Airbases
 * 100 Missions
 ---
 ### **Civilian Missions**
-* General Aviation (GA): Sightseeing tours, flight instruction, agricultural/geological surveys, remote deliveries, and smaller medical/cargo transports.
-* Turboprop (TURBO): Regional commuters, overnight feeders, remote medevacs, and atmospheric sampling.
-* Business Jet (BIZ JET): C-suite commutes, celebrity charters, AOG part relays, and VIP escorts.
-* Jet (JET): Scheduled commercial routes, heavy freighters, mass evacuations, sports charters, and high-value asset relocation.
-* Helicopter (HELI): Search and rescue, traffic/news patrols, simulated sling-load ops, tactical insertions, and local VIP transfers.
-* Warbird (WARBIRD): Heritage flights, airshow displays, formation training, and vintage air races.
+* General Aviation: Sightseeing tours, flight instruction, agricultural/geological surveys, remote deliveries, and smaller medical/cargo transports.
+* Turboprop: Regional commuters, overnight feeders, remote medevacs, and atmospheric sampling.
+* Business Jet: C-suite commutes, celebrity charters, AOG part relays, and VIP escorts.
+* Jet: Scheduled commercial routes, heavy freighters, mass evacuations, sports charters, and high-value asset relocation.
+* Helicopter: Search and rescue, traffic/news patrols, simulated sling-load ops, tactical insertions, and local VIP transfers.
+* Warbird: Heritage flights, airshow displays, formation training, and vintage air races.
 
 ### **Military Missions**
-* WARBIRD / JET / HELI: Border reconnaissance, electronic signals survey, search & rescue support, forward base relocation.
-* HELI: Local aerial overwatch, base perimeter tours, secure mail runs, VIP security transport.
-* JET: Advanced jet familiarization, low-level penetration, "Red Air" aggressor support, strategic deterrence transit, joint interoperability drills.
-* WARBIRD / JET: Radar calibration, formation proficiency checks, tactical navigation familiarization.
+* Warbird, Jet, Helicopter: Border reconnaissance, electronic signals survey, search & rescue support, forward base relocation.
+* Helicotper: Local aerial overwatch, base perimeter tours, secure mail runs, VIP security transport.
+* Jet: Advanced jet familiarization, low-level penetration, "Red Air" aggressor support, strategic deterrence transit, joint interoperability drills.
+* Warbird/ Jet: Radar calibration, formation proficiency checks, tactical navigation familiarization.
+* Tactial Jet: Strategic Deterrence Transit, Terrain Masking Navigation, Advanced Jet Familiarization, Low-Level Penetration, and 'Red Air' Aggressor Support.
 ---
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
