@@ -44,21 +44,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * 100+ 3rd Party Payware & Freeware Airports
 * 50+ 3rd Party & Freeware Military Airbases
 * 100 Missions
----
-### **Civilian Missions**
-* General Aviation: Sightseeing tours, flight instruction, agricultural/geological surveys, remote deliveries, and smaller medical/cargo transports.
-* Turboprop: Regional commuters, overnight feeders, remote medevacs, and atmospheric sampling.
-* Business Jet: C-suite commutes, celebrity charters, AOG part relays, and VIP escorts.
-* Jet: Scheduled commercial routes, heavy freighters, mass evacuations, sports charters, and high-value asset relocation.
-* Helicopter: Search and rescue, traffic/news patrols, simulated sling-load ops, tactical insertions, and local VIP transfers.
-* Warbird: Heritage flights, airshow displays, formation training, and vintage air races.
 
-### **Military Missions**
-* Warbird, Jet, Helicopter: Border reconnaissance, electronic signals survey, search & rescue support, forward base relocation.
-* Helicotper: Local aerial overwatch, base perimeter tours, secure mail runs, VIP security transport.
-* Jet: Advanced jet familiarization, low-level penetration, "Red Air" aggressor support, strategic deterrence transit, joint interoperability drills.
-* Warbird/ Jet: Radar calibration, formation proficiency checks, tactical navigation familiarization.
-* Tactial Jet: Strategic Deterrence Transit, Terrain Masking Navigation, Advanced Jet Familiarization, Low-Level Penetration, and 'Red Air' Aggressor Support.
 ---
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
