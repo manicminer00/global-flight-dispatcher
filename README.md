@@ -10,7 +10,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 
 ### **60-120 minute flights**
 * **Selectable Target Flight Time:** Use the UI slider to choose a target flight duration of 60, 90, or 120 minutes. The dispatcher automatically scales the route distance and calculates appropriate altitude increases to match your selected timeframe *(Note: Helicopter missions are unaffected by this slider)*.
-* **Custom Departure Override:** Leave the departure blank for a completely random route, or enter a specific ICAO to generate a flight departing from your current location. (*airports can be added to custom database)
+* **Custom Departure Override:** Leave the departure blank for a completely random route, or enter a specific ICAO to generate a flight departing from your current location. *(airports can be added to custom database)*
 
 ### **Persistence**
 * **Flight Persistence:** Keep the journey going by simply clicking 'Continue from last arrival airport?' to chain your flights together, picking up exactly where your last session ended.*
@@ -21,7 +21,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * **Searchable Aircraft Fleet:** Supports over 80 aircraft ranging from helicopters and light GA to business jets, airliners, Warbirds and Tactical Jets. Select your airframe via the dropdown menu or type to search.
 
 ### **Missions**
-* **Airframe-Specific Missions & Job Tickets:** Flight generation is tailored to your aircraft type (GA, Warbird, Business Jet, Turboprop, Passenger, Cargo, Tactical Jet or Helicopter). It includes 100 diverse mission types such as Medical Transport, VIP Transfers, and Historic/Airshow display flights.
+* **Airframe-Specific Missions & Job Tickets:** Flight generation is tailored to your aircraft type *(GA, Warbird, Business Jet, Turboprop, Passenger, Cargo, Tactical Jet or Helicopter)*. It includes 100 diverse mission types such as Medical Transport, VIP Transfers, and Historic/Airshow display flights.
 * **Helicopter Operations:** Full support for rotary-wing operations, including helipad-to-helipad dispatch and local A-to-A sightseeing, news, and patrol missions.
 
 ### **MTOW, Safe Altitudes and SimBrief Export**
