@@ -11,7 +11,7 @@ This tool takes the friction out of flight simulation. It ensures you can jump i
 * **Selectable Target Flight Time:** Use the UI slider to choose a target flight duration of 60, 90, or 120 minutes. The dispatcher automatically scales the route distance and calculates appropriate altitude increases to match your selected timeframe *(Note: Helicopter missions are unaffected by this slider)*.
 * **Custom Departure Override:** Leave the departure blank for a completely random route, or enter a specific ICAO to generate a flight departing from your current location. (*airports can be added to custom database)
 
-
+--
 * **Flight Persistence:** Keep the journey going by simply clicking 'Continue from last arrival airport?' to chain your flights together, picking up exactly where your last session ended.*
 * **Pilot Logbook:** Automatically track your flight history with a built-in logbook. You can clear it at any time, export it alongside your custom database backups, and safely reset your custom airport/aircraft databases without losing your logged flight history.
 
