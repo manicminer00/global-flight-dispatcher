@@ -1414,7 +1414,7 @@ function dispatchFlight() {
     }
 // --- MILITARY AIRPORT PREFERENCE LOGIC ---
     // Filters the pool to favor routes with military airports for military flights and contractors
-    if (spec.isMilitary || isContractorMode || forceMilitaryBases) {
+    if (forceMilitaryBases) {
         candidatePairs.forEach(pair => {
             let score = 0;
             if (pair.src.isMilitary) score += 1;
