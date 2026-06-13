@@ -3,7 +3,7 @@
 > 
 **'Vector'** is a browser-based tool to generate a dynamic flight, or a 20-minute helicopter mission, between high-quality destinations. It removes the guesswork of planning your next session while adding immersion through dynamic, aircraft-specific missions.
 
-This tool takes the friction out of flight simulation. It ensures you can jump into the cockpit without worrying if the runway is suitable, if you've overloaded the airframe, or if the destination exists in MSFS 2024 and, perhaps most importantly, if you want to only fly to and from airports that you own, you can! Finally, a way to visit all those airports that you bought!
+This tool takes the friction out of flight simulation. It ensures you can jump into the cockpit without worrying if the runway is suitable, if you've overloaded the airframe, or if the destination exists in MSFS 2024 and, perhaps most importantly, if you want to only fly to and from airports that you own, you can! Finally, a way to visit all those airports that you bought - without having to plan the flight!
 
 ---
 ### **Key Features**
