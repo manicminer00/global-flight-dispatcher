@@ -1,4 +1,4 @@
-//fleet-db.js v.a
+//fleet-db.js v.b
 const coreFleetSpecs = {
 "AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
 "PA24": { "name": "A2A - Piper Comanche 250", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.3 },
@@ -10,6 +10,7 @@ const coreFleetSpecs = {
 "BE36": { "name": "Asobo - Bonanza G36 (G1000)",	"maxPax": 5, "maxCargo": 32, "minD": 20, "maxD": 200, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1913, "class": "GA", "mtow": 1656, "oew": 1182, "fuelPerNm": 0.3 },
 "C172": { "name": "Asobo - C172 (G1000)", "maxPax": 3, "maxCargo": 54, "minD": 20, "maxD": 400, "minAlt": 3000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1630, "class": "GA", "mtow": 1157, "oew": 767, "fuelPerNm": 0.2 },
 "C700": { "name": "Asobo - Cessna Citation Longitude Model 700", "maxPax": 12, "maxCargo": 506, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 45000, "rules": "IFR", "minRunwayLength": 4810, "class": "BIZ JET", "mtow": 17917, "oew": 10705, "fuelPerNm": 1.88 },
+"M600": { "name": "Asobo - Piper M600", "maxPax": 5, "maxCargo": 91, "minD": 70, "maxD": 180, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 2635, "class": "TURBO", "mtow": 2722, "oew": 1656, "fuelPerNm": 0.44 },
 "U16": { "name": "Asobo - Grumman HU-16 Albatross", "maxPax": 28, "maxCargo": 4500, "minD": 20, "maxD": 400, "minAlt": 3000, "maxAlt": 21000, "rules": "VFR/Scenic", "minRunwayLength": 2500, "class": "GA", "mtow": 13500, "oew": 9000, "fuelPerNm": 2.5 },
 "JAGR": { "name": "AzurPoly - Sepecat Jaguar", "isMilitary": true, "isTactical": true,  "maxPax": 0, "maxCargo": 4500, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 45000, "rules": "IFR", "minRunwayLength": 3080, "class": "JET", "mtow": 14800, "oew": 7315, "fuelPerNm": 4.5 },
 "V10": { "name": "Azurpoly - OV-10 Bronco", "isMilitary": true, "isTactical": true,  "maxPax": 5, "maxCargo": 1451, "minD": 70, "maxD": 300, "minAlt": 5000, "maxAlt": 26000, "rules": "IFR", "minRunwayLength": 1030, "class": "TURBO", "mtow": 6552, "oew": 3127, "fuelPerNm": 1.1 },
@@ -45,6 +46,7 @@ const coreFleetSpecs = {
 "A388": { "name": "FlyByWire - Airbus A380-800", "maxPax": 853, "maxCargo": 83000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 43000, "rules": "IFR", "minRunwayLength": 6725, "class": "JET", "mtow": 575000, "oew": 276800, "fuelPerNm": 25.0 },
 "C414": { "name": "Flysimware - Cessna 414 AW Chancellor", "maxPax": 7, "maxCargo": 226, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 25000, "rules": "VFR/Scenic", "minRunwayLength": 2595, "class": "GA", "mtow": 3062, "oew": 1980, "fuelPerNm": 0.5 },
 "LJ35": { "name": "Flysimware - Bombardier Lear Jet 35A", "maxPax": 8, "maxCargo": 1450, "minD": 150, "maxD": 1500, "minAlt": 24000, "maxAlt": 45000, "rules": "IFR", "minRunwayLength": 4972, "class": "BIZ JET", "mtow": 8300, "oew": 4590, "fuelPerNm": 1.5 },
+"P46T": { "name": "FSRebron - Piper M500", "maxPax": 5, "maxCargo": 45, "minD": 70, "maxD": 180, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 2438, "class": "TURBO", "mtow": 2310, "oew": 1559, "fuelPerNm": 0.41 },
 "E55P": { "name": "FSReborn - Phenom 300e", "maxPax": 7, "maxCargo": 550, "minD": 150, "maxD": 1500, "minAlt": 25000, "maxAlt": 45000, "rules": "IFR", "minRunwayLength": 3209, "class": "BIZ JET", "mtow": 8150, "oew": 5200, "fuelPerNm": 1.5 },
 "H145": { "name": "HPG - H145 (Civilian)", "simbriefIcao": "H145", "maxPax": 8, "maxCargo": 400, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 5000, "rules": "VFR/Scenic", "minRunwayLength": 0, "class": "HELI", "mtow": 3700, "oew": 1919, "fuelPerNm": 1.9 },
 "H14M": { "name": "HPG - H145M (Military)", "simbriefIcao": "H145", "isMilitary": true, "isTactical": true, "maxPax": 8, "maxCargo": 400, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 5000, "rules": "VFR/Scenic", "minRunwayLength": 0, "class": "HELI", "mtow": 3700, "oew": 1919, "fuelPerNm": 1.9 },
