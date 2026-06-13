@@ -507,8 +507,8 @@
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
 	<script type="text/javascript" src="airports-db.js?v=b"></script>
-	<script type="text/javascript" src="fleet-db.js?v=k"></script>
-	<script type="text/javascript" src="missions-db.js?v=i"></script>Use military airbases? (and allow Turboprops, Business Jets and Jets on military missions)
+	<script type="text/javascript" src="fleet-db.js?v=l"></script>
+	<script type="text/javascript" src="missions-db.js?v=i"></script>
 </head>
 <body>
 <div class="container">
@@ -545,7 +545,7 @@
 				<input type="checkbox" id="useLastArrivalToggle" onchange="toggleLastArrival()" style="margin: 0 6px 0 0;">Continue from last arrival airport?</label>
 				<label for="militaryBaseToggle" style="display: flex; align-items: center; font-weight: normal; cursor: pointer; white-space: nowrap; margin: 0;">
 				<input type="checkbox" id="militaryBaseToggle" style="width: 16px; height: 16px; margin: 0 6px 0 0; cursor: pointer; flex-shrink: 0;">
-				<span class="field-hint" style="font-size: 12px; color: var(--accent-color); margin-left: 0;">Use military airbases? (and allow Turboprops, Business Jets and Jets on military missions)</span>
+				<span class="field-hint" style="font-size: 12px; color: var(--accent-color); margin-left: 0;">Enable Military Contractor Mode (Allows civilian aircraft to operate from military bases and fly military missions)</span>
 				</label> 
 		</div>
 	</div>
@@ -917,7 +917,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color:#318F34; text-decoration: underline; font-weight: bold;">READ ME</a> for details. v1.2.5
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color:#318F34; text-decoration: underline; font-weight: bold;">READ ME</a> for details. v1.2.6
         </div>
     </div>
 </div>
@@ -1527,11 +1527,11 @@ let filteredMissions = missionMatrix.filter(m => {
             if (isFreighter && m.paxOnly) return false;
             if (isPaxAirframe && m.cargoOnly) return false;
         }
-
-        // 3. Tactical / Fighter Restrictions
-        // Auto-clears WARBIRD and HELI classes for tactical checks to save DB entry time
-        const isTacticalAirframe = spec.isTactical || spec.class === "WARBIRD" || spec.class === "HELI"; 
-        if (m.tacticalOnly && !isTacticalAirframe) return false;
+		
+		// 3. Tactical / Fighter Restrictions
+		// Auto-clears WARBIRD and HELI classes for tactical checks to save DB entry time
+		const isTacticalAirframe = spec.isTactical || spec.class === "WARBIRD"; 
+		if (m.tacticalOnly && !isTacticalAirframe) return false;
 
         // 4. Military vs Civilian Segregation & Contractor Mode
         if (m.militaryOnly) {
