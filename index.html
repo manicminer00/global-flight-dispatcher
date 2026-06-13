@@ -512,7 +512,18 @@
 	<script type="text/javascript" src="airports-db.js?v=b"></script>
 	<script type="text/javascript" src="fleet-db.js?v=a"></script>
 	<script type="text/javascript" src="missions-db.js?v=a"></script>
+    <script>
+        const currentAppVersion = "1.3"; 
+        const savedAppVersion = localStorage.getItem("dispatcher_app_version");
+
+        if (savedAppVersion !== currentAppVersion) {
+            localStorage.setItem("dispatcher_app_version", currentAppVersion);
+            window.location.href = window.location.href.split('?')[0] + '?v=' + currentAppVersion;
+        }
+    </script>
 </head>
+<body>
+<div class="container">
 <body>
 <div class="container">
     <div class="dispatcher-banner-container">
