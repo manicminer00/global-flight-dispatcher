@@ -507,8 +507,8 @@
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
 	<script type="text/javascript" src="airports-db.js?v=b"></script>
-	<script type="text/javascript" src="fleet-db.js?v=j"></script>
-	<script type="text/javascript" src="missions-db.js?v=k"></script>
+	<script type="text/javascript" src="fleet-db.js?v=k"></script>
+	<script type="text/javascript" src="missions-db.js?v=i"></script>Use military airbases? (and allow Turboprops, Business Jets and Jets on military missions)
 </head>
 <body>
 <div class="container">
@@ -917,7 +917,7 @@
             </a>
         </div>
         <div style="text-align: right;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color:#318F34; text-decoration: underline; font-weight: bold;">READ ME</a> for details. v1.2.4
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color:#318F34; text-decoration: underline; font-weight: bold;">READ ME</a> for details. v1.2.5
         </div>
     </div>
 </div>
@@ -1517,25 +1517,35 @@ const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
     const searchClass = currentClass;
     const isLocalFlight = (origin.icao === destination.icao);
 let filteredMissions = missionMatrix.filter(m => {
-        const classMatch = m.allowedClasses.includes(searchClass);
-        if (!classMatch) return false;
-        // MULTI-ROLE EXEMPTION: Apply civilian Freighter/Pax rules ONLY to civilian aircraft.
-        // Military tactical lifters ignore these restrictions.
+        // 1. Basic Class Match
+        if (!m.allowedClasses.includes(searchClass)) return false;
+
+        // 2. Cargo / Passenger Restrictions (Civilian Aircraft Only)
         if (!spec.isMilitary) {
             const isFreighter = spec.maxPax === 0;
             const isPaxAirframe = spec.maxPax > 0;
             if (isFreighter && m.paxOnly) return false;
             if (isPaxAirframe && m.cargoOnly) return false;
         }
-		// RULE 1: Military aircraft ONLY get military missions
-        if (spec.isMilitary && !m.militaryOnly) return false;
-        // RULE 2: Civilian aircraft ONLY get civilian missions, 
-        // UNLESS the military toggle is enabled (Contractor Mode).
-        if (!spec.isMilitary && m.militaryOnly && !preferMilitary) return false;
-		// RULE 3: Strict Base Matching
-        if (origin.isMilitary && !m.militaryOnly) return false; // Military bases only give military missions
-        // RULE 4: Fighter / Tactical Separation
-        if (m.tacticalOnly && !spec.isTactical) return false;
+
+        // 3. Tactical / Fighter Restrictions
+        // Auto-clears WARBIRD and HELI classes for tactical checks to save DB entry time
+        const isTacticalAirframe = spec.isTactical || spec.class === "WARBIRD" || spec.class === "HELI"; 
+        if (m.tacticalOnly && !isTacticalAirframe) return false;
+
+        // 4. Military vs Civilian Segregation & Contractor Mode
+        if (m.militaryOnly) {
+            // Military missions are allowed if the aircraft is military OR Contractor Mode is ON
+            if (!spec.isMilitary && !preferMilitary) return false;
+        } else {
+            // Civilian missions are explicitly blocked for Military Aircraft (keeps things realistic)
+            if (spec.isMilitary) return false;
+        }
+
+        // 5. Strict Military Base Departure Rule
+        // If departing from a military base, you can ONLY fly military missions
+        if (origin.isMilitary && !m.militaryOnly) return false;
+
         return true;
     });
     if (isLocalFlight) {
