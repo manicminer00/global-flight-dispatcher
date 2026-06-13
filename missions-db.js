@@ -1,4 +1,4 @@
-//missions-db.js v.d
+//missions-db.js v.e
 const missionMatrix = [
 { type: 1, name: "Medical Research", desc: "transporting temperature-sensitive serum cultures", detail: "Cabin temperature must be strictly regulated. Avoid rapid altitude changes to prevent pressurization spikes.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
 { type: 2, name: "Medical Transport", desc: "expediting specialized surgical equipment", detail: "A regional clinic requires these instruments for an impending procedure. Minimize block time.", weight: 10, allowedClasses: ["GA", "TURBO", "HELI"] },
@@ -66,7 +66,7 @@ const missionMatrix = [
 { type: 64, name: "News Broadcast", desc: "providing live coverage of a civic event", detail: "Establish a loiter pattern clear of other traffic. Keep movements predictable for the camera operator.", weight: 8, allowedClasses: ["HELI"], isLocal: true, paxOnly: true },
 { type: 65, name: "Cinematic Filming", desc: "capturing dynamic tracking shots", detail: "Coordinate closely with the ground director to match the pace of the subject.", weight: 6, allowedClasses: ["HELI"], isLocal: true },
 { type: 66, name: "Tactical Insertion", desc: "deploying a specialized ground team", detail: "Approach the LZ utilizing terrain masking. Ensure a stabilized hover for deployment.", weight: 4, allowedClasses: ["HELI"], paxOnly: true },
-{ type: 67, name: "Airshow Display", desc: "performing a historic flight demonstration", detail: "The aircraft is requested for a static display and a brief aerial routine. Ensure all fluid systems are checked before departure.", weight: 3, allowedClasses: ["GA", "WARBIRD"] },
+{ type: 67, name: "Airshow Display", desc: "performing a historic flight demonstration", detail: "The aircraft is requested for a static display and a brief aerial routine. Ensure all fluid systems are checked before departure.", weight: 3, allowedClasses: ["WARBIRD"] },
 { type: 68, name: "Memorial Flypast", desc: "conducting a commemorative low-level transit", detail: "Execute a precise time-on-target profile over the designated memorial coordinates.", weight: 4, allowedClasses: ["WARBIRD", "JET", "HELI"] },
 { type: 69, name: "Heritage Relocation", desc: "ferrying a restored airframe to a museum", detail: "Treat the engine gently. Avoid high manifold pressures and aggressive leaning profiles.", weight: 4, allowedClasses: ["GA", "WARBIRD"] },
 { type: 70, name: "Formation Training", desc: "acting as a chase plane for a historic squadron", detail: "Maintain visual separation and monitor engine temperatures during extended formation power settings.", weight: 4, allowedClasses: ["GA"] },
