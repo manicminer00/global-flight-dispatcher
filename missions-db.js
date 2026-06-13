@@ -1,4 +1,4 @@
-//missions-db.js v.e
+//missions-db.js v.f
 const missionMatrix = [
 { type: 1, name: "Medical Research", desc: "transporting temperature-sensitive serum cultures", detail: "Cabin temperature must be strictly regulated. Avoid rapid altitude changes to prevent pressurization spikes.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
 { type: 2, name: "Medical Transport", desc: "expediting specialized surgical equipment", detail: "A regional clinic requires these instruments for an impending procedure. Minimize block time.", weight: 10, allowedClasses: ["GA", "TURBO", "HELI"] },
