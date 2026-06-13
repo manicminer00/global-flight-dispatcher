@@ -1,4 +1,4 @@
-# **Dynamic Global Flight Dispatcher (for MSFS 2024)**
+# **'VECTOR' - MSFS 2024 Flight Dispatcher**
 > *'Don't know where to fly but know what you want to fly? Just select your aircraft and click Generate Flight and off you go!'*
 > 
 The **Dynamic Global Flight Dispatcher** is a lightweight, browser-based tool designed to generate a dynamically scaled fixed-wing flight, or a 20-minute helicopter mission, between high-quality destinations. It removes the guesswork of planning your next session while adding immersion through dynamic, aircraft-specific missions.
