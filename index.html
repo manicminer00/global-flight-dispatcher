@@ -508,7 +508,517 @@
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
 	<script type="text/javascript" src="airports-db.js?v=b"></script>
 	<script type="text/javascript" src="fleet-db.js?v=l"></script>
-	<script type="text/javascript" src="missions-db.js?v=i"></script>
+	<script type="text/javascript" src="missions-db.js?v=m"></script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Global Flight Dispatcher</title>
+    <style>
+        :root {
+            --accent-color: #2196f3; 
+            --accent-hover: #0b7dda;
+        }
+
+        html.light-mode {
+            color-scheme: light;
+        }
+        html {
+            color-scheme: dark;
+        }
+
+        body.light-mode {
+            background-color: #ffffff;
+            color: #111111;
+            color-scheme: light;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            color-scheme: dark;
+        }
+
+        body.light-mode .container {
+            background-color: #f8f9fa;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .container {
+            background-color: #2d2d2d;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+        }
+
+        body.light-mode .dispatcher-banner-container {
+            border-color: #d1d9e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .dispatcher-banner-container {
+            width: 100%;
+            height: 180px; 
+            overflow: hidden;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            border: 1px solid #444;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .dispatcher-banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            object-position: center;
+            display: block;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+            text-align: center;
+        }
+
+        body.light-mode .control-group, 
+        body.light-mode .settings-group, 
+        body.light-mode .important-box, 
+        body.light-mode .dispatch-release {
+            background: #f0f4f8; 
+            border-color: #d1d9e0;
+        }
+
+        .important-box {
+            background-color: #222;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            border-left: 5px solid #ff5722; 
+            display: flex;
+            align-items: center;       
+            justify-content: center;   
+            min-height: 80px;
+        }
+
+        #quoteDisplay {
+            text-align: center;
+            margin: 0; 
+            font-style: italic;
+            color: #777;
+            line-height: 1.5;
+        }
+
+        .control-group, .settings-group {
+            margin-bottom: 20px;
+            background: #222;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #444;
+        }
+
+        .settings-toggle-btn {
+            background-color: #000;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-weight: normal;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: block;
+            margin-left: auto;
+            width: auto;
+        }
+
+        .settings-panel {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px dashed #555;
+        }
+
+        body.light-mode details div {
+            background: #f0f4f8 !important;
+            border-color: #d1d9e0 !important;
+            color: #42423F !important;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .field-hint {
+            font-size: 12px;
+            color: #aaa;
+            font-weight: normal;
+            display: inline;
+            margin-left: 5px;
+        }
+
+        .field-hint a {
+            color: #00bcd4;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        body.light-mode input[type="text"], 
+        body.light-mode input[type="number"], 
+        body.light-mode select, 
+        body.light-mode textarea {
+            background-color: #ffffff;
+            color: #111111;
+            border-color: #b0bec5;
+            color-scheme: light;
+        }
+        select, input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-size: 15px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            color-scheme: dark;
+        }
+
+        #aircraftInput {
+            font-size: 15px;
+            font-weight: normal;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="text"]:focus, select:focus, input[type="number"]:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        body.light-mode input::placeholder {
+            color: #888;
+        }
+        input::placeholder {
+            color: #666; 
+            opacity: 1;      
+        }
+
+        optgroup {
+            color: #ff5722; 
+            text-transform: uppercase; 
+            font-style: normal;
+            font-weight: bold;
+        }
+
+        optgroup option {
+            color: #fff;
+            text-transform: none;
+        }
+
+        .dispatch-release {
+            margin-top: 30px;
+            display: none;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #444;
+        }
+
+        body.light-mode .ticket-note {
+            background-color: #DCEDFA; 
+            border-left-color: #00bcd4; 
+            color: #42423F;              
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+        }
+        .ticket-note {
+            background-color: #1b365d;
+            border-left: 5px solid #00bcd4;
+            padding: 15px;
+            margin: 15px 0;
+            font-style: italic;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); 
+        }
+
+        body.light-mode .ticket-note-military {
+            background-color: #EDEDE6;
+            border-left-color: #d4af37; 
+            color: #2e3b32;              
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+        }
+        .ticket-note-military {
+            background-color: #2b332c; 
+            border-left: 5px solid #d4af37; 
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', Courier, monospace; 
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); 
+        }
+
+        body.light-mode .url-box {
+            background-color: #eceff1;
+            border-color: #cfd8dc;
+        }
+        .url-box {
+            background-color: #111;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            word-break: break-all;
+            border: 1px solid #333;
+            margin-top: 10px;
+        }
+
+        body.light-mode .url-box-label {
+            color: #111111;
+        }
+        .url-box-label {
+            color: #aaa;
+        }
+
+        /* ------ BUTTONS ------ */
+        .backup-btn-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        button, .backup-btn, .settings-toggle-btn, a.simbrief-btn {
+            height: 48px;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: inherit;
+            font-size: 14px !important;
+            font-weight: bold !important;
+            padding: 0 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .settings-toggle-btn { margin-bottom: 15px; }
+        button { width: 100%; } 
+        #logFlightBtn, #logbookToggleBtn, .settings-toggle-btn { width: auto; } 
+
+        /* BUTTONS UP */
+        body.light-mode button               { background-color: var(--accent-color); color: #ffffff; }
+        button                 { background-color: var(--accent-color); color: #ffffff; }
+
+        body.light-mode .settings-toggle-btn { background-color: #cfd8dc; color: #777777; } 
+        .settings-toggle-btn   { background-color: #777777; color: #ffffff; }
+
+        body.light-mode .backup-btn          { background-color: #cfd8dc; color: #333333; }
+        .backup-btn            { background-color: #555555; color: #ffffff; }
+
+        body.light-mode #logFlightBtn  { background-color: #3F69BA; color: #ffffff; }
+        #logFlightBtn  { background-color: #3F69BA; color: #ffffff; }
+
+        a.simbrief-btn         { background-color: #008cba; color: #ffffff; }
+        #downloadPlnBtn        { background-color: #4CAF50; color: #ffffff; }
+
+        /* BUTTONS ROLLOVER */
+        body.light-mode button:hover               { background-color: #318F34; color: #ffffff; }
+        button:hover               { background-color: #318F34; color: #ffffff; }
+
+        body.light-mode .settings-toggle-btn:hover { background-color: #318F34; color: #ffffff; }
+        .settings-toggle-btn:hover { background-color: #318F34; color: #ffffff; }
+
+        body.light-mode .backup-btn:hover          { background-color: #E3AE36; color: #ffffff; }
+        .backup-btn:hover          { background-color: #E3AE36; color: #ffffff; }
+
+        body.light-mode #logFlightBtn:hover { background-color: #318F34; color: #ffffff; }
+        #logFlightBtn:hover { background-color: #318F34; color: #ffffff; }
+
+        body.light-mode #logFlightBtn:hover        { color: #ffffff !important; }
+        #logFlightBtn:hover        { color: #ffffff !important; }
+
+        a.simbrief-btn:hover       { background-color: #007399; color: #ffffff; }
+        #downloadPlnBtn:hover      { background-color: #388E3C; color: #ffffff; }
+
+        /* UNIQUE EXCEPTIONS */
+        #generateFlightBtn {
+            font-weight: bold !important;
+            font-size: 18px !important; 
+        }
+        /* END BUTTONS */
+
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+
+        body.light-mode table, 
+        body.light-mode th, 
+        body.light-mode td {
+            border-color: #cfd8dc;
+        }
+        table, th, td {
+            border: 1px solid #444;
+        }
+
+        td, th {
+            padding: 10px;
+            text-align: left;
+        }
+
+        body.light-mode th {
+            background-color: #e0e6ed;
+        }
+        th {
+            background-color: #333;
+            width: 25%;
+        }
+
+        body.light-mode hr {
+            border-color: #cfd8dc !important;
+        }
+        .config-separator {
+            border-color: #444; 
+            margin: 25px 0;
+        }
+
+        body.light-mode a.scenery-link:hover {
+            color: #318F34;
+        }
+        a.scenery-link:hover {
+            color: #318F34;
+        }
+        a.scenery-link {
+            color: #00bcd4;
+            text-decoration: underline;
+        }
+
+        .db-stats-container { margin-bottom: 15px; }
+
+        body.light-mode .db-stat-item {
+            background-color: #e8eaf6;
+            border-color: #c5cae9;
+            color: var(--accent-color); 
+        }
+        .db-stat-item {
+            background-color: #2a2a2a;
+            color: var(--accent-color);
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        body.light-mode .db-stat-item:hover {
+            background-color: #d0dce7;
+        }
+        .db-stat-item:hover { background-color: #333; }
+
+        body.light-mode .db-dropdown {
+            background-color: #ffffff;
+            border-color: #c5cae9;
+        }
+        .db-dropdown {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        body.light-mode .db-dropdown ul {
+            color: #333;
+        }
+        .db-dropdown ul { margin: 0; padding-left: 20px; color: #ccc; font-size: 13px; }
+        .db-dropdown li { margin-bottom: 4px; }
+
+        body.light-mode #colorPicker .light-color { display: block; }
+        #colorPicker .light-color { display: none; }
+
+        body.light-mode #colorPicker .dark-color { display: none; }
+        #colorPicker .dark-color { display: block; }
+
+        body.light-mode #timeVal {
+            color: var(--accent-color);
+        }
+        #timeVal {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        body.light-mode .custom-datalist {
+            background-color: #ffffff;
+            border-color: #b0bec5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .custom-datalist {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 250px;
+            overflow-y: auto;
+            background-color: #333;
+            border: 1px solid #555;
+            border-radius: 4px;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-top: -10px;
+        }
+
+        body.light-mode .custom-datalist div {
+            color: #111111;
+        }
+        .custom-datalist div {
+            padding: 6px 10px;
+            cursor: pointer;
+            color: #fff;
+            font-size: 15px;
+        }
+
+        body.light-mode .custom-datalist div:hover {
+            background-color: #e0e6ed;
+            color: var(--accent-color);
+        }
+        .custom-datalist div:hover {
+            background-color: var(--accent-color);
+        }
+
+        body.light-mode #actionPrompt {
+            color: #409444; 
+        }
+        #actionPrompt {
+            color: yellow; 
+        }
+    </style>
+	<script type="text/javascript" src="simbrief.apiv1.js"></script>
+	<script type="text/javascript" src="airports-db.js?v=b"></script>
+	<script type="text/javascript" src="fleet-db.js?v=l"></script>
+	<script type="text/javascript" src="missions-db.js?v=m"></script>
 </head>
 <body>
 <div class="container">
@@ -545,8 +1055,12 @@
 				<input type="checkbox" id="useLastArrivalToggle" onchange="toggleLastArrival()" style="margin: 0 6px 0 0;">Continue from last arrival airport?</label>
 				<label for="militaryBaseToggle" style="display: flex; align-items: center; font-weight: normal; cursor: pointer; white-space: nowrap; margin: 0;">
 				<input type="checkbox" id="militaryBaseToggle" style="width: 16px; height: 16px; margin: 0 6px 0 0; cursor: pointer; flex-shrink: 0;">
-				<span class="field-hint" style="font-size: 12px; color: var(--accent-color); margin-left: 0;">Enable Military Contractor Mode (Allows civilian aircraft to operate from military bases and fly military missions)</span>
+				<span class="field-hint" style="font-size: 12px; color: var(--accent-color); margin-left: 0;">Restrict departures to Military Airbases only</span>
 				</label> 
+				<label for="contractorToggle" style="display: flex; align-items: center; font-weight: normal; cursor: pointer; white-space: nowrap; margin: 0; margin-top: 5px;">
+				<input type="checkbox" id="contractorToggle" style="width: 16px; height: 16px; margin: 0 6px 0 0; cursor: pointer; flex-shrink: 0;">
+				<span class="field-hint" style="font-size: 12px; color: var(--accent-color); margin-left: 0;">Enable Military Contractor Mode (Civilian aircraft can fly military missions)</span>
+				</label>
 		</div>
 	</div>
         <div style="display: block; margin-top: 10px; margin-bottom: 15px;">
@@ -1334,8 +1848,1397 @@ function dispatchFlight() {
     }
 //-------------------------------
 const spec = { ...activeFleetSpecs[type] };
-    // Retrieve the toggle state early for filtering
-    const preferMilitary = document.getElementById("militaryBaseToggle").checked;
+    // Retrieve the toggle states early for filtering
+    const forceMilitaryBases = document.getElementById("militaryBaseToggle").checked;
+    const isContractorMode = document.getElementById("contractorToggle").checked;
+    let validAirports = activeAirportDatabase.filter(ap => {
+        let allowedClasses = [];
+        switch(ap.rwy) {
+            case "GA": allowedClasses = ["GA", "WARBIRD", "HELI"]; break;
+            case "TURBO": allowedClasses = ["GA", "WARBIRD", "TURBO", "HELI"]; break;
+            case "BIZ JET": allowedClasses = ["GA", "WARBIRD", "TURBO", "BIZ JET", "HELI"]; break;
+            case "JET": allowedClasses = ["GA", "WARBIRD", "TURBO", "BIZ JET", "JET", "HELI"]; break;
+            case "HELI": allowedClasses = ["HELI"]; break;
+        }
+        const isAllowedType = allowedClasses.includes(spec.class);
+        const meetsLength = ap.length ? (ap.length >= spec.minRunwayLength) : true;
+        // Exclude military airports unless the toggle is selected (bypassed if it's a specific departure override)
+        if (!preferMilitary && ap.isMilitary && ap.icao !== depOverride) {
+            return false;
+        }
+        return isAllowedType && meetsLength;
+    });
+//-------------------------------
+    if (depOverride && !activeAirportDatabase.some(ap => ap.icao === depOverride)) {
+        alert(`Custom Departure Airport ${depOverride} is not currently included in the master database. You can add it manually in Settings.`);
+        return;
+    }
+    let blockSpeed = 90; 
+    if (spec.class === "JET") blockSpeed = 380;
+    else if (spec.class === "BIZ JET") blockSpeed = 340;
+    else if (spec.class === "TURBO") blockSpeed = 220;
+    else if (spec.class === "WARBIRD") blockSpeed = 200;
+    else if (spec.class === "HELI") blockSpeed = 80;
+    else if (spec.class === "GA" && spec.maxAlt >= 15000) blockSpeed = 160;
+    let effectiveMins = (spec.class === "HELI") ? 20 : Math.max(10, targetMins - 30);
+    const targetDist = (blockSpeed * effectiveMins) / 60;
+    const minTarget = (spec.class === "HELI") ? 5 : Math.max(spec.minD, targetDist * 0.85);
+    const maxTarget = (spec.class === "HELI") ? 35 : Math.min(spec.maxD, targetDist * 1.15);
+    let candidatePairs = [];
+    for (let src of validAirports) {
+        if (depOverride && src.icao !== depOverride) continue;
+        for (let dst of validAirports) {
+            if (src.icao === dst.icao && spec.class === "HELI") {
+                candidatePairs.push({ src: src, dst: src, dist: 25 });
+                continue; 
+            }
+            if (src.icao === dst.icao) continue;
+            const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
+            if (dist >= minTarget && dist <= maxTarget) {
+                candidatePairs.push({ src, dst, dist });
+            }
+        }
+    }
+    if (candidatePairs.length === 0) {
+        for (let src of validAirports) {
+            if (depOverride && src.icao !== depOverride) continue;
+            for (let dst of validAirports) {
+                if (src.icao === dst.icao && spec.class === "HELI") continue;
+                if (src.icao === dst.icao) continue;
+                const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
+                if (dist >= spec.minD && dist <= spec.maxD) {
+                    candidatePairs.push({ src, dst, dist });
+                }
+            }
+        }
+    }
+    if (candidatePairs.length === 0) {
+        alert(`No valid routes found matching current physical fleet configurations.`);
+        return;
+    }
+// --- MILITARY AIRPORT PREFERENCE LOGIC ---
+    // preferMilitary is already declared above. 
+    // Filters the pool to favor routes with military airports when selected.
+    if (preferMilitary) {
+        candidatePairs.forEach(pair => {
+            let score = 0;
+            if (pair.src.isMilitary) score += 1;
+            if (pair.dst.isMilitary) score += 1;
+            pair.milScore = score;
+        });
+        const maxMilScore = Math.max(...candidatePairs.map(p => p.milScore || 0));
+        if (maxMilScore > 0) {
+            candidatePairs = candidatePairs.filter(p => p.milScore === maxMilScore);
+        }
+    }
+    // --- OWNED AIRPORTS PREFERENCE LOGIC ---
+    const preferOwned = document.getElementById("preferOwnedToggle").checked;
+    if (preferOwned) {
+        const ownedRaw = document.getElementById("ownedAirportsInput").value;
+        const ownedList = ownedRaw.split(',').map(s => s.trim().toUpperCase()).filter(s => s.length > 0);
+        if (ownedList.length > 0) {
+            candidatePairs.forEach(pair => {
+                let score = 0;
+                // Score +1 for each owned airport in the pairing
+                if (ownedList.includes(pair.src.icao)) score += 1;
+                if (ownedList.includes(pair.dst.icao)) score += 1;
+                pair.ownedScore = score;
+            });
+            // Find the maximum score available in the valid route pool
+            const maxScore = Math.max(...candidatePairs.map(p => p.ownedScore));
+            // Filter down to the highest scored pairs, ONLY if an owned route actually exists within range
+            if (maxScore > 0) {
+                candidatePairs = candidatePairs.filter(p => p.ownedScore === maxScore);
+            }
+        }
+    }
+    // --- END PREFERENCE LOGIC ---
+    const selectedRoute = candidatePairs[Math.floor(Math.random() * candidatePairs.length)];
+    const origin = selectedRoute.src;
+    const destination = selectedRoute.dst;
+    const distanceNm = Math.round(selectedRoute.dist);
+    const bearing = calculateBearing(origin.lat, origin.lon, destination.lat, destination.lon);
+    const isEasterly = (bearing >= 0 && bearing < 180);
+    const depElev = origin.elev || 0;
+    const arrElev = destination.elev || 0;
+    let terrainSafetyFloor = Math.max(depElev, arrElev) + 3000;
+    let midLat = (origin.lat + destination.lat) / 2;
+    let midLon = (origin.lon + destination.lon) / 2;
+    const globalRanges = [
+        { name: "Alps", latMin: 45.0, latMax: 48.0, lonMin: 5.0, lonMax: 15.0, safeFloor: 11500 },
+        { name: "Pyrenees", latMin: 42.0, latMax: 43.3, lonMin: -2.0, lonMax: 3.3, safeFloor: 9500 },
+        { name: "North American Rockies", latMin: 35.0, latMax: 60.0, lonMin: -125.0, lonMax: -105.0, safeFloor: 14500 },
+        { name: "South American Andes", latMin: -55.0, latMax: 10.0, lonMin: -76.0, lonMax: -65.0, safeFloor: 15500 },
+        { name: "Himalayas / Tibetan Plateau", latMin: 26.0, latMax: 38.0, lonMin: 70.0, lonMax: 105.0, safeFloor: 21500 },
+        { name: "Japanese Alps / Central Ranges", latMin: 34.5, latMax: 37.5, lonMin: 136.0, lonMax: 139.5, safeFloor: 10500 }
+    ];
+    for (let range of globalRanges) {
+        let dMatch = (origin.lat >= range.latMin && origin.lat <= range.latMax && origin.lon >= range.lonMin && origin.lon <= range.lonMax);
+        let aMatch = (destination.lat >= range.latMin && destination.lat <= range.latMax && destination.lon >= range.lonMin && destination.lon <= range.lonMax);
+        let mMatch = (midLat >= range.latMin && midLat <= range.latMax && midLon >= range.lonMin && midLon <= range.lonMax);
+        if (dMatch || aMatch || mMatch) {
+            if (spec.class !== "HELI") {
+                terrainSafetyFloor = Math.max(terrainSafetyFloor, range.safeFloor);
+            }
+            break; 
+        }
+    }
+    let climbProfile = 150; 
+    if (spec.class === "GA" || spec.class === "HELI" || spec.class === "WARBIRD") climbProfile = 100;
+    if (spec.class === "BIZ JET") climbProfile = 250;
+    const distanceAltCap = distanceNm * climbProfile;
+    const finalMinAlt = Math.max(spec.minAlt, terrainSafetyFloor);
+    const effectiveMaxAlt = Math.max(Math.min(spec.maxAlt, distanceAltCap), terrainSafetyFloor);
+    const safeMaxAlt = effectiveMaxAlt;
+    const dynamicMinAlt = effectiveMaxAlt < finalMinAlt 
+        ? Math.max(terrainSafetyFloor, safeMaxAlt - 4000)
+        : Math.max(finalMinAlt, safeMaxAlt - 4000);
+let baseThousands = Math.floor((Math.random() * (safeMaxAlt - dynamicMinAlt + 1) + dynamicMinAlt) / 1000);
+    // Dynamically upgrade VFR to IFR if the assigned altitude reaches Class A airspace (18,000+ ft)
+    if (spec.rules.includes("VFR") && baseThousands >= 18) {
+        spec.rules = "IFR";
+    }
+    let altValue;
+    if (spec.rules.includes("VFR")) {
+        if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
+        if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
+        altValue = (baseThousands * 1000) + 500;
+    } else {
+        if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
+        if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
+        altValue = baseThousands * 10;
+    }
+    let pax = 0;
+    if (spec.maxPax > 0) {
+        let minPax = spec.class === "JET" ? Math.floor(spec.maxPax * 0.5) : 1;
+        pax = Math.floor(Math.random() * (spec.maxPax - minPax + 1)) + minPax;
+    }
+const safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
+    const safeOew = spec.oew || (spec.class === "JET" ? 42000 : 2000);
+    const safeFuelPerNm = spec.fuelPerNm || (spec.class === "JET" ? 6 : 0.5);
+    const paxWeight = pax * 104;
+    const estimatedBlockFuel = distanceNm * safeFuelPerNm;
+    // Calculate ratio of filled seats to scale down available cargo space proportionally
+    const paxRatio = spec.maxPax > 0 ? (pax / spec.maxPax) : 0;
+    const proportionalCargoLimit = spec.maxCargo * (1 - paxRatio);
+    // Check raw structural weight limit 
+    const maxStructuralPayload = safeMtow - safeOew - estimatedBlockFuel;
+    const remainingPayload = Math.max(0, maxStructuralPayload - paxWeight);
+    // Choose the strictest limit: proportional capacity vs raw structural limit
+    const hardCargoLimit = Math.floor(Math.min(proportionalCargoLimit, remainingPayload));
+    let cargoKg = hardCargoLimit > 0 ? Math.floor(Math.random() * hardCargoLimit) : 0;
+    const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
+    const currentClass = spec.class || "GA"; 
+    const searchClass = currentClass;
+    const isLocalFlight = (origin.icao === destination.icao);
+let filteredMissions = missionMatrix.filter(m => {
+        // 1. Basic Class Match
+        if (!m.allowedClasses.includes(searchClass)) return false;
+
+        // 2. Cargo / Passenger Restrictions (Civilian Aircraft Only)
+        if (!spec.isMilitary) {
+            const isFreighter = spec.maxPax === 0;
+            const isPaxAirframe = spec.maxPax > 0;
+            if (isFreighter && m.paxOnly) return false;
+            if (isPaxAirframe && m.cargoOnly) return false;
+        }
+		
+		// 3. Tactical / Fighter Restrictions
+		// Auto-clears WARBIRD and HELI classes for tactical checks to save DB entry time
+		const isTacticalAirframe = spec.isTactical || spec.class === "WARBIRD"; 
+		if (m.tacticalOnly && !isTacticalAirframe) return false;
+
+        // 4. Military vs Civilian Segregation & Contractor Mode
+        if (m.militaryOnly) {
+            // Military missions are allowed if the aircraft is military OR Contractor Mode is ON
+            if (!spec.isMilitary && !preferMilitary) return false;
+        } else {
+            // Civilian missions are explicitly blocked for Military Aircraft (keeps things realistic)
+            if (spec.isMilitary) return false;
+        }
+
+        // 5. Strict Military Base Departure Rule
+        // If departing from a military base, you can ONLY fly military missions
+        if (origin.isMilitary && !m.militaryOnly) return false;
+
+        return true;
+    });
+    if (isLocalFlight) {
+        const localMissions = filteredMissions.filter(m => m.isLocal);
+        if (localMissions.length > 0) {
+            filteredMissions = localMissions;
+        }
+    } else {
+        filteredMissions = filteredMissions.filter(m => !m.isLocal);
+    }
+    if (filteredMissions.length === 0) {
+        alert("No valid military missions found for this routing. Try generating a new route or checking airport sizes.");
+        return;
+    }
+    const finalSelectionPool = filteredMissions;
+    let selectionPoolWithGuard = finalSelectionPool.filter(m => m.type !== lastMissionType);
+    if (selectionPoolWithGuard.length === 0) {
+        selectionPoolWithGuard = finalSelectionPool; 
+    }
+    const totalWeight = selectionPoolWithGuard.reduce((sum, m) => sum + m.weight, 0);
+    let randomNum = Math.random() * totalWeight;
+    let chosenMission = selectionPoolWithGuard[0];
+    for (let m of selectionPoolWithGuard) {
+        if (randomNum < m.weight) {
+            chosenMission = m;
+            break;
+        }
+        randomNum -= m.weight;
+    }
+    lastMissionType = chosenMission.type;
+    let randomName = names[Math.floor(Math.random() * names.length)];
+    let randomAthlete = athletes[Math.floor(Math.random() * athletes.length)];
+    let randomTeam = teams[Math.floor(Math.random() * teams.length)];
+    let processedDesc = chosenMission.desc
+        .replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName)
+        .replace("{team}", randomTeam);
+    let processedDetail = chosenMission.detail
+        .replace("{name}", chosenMission.type === 15 ? randomAthlete : randomName)
+        .replace("{team}", randomTeam);
+let jobTicket = "";
+    if (chosenMission.militaryOnly) {
+        // MILITARY / TACTICAL TONE (FRAGO / ATO Style)
+        let manifestText = chosenMission.paxOnly ? `${pax} PERS` : `${cargoKg} KG MATERIEL`;
+        // --- NEW: Branch the military routing text based on local vs transit ---
+        let routingText = isLocalFlight 
+            ? `Execute local operations originating from ${origin.icao} and return to base.`
+            : `Execute routing from ${origin.icao} to ${destination.icao} strictly as filed.`;
+        jobTicket = `
+            <strong>CLASSIFICATION:</strong> TACTICAL SORTIE (ATO# ${Math.floor(Math.random() * 9000) + 1000})<br>
+            <strong>TASKING:</strong> ${chosenMission.name.toUpperCase()}<br>
+            <strong>MANIFEST:</strong> ${manifestText} - ${processedDesc.toUpperCase()}<br>
+            <br>
+            <strong>SPECIAL INSTRUCTIONS:</strong> ${processedDetail} Maintain sterile comms outside of ATC requirements. ${routingText} Check threat and weather scopes prior to engine start. Dismissed.`;
+    } else {
+        // CIVILIAN / STORYTELLER TONE
+        let manifestText = chosenMission.paxOnly ? `${pax} Passengers` : `${cargoKg} kg Cargo`;
+        if (spec.rules.includes("VFR")) {
+            if (isLocalFlight) {
+                jobTicket = `
+                    <strong>Client Assignment:</strong> ${chosenMission.name}<br>
+                    <strong>Manifest:</strong> ${processedDesc} (${manifestText})<br>
+                    <strong>Contract Value:</strong> ${payout}<br>
+                    <br>
+                    <strong>Dispatcher Notes:</strong> Good day, Captain. This is a local operations flight operating out of ${origin.name}. ${processedDetail} The visual conditions should be in your favor, so keep your eyes outside the cockpit, watch your altitude over populated areas, and return to base when the block time is up.`;
+            } else {
+                jobTicket = `
+                    <strong>Client Assignment:</strong> ${chosenMission.name}<br>
+                    <strong>Manifest:</strong> ${processedDesc} (${manifestText})<br>
+                    <strong>Contract Value:</strong> ${payout}<br>
+                    <br>
+                    <strong>Dispatcher Notes:</strong> Good day, Captain. This is a visual low-level run tracking out from ${origin.name} toward ${destination.name}. ${processedDetail} Keep your eyes open for points of interest along the route and keep clear of cloud decks.`;
+            }
+        } else {
+            jobTicket = `
+                <strong>Client Assignment:</strong> ${chosenMission.name}<br>
+                <strong>Manifest:</strong> ${processedDesc} (${manifestText})<br>
+                <strong>Contract Value:</strong> ${payout}<br>
+                <br>
+                <strong>Dispatcher Notes:</strong> Welcome to the flight deck, Captain. The airway logs are locked down for this transit from ${origin.icao} to ${destination.icao}. ${processedDetail} Follow standard instrument transitions, watch your spacing tags, and stick exactly to your assigned vertical profiles. Safe flight.`;
+        }
+    }
+    document.getElementById("outCallsign").innerText = callsignRaw;
+    document.getElementById("outAirframe").innerText = spec.name;
+    document.getElementById("outRules").innerText = spec.rules;
+    document.getElementById("outOrig").innerText = `${origin.icao} (${origin.name})`;
+    document.getElementById("outDest").innerText = `${destination.icao} (${destination.name})`;
+    document.getElementById("outAlt").innerText = spec.rules.includes("VFR") 
+        ? altValue.toLocaleString('en-US') + " ft" 
+        : "FL" + altValue;
+    document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
+    document.getElementById("outPax").innerText = pax > 0 ? `${pax} pax` : "0 (Solo)";
+	document.getElementById("outCargo").innerText = cargoKg;
+	const missionImgEl = document.getElementById("outMissionImage");
+    missionImgEl.src = `images-missions/mission${chosenMission.type}.jpg`;
+    missionImgEl.style.display = "block";
+    const ticketEl = document.getElementById("outTicket");
+        ticketEl.innerHTML = jobTicket;
+        // The Switch: Are we military or civilian?
+        if (chosenMission.militaryOnly) {
+            ticketEl.classList.add("ticket-note-military"); // Put on military uniform
+            ticketEl.classList.remove("ticket-note");       // Take off standard uniform
+        } else {
+            ticketEl.classList.add("ticket-note");          // Put on standard uniform
+            ticketEl.classList.remove("ticket-note-military"); // Take off military uniform
+        }
+    const cleanAlt = altValue.toString().replace(/[^0-9]/g, ''); 
+    const cargoParam = (cargoKg / 1000).toFixed(3);
+    const plnAlt = spec.rules.includes("VFR") ? cleanAlt : (parseInt(cleanAlt) * 100).toString();
+    const dispatchType = spec.simbriefIcao || type;
+    const simbriefUrl = `https://www.simbrief.com/system/dispatch.php?share=1&type=${dispatchType}&orig=${origin.icao}&dest=${destination.icao}&callsign=${callsignRaw}&fl=${cleanAlt}&pax=${pax}&cargo=${cargoParam}&units=KGS`;
+    const linkEl = document.getElementById("outLink");
+    linkEl.href = simbriefUrl;
+    const isWarbird = spec.class === "WARBIRD" || spec.name.toLowerCase().includes("flying iron") || spec.name.toLowerCase().includes("warbird");
+    const isSimbriefSupported = ["GA", "TURBO", "BIZ JET", "JET"].includes(spec.class) && !isWarbird;
+    const actionPromptEl = document.getElementById("actionPrompt");
+    const heliMessageEl = document.getElementById("heliMessage");
+	if (!isSimbriefSupported) {
+        heliMessageEl.style.display = "inline";
+        actionPromptEl.innerText = "Click below to download a .pln file for MSFS 2024.";
+        actionPromptEl.style.color = "#ff5722"; // Forces orange in both modes
+        actionPromptEl.style.fontWeight = "normal";
+        document.getElementById("outLink").style.display = "none";
+    } else {
+        heliMessageEl.style.display = "none";
+        actionPromptEl.innerText = "Click below to send this plan to SimBrief or download a .pln file for MSFS 2024.";
+        actionPromptEl.style.color = ""; // Clears inline style, lets CSS handle Light/Dark mode colors
+        actionPromptEl.style.fontWeight = "normal";
+		document.getElementById("outLink").style.display = "inline-flex";
+    }
+    const depElevStr = origin.elev || 0;
+    const arrElevStr = destination.elev || 0;
+    const depLLA = getMSFSLLA(origin.lat, origin.lon, depElevStr);
+    const destLLA = getMSFSLLA(destination.lat, destination.lon, arrElevStr);
+    const isIfr = spec.rules.includes("IFR");
+    const isLocal = origin.icao === destination.icao;
+    const localWptLLA = isLocal ? getMSFSLLA(origin.lat + 0.2, origin.lon, parseInt(cleanAlt)) : "";
+    const xmlString = generatePlnXml({
+        originIcao: origin.icao,
+        destIcao: destination.icao,
+        originName: origin.name.replace(/&/g, '&amp;'), 
+        destName: destination.name.replace(/&/g, '&amp;'),
+        depLLA: depLLA,
+        destLLA: destLLA,
+        localWptLLA: localWptLLA,
+        isIfr: isIfr,
+        altValue: plnAlt 
+    });
+    const blob = new Blob([xmlString], { type: "text/xml" });
+    const url = URL.createObjectURL(blob);
+const downloadBtn = document.getElementById("downloadPlnBtn");
+    downloadBtn.href = url;
+    downloadBtn.download = `${origin.icao}_to_${destination.icao}.pln`;
+	downloadBtn.style.display = "inline-flex";
+currentPendingFlight = {
+        orig: origin.icao,
+        dest: destination.icao,
+        aircraft: spec.name,
+        mission: chosenMission.name,
+        durationMins: spec.class === "HELI" ? 20 : targetMins
+    };
+    document.getElementById("logFlightBtn").style.display = "inline-block";
+    document.getElementById("dispatchRelease").style.display = "block";
+}
+function convertToDMS(deg, isLat) {
+    const dir = isLat ? (deg >= 0 ? 'N' : 'S') : (deg >= 0 ? 'E' : 'W');
+    const absDeg = Math.abs(deg);
+    const d = Math.floor(absDeg);
+    const mFloat = (absDeg - d) * 60;
+    const m = Math.floor(mFloat);
+    const s = ((mFloat - m) * 60).toFixed(2);
+    return `${dir}${d}° ${m.toString().padStart(2, '0')}' ${s.padStart(5, '0')}"`;
+}
+function formatAltitude(feet) {
+    const sign = feet >= 0 ? '+' : '-';
+    return `${sign}${Math.abs(feet).toFixed(2).padStart(9, '0')}`;
+}
+function getMSFSLLA(lat, lon, altFeet) {
+    return `${convertToDMS(lat, true)},${convertToDMS(lon, false)},${formatAltitude(altFeet)}`;
+}
+function generatePlnXml(data) {
+    let routeNodes = `
+        <ATCWaypoint id="${data.originIcao}">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>${data.depLLA}</WorldPosition>
+            <ICAO>
+                <ICAOIdent>${data.originIcao}</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>`;
+    if (data.originIcao === data.destIcao) {
+        routeNodes += `
+        <ATCWaypoint id="TOUR">
+            <ATCWaypointType>User</ATCWaypointType>
+            <WorldPosition>${data.localWptLLA}</WorldPosition>
+        </ATCWaypoint>`;
+    }
+    routeNodes += `
+        <ATCWaypoint id="${data.destIcao}">
+            <ATCWaypointType>Airport</ATCWaypointType>
+            <WorldPosition>${data.destLLA}</WorldPosition>
+            <ICAO>
+                <ICAOIdent>${data.destIcao}</ICAOIdent>
+            </ICAO>
+        </ATCWaypoint>`;
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<SimBase.Document Type="AceXML" version="1,0">
+    <Descr>AceXML Document</Descr>
+    <FlightPlan.FlightPlan>
+        <Title>${data.originIcao} to ${data.destIcao}</Title>
+        <FPType>${data.isIfr ? 'IFR' : 'VFR'}</FPType>
+        <RouteType>Direct</RouteType>
+        <CruisingAlt>${data.altValue}</CruisingAlt>
+        <DepartureID>${data.originIcao}</DepartureID>
+        <DepartureLLA>${data.depLLA}</DepartureLLA>
+        <DestinationID>${data.destIcao}</DestinationID>
+        <DestinationLLA>${data.destLLA}</DestinationLLA>
+        <Descr>${data.originIcao} to ${data.destIcao}</Descr>
+        <DepartureName>${data.originName}</DepartureName>
+        <DestinationName>${data.destName}</DestinationName>
+        <AppVersion>
+            <AppVersionMajor>10</AppVersionMajor>
+            <AppVersionBuild>61472</AppVersionBuild>
+        </AppVersion>${routeNodes}
+    </FlightPlan.FlightPlan>
+</SimBase.Document>`;
+}
+function loadRandomBanner() {
+    const bannerAssets = [
+        'banner-bizjet1.png', 'banner-bizjet2.png', 'banner-bizjet3.png', 'banner-bizjet4.png', 'banner-bizjet5.png',
+        'banner-ga1.png', 'banner-ga2.png', 'banner-ga3.png', 'banner-ga4.png', 'banner-ga5.png',
+        'banner-heli1.png', 'banner-heli2.png', 'banner-heli3.png', 'banner-heli4.png',
+        'banner-jet1.png', 'banner-jet2.png', 'banner-jet3.png', 'banner-jet4.png', 'banner-jet5.png', 'banner-jet6.png', 'banner-jet7.png', 'banner-jet8.png', 'banner-jet9.png', 'banner-jet10.png',
+        'banner-mil1.png', 'banner-mil2.png', 'banner-mil3.png', 'banner-mil5.png', 'banner-mil6.png', 'banner-mil7.png', 'banner-mil8.png', 'banner-mil9.png', 'banner-mil10.png',       
+        'banner-turbo1.png', 'banner-turbo2.png',
+        'banner-warbird1.png', 'banner-warbird2.png', 'banner-warbird3.png', 'banner-warbird4.png' 
+    ];
+    const randomIndex = Math.floor(Math.random() * bannerAssets.length);
+    document.getElementById("dynamicWorkflowBanner").src = 'images/' + bannerAssets[randomIndex];
+}
+let currentPendingFlight = null;
+function toggleLastArrival() {
+    const toggle = document.getElementById("useLastArrivalToggle");
+    const depInput = document.getElementById("depOverrideInput");
+    if (toggle.checked) {
+        const lastArr = localStorage.getItem("dispatcher_last_arrival");
+        if (lastArr) {
+            depInput.value = lastArr;
+        } else {
+            alert("No previous arrival logged yet! Complete a flight first.");
+            toggle.checked = false;
+        }
+    } else {
+        depInput.value = "";
+    }
+}
+function logCurrentFlight() {
+    if (!currentPendingFlight) return;
+    let logbook = JSON.parse(localStorage.getItem("dispatcher_logbook")) || [];
+    const dateStr = new Date().toLocaleDateString();
+    
+    logbook.unshift({
+        date: dateStr,
+        orig: currentPendingFlight.orig,
+        dest: currentPendingFlight.dest,
+        aircraft: currentPendingFlight.aircraft,
+        mission: currentPendingFlight.mission,
+        duration: currentPendingFlight.durationMins
+    });
+    
+    localStorage.setItem("dispatcher_logbook", JSON.stringify(logbook));
+    localStorage.setItem("dispatcher_last_arrival", currentPendingFlight.dest);
+    
+    document.getElementById("logFlightBtn").style.display = "none";
+    
+    // Updated alert message
+    alert("Flight saved to logbook.");
+    
+    // Removed the line that automatically forced the departure input to update
+    
+    currentLogbookPage = 1;
+    updateLogbookUI();
+    updateDatabaseStats();
+}
+let currentLogbookPage = 1;
+const logbookRowsPerPage = 5;
+function updateLogbookUI() {
+    const logbook = JSON.parse(localStorage.getItem("dispatcher_logbook")) || [];
+    document.getElementById("lbTotalFlights").innerText = logbook.length;
+    let totalMins = logbook.reduce((sum, flight) => sum + (flight.duration || 0), 0);
+    document.getElementById("lbTotalHours").innerText = (totalMins / 60).toFixed(1);
+    const tbody = document.getElementById("logbookTableBody");
+    const pagControls = document.getElementById("paginationControls");
+    if (logbook.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #888; border: none;">No flights logged yet.</td></tr>`;
+        pagControls.style.display = "none";
+        return;
+    }
+    const totalPages = Math.ceil(logbook.length / logbookRowsPerPage);
+    if (currentLogbookPage > totalPages) currentLogbookPage = totalPages;
+    if (currentLogbookPage < 1) currentLogbookPage = 1;
+    const startIdx = (currentLogbookPage - 1) * logbookRowsPerPage;
+    const endIdx = startIdx + logbookRowsPerPage;
+    const pageData = logbook.slice(startIdx, endIdx);
+tbody.innerHTML = pageData.map(f => `
+        <tr>
+            <td style="text-align: left;">${f.date}</td>
+            <td style="text-align: left;"><strong>${f.orig}</strong> ➔ <strong>${f.dest}</strong></td>
+            <td style="text-align: left;">${f.aircraft.split(' - ')[1] || f.aircraft}</td>
+            <td style="text-align: left;"><span style="opacity: 0.8;">${f.mission}</span></td>
+            <td style="text-align: left;">${(f.duration / 60).toFixed(1)} hours</td>
+        </tr>
+    `).join('');
+    if (totalPages > 1) {
+        pagControls.style.display = "block";
+        document.getElementById("pageIndicator").innerText = `Page ${currentLogbookPage} of ${totalPages}`;
+    } else {
+        pagControls.style.display = "none";
+    }
+}
+function changePage(direction) {
+    currentLogbookPage += direction;
+    updateLogbookUI();
+}
+function clearLogbook() {
+    if (confirm("Are you sure you want to delete your entire flight history? This cannot be undone.")) {
+        localStorage.removeItem("dispatcher_logbook");
+        localStorage.removeItem("dispatcher_last_arrival");
+        document.getElementById("useLastArrivalToggle").checked = false;
+        document.getElementById("depOverrideInput").value = "";
+        currentLogbookPage = 1;
+        updateLogbookUI();
+        updateDatabaseStats();
+    }
+}
+window.onload = function() {
+    loadRandomBanner(); 
+    loadSettings();
+    rebuildActiveDatabase();
+    rebuildFleetDropdown();
+    updateDatabaseStats();
+    displayRandomQuote();
+	const slider = document.getElementById("timeSlider");
+	document.getElementById("timeVal").innerText = slider.value;
+};
+</script>
+</body>
+</html>
+</head>
+<body>
+<div class="container">
+    <div class="dispatcher-banner-container">
+        <img id="dynamicWorkflowBanner" alt="Dynamic Flight Dispatch Banner" class="dispatcher-banner-img">
+    </div>
+<h1>Dynamic Global Flight Dispatcher (for MSFS 2024)</h1>
+    <div class="important-box">
+        <p id="quoteDisplay"></p>
+    </div>
+    <div class="control-group">
+        <label for="callsignInput">Enter ATC Callsign: 
+            <span class="field-hint">
+                <a onclick="event.preventDefault(); saveCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Save Callsign</a>
+                <span style="color: #666; margin: 0 3px;">/</span>
+                <a href="https://123atc.com/call-signs" target="_blank" rel="noopener noreferrer" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Callsign lookup</a>
+            </span>
+        </label>
+        <input type="text" id="callsignInput" placeholder="e.g. MRD275" maxlength="6" required>
+        <label for="aircraftInput" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">Select Aircraft Type:</label>
+		<div style="position: relative; width: 100%;">
+			<input type="text" id="aircraftInput" placeholder="Type to search or click for list..." autocomplete="off">
+			<div id="customAircraftList" class="custom-datalist"></div>
+		</div>
+        <div style="display: block;">
+			<div style="display: flex; align-items: center; justify-content: space-between;">
+                <label for="depOverrideInput" style="margin: 0; white-space: nowrap;">Departure Airport ICAO (Optional)</label>
+            </div>
+            <div style="margin-top: 8px;">
+                <input type="text" id="depOverrideInput" placeholder="e.g. EGLL (Leave blank for random selection)" maxlength="4">
+            </div>		
+			<div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
+				<label style="display: flex; align-items: center; font-size: 12px; font-weight: normal; margin: 0; cursor: pointer; color: var(--accent-color);">
+				<input type="checkbox" id="useLastArrivalToggle" onchange="toggleLastArrival()" style="margin: 0 6px 0 0;">Continue from last arrival airport?</label>
+				<label for="militaryBaseToggle" style="display: flex; align-items: center; font-weight: normal; cursor: pointer; white-space: nowrap; margin: 0;">
+				<input type="checkbox" id="militaryBaseToggle" style="width: 16px; height: 16px; margin: 0 6px 0 0; cursor: pointer; flex-shrink: 0;">
+				<span class="field-hint" style="font-size: 12px; color: var(--accent-color); margin-left: 0;">Restrict departures to Military Airbases only</span>
+				</label> 
+				<label for="contractorToggle" style="display: flex; align-items: center; font-weight: normal; cursor: pointer; white-space: nowrap; margin: 0; margin-top: 5px;">
+				<input type="checkbox" id="contractorToggle" style="width: 16px; height: 16px; margin: 0 6px 0 0; cursor: pointer; flex-shrink: 0;">
+				<span class="field-hint" style="font-size: 12px; color: var(--accent-color); margin-left: 0;">Enable Military Contractor Mode (Civilian aircraft can fly military missions)</span>
+				</label>
+		</div>
+	</div>
+        <div style="display: block; margin-top: 10px; margin-bottom: 15px;">
+            <label for="timeSlider" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span>Target Flight Time: <span id="timeVal">60</span> minutes</span>
+                <span style="font-size: 12px; color: #666; font-weight: normal; font-style: normal;">
+                    (N.B. Helicopter missions are unaffected by this slider.)
+                </span>
+            </label>
+            <input type="range" id="timeSlider" min="60" max="120" step="30" value="60" list="steplist" oninput="document.getElementById('timeVal').innerText = this.value" style="width: 100%; cursor: pointer;">
+            <datalist id="steplist">
+                <option value="60"></option>
+                <option value="90"></option>
+                <option value="120"></option>
+            </datalist>
+        </div>
+<button id="generateFlightBtn" onclick="dispatchFlight()">🎲 Dynamically Generate Flightplan</button>
+    </div>
+<div style="display: flex; margin-bottom: 15px; position: relative; justify-content: center; align-items: center; min-height: 35px;">
+    <button type="button" id="logbookToggleBtn" class="settings-toggle-btn" style="margin: 0; position: absolute; left: 15px;" onclick="toggleLogbookPanel()">📋 View Pilot Logbook</button>
+    <button type="button" class="settings-toggle-btn" style="margin: 0; position: absolute; right: 15px;" onclick="toggleSettingsPanel()">⚙️ Settings & Database Tools</button>
+</div>
+    <hr style="border-color: #444; margin-top: 20px;">
+    <div id="logbookPanel" class="settings-panel settings-group" style="display: none;">
+        <h3 style="margin-top: 0;">📋 Pilot Logbook</h3>
+        <div class="db-stats-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="db-stat-item" style="cursor: default;">
+                <span>Total Flights</span>
+                <span id="lbTotalFlights">0</span>
+            </div>
+            <div class="db-stat-item" style="cursor: default;">
+                <span>Flight Time (hrs)</span>
+                <span id="lbTotalHours">0.0</span>
+            </div>
+        </div>
+<div class="url-box" style="max-height: 250px; overflow-y: auto; padding: 0; margin-bottom: 15px; margin-top: 10px; border: none;">
+<table style="margin-top: 0; font-size: 12px; text-align: left; width: 100%;">
+<thead>
+    <tr>
+        <th style="width: 11%;">Date</th>
+        <th style="width: 13%;">Route</th>
+        <th style="width: 35%;">Aircraft</th>
+        <th style="width: 30%;">Mission</th>
+        <th style="width: 11%;">Time</th>
+    </tr>
+</thead>
+                <tbody id="logbookTableBody">
+                    <tr><td colspan="5" style="text-align: center; opacity: 0.7;">No flights logged yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="paginationControls" style="text-align: center; margin-top: 5px; font-size: 13px; display: none;">
+            <a href="#" onclick="event.preventDefault(); changePage(-1);" style="color: var(--accent-color); text-decoration: none;">&lt; Prev.</a>
+            <span id="pageIndicator" style="margin: 0 10px; color: #888;"></span>
+            <a href="#" onclick="event.preventDefault(); changePage(1);" style="color: var(--accent-color); text-decoration: none;">Next &gt;</a>
+        </div>
+        <div style="text-align: right; margin-top: 10px;">
+            <a href="#" onclick="event.preventDefault(); clearLogbook();" style="color: #ff5722; text-decoration: underline; font-size: 12px;">Clear Logbook</a>
+        </div>
+    </div>
+    <div id="settingsPanel" class="settings-panel settings-group">
+        <h3>🔒 Permanent Database</h3>
+        <div class="db-stats-container">
+            <div class="db-stat-item" onclick="toggleDropdown('coreAircraftList')">
+                <span>✈️ Aircraft</span>
+                <span id="coreAircraftCount">0</span>
+            </div>
+            <div id="coreAircraftList" class="db-dropdown" style="display:none;"></div>
+            <div class="db-stat-item" onclick="toggleDropdown('coreHandcraftedList')">
+                <span>🛠️ Hand-Crafted Airports</span>
+                <span id="coreHandcraftedCount">0</span>
+            </div>
+            <div id="coreHandcraftedList" class="db-dropdown" style="display:none;"></div>
+			<div class="db-stat-item" onclick="toggleDropdown('coreThirdPartyList')">
+                <span>🛒 Third Party Airports</span>
+                <span id="coreThirdPartyCount">0</span>
+            </div>
+            <div id="coreThirdPartyList" class="db-dropdown" style="display:none;"></div>
+            <div class="db-stat-item" onclick="toggleDropdown('coreMilitaryList')">
+                <span>🪖 Military Bases</span>
+                <span id="coreMilitaryCount">0</span>
+            </div>
+            <div id="coreMilitaryList" class="db-dropdown" style="display:none;"></div>
+            <div style="margin-top: 10px; margin-bottom: 5px; text-align: left; font-size: 12px; color: #888;">
+                N.B. Airports may be listed multiple times if available from different developers on different stores (e.g., Contrail, iniBuilds and ORBX).
+            </div>
+        </div>
+        <hr class="config-separator">
+        <h3>🏳️‍🌈 Dispatcher Configuration</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button type="button" onclick="setMode('light')" style="background-color: #f0f4f8; color: #111; border: 1px solid #b0bec5; font-weight: normal;">☀️ Light Mode</button>
+            <button type="button" onclick="setMode('dark')" style="background-color: #333; color: #fff; border: 1px solid #555; font-weight: normal;">🌙 Dark Mode</button>
+        </div>
+        <label for="colorPicker">Interface Accent Color:</label>
+        <select id="colorPicker" onchange="changeAccentColor(this.value)">
+			<option value="#3F69BA" class="light-color">Blue</option>
+            <option value="#566685" class="light-color">Blue Grey</option>
+            <option value="#6A7567" class="light-color">Olive</option>
+            <option value="#3F69BA" class="dark-color">Blue</option>
+            <option value="#777777" class="dark-color">Grey</option>
+            <option value="#6f7064" class="dark-color">Olive</option>   
+        </select>
+        <hr class="config-separator">
+        <h3>⭐ Owned Airports Filter</h3>
+        <div style="margin-bottom: 10px; font-size: 13px; color: #888;">
+            Enter the ICAO codes for airport scenery that you own, separated by commas. As long as the ICAO is in the master database, or you have added it to your custom database below, the dispatcher will prioritize routes using these airports.
+        </div>
+        <textarea id="ownedAirportsInput" rows="3" placeholder="e.g. EGLL, KJFK, YSSY" style="resize: vertical;"></textarea>
+        <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 15px;">
+            <input type="checkbox" id="preferOwnedToggle" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
+            <label for="preferOwnedToggle" style="margin: 0; font-weight: bold; color: var(--accent-color); cursor: pointer;">Enable Preferred Routing</label>
+        </div>
+        <button type="button" onclick="saveOwnedAirports()">Save Airport Preferences</button>
+                <hr class="config-separator">
+		<h3>📍 Add New Airport (to Local DB)</h3>
+        <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px;">
+            <input type="checkbox" id="newApMilitary" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
+            <label for="newApMilitary" style="margin: 0 0 0 8px; cursor: pointer;">Select if adding a Military Airbase</label>
+        </div>
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+			<div>
+			<label for="newLat">Latitude (Decimal):</label>
+			<input type="number" id="newLat" placeholder="e.g. 35.214" step="any">
+			</div>
+			<div>
+			<label for="newLon">Longitude (Decimal):</label>
+			<input type="number" id="newLon" placeholder="e.g. -80.943" step="any">
+			</div>
+		</div>
+		<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newIcao">Airport ICAO:</label>
+                <input type="text" id="newIcao" placeholder="e.g. EGLL" maxlength="4">
+            </div>
+            <div>
+                <label for="newName">Airport Name:</label>
+                <input type="text" id="newName" placeholder="e.g. Heathrow">
+            </div>
+            <div>
+                <label for="newElev">Elevation (ft):</label>
+                <input type="number" id="newElev" placeholder="e.g. 83">
+            </div>
+            <div>
+                <label for="newApLength">Runway Length (ft):</label>
+                <input type="number" id="newApLength" placeholder="e.g. 8000">
+            </div>
+        </div>
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newRwyType">Runway Suitability:</label>
+                <select id="newRwyType">
+                    <option value="GA">GA / STOL: &lt;3000ft</option>
+                    <option value="TURBO">Turboprop: 3000-6000ft</option>
+                    <option value="BIZ JET">Business Jet: 3000-6000ft</option>
+                    <option value="JET">Jets / Military Jets: &gt;6000ft</option>
+                    <option value="HELI">Helipad</option>
+                </select>
+                <details style="text-align: left; margin-top: -5px; font-size: 12px; color: #666; cursor: pointer;">
+                    <summary style="text-decoration: underline; margin-bottom:5px;">Why do I need to choose between Turboprop and Business Jet?</summary>				
+					<div style="background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #444; margin-top: 5px; line-height: 1.4;">
+					📍 Even if a runway is physically long enough for Business Jets, it might not allow them due to noise restrictions, permits, weight-bearing limits on the tarmac, or a lack of specific FBO facilities. This option allows you to designate a 3000-6000ft runway as "Turboprop only" or "Business Jet capable."
+                    </div>
+                </details>
+            </div>
+            <div>
+                <label for="newSource">Database Tier Source:</label>
+                <select id="newSource">
+                    <option value="Contrail Store">Contrail</option>
+                    <option value="Flightsim.to">Flightsim.to</option>
+					<option value="iniBuilds">iniBuilds</option>
+                    <option value="MSFS hand-crafted airport">MSFS Hand-Crafted</option>                    
+                    <option value="MSFS Marketplace">MSFS Marketplace</option>
+                    <option value="ORBX Store">ORBX</option>
+                    <option value="SimMarket Store">SimMarket</option>
+                    <option value="Other">Other Retail Channels</option>
+                </select>
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button type="button" onclick="saveCustomAirport()">Save Airport</button>
+        </div>
+        <hr class="config-separator">
+		<h3>🛩️ Add New Aircraft (to Local DB)</h3>
+        <div style="display: flex; align-items: center; justify-content: flex-start; margin-bottom: 15px;">
+            <input type="checkbox" id="newAcMilitary" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
+            <label for="newAcMilitary" style="margin: 0 0 0 8px; cursor: pointer;">Select if adding a Military Airframe</label>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newAcName">Aircraft Name:</label>
+                <input type="text" id="newAcName" placeholder="e.g. Guimbal Cabri G2">
+            </div>
+            <div>
+                <label for="newAcIcao">Aircraft ICAO Code: <span class="field-hint">(<a href="https://www.icao.int/operational-safety/doc-8643-aircraft-type-designators/search" target="_blank" rel="noopener noreferrer">Look Up Aircraft</a> / <a href="https://www.helihub.com/data/icao-code/" target="_blank" rel="noopener noreferrer">Look Up Helicopter</a>)</span></label>
+                <input type="text" id="newAcIcao" placeholder="e.g. CABG" maxlength="4">
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+                <label for="newAcLength">Min Takeoff Distance (ft):</label>
+                <input type="number" id="newAcLength" placeholder="Refer to Aircraft Manual / 0ft for Helicopters">
+            </div>
+            <div>
+                <label for="newAcClass">Aircraft Operational Class:</label>
+					<select id="newAcClass">
+						<option value="GA">General Aviation / STOL</option>
+						<option value="TURBO">Turboprop</option>
+						<option value="BIZ JET">Business Jet</option>
+						<option value="JET">Jet</option>
+						<option value="MIL_JET">Military Jet</option>
+						<option value="WARBIRD">Warbird (e.g. Spitfire)</option>
+						<option value="HELI">Helicopter</option>
+					</select>
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+            <div>
+                <label for="newAcMaxPax">Max Passengers (excluding pilot/s):</label>
+                <input type="number" id="newAcMaxPax" placeholder="e.g. 180">
+            </div>
+            <div>
+                <label for="newAcMaxCargo">Max Cargo (kg):</label>
+                <input type="number" id="newAcMaxCargo" placeholder="e.g. 5000">
+            </div>
+            <div>
+                <label for="newAcMtow">MTOW (kg):</label>
+                <input type="number" id="newAcMtow" placeholder="e.g. 75000">
+            </div>
+            <div>
+                <label for="newAcOew">OEW (kg):<span class="field-hint">(<a href="https://ansperformance.eu/acronym/oew/" target="_blank" rel="noopener noreferrer">OEW definition</a>)</span></label>
+                <input type="number" id="newAcOew" placeholder="e.g. 42000">
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+            <div>
+                <label for="newAcFuel">Fuel Burn (kg/nm):</label>
+                <input type="number" id="newAcFuel" placeholder="e.g. 6.0" step="0.1">
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button type="button" onclick="saveCustomAircraft()">Save Airframe</button>
+        </div>
+        <details style="text-align: left; margin-top: 20px; font-size: 12px; color: #666; cursor: pointer;">
+            <summary style="text-decoration: underline; margin-bottom:0px;">What does Add New Airport (to Local DB) or Add New Aircraft (to Local DB) do?</summary>
+            <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #444; margin-top: 5px; line-height: 1.4;">
+                <strong>📍 Add New Airport (to Local DB):</strong>
+                <ul style="padding-left: 20px; margin: 5px 0 20px 0;">
+                    <li>If your desired departure airport is not in the main database, you can add it manually and save it to your local browser cache.</li>
+                </ul>
+                <strong>🛩️ Add New Aircraft (to Local DB):</strong>
+                <ul style="padding-left: 20px; margin: 5px 0 0 0;">
+                    <li>If your desired aircraft is not in the main database, you can add it manually and save it to your local browser cache.</li>
+                </ul>
+            </div>
+        </details>
+        <hr class="config-separator">
+        <h3>💾 Custom Database Backup</h3>
+        <div style="margin-top: 0px; margin-bottom: 10px; text-align: left; font-size: 14px; color: #888;">
+            N.B. Any custom aircraft and airports that you have added to your local database will be removed if you empty your browser cache. Use the buttons below to create and restore a local backup of your custom database before emptying your browser cache. <strong>Logbook Entries are included in the exported file.</strong> 
+        </div>
+        <div class="backup-btn-container">
+            <button type="button" class="backup-btn" onclick="exportDatabaseBackup()">📥 Export Backup (.json)</button>
+            <button type="button" class="backup-btn" onclick="document.getElementById('importFileInput').click()">📤 Import Backup File</button>
+            <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
+        </div>
+        <div style="text-align: right; margin-bottom: 20px; margin-top: -5px;">
+            <a href="#" onclick="event.preventDefault(); resetCustomDatabase();" style="color: #ff5722; text-decoration: underline; font-size: 13px;">Reset Custom Database</a>
+            <details style="text-align: left; margin-top: 0px; font-size: 12px; color: #666; cursor: pointer;">
+                <summary style="text-decoration: underline; margin-bottom: 0px;">What does Reset Custom Database do?</summary>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #444; margin-top: 5px; line-height: 1.4;">
+                    <strong>Step-by-Step Process:</strong>
+                    <ul style="padding-left: 20px; margin: 5px 0 0 0;">
+                        <li><strong>1. Confirmation:</strong> A dialog asks for permission to wipe custom data.</li>
+                        <li><strong>2. Deletion:</strong> Only the (<code>dispatcher_custom_airports</code>, and <code>dispatcher_custom_fleet</code>) keys are removed from your browser's local memory.</li>
+                        <li><strong>3. Reassurance:</strong> This does not clear cookies, bookmarks, or browsing history; it only affects this specific dispatcher tool.</li>
+						<li><strong>4. What about my Logbook?:</strong> 'Reset Custom Database' only deletes custom airframes and custom airports that you have manually added. It does not clear your Logbook or remove your Owned Airport list.
+                        <li><strong>5. Clean up:</strong> The interface instantly updates to reflect the empty database.</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+        <div class="db-stats-container">
+                <div class="db-stat-item" style="cursor: default;">
+                    <span>⭐ Owned Airports</span>
+                    <span id="ownedAirportsCount">0</span>
+                </div>
+            <div class="db-stat-item" onclick="toggleDropdown('customAirportsList')">
+                <span>📍 Saved Airports</span>
+                <span id="customAirportsCount">0</span>
+            </div>
+            <div id="customAirportsList" class="db-dropdown" style="display:none;"></div>
+            <div class="db-stat-item" onclick="toggleDropdown('customAircraftList')">
+                <span>🛩️ Saved Aircraft</span>
+                <span id="customAircraftCount">0</span>
+            </div>
+<div id="customAircraftList" class="db-dropdown" style="display:none;"></div>
+            <div class="db-stat-item" style="cursor: default;">
+                <span>📋 Logbook Entries</span>
+                <span id="backupLogbookCount">0</span>
+            </div>
+        </div>
+    </div>
+    <div id="dispatchRelease" class="dispatch-release">
+        <h2>Flight Dispatch Details</h2>
+        <table>
+            <tr><th>Callsign</th><td><strong id="outCallsign" style="color:var(--accent-color);">---</strong></td></tr>
+            <tr><th>Airframe</th><td id="outAirframe"></td></tr>
+            <tr><th>Flight Rules</th><td id="outRules"></td></tr>
+            <tr><th>Routing</th><td><strong id="outOrig"></strong> ➔ <strong id="outDest"></strong></td></tr>
+            <tr><th>Cruise Altitude</th><td><strong id="outAlt" style="color:#ff5722;"></strong></td></tr>
+            <tr><th>Scenery Links</th><td id="outScenery"></td></tr>
+        </table>
+		<h3>Job Ticket</h3>
+        <img id="outMissionImage" style="display: none; width: 100%; border-radius: 4px; margin-top: 15px; border: 1px solid #444; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); box-sizing: border-box; object-fit: cover;" alt="Mission Image">
+        <div class="ticket-note" id="outTicket"></div>
+        <h3>Weight & Balance Loadsheet</h3>
+        <ul>
+            <li><strong>Assigned Passengers:</strong> <span id="outPax"></span></li>
+            <li><strong>Assigned Cargo Payload:</strong> <span id="outCargo"></span> kg</li>
+            <li><strong>Validation:</strong> Payload strictly mapped under limits in Metric KG.</li>
+        </ul>
+<div style="text-align: right; margin-top: 10px;">
+    <button id="logFlightBtn" type="button" style="width: auto; padding: 10px 20px; display: none;" onclick="logCurrentFlight()">✅ Save Flight to Logbook</button>
+</div>
+        <hr style="border-color: #444;">
+        <h3 style="margin-bottom: 0px;">SimBrief Dispatch / MSFS Flightplan Download</h3>
+        <p id="dispatchActionText" style="margin-top: 5px; margin-bottom: 15px;">
+		<span id="heliMessage" style="display: none; color: #ff5722; font-weight: normal; margin-right: 5px;">Simbrief Dispatch is not available for this aircraft type.</span>
+            <span id="actionPrompt"></span>
+        </p>
+<div style="display: flex; align-items: center; width: 100%; gap: 10px;">
+    <a id="outLink" class="simbrief-btn" target="_blank" rel="noopener noreferrer">Generate Flight Plan via SimBrief</a>
+    <a id="downloadPlnBtn" class="simbrief-btn" style="cursor: pointer;">Download MSFS .PLN</a>
+</div>
+            <details style="text-align: left; margin-top: 15px; font-size: 12px; color: #666; cursor: pointer;">
+                <summary style="text-decoration: underline; margin-bottom:0px;">SimBrief Aircraft Profiles Notice</summary>
+                <div style="background: #1a1a1a; padding: 10px; border-radius: 4px; border: 1px solid #444; margin-top: 5px; line-height: 1.4;">
+                    <strong>Disclaimer:</strong> Some aircraft in the dispatcher database are not included in the <a href="https://www.simbrief.com/home/index.php?page=aircraft&sort=lastupdated_time" target="_blank" rel="noopener noreferrer" style="color: #00bcd4; text-decoration: underline;">SimBrief</a> database. These aircraft require a custom aircraft profile to generate accurate flight plans, which is beyond the scope of this tool. I have provided links below to third-party aircraft profiles for SimBrief.<br />
+					<br />* If you use LittleNavMap, Jonathan Beckett has a comprehensive set of profiles for these aircraft that you can purchase <a href="https://ko-fi.com/s/80ce405120" target="_blank" rel="noopener noreferrer" style="color: #00bcd4; text-decoration: underline;">here</a>.<br />
+				<ul style="padding-left: 20px; margin: 5px 0 0 0;">
+					<li><a href="https://dispatch.simbrief.com/airframes/share/347385_1696188817489" target="_blank" rel="noopener noreferrer" style="color: #00bcd4; text-decoration: underline;">Asobo - Airbus A400M Atlas</a></li>
+					<li><a href="https://forums.flightsimulator.com/uploads/short-url/szJWEfPZcTO9up9dlv8kYwQFsjV.lnmperf" target="_blank" rel="noopener noreferrer" style="color: #00bcd4; text-decoration: underline;">Asobo - Grumman Amphibian Albatross G111/HU16</a> (LittleNavMap only)</li>
+					<li>Azurpoly - North American OV-10 Bronco</li>
+					<li>Azurpoly - SEPECAT Jaguar</li>
+					<li><a href="https://dispatch.simbrief.com/airframes/share/102808_1751373534540" target="_blank" rel="noopener noreferrer" style="color: #00bcd4; text-decoration: underline;">Carenado - Cessna CT210N</a></li>
+					<li>Flying Iron - Messerschmitt Bf 109G-6</li>
+					<li>Flying Iron - Grumman F6F-5 Hellcat</li>
+					<li>Flying Iron - Lockheed P-38 Lightning</li>
+					<li>Flying Iron - Supermarine Spitfire L.F Mk IXc</li>
+					<li><a href= "https://flightsim.to/addon/75961/f14-tomcat-simbrief-profile-by-xhaferico-bty007" target="_blank" rel="noopener noreferrer" style="color: #00bcd4; text-decoration: underline;">IndiaFoxtEcho - F-14 A/B</a></li>
+					<li>IndiaFoxtEcho - Panavia Tornado</li>
+					<li>Just Flight - Avro Vulcan</li>
+					<li>Just Flight - BAE Systems Hawk T1/A</li>
+					<li>Just Flight - Piper Tomahawk</li>
+					<li><a href="https://www.twotonemurphy.com/recipes/piper-turbo-arrow-simbrief-profile" target="_blank" rel="noopener noreferrer" style="color: #00bcd4; text-decoration: underline;">Just Flight - Piper Turbo Arrow III and IV</a></li>
+				</ul>
+                </div>
+            </details>
+    </div>
+    <div style="margin-top: 5px; text-align: center; font-size: 11px; color: #888;">
+        <strong>Disclaimer:</strong> For flight simulation use only. Do not use for real-world aviation or dispatch. Third-party names and links belong to their respective owners.
+    </div>
+    <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #888;">
+        <div style="text-align: left;">
+           <a href="https://buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" style="color: #2596be; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 6px;">
+                <img src="https://cdn.buymeacoffee.com/buttons/bmc-new-btn-logo.svg" alt="Buy Me A Coffee" style="height: 16px; width: auto;">
+                Show your Support - Buy Me A Coffee!
+            </a>
+        </div>
+        <div style="text-align: right;">
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" style="color:#318F34; text-decoration: underline; font-weight: bold;">READ ME</a> for details. v1.2.7
+        </div>
+    </div>
+</div>
+<script>
+let lastMissionType = null;
+let activeAirportDatabase = [];
+let activeFleetSpecs = {};
+function saveCallsign() {
+    const cs = document.getElementById("callsignInput").value.trim().toUpperCase();
+    if (cs.length < 3) {
+        alert("Please specify a valid callsign prefix.");
+        return;
+    }
+    localStorage.setItem("dispatcher_saved_callsign", cs);
+    alert(`Callsign ${cs} saved to local memory configuration.`);
+}
+function saveOwnedAirports() {
+    const input = document.getElementById("ownedAirportsInput").value;
+    const toggle = document.getElementById("preferOwnedToggle").checked;
+    localStorage.setItem("dispatcher_owned_airports", input);
+    localStorage.setItem("dispatcher_prefer_owned", toggle ? "true" : "false");
+    // Refresh the stats immediately
+    updateDatabaseStats();
+    alert("Owned airports configuration saved to local memory!");
+}
+function loadSettings() {
+    const storedColor = localStorage.getItem("dispatcher_accent");
+    if (storedColor) {
+        document.getElementById("colorPicker").value = storedColor;
+        changeAccentColor(storedColor);
+    }
+    const savedCallsign = localStorage.getItem("dispatcher_saved_callsign");
+    if (savedCallsign) {
+        document.getElementById("callsignInput").value = savedCallsign;
+    }
+    const storedTheme = localStorage.getItem("dispatcher_theme");
+    if (storedTheme) setMode(storedTheme);
+    // --- New Load Logic ---
+    const ownedList = localStorage.getItem("dispatcher_owned_airports");
+    if (ownedList) {
+        document.getElementById("ownedAirportsInput").value = ownedList;
+    }
+    const preferOwned = localStorage.getItem("dispatcher_prefer_owned") === "true";
+    document.getElementById("preferOwnedToggle").checked = preferOwned;
+}
+function displayRandomQuote() {
+    if (typeof preFlightQuotes === 'undefined' || preFlightQuotes.length === 0) return;
+    const quoteObj = preFlightQuotes[Math.floor(Math.random() * preFlightQuotes.length)];
+    const displayEl = document.getElementById("quoteDisplay");
+    if (quoteObj.author) {
+        displayEl.innerHTML = `"${quoteObj.text}" - <strong>${quoteObj.author}</strong>`;
+    } else {
+        displayEl.innerHTML = `"${quoteObj.text}"`;
+    }
+}
+function toggleSettingsPanel() {
+    const p = document.getElementById("settingsPanel");
+    p.style.display = (p.style.display === "block") ? "none" : "block";
+    document.getElementById("logbookPanel").style.display = "none";
+}
+function toggleLogbookPanel() {
+    const lb = document.getElementById("logbookPanel");
+    lb.style.display = (lb.style.display === "block") ? "none" : "block";
+    document.getElementById("settingsPanel").style.display = "none";
+    if (lb.style.display === "block") updateLogbookUI();
+}
+function toggleDropdown(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+function setMode(mode) {
+    const picker = document.getElementById("colorPicker");
+    if (mode === 'light') {
+        document.body.classList.add('light-mode');
+        document.documentElement.classList.add('light-mode'); // Forces native UI to light mode
+        localStorage.setItem("dispatcher_theme", "light");
+        if (picker.selectedOptions[0] && picker.selectedOptions[0].classList.contains('dark-color')) {
+            picker.value = "#3F69BA"; 
+            changeAccentColor("#3F69BA");
+        }
+    } else {
+        document.body.classList.remove('light-mode');
+        document.documentElement.classList.remove('light-mode'); // Reverts native UI to dark mode
+        localStorage.setItem("dispatcher_theme", "dark");
+        if (picker.selectedOptions[0] && picker.selectedOptions[0].classList.contains('light-color')) {
+            picker.value = "#3F69BA"; 
+            changeAccentColor("#3F69BA"); 
+        }
+    }
+}
+function updateDatabaseStats() {
+    const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
+    const totalActiveFleet = { ...coreFleetSpecs, ...customFleet };
+    let coreAcHtml = "";
+    const sortedFleet = Object.values(totalActiveFleet).sort((a, b) => a.name.localeCompare(b.name));
+    sortedFleet.forEach(aircraft => {
+        coreAcHtml += `<li style="margin-bottom: 2px;">${aircraft.name}</li>`;
+    });
+    document.getElementById('coreAircraftCount').innerText = Object.keys(coreFleetSpecs).length;
+    document.getElementById('coreAircraftList').innerHTML = `<ul>${coreAcHtml}</ul>`;
+    const liveAirportsDB = (typeof seedAirportDatabase !== 'undefined' && Array.isArray(seedAirportDatabase)) ? seedAirportDatabase : [];
+    const coreHandcrafted = liveAirportsDB.filter(a => a.tag === 'Hand-Crafted' || a.tag === 'Both');
+    const coreThirdParty = liveAirportsDB.filter(a => a.tag === 'Third Party' || a.tag === 'Both');
+    document.getElementById('coreHandcraftedCount').innerText = coreHandcrafted.length;
+    document.getElementById('coreHandcraftedList').innerHTML = coreHandcrafted.length > 0
+        ? `<ul>${coreHandcrafted.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`
+        : `<ul><li>Loading permanent database array records...</li></ul>`;
+	document.getElementById('coreThirdPartyCount').innerText = coreThirdParty.length;
+    document.getElementById('coreThirdPartyList').innerHTML = coreThirdParty.length > 0
+        ? `<ul>${coreThirdParty.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`
+        : `<ul><li>Loading permanent database array records...</li></ul>`;
+    const coreMilitary = liveAirportsDB.filter(a => a.isMilitary === true);
+    document.getElementById('coreMilitaryCount').innerText = coreMilitary.length;
+    document.getElementById('coreMilitaryList').innerHTML = coreMilitary.length > 0
+        ? `<ul>${coreMilitary.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>`
+        : `<ul><li>Loading permanent database array records...</li></ul>`;
+    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
+    document.getElementById('customAirportsCount').innerText = customAirports.length;
+    document.getElementById('customAirportsList').innerHTML = customAirports.length > 0 
+        ? `<ul>${customAirports.map(a => `<li>${a.icao} - ${a.name}</li>`).join('')}</ul>` 
+        : `<ul><li>No custom airports saved.</li></ul>`;
+    const customAcKeys = Object.keys(customFleet);
+    document.getElementById('customAircraftCount').innerText = customAcKeys.length;
+    document.getElementById('customAircraftList').innerHTML = customAcKeys.length > 0
+        ? `<ul>${Object.values(customFleet).map(a => `<li>${a.name}</li>`).join('')}</ul>`
+        : `<ul><li>No custom aircraft saved.</li></ul>`;
+    // --- Update Owned Airports Count ---
+    const ownedRaw = localStorage.getItem("dispatcher_owned_airports") || "";
+    const ownedList = ownedRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
+	const ownedCountEl = document.getElementById('ownedAirportsCount');
+    if (ownedCountEl) {
+        ownedCountEl.innerText = ownedList.length;
+    }
+    const logbookData = JSON.parse(localStorage.getItem("dispatcher_logbook")) || [];
+    const logbookCountEl = document.getElementById('backupLogbookCount');
+    if (logbookCountEl) {
+        logbookCountEl.innerText = logbookData.length;
+    }
+}
+function saveCustomAirport() {
+    const icao = document.getElementById("newIcao").value.trim().toUpperCase();
+    const name = document.getElementById("newName").value.trim();
+    const rwy = document.getElementById("newRwyType").value;
+    const source = document.getElementById("newSource").value;
+    const elev = parseInt(document.getElementById("newElev").value) || 0;
+    const length = parseInt(document.getElementById("newApLength").value) || 0;
+    const isMilitary = document.getElementById("newApMilitary").checked;
+    // NEW: Capture Lat/Lon
+    const lat = parseFloat(document.getElementById("newLat").value) || 0;
+    const lon = parseFloat(document.getElementById("newLon").value) || 0;
+    if(icao.length !== 4 || name === "") {
+        alert("Please enter a valid 4-character ICAO code and Airport Name.");
+        return;
+    }
+    let customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
+    customAirports = customAirports.filter(ap => ap.icao !== icao);
+    let determinedTag = source === "MSFS hand-crafted airport" ? "Hand-Crafted" : "Third Party";
+    let determinedLinkText = source === "MSFS hand-crafted airport" ? undefined : source;
+customAirports.push({
+        icao: icao,
+        name: name,
+        rwy: rwy,
+        length: length,
+        elev: elev,
+        lat: lat, 
+        lon: lon,
+        source: source,
+        tag: determinedTag,
+        linkText: determinedLinkText,
+        isMilitary: isMilitary
+    });
+    localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(customAirports));
+    alert(`${icao} added successfully to local memory!`);
+    document.getElementById("newIcao").value = "";
+    document.getElementById("newName").value = "";
+    document.getElementById("newElev").value = "";
+    document.getElementById("newApMilitary").checked = false; // Reset the checkbox
+    rebuildActiveDatabase();
+    updateDatabaseStats();
+}
+function saveCustomAircraft() {
+    const name = document.getElementById("newAcName").value.trim();
+	const icao = document.getElementById("newAcIcao").value.trim().toUpperCase();
+    const minLength = document.getElementById("newAcLength").value;
+    // Get the raw value from the dropdown
+    const rawClass = document.getElementById("newAcClass").value;
+    // THE SAFEGUARD: Map "MIL_JET" back to "JET" to preserve mission and speed calculations
+    const acClass = rawClass === "MIL_JET" ? "JET" : rawClass;
+    // Ensure the military flag is thrown if they selected the new option, 
+    // or if they manually checked the military checkbox from the previous update
+    const militaryCheckbox = document.getElementById("newAcMilitary");
+    const isMilitary = (militaryCheckbox && militaryCheckbox.checked) || rawClass === "MIL_JET";
+    // New parameters
+    const maxPax = parseInt(document.getElementById("newAcMaxPax").value) || 0;
+    const maxCargo = parseInt(document.getElementById("newAcMaxCargo").value) || 0;
+    const mtow = parseInt(document.getElementById("newAcMtow").value) || 0;
+    const oew = parseInt(document.getElementById("newAcOew").value) || 0;
+    const fuelPerNm = parseFloat(document.getElementById("newAcFuel").value) || 0;
+    if (!name || icao.length < 2 || !minLength) {
+        alert("Please completely fill out all essential Aircraft parameter inputs.");
+        return;
+    }
+    let customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
+    customFleet[icao] = {
+        name: `${name} (${icao})`,
+        maxPax: maxPax,
+        maxCargo: maxCargo,
+        minD: acClass === "HELI" ? 5 : (acClass === "JET" ? 150 : 20),
+        maxD: acClass === "HELI" ? 40 : (acClass === "JET" ? 320 : 350),
+        minAlt: acClass === "HELI" ? 500 : (acClass === "JET" ? 28000 : 6000),
+        maxAlt: acClass === "HELI" ? 4000 : (acClass === "JET" ? 40000 : 12000),
+        rules: acClass === "HELI" ? "VFR Helicopter" : ((acClass === "GA" || acClass === "WARBIRD") ? "VFR/Scenic" : "IFR"),
+        minRunwayLength: parseInt(minLength),
+		class: acClass,
+        mtow: mtow,
+        oew: oew,
+        fuelPerNm: fuelPerNm,
+        isMilitary: isMilitary,
+        isTactical: rawClass === "MIL_JET" || acClass === "WARBIRD"
+    };
+    localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(customFleet));
+    alert(`${icao} updated successfully in local fleet configurations.`);
+    rebuildFleetDropdown();
+    updateDatabaseStats();
+}
+function rebuildActiveDatabase() {
+    const liveSeedDB = (typeof seedAirportDatabase !== 'undefined' && Array.isArray(seedAirportDatabase)) ? seedAirportDatabase : [];
+    const legacyData = localStorage.getItem("dispatcher_custom_airports");
+    if (legacyData) {
+        const parsedLegacy = JSON.parse(legacyData);
+        const seedIcaos = liveSeedDB.map(a => a.icao);
+        const pureCustom = parsedLegacy.filter(a => !seedIcaos.includes(a.icao));
+        localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(pureCustom));
+        localStorage.removeItem("dispatcher_custom_airports"); 
+    }
+    const customAirports = JSON.parse(localStorage.getItem("dispatcher_custom_user_airports")) || [];
+    const allEntries = [...liveSeedDB, ...customAirports];
+    const grouped = {};
+    allEntries.forEach(entry => {
+        if (!grouped[entry.icao]) {
+            grouped[entry.icao] = [];
+        }
+        const isDuplicateLink = grouped[entry.icao].some(existing => 
+            existing.linkText && entry.linkText && 
+            existing.linkText.toLowerCase() === entry.linkText.toLowerCase()
+        );
+        if (isDuplicateLink) {
+		const existingEntry = grouped[entry.icao].find(existing => 
+			existing.linkText && existing.linkText.toLowerCase() === entry.linkText.toLowerCase()
+		);
+            if (entry.tag === "Both" || existingEntry.tag === "Both") {
+                existingEntry.tag = "Both";
+            }
+        } else {
+            grouped[entry.icao].push(entry);
+        }
+    });
+    activeAirportDatabase = Object.keys(grouped).map(icao => {
+        const variants = grouped[icao];
+        if (variants.length === 1) return variants[0];
+        let priorityCandidate = variants.find(v => v.linkText && v.linkText.toLowerCase().includes("contrail"));
+        if (!priorityCandidate) {
+            priorityCandidate = variants.find(v => v.tag === "Third Party" || v.tag === "Both");
+        }
+        if (!priorityCandidate) {
+            priorityCandidate = variants[0];
+        }
+        const finalAirport = { ...priorityCandidate };
+        finalAirport.allOptions = variants; 
+        return finalAirport;
+    });
+}
+function rebuildFleetDropdown() {
+    const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
+    activeFleetSpecs = { ...coreFleetSpecs, ...customFleet };
+    
+    const inputEl = document.getElementById("aircraftInput");
+    const listEl = document.getElementById("customAircraftList");
+    
+    const sortedFleetEntries = Object.entries(activeFleetSpecs).sort((a, b) => a[1].name.localeCompare(b[1].name));
+    
+    function renderList(filterText = "") {
+        listEl.innerHTML = "";
+        const filtered = sortedFleetEntries.filter(entry => 
+            entry[1].name.toLowerCase().includes(filterText.toLowerCase())
+        );
+        
+        if (filtered.length === 0) {
+            listEl.style.display = "none";
+            return;
+        }
+        
+        filtered.forEach(([code, spec]) => {
+            const item = document.createElement("div");
+            item.textContent = spec.name;
+            item.onclick = function() {
+                inputEl.value = spec.name;
+                listEl.style.display = "none";
+            };
+            listEl.appendChild(item);
+        });
+        
+        listEl.style.display = "block";
+    }
+
+    inputEl.onfocus = () => renderList(inputEl.value);
+    inputEl.oninput = (e) => renderList(e.target.value);
+
+    // Close dropdown when clicking outside of it
+    document.addEventListener('click', function(e) {
+        if (e.target !== inputEl && e.target !== listEl) {
+            listEl.style.display = "none";
+        }
+    });
+}
+function exportDatabaseBackup() {
+    const backupObject = {
+        airports: JSON.parse(localStorage.getItem("dispatcher_custom_user_airports") || "[]"),
+        fleet: JSON.parse(localStorage.getItem("dispatcher_custom_fleet") || "{}"),
+        logbook: JSON.parse(localStorage.getItem("dispatcher_logbook") || "[]")
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObject, null, 2));
+    const a = document.createElement('a');
+    a.setAttribute("href", dataStr);
+    a.setAttribute("download", "dispatcher_backup.json");
+    a.click();
+}
+function importDatabaseBackup(inputElement) {
+    const file = inputElement.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const d = JSON.parse(e.target.result);
+        if (d.airports) localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(d.airports));
+        if (d.fleet) localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(d.fleet));
+        if (d.logbook) localStorage.setItem("dispatcher_logbook", JSON.stringify(d.logbook));
+        rebuildActiveDatabase();
+        rebuildFleetDropdown();
+        updateDatabaseStats();
+        if (typeof updateLogbookUI === 'function') updateLogbookUI();
+        alert("Backup imported successfully!");
+    };
+    reader.readAsText(file);
+}
+function resetCustomDatabase() {
+    if (confirm("Are you sure you want to completely wipe all custom airports and aircraft from your local database? This cannot be undone.")) {
+        localStorage.removeItem("dispatcher_custom_user_airports");
+        localStorage.removeItem("dispatcher_custom_airports");
+        localStorage.removeItem("dispatcher_custom_fleet");
+        rebuildActiveDatabase();
+        rebuildFleetDropdown();
+        updateDatabaseStats();
+        alert("Custom databases have been successfully reset. Your Owned Airports list and Logbook were kept intact.");
+    }
+}
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 3440.065; 
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * R;
+}
+function changeAccentColor(colorHex) {
+    document.documentElement.style.setProperty('--accent-color', colorHex);
+    // Mixes the chosen hex color with 20% black to genuinely darken it
+    document.documentElement.style.setProperty('--accent-hover', `color-mix(in srgb, ${colorHex}, black 30%)`); 
+    localStorage.setItem("dispatcher_accent", colorHex);
+}
+function calculateBearing(lat1, lon1, lat2, lon2) {
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
+    const x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) - Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon);
+    return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
+}
+function formatScenery(apt) {
+    function makeLink(item) {
+        const text = item.linkText ? item.linkText : 'Store';
+        return item.url ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="scenery-link">${text}</a>` : text;
+    }
+    const holdsHandcrafted = apt.allOptions 
+        ? apt.allOptions.some(v => v.tag === 'Hand-Crafted' || v.tag === 'Both')
+        : (apt.tag === 'Hand-Crafted' || apt.tag === 'Both');
+    let thirdPartyLinks = [];
+    if (apt.allOptions) {
+        apt.allOptions.forEach(v => {
+            if (v.tag === 'Third Party' || v.tag === 'Both') {
+                thirdPartyLinks.push(makeLink(v));
+            }
+        });
+    } else if (apt.tag === 'Third Party' || apt.tag === 'Both') {
+        thirdPartyLinks.push(makeLink(apt));
+    }
+    if (holdsHandcrafted && thirdPartyLinks.length > 0) {
+        return `${apt.icao} - Hand-Crafted / ${thirdPartyLinks.join(' OR ')}`;
+    } else if (thirdPartyLinks.length > 0) {
+        return `${apt.icao} - ${thirdPartyLinks.join(' OR ')}`;
+    } else {
+        return `${apt.icao} - Hand-Crafted`;
+    }
+}
+function dispatchFlight() {
+    const callsignRaw = document.getElementById("callsignInput").value.trim().toUpperCase();
+    const depOverride = document.getElementById("depOverrideInput").value.trim().toUpperCase();
+    if (!callsignRaw) {
+        alert("Please supply a Callsign to proceed.");
+        return;
+    }
+    const selectedName = document.getElementById("aircraftInput").value.trim();
+    const type = Object.keys(activeFleetSpecs).find(key => activeFleetSpecs[key].name === selectedName);
+    const targetMins = parseInt(document.getElementById("timeSlider").value);
+    if (!type) {
+        alert("Please select a valid aircraft from the searchable list.");
+        return;
+    }
+//-------------------------------
+const spec = { ...activeFleetSpecs[type] };
+    // Retrieve the toggle states early for filtering
+    const forceMilitaryBases = document.getElementById("militaryBaseToggle").checked;
+    const isContractorMode = document.getElementById("contractorToggle").checked;
     let validAirports = activeAirportDatabase.filter(ap => {
         let allowedClasses = [];
         switch(ap.rwy) {
