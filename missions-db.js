@@ -1,4 +1,4 @@
-//missions-db.js v.f
+//missions-db.js v.g
 const missionMatrix = [
 { type: 1, name: "Medical Research", desc: "transporting temperature-sensitive serum cultures", detail: "Cabin temperature must be strictly regulated. Avoid rapid altitude changes to prevent pressurization spikes.", weight: 10, allowedClasses: ["GA", "TURBO", "BIZ JET", "JET", "HELI"] },
 { type: 2, name: "Medical Transport", desc: "expediting specialized surgical equipment", detail: "A regional clinic requires these instruments for an impending procedure. Minimize block time.", weight: 10, allowedClasses: ["GA", "TURBO", "HELI"] },
@@ -49,7 +49,7 @@ const missionMatrix = [
 { type: 47, name: "Overnight Feeder", desc: "moving regional express packages", detail: "Night freight operations. Hit your slot times to keep the logistics network flowing.", weight: 9, allowedClasses: ["TURBO", "JET"] },
 { type: 48, name: "Remote Medevac", desc: "airlifting a patient from a rural strip", detail: "Operations into an uncontrolled field. Verify runway conditions before committing to the approach.", weight: 6, allowedClasses: ["TURBO", "BIZ JET", "HELI"], paxOnly: true },
 { type: 49, name: "Factory Shuttle", desc: "moving industrial staff between sites", detail: "Routine personnel transfer. Standard operational procedures apply.", weight: 5, allowedClasses: ["TURBO", "BIZ JET"], paxOnly: true },
-{ type: 50, name: "Atmospheric Sampling", desc: "gathering specific meteorological data", detail: "Fly the requested altitudes and headings strictly to ensure accurate environmental readings.", weight: 3, allowedClasses: ["GA", "TURBO", "JET"] },
+{ type: 50, name: "Atmospheric Sampling", desc: "gathering specific meteorological data", detail: "Fly the requested altitudes and headings strictly to ensure accurate environmental readings.", weight: 3, allowedClasses: ["TURBO", "JET"] },
 { type: 51, name: "Flight Instruction", desc: "conducting a standardization flight", detail: "Focus on standard maneuvers and clean radio work in the local traffic pattern.", weight: 7, allowedClasses: ["GA"], paxOnly: true },
 { type: 52, name: "Agricultural Survey", desc: "inspecting crop yields visually", detail: "Maintain low altitude over the designated sectors. Watch for unmarked power lines.", weight: 3, allowedClasses: ["GA", "HELI"] },
 { type: 53, name: "Air Taxi", desc: "operating a short on-demand charter", detail: "Client requires a rapid hop to bypass ground traffic. VFR direct routing is preferred.", weight: 9, allowedClasses: ["GA", "HELI"], paxOnly: true },
