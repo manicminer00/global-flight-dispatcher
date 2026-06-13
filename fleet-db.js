@@ -1,10 +1,11 @@
-//fleet-db.js v.f
+//fleet-db.js v.g
 const coreFleetSpecs = {
 "AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
 "PA24": { "name": "A2A - Piper Comanche 250", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.3 },
 "A346": { "name": "Aerosoft - A340-600 Pro", "maxPax": 475, "maxCargo": 42000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 11200, "class": "JET", "mtow": 368000, "oew": 177800, "fuelPerNm": 18.0 },
 "CRJ7": { "name": "Aerosoft - CRJ v2", "maxPax": 78, "maxCargo": 2400, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 41000, "rules": "IFR", "minRunwayLength": 5280, "class": "JET", "mtow": 34019, "oew": 19731, "fuelPerNm": 3.5 },
-"A400": { "name": "Asobo - Airbus A400M Atlas", "isMilitary": true, "maxPax": 116, "maxCargo": 37000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 40000, "rules": "IFR", "minRunwayLength": 3215, "class": "JET", "mtow": 141000, "oew": 76500, "fuelPerNm": 12.0 },
+"A400": { "name": "Asobo - Airbus A400M Atlas - Passenger", "isMilitary": true, "maxPax": 116, "maxCargo": 0 "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 40000, "rules": "IFR", "minRunwayLength": 3215, "class": "JET", "mtow": 141000, "oew": 76500, "fuelPerNm": 12.0 },
+"A400": { "name": "Asobo - Airbus A400M Atlas - Cargo", "isMilitary": true, "maxPax": 0, "maxCargo": 37000, "minD": 150, "maxD": 320, "minAlt": 24000, "maxAlt": 40000, "rules": "IFR", "minRunwayLength": 3215, "class": "JET", "mtow": 141000, "oew": 76500, "fuelPerNm": 12.0 },
 "AT46": { "name": "Asobo - ATR 42-600", "maxPax": 48, "maxCargo": 5300, "minD": 70, "maxD": 800, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 3632, "class": "TURBO", "mtow": 18600, "oew": 11700, "fuelPerNm": 2.7 },
 "AT76": { "name": "Asobo - ATR 72-600", "maxPax": 72, "maxCargo": 7550, "minD": 70, "maxD": 800, "minAlt": 15000, "maxAlt": 25000, "rules": "IFR", "minRunwayLength": 4196, "class": "TURBO", "mtow": 22800, "oew": 13450, "fuelPerNm": 2.8 },
 "BE36": { "name": "Asobo - Bonanza G36 (G1000)",	"maxPax": 5, "maxCargo": 32, "minD": 20, "maxD": 200, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1913, "class": "GA", "mtow": 1656, "oew": 1182, "fuelPerNm": 0.3 },
