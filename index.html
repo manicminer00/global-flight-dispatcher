@@ -507,8 +507,8 @@
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
 	<script type="text/javascript" src="airports-db.js?v=b"></script>
-	<script type="text/javascript" src="fleet-db.js?v=c"></script>
-	<script type="text/javascript" src="missions-db.js?v=c"></script>
+	<script type="text/javascript" src="fleet-db.js?v=d"></script>
+	<script type="text/javascript" src="missions-db.js?v=e"></script>
 </head>
 <body>
 <div class="container">
@@ -859,7 +859,8 @@
             <tr><th>Cruise Altitude</th><td><strong id="outAlt" style="color:#ff5722;"></strong></td></tr>
             <tr><th>Scenery Links</th><td id="outScenery"></td></tr>
         </table>
-        <h3>Job Ticket</h3>
+		<h3>Job Ticket</h3>
+        <img id="outMissionImage" style="display: none; width: 100%; border-radius: 4px; margin-top: 15px; border: 1px solid #444; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4); box-sizing: border-box; object-fit: cover;" alt="Mission Image">
         <div class="ticket-note" id="outTicket"></div>
         <h3>Weight & Balance Loadsheet</h3>
         <ul>
@@ -1626,7 +1627,10 @@ let jobTicket = "";
         : "FL" + altValue;
     document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
     document.getElementById("outPax").innerText = pax > 0 ? `${pax} pax` : "0 (Solo)";
-    document.getElementById("outCargo").innerText = cargoKg;
+	document.getElementById("outCargo").innerText = cargoKg;
+	const missionImgEl = document.getElementById("outMissionImage");
+    missionImgEl.src = `images-missions/mission${chosenMission.type}.jpg`;
+    missionImgEl.style.display = "block";
     const ticketEl = document.getElementById("outTicket");
         ticketEl.innerHTML = jobTicket;
         // The Switch: Are we military or civilian?
