@@ -1,4 +1,4 @@
-//fleet-db.js v.d
+//fleet-db.js v.e
 const coreFleetSpecs = {
 "AEST": { "name": "A2A - Aerostar 600", "maxPax": 5, "maxCargo": 250, "minD": 60, "maxD": 400, "minAlt": 5000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 2000, "class": "GA", "mtow": 2721, "oew": 1939, "fuelPerNm": 0.6 },
 "PA24": { "name": "A2A - Piper Comanche 250", "maxPax": 3, "maxCargo": 90, "minD": 20, "maxD": 400, "minAlt": 4000, "maxAlt": 9500, "rules": "VFR/Scenic", "minRunwayLength": 1200, "class": "GA", "mtow": 1451, "oew": 852, "fuelPerNm": 0.3 },
@@ -27,7 +27,7 @@ const coreFleetSpecs = {
 "DA42": { "name": "COWS - Diamond DA42", "maxPax": 3, "maxCargo": 30, "minD": 30, "maxD": 400, "minAlt": 5000, "maxAlt": 18000, "rules": "VFR/Scenic", "minRunwayLength": 2129, "class": "GA", "mtow": 1900, "oew": 1251, "fuelPerNm": 0.2 },
 "R22": { "name": "Cowansim - R22 Helicopter", "maxPax": 1, "maxCargo": 22, "minD": 5, "maxD": 40, "minAlt": 1000, "maxAlt": 4000, "rules": "VFR/Scenic", "minRunwayLength": 0, "class": "HELI", "mtow": 622, "oew": 389, "fuelPerNm": 0.32 },
 "A319": { "name": "Fenix - Airbus A319", "maxPax": 156, "maxCargo": 4000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 5000, "class": "JET", "mtow": 75500, "oew": 40800, "fuelPerNm": 5.0 },
-"A320": { "name": "Fenix - Airbut A320", "maxPax": 180, "maxCargo": 6000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 6000, "class": "JET", "mtow": 78000, "oew": 42600, "fuelPerNm": 6.0 },
+"A320": { "name": "Fenix - Airbus A320", "maxPax": 180, "maxCargo": 6000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 6000, "class": "JET", "mtow": 78000, "oew": 42600, "fuelPerNm": 6.0 },
 "A321": { "name": "Fenix - Airbus A321", "maxPax": 236, "maxCargo": 10000, "minD": 150, "maxD": 2500, "minAlt": 24000, "maxAlt": 39000, "rules": "IFR", "minRunwayLength": 7500, "class": "JET", "mtow": 93500, "oew": 48500, "fuelPerNm": 7.0 },
 "C750": { "name": "FlightFX - Cessna 750 Citation X", "maxPax": 9, "maxCargo": 850, "minD": 150, "maxD": 1500, "minAlt": 25000, "maxAlt": 51000, "rules": "IFR", "minRunwayLength": 5200, "class": "BIZ JET", "mtow": 16375, "oew": 9843, "fuelPerNm": 2.5 },
 "HDJT": { "name": "FlightFX - Honda Jet", "maxPax": 5, "maxCargo": 181, "minD": 150, "maxD": 1500, "minAlt": 25000, "maxAlt": 40000, "rules": "IFR", "minRunwayLength": 3500, "class": "BIZ JET", "mtow": 4808, "oew": 3267, "fuelPerNm": 1.0 },
