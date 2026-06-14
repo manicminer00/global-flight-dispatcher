@@ -1,4 +1,4 @@
-// ----airport list v.1
+// ----airport list v.2
 const seedAirportDatabase = [
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "BIZ JET", length: 4400, elev: 8, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
 { icao: "0CN2", name: "Sutter Butte Dusters Airport", rwy: "GA", length: 2400, elev: 50, lat: 39.2286, lon:  -121.6882, source: "Core", tag: "Third Party", linkText: "Backwood Studios via Contrail", url: "https://contrail.shop/search?q=0CN2" },
@@ -255,7 +255,7 @@ const seedAirportDatabase = [
 { icao: "ENAL", name: "Alesund Vigra Airport", rwy: "JET", length: 7595, elev: 11, lat: 62.5625, lon: 6.1197, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "ENAT", name: "Alta Airport", rwy: "JET", length: 7392, elev: 9, lat: 69.976, lon: 23.371, source: "Core", tag: "Third Party", linkText: "Aerosoft via Contrail", url: "https://contrail.shop/search?q=ENAT" },
 { icao: "ENBR", name: "Bergen Flesland Airport", rwy: "JET", length: 9810, elev: 166, lat: 60.293, lon: 5.218, source: "Core", tag: "Third Party", linkText: "RDPresets via Contrail", url: "https://contrail.shop/search?q=ENBR" },
-{ icao: "ENDO", name: "Dkka Airfield Thomlevold", rwy: "GA", length: 2400, elev: 450, lat: 60.871, lon: 10.081, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/96164/endo-dokka-airfield-thomlevold" },
+{ icao: "ENDO", name: "Dokka Airfield Thomlevold", rwy: "GA", length: 2400, elev: 450, lat: 60.871, lon: 10.081, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/96164/endo-dokka-airfield-thomlevold" },
 { icao: "ENEV", name: "Harstad/Narvik Airport", rwy: "JET", length: 9511, elev: 85, lat: 68.491, lon: 16.678, source: "Core", tag: "Third Party", linkText: "M'M Simulations via Contrail", url: "https://contrail.shop/search?q=ENEV" },
 { icao: "ENGM", name: "Oslo Airport, Gardermoen", rwy: "JET", length: 11811, elev: 681, lat: 60.1939, lon: 11.1004, source: "Core", tag: "Third Party", linkText: "Aerosoft via Contrail", url: "https://contrail.shop/search?q=ENGM" },
 { icao: "ENGM", name: "Oslo Airport, Gardermoen", rwy: "JET", length: 11811, elev: 681, lat: 60.1939, lon: 11.1004, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
