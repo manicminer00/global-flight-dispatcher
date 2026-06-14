@@ -509,11 +509,11 @@
         }
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
-	<script type="text/javascript" src="airports-db.js?v=1"></script>
+	<script type="text/javascript" src="airports-db.js?v=2"></script>
 	<script type="text/javascript" src="fleet-db.js?v=1"></script>
 	<script type="text/javascript" src="missions-db.js?v=a"></script>
     <script>
-        const currentAppVersion = "1.4.1"; 
+        const currentAppVersion = "1.5"; 
         const savedAppVersion = localStorage.getItem("dispatcher_app_version");
 
         if (savedAppVersion !== currentAppVersion) {
@@ -534,14 +534,16 @@
         <p id="quoteDisplay"></p>
     </div>
     <div class="control-group">
-        <label for="callsignInput">Enter ATC Callsign: 
+<label for="callsignInput">Enter ATC Callsign: 
             <span class="field-hint">
                 <a onclick="event.preventDefault(); saveCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Save Callsign</a>
                 <span style="color: #666; margin: 0 3px;">/</span>
                 <a href="https://123atc.com/call-signs" target="_blank" rel="noopener noreferrer" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Callsign lookup</a>
+                <span style="color: #666; margin: 0 3px;">/</span>
+                <a onclick="event.preventDefault(); generateRandomCallsign();" style="cursor:pointer; color:#00bcd4; text-decoration:underline;">Generate Callsign</a>
             </span>
         </label>
-        <input type="text" id="callsignInput" placeholder="e.g. MRD275" maxlength="6" required>
+        <input type="text" id="callsignInput" placeholder="e.g. MRD275" maxlength="7" required>
         <label for="aircraftInput" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">Select Aircraft Type:</label>
 		<div style="position: relative; width: 100%;">
 			<input type="text" id="aircraftInput" placeholder="Type to search or click for list..." autocomplete="off">
@@ -549,10 +551,11 @@
 		</div>
 <div style="display: block;">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-                <label for="depOverrideInput" style="margin: 0; white-space: nowrap;">Departure Airport ICAO (Optional)</label>
+                <label for="depOverrideInput" style="margin: 0; white-space: nowrap;">Departure Airport (Optional)</label>
             </div>
-            <div style="margin-top: 8px; margin-bottom: 15px;">
-                <input type="text" id="depOverrideInput" placeholder="e.g. EGLL (Leave blank for random selection)" maxlength="4">
+            <div style="margin-top: 8px; margin-bottom: 15px; position: relative;">
+                <input type="text" id="depOverrideInput" placeholder="Enter Airport Name or ICAO. (Leave blank for random)" autocomplete="off">
+                <div id="customAirportList" class="custom-datalist"></div>
             </div>        
         </div>
 <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 20px;">
@@ -1252,6 +1255,66 @@ function rebuildFleetDropdown() {
             listEl.style.display = "none";
         }
     });
+}
+function rebuildAirportDropdown() {
+    const inputEl = document.getElementById("depOverrideInput");
+    const listEl = document.getElementById("customAirportList");
+
+function renderList(filterText = "") {
+        listEl.innerHTML = "";
+        // Require at least 2 characters to start searching to prevent lag
+        if (filterText.length < 2) {
+            listEl.style.display = "none";
+            return;
+        }
+
+        // Helper to strip special characters and umlauts for searching
+        const normalizeStr = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+        
+        const lowerFilter = normalizeStr(filterText);
+        
+        const filtered = activeAirportDatabase.filter(ap => 
+            (ap.icao && ap.icao.toLowerCase().includes(lowerFilter)) || 
+            (ap.name && normalizeStr(ap.name).includes(lowerFilter))
+        ).slice(0, 50); // Limit to 50 results
+
+        if (filtered.length === 0) {
+            listEl.style.display = "none";
+            return;
+        }
+
+        filtered.forEach(ap => {
+            const item = document.createElement("div");
+            item.textContent = `${ap.icao} - ${ap.name}`;
+            item.onclick = function() {
+                // When clicked, ONLY put the ICAO code into the box
+                inputEl.value = ap.icao; 
+                listEl.style.display = "none";
+            };
+            listEl.appendChild(item);
+        });
+
+        listEl.style.display = "block";
+    }
+
+    inputEl.onfocus = () => renderList(inputEl.value);
+    inputEl.oninput = (e) => renderList(e.target.value);
+
+    document.addEventListener('click', function(e) {
+        if (e.target !== inputEl && e.target !== listEl) {
+            listEl.style.display = "none";
+        }
+    });
+}
+
+function generateRandomCallsign() {
+    // Array of popular real-world airline ICAO prefixes
+    const prefixes = ["AAL", "BAW", "DAL", "UAL", "RYR", "EZY", "SWA", "AFR", "DLH", "KLM", "QFA", "VIR", "MRD", "JAL", "ANZ", "SIA", "UAE"];
+    const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    // Generate a random flight number between 1 and 9999
+    const randomNumber = Math.floor(Math.random() * 9999) + 1;
+    
+    document.getElementById("callsignInput").value = `${randomPrefix}${randomNumber}`;
 }
 function exportDatabaseBackup() {
     const backupObject = {
@@ -1955,6 +2018,7 @@ window.onload = function() {
     loadSettings();
     rebuildActiveDatabase();
     rebuildFleetDropdown();
+    rebuildAirportDropdown(); // Initializes the new airport search
     updateDatabaseStats();
     displayRandomQuote();
 	const slider = document.getElementById("timeSlider");
