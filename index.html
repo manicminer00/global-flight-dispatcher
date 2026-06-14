@@ -509,11 +509,11 @@
         }
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
-	<script type="text/javascript" src="airports-db.js?v=c"></script>
-	<script type="text/javascript" src="fleet-db.js?v=g"></script>
+	<script type="text/javascript" src="airports-db.js?v=d"></script>
+	<script type="text/javascript" src="fleet-db.js?v=h"></script>
 	<script type="text/javascript" src="missions-db.js?v=a"></script>
     <script>
-        const currentAppVersion = "1.3.1"; 
+        const currentAppVersion = "1.3.2"; 
         const savedAppVersion = localStorage.getItem("dispatcher_app_version");
 
         if (savedAppVersion !== currentAppVersion) {
@@ -1341,10 +1341,34 @@ function formatScenery(apt) {
 function dispatchFlight() {
     const callsignRaw = document.getElementById("callsignInput").value.trim().toUpperCase();
     const depOverride = document.getElementById("depOverrideInput").value.trim().toUpperCase();
+    
+    // Explicitly rebuild the database to ensure seedAirportDatabase is merged with custom data
+    rebuildActiveDatabase(); 
+
+	if (depOverride) {
+		rebuildActiveDatabase(); 
+		
+		// Normalize and trim to ensure a clean comparison
+		const searchIcao = depOverride.trim().toUpperCase();
+		
+		const isValid = activeAirportDatabase.some(ap => 
+			ap.icao && ap.icao.trim().toUpperCase() === searchIcao
+		);
+		
+		if (!isValid) {
+			// Debugging hint: log the database length to see if it's actually loaded
+			console.log("Database entries loaded: ", activeAirportDatabase.length);
+			alert(`Error: The airport ${searchIcao} was not found. Please check the ICAO code.`);
+			return;
+		}
+	}
+    // ... rest of the function
+
     if (!callsignRaw) {
         alert("Please supply a Callsign to proceed.");
         return;
     }
+    // ... rest of your existing function
     const selectedName = document.getElementById("aircraftInput").value.trim();
     const type = Object.keys(activeFleetSpecs).find(key => activeFleetSpecs[key].name === selectedName);
     const targetMins = parseInt(document.getElementById("timeSlider").value);
@@ -1374,11 +1398,20 @@ function dispatchFlight() {
         // 2. Block military bases if the aircraft has no access
         if (ap.isMilitary && !hasMilitaryAccess && ap.icao !== depOverride) return false;
 
-// 3. If the user checked "Restrict departures to Military Airbases only", block all civilian airports
+		// 3. If the user checked "Restrict departures to Military Airbases only", block all civilian airports
         if (forceMilitaryBases && !ap.isMilitary && ap.icao !== depOverride) return false;
 
-        const isAllowedType = allowedClasses.includes(spec.class);
-        return isAllowedType && meetsLength;
+        let isAllowedType = allowedClasses.includes(spec.class);
+        let finalMeetsLength = meetsLength;
+
+        // --- Regional STOL Exception for EGLC and EGNS ---
+        const stolJets = ["E190", "E195"];
+        if ((ap.icao === "EGLC" || ap.icao === "EGNS") && stolJets.includes(type)) {
+            isAllowedType = true;     // Overrides the 'BIZ JET' or 'TURBO' class restriction
+            finalMeetsLength = true;  // Overrides the physical minRunwayLength restriction
+        }
+
+        return isAllowedType && finalMeetsLength;
     });
 //-------------------------------
     if (depOverride && !activeAirportDatabase.some(ap => ap.icao === depOverride)) {
