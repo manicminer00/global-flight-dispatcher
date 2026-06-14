@@ -510,10 +510,10 @@
     </style>
 	<script type="text/javascript" src="simbrief.apiv1.js"></script>
 	<script type="text/javascript" src="airports-db.js?v=g"></script>
-	<script type="text/javascript" src="fleet-db.js?v=h"></script>
+	<script type="text/javascript" src="fleet-db.js?v=1"></script>
 	<script type="text/javascript" src="missions-db.js?v=a"></script>
     <script>
-        const currentAppVersion = "1.3.3"; 
+        const currentAppVersion = "1.4"; 
         const savedAppVersion = localStorage.getItem("dispatcher_app_version");
 
         if (savedAppVersion !== currentAppVersion) {
@@ -1405,12 +1405,11 @@ function dispatchFlight() {
         let finalMeetsLength = meetsLength;
 
         // --- Regional STOL Exception for EGLC and EGNS ---
-        const stolJets = ["E190", "E195"];
+        const stolJets = ["E190", "E195", "RJ70", "RJ85", "B461", "B462", "B463"];
         if ((ap.icao === "EGLC" || ap.icao === "EGNS") && stolJets.includes(type)) {
             isAllowedType = true;     // Overrides the 'BIZ JET' or 'TURBO' class restriction
             finalMeetsLength = true;  // Overrides the physical minRunwayLength restriction
         }
-
         return isAllowedType && finalMeetsLength;
     });
 //-------------------------------
