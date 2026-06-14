@@ -1,4 +1,4 @@
-// ----airport list v.f
+// ----airport list v.g
 const seedAirportDatabase = [
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "BIZ JET", length: 4400, elev: 8, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
 { icao: "0CN2", name: "Sutter Butte Dusters Airport", rwy: "GA", length: 2400, elev: 50, lat: 39.2286, lon:  -121.6882, source: "Core", tag: "Third Party", linkText: "Backwood Studios via Contrail", url: "https://contrail.shop/search?q=0CN2" },
@@ -265,6 +265,7 @@ const seedAirportDatabase = [
 { icao: "ENML", name: "Molde Airport", rwy: "JET", length: 7152, elev: 10, lat: 62.7447, lon: 7.2625, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "ENNO", name: "Notodden Airport", rwy: "TURBO", length: 4570, elev: 61, lat: 59.5653, lon: 9.2136, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "ENRA", name: "Mo i Rana Airport", rwy: "GA", length: 2877, elev: 235, lat: 66.364, lon: 14.301, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
+{ icao: "ENRO", name: "Røros Airport", rwy: "BIZ JET", length: 5710, elev: 2054, lat: 62.579, lon: 11.345, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "[https://flightsim.to/addon/34969/rros-lufthavn](https://flightsim.to/addon/34969/rros-lufthavn)" },
 { icao: "ENSB", name: "Svalbard Airport", rwy: "JET", length: 8127, elev: 94, lat: 78.2461, lon: 15.4655, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "ENSB", name: "Svalbard Airport", rwy: "JET", length: 8127, elev: 94, lat: 78.2461, lon: 15.4655, source: "Core", tag: "Third Party", linkText: "Inibuilds", url: "https://inibuilds.com/search?q=ensb" },
 { icao: "ENSD", name: "Sandane Airport", rwy: "TURBO", length: 3182, elev: 196, lat: 61.8300, lon: 6.1067, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
