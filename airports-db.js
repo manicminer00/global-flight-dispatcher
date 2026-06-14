@@ -1,5 +1,5 @@
+// ----airport list v.b
 const seedAirportDatabase = [
-// ----airport list
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "BIZ JET", length: 4400, elev: 8, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
 { icao: "0CN2", name: "Sutter Butte Dusters Airport", rwy: "GA", length: 2400, elev: 50, lat: 39.0569, lon: -121.7289, source: "Core", tag: "Third Party", linkText: "Backwood Studios via Contrail", url: "https://contrail.shop/search?q=0CN2" },
 { icao: "0CN2", name: "Sutter Butte Dusters Airport", rwy: "GA", length: 2400, elev: 50, lat: 39.0569, lon: -121.7289, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
@@ -133,6 +133,7 @@ const seedAirportDatabase = [
 { icao: "EGAA", name: "Belfast Airport", rwy: "JET", length: 9121, elev: 268, lat: 54.657, lon: -6.215, source: "Core", tag: "Third Party", linkText: "Pyreegue Dev Co. via Contrail", url: "https://contrail.shop/search?q=EGAA" },
 { icao: "EGAO", name: "Aboyne Airfield", rwy: "GA", length: 2400, elev: 420, lat: 57.076, lon: -2.838, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "EGBB", name: "Birmingham", rwy: "JET", length: 10013, elev: 328, lat: 52.453, lon: -1.748, source: "Core", tag: "Third Party", linkText: "MaccoSim or Pyreegue Dev Co. via Contrail", url: "https://contrail.shop/search?q=EGBB" },
+{ icao: "EGBJ", name: "Gloucestershire Airport", rwy: "BIZ JET", length: 4695, elev: 101, lat: 51.894, lon: -2.167, isMilitary: false, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/110251/egbj-gloucester-2026-version-fs2020-2024" },
 { icao: "EGBM", name: "Tatenhill Airfield", rwy: "TURBO", length: 3510, elev: 430, lat: 52.8125, lon: -1.7583, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "EGBO", name: "Wolverhampton Halfpenny Green Airport", rwy: "TURBO", length: 3878, elev: 283, lat: 52.5175, lon: -2.2594, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "EGBP", name: "Cotswold Airport (Kemble)", rwy: "JET", length: 6591, elev: 433, lat: 51.6678, lon: -2.0567, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
