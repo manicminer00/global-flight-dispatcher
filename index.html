@@ -513,7 +513,7 @@
 	<script type="text/javascript" src="fleet-db.js?v=1"></script>
 	<script type="text/javascript" src="missions-db.js?v=a"></script>
     <script>
-        const currentAppVersion = "1.4"; 
+        const currentAppVersion = "1.4.1"; 
         const savedAppVersion = localStorage.getItem("dispatcher_app_version");
 
         if (savedAppVersion !== currentAppVersion) {
@@ -1377,10 +1377,11 @@ function dispatchFlight() {
         return;
     }
 //-------------------------------
-	const spec = { ...activeFleetSpecs[type] };
+    const spec = { ...activeFleetSpecs[type] };
     // Retrieve the toggle states early for filtering
     const forceMilitaryBases = document.getElementById("militaryBaseToggle").checked;
     const isContractorMode = document.getElementById("contractorToggle").checked;
+    
     let validAirports = activeAirportDatabase.filter(ap => {
         let allowedClasses = [];
         switch(ap.rwy) {
@@ -1390,7 +1391,7 @@ function dispatchFlight() {
             case "JET": allowedClasses = ["GA", "WARBIRD", "TURBO", "BIZ JET", "JET", "HELI"]; break;
             case "HELI": allowedClasses = ["HELI"]; break;
         }
-	const meetsLength = ap.length ? (ap.length >= spec.minRunwayLength) : true;
+        const meetsLength = ap.length ? (ap.length >= spec.minRunwayLength) : true;
         
         // 1. Does the aircraft have clearance for military bases? (Military aircraft always do, civilians need Contractor Mode)
         const hasMilitaryAccess = spec.isMilitary || isContractorMode;
@@ -1398,7 +1399,7 @@ function dispatchFlight() {
         // 2. Block military bases if the aircraft has no access
         if (ap.isMilitary && !hasMilitaryAccess && ap.icao !== depOverride) return false;
 
-		// 3. If the user checked "Restrict departures to Military Airbases only", block all civilian airports
+        // 3. If the user checked "Restrict departures to Military Airbases only", block all civilian airports
         if (forceMilitaryBases && !ap.isMilitary && ap.icao !== depOverride) return false;
 
         let isAllowedType = allowedClasses.includes(spec.class);
@@ -1410,6 +1411,19 @@ function dispatchFlight() {
             isAllowedType = true;     // Overrides the 'BIZ JET' or 'TURBO' class restriction
             finalMeetsLength = true;  // Overrides the physical minRunwayLength restriction
         }
+
+        // --- SBRJ Exception for Airbus A319 ---
+        if (ap.icao === "SBRJ") {
+            if (spec.class === "JET" && type !== "A319") {
+                // Actively block all other standard JET class aircraft
+                isAllowedType = false; 
+            } else if (type === "A319") {
+                // Explicitly allow the A319 (overrides class and length restrictions)
+                isAllowedType = true;
+                finalMeetsLength = true;
+            }
+        }
+
         return isAllowedType && finalMeetsLength;
     });
 //-------------------------------
