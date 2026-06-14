@@ -1,4 +1,4 @@
-// ----airport list v.e
+// ----airport list v.f
 const seedAirportDatabase = [
 { icao: "07FA", name: "Ocean Reef Club Airport", rwy: "BIZ JET", length: 4400, elev: 8, lat: 25.325, lon: -80.274, source: "Core", tag: "Third Party", linkText: "Astralis Studios via Contrail", url: "https://contrail.shop/search?q=07FA" },
 { icao: "0CN2", name: "Sutter Butte Dusters Airport", rwy: "GA", length: 2400, elev: 50, lat: 39.2286, lon:  -121.6882, source: "Core", tag: "Third Party", linkText: "Backwood Studios via Contrail", url: "https://contrail.shop/search?q=0CN2" },
@@ -426,6 +426,7 @@ const seedAirportDatabase = [
 { icao: "KMTN", name: "Martin State", rwy: "BIZ JET", length: 6996, elev: 21, lat: 39.325, lon: -76.413, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/57385/martin-state-kmtn" },
 { icao: "KMTP", name: "Montauk Airport", rwy: "TURBO", length: 3246, elev: 7, lat: 41.077, lon: -71.921, source: "Core", tag: "Third Party", linkText: "EMBCreations via Flightsim.to", url: "https://flightsim.to/addon/63211/kmtp-montauk-airport" },
 { icao: "KMVY", name: "Martha’s Vineyard Airport", rwy: "BIZ JET", length: 5504, elev: 67, lat: 41.393, lon: -70.614, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
+{ icao: "KMYF", name: "Montgomery-Gibbs Executive Airport", rwy: "BIZ JET", length: 4598, elev: 427, lat: 32.816, lon: -117.140, source: "Core", tag: "Third Party", linkText: "vbazllio via Flightsim.to", url: "https://flightsim.to/addon/5856/montgomery-gibbs-exec-airport-taxiway-fix-and-many-more" },
 { icao: "KMYL", name: "McCall Municipal Airport", rwy: "BIZ JET", length: 6108, elev: 5024, lat: 44.889, lon: -116.101, source: "Core", tag: "Third Party", linkText: "ORBX", url: "https://orbxdirect.com" },
 { icao: "KMYR", name: "Myrtle Beach International", rwy: "JET", length: 9503, elev: 33, lat: 33.679, lon: -78.928, source: "Core", tag: "Third Party", linkText: "Verticalsim via Contrail", url: "https://contrail.shop/search?q=KMYR" },
 { icao: "KNBG", name: "Naval Air Station Joint Reserve Base", rwy: "JET", length: 10000, elev: 3, lat: 29.825, lon: -90.017, source: "Core", tag: "Third Party", linkText: "Freeware via Flightsim.to", url: "https://flightsim.to/addon/90127/naval-air-station-joint-reserve-base-new-orleans-knbg", isMilitary: true },
