@@ -1,0 +1,2153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VECTOR - FLIGHT DISPATCH</title>
+	<link rel="icon" href="favicon/favicon.ico" sizes="any">
+	<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+	<link rel="manifest" href="favicon/site.webmanifest">
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Expires" content="0">
+		<style>
+        :root {
+			/* ------------------------------- FONT & SPACING ------------------------- */
+            --font-size-nb: 13px;                         /* N.B. notes, info-details, DB lists, field hints */
+            --font-size-ui: 14px;                           /* inputs, hints, checkboxes, action prompt */
+            --font-size-small: 11px;                      /* footer, version label, logbook table */
+            --font-size-btn: 16px;                        /* all buttons except GENERATE FLIGHT */
+            --font-size-generate-btn: 18px;        /* GENERATE FLIGHT button only */
+            --font-size-label: 1em;                       /* form labels, accent checkbox labels */
+            --font-size-section-summary: 1.17em;    /* settings section titles (Owned Airports, etc.) */
+
+            --font-weight-label: bold;                     /* form labels, accent checkbox labels */
+            --font-weight-body: normal;                 /* notes, hints, checkboxes, muted body text */
+            --font-weight-btn: bold;                        /* standard action buttons, backup buttons, SimBrief row */
+            --font-weight-generate-btn: bold;        /* GENERATE FLIGHT button */
+            --font-weight-theme-btn: normal;        /* Light / Dark / Greyscale mode buttons */
+            --font-weight-panel-toggle: bold;        /* View Logbook / Settings buttons */
+            --font-weight-db-stat: bold;                 /* DB category stat row labels */
+            --font-weight-section-summary: bold; /* settings section summary lines */
+            --font-weight-time-val: bold;                /* flight time slider value */
+            --font-weight-footer-link: bold;             /* footer README & Buy Me A Coffee links */
+            --font-weight-manage-heading: bold;  /* Manage Custom Database subheadings */
+            --font-weight-optgroup: bold;              /* aircraft select group headers */
+            --font-weight-input: normal;                 /* aircraft search input */
+            --font-weight-logbook-header: bold;          /* logbook table heading row */
+            --font-weight-logbook-row: normal;           /* logbook table data rows */
+			
+            --spacing-inner: 15px;                       /* panel padding; settings section gaps */
+            --spacing-hint-bottom: 10px;           /* gap below hint-block / note blocks */
+            --spacing-section-title-bottom: 6px;  /* gap below h3 / form section titles */
+			
+           	/* ------------------------------- DARK MODE -------------------------------- */
+            color-scheme: dark;
+			
+            /* --- Text colours --- */
+            --accent-color: #2196f3;                    /* labels, primary buttons, focus rings */
+            --text-primary: #e0e0e0;                    /* body, h3 headings, theme buttons */
+            --text-muted: #717a8e;                     /* note-text, hints, checkboxes, footers */
+            --text-secondary: #e0e0e0;                /* select/input text, DB expanded list items */
+            --text-notice: #e0e0e0;                      /* info-details expanded panel body */
+            --text-on-accent: #ffffff;                    /* white text on coloured buttons and hovers */
+            --color-link-inline: #00bcd4;                /* inline links, field hints, scenery links */
+            --color-link-danger: #ff5722;               /* delete/reset links, warnings */
+            --color-link-readme: #318F34;            /* readme link, scenery link hover */
+            --color-owned-airport: #3d9a4a;        /* owned ICAO highlight on dispatch form */
+            --color-field-hint: #aaaaaa;                 /* small hint text beside labels */
+            --color-field-hint-sep: #666666;         /* "/" separator in field hints */
+            --color-version-label: #717a8e;          /* app version at bottom of settings */
+            --color-footer-bmc: #ffffff;                 /* Buy Me A Coffee footer link */
+            --placeholder-color: #717a8e;             /* input placeholder text */
+            --dropdown-text: #e0e0e0;    /* select option text */
+            --color-db-list-text: #e0e0e0; /* items inside expanded DB dropdown lists */
+            --db-stat-text: #2196f3; /* Saved Airports/Aircraft & Permanent Database category labels */
+
+            --text-ticket-note: #e0e0e0;  /* civilian ticket text */
+            --text-ticket-military: #e0e0e0; /* military ticket text */
+            --dispatch-details-label-text: #e0e0e0;
+            --dispatch-details-value-text: #e0e0e0;
+			
+            /* --- Backgrounds --- */
+            --bg-page: #171a24;                          /* page background outside main card */
+            --bg-container: #202531;                   /* main card background; banner border blend */
+            --bg-section: #181b25;                       /* control-group / settings-group panels */
+            --bg-inset: #202531;                          /* url-box, logbook table cells */
+            --bg-panel: #171a24;                         /* info-details body, DB dropdown panels */
+            --bg-table-header: #171a24;             /* generic table headers (custom DB tables) */
+            --bg-input: var(--bg-container);        /* text inputs, selects, textareas */
+            --bg-db-stat: var(--bg-container);     /* DB category button background (Custom & Permanent) */
+            --bg-checkbox: var(--bg-container); /* checkbox fill */
+            --bg-url-box: var(--bg-inset);            /* monospace url / logbook wrap areas */
+            --bg-details: var(--bg-panel);            /* alias for info-details panels */
+            --bg-db-dropdown: var(--bg-panel); /* expanded DB list container */
+            --dropdown-bg: var(--bg-input);       /* select & datalist panel background */
+			
+            /* --- Borders --- */
+            --border-color: #3f434e;                     /* all panel, input, table and button borders */
+            --border-width: 1px;
+            --border-ticket-note: #00bcd4; /* civilian ticket left stripe */
+            --border-ticket-military: #d4af37;         /* military ticket left stripe */
+			
+            /* --- Job tickets --- */
+            --bg-ticket-note: #1b365d;                   /* civilian job ticket panel */
+            --bg-ticket-military: #2b332c;               /* military job ticket panel */
+            --ticket-line-height: 1.30;                 /* job ticket spacing (shared across all themes) */
+            --ticket-row-spacing: 0.20em;              /* job ticket spacing (shared across all themes) */
+			
+            /* --- Buttons --- */
+            --color-btn-bg: var(--accent-color);         /* standard button background */
+            --color-btn-text: var(--text-on-accent);    /* standard button label */
+            --color-btn-hover-bg: #318F34;               /* green hover for most buttons */
+            --color-btn-hover-text: var(--text-on-accent); /* text on green hover */
+            --color-btn-backup-hover-bg: #E3AE36; /* Export backup hover */
+            --color-btn-import-hover-bg: #318F34;  /* Import backup hover */
+            --color-btn-reset-hover-bg: #c75c5c;     /* Reset custom database hover (soft red) */
+            --color-panel-toggle-bg: #1c202b;   /* View Logbook / Settings button background */
+            --color-panel-toggle-text: #717a8e; /* View Logbook / Settings button label */
+            --color-datalist-hover-bg: #2196f3; /* search dropdown item hover background */
+            --color-datalist-hover-text: #ffffff; /* search dropdown item hover label */
+            --color-db-stat-hover-bg: #181b25; /* DB category button hover (Custom & Permanent) */
+			
+            /* --- Shadows --- */
+            --shadow-container: 0 4px 15px rgba(0,0,0,0.5);   /* main card drop shadow */
+            --shadow-banner: 0 2px 8px rgba(0,0,0,0.3);       /* banner image shadow */
+            --shadow-ticket-note: 0 4px 10px rgba(0, 0, 0, 0.4); /* job ticket shadow */
+			
+            /* --- Logbook table --- */
+            --logbook-header-bg: #171a24;
+            --logbook-header-text: #e0e0e0;
+            --logbook-row-bg: #202531;
+            --logbook-row-text: #e0e0e0;
+
+            /* --- Flight dispatch ticket --- */
+            --dispatch-release-bg: #171a24;
+            --dispatch-details-label-bg: #171a24;
+            --dispatch-details-value-bg: #171a24;
+        }
+		/* ------------------------------- LIGHT MODE -------------------------------- */
+        html.light-mode {
+            color-scheme: light;
+			
+            /* --- Text colours --- */
+            --accent-color: #3F69BA;                  /* labels, primary buttons */
+            --text-primary: #2E3F60;                   /* body, h3 headings */
+            --text-muted: #717a8e;                     /* notes, hints, checkboxes, footers */
+            --text-secondary: #2E3F60;               /* select/input text, DB list items */
+            --text-notice: #2E3F60;                     /* info-details expanded panel body */
+            --text-on-accent: #ffffff;                   /* white text on coloured buttons */
+            --color-link-inline: #00bcd4;                /* inline links, field hints, scenery links */
+            --color-link-danger: #ff5722;               /* delete/reset links, warnings */
+            --color-link-readme: #318F34;            /* readme link, scenery link hover */
+            --color-owned-airport: #1b6b28;        /* owned ICAO highlight */
+            --color-field-hint: #888888;                 /* label hint text */
+            --color-field-hint-sep: #666666;         /* "/" separator in field hints */
+            --color-version-label: #717a8e;           /* app version label */
+            --color-footer-bmc: #ffffff;                 /* Buy Me A Coffee footer link */
+            --placeholder-color: #888888;             /* input placeholders */
+            --dropdown-text: #2E3F60;    /* select option text */
+            --color-db-list-text: #2E3F60; /* items inside expanded DB dropdown lists */
+            --db-stat-text: #3F69BA; /* Saved Airports/Aircraft & Permanent Database category labels */
+            --text-ticket-note: #1a2b4c;                /* civilian ticket text */
+            --text-ticket-military: #2e3b32;           /* military ticket text */
+            --dispatch-details-label-text: #2E3F60;
+            --dispatch-details-value-text: #2E3F60;
+			
+            /* --- Backgrounds --- */
+            --bg-page: #ffffff;                          /* page background */
+            --bg-container: #FAFAFF;                /* main card background */
+            --bg-section: #F5F5FF;                    /* control-group / settings panels */
+            --bg-inset: #eceff1;                       /* url-box, logbook cells */
+            --bg-panel: #ffffff;                      /* info-details, DB dropdown background */
+            --bg-table-header: #e0e6ed;        /* generic table headers (custom DB tables) */
+            --bg-input: #ffffff;                         /* inputs and selects */
+            --bg-db-stat: #FDFDFF;                  /* DB category button background (Custom & Permanent) */
+            --bg-checkbox: #ffffff;                   /* checkbox fill */
+            --bg-url-box: var(--bg-inset);            /* monospace url / logbook wrap areas */
+            --bg-details: var(--bg-panel);            /* alias for info-details panels */
+            --bg-db-dropdown: #ffffff;            /* expanded Permanent Database container */
+            --dropdown-bg: var(--bg-input);      /* select & datalist panel background */
+			
+            /* --- Borders --- */
+            --border-color: #d1d9e0;                     /* all panel, input, table and button borders */
+            --border-width: 1px;
+            --border-ticket-note: #2196f3;			  /* civilian ticket left stripe */
+            --border-ticket-military: #d4af37;         /* military ticket left stripe */
+			
+            /* --- Job tickets --- */
+            --bg-ticket-note: #F0F0FA;                /* civilian job ticket panel */
+            --bg-ticket-military: #EDEDE6;            /* military job ticket panel */
+			
+            /* --- Buttons --- */
+            --color-btn-bg: var(--accent-color);         /* standard button background */
+            --color-btn-text: var(--text-on-accent);    /* standard button label */
+            --color-btn-hover-bg: #318F34;               /* green hover for most buttons */
+            --color-btn-hover-text: var(--text-on-accent); /* text on green hover */
+            --color-btn-backup-hover-bg: #E3AE36; /* Export backup hover */
+            --color-btn-import-hover-bg: #318F34;  /* Import backup hover */
+            --color-btn-reset-hover-bg: #c75c5c;     /* Reset custom database hover (soft red) */
+            --color-panel-toggle-bg: #F5F5FF;              /* View Logbook / Settings button background */
+            --color-panel-toggle-text: #717a8e;            /* View Logbook / Settings button label */
+            --color-datalist-hover-bg: #e0e6ed;          /* search dropdown item hover background */
+            --color-datalist-hover-text: #3F69BA; /* search dropdown item hover label */
+            --color-db-stat-hover-bg: #F5F5FF; /* DB category button hover (Custom & Permanent) */
+			
+            /* --- Shadows --- */
+            --shadow-container: 0 4px 15px rgba(0,0,0,0.1);
+            --shadow-banner: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-ticket-note: 0 4px 10px rgba(0, 0, 0, 0.08);
+			
+            /* --- Logbook table --- */
+            --logbook-header-bg: #FAFAFF;
+            --logbook-header-text: #293A5B;
+            --logbook-row-bg: #fff;
+            --logbook-row-text: #293A5B;
+
+            /* --- Flight dispatch ticket --- */
+            --dispatch-release-bg: #FAFAFF;
+            --dispatch-details-label-bg: #ffffff;
+            --dispatch-details-value-bg: #ffffff;
+        }
+		/* ------------------------------- GREYSCALE MODE -------------------------------- */
+        html.greyscale-mode {
+            color-scheme: dark;
+			
+            /* --- Text colours --- */
+            --accent-color: #b5b5b5; /* labels (not main buttons) */
+            --text-primary: #e0e0e0;
+            --text-muted: #888888;
+            --text-secondary: #e0e0e0;
+            --text-notice: #e0e0e0;
+            --text-on-accent: #ffffff;  /* white text on grey buttons */
+            --color-link-inline: #00bcd4;                /* inline links, field hints, scenery links */
+            --color-link-danger: #ff5722;               /* delete/reset links, warnings */
+            --color-link-readme: #318F34;            /* readme link, scenery link hover */
+            --color-owned-airport: #d0d0d0;
+            --color-field-hint: #999999;
+            --color-field-hint-sep: #666666;         /* "/" separator in field hints */
+            --color-version-label: #777777;
+            --color-footer-bmc: #e0e0e0;
+            --placeholder-color: #888888;             /* input placeholder text */
+            --dropdown-text: #c0c0c0;    /* select option text */
+            --color-db-list-text: #c0c0c0; /* items inside expanded DB dropdown lists */
+            --db-stat-text: #b5b5b5; /* Saved Airports/Aircraft & Permanent Database category labels */
+            --text-ticket-note: #e0e0e0;
+            --text-ticket-military: #e0e0e0;
+            --dispatch-details-label-text: #e0e0e0;
+            --dispatch-details-value-text: #e0e0e0;
+			
+            /* --- Backgrounds --- */
+            --bg-page: #141414;
+            --bg-container: #1e1e1e;
+            --bg-section: #252525;
+            --bg-inset: #0d0d0d;
+            --bg-panel: #1a1a1a;
+            --bg-table-header: #333333;
+            --bg-input: #2a2a2a;
+            --bg-db-stat: #2a2a2a;                  /* DB category button background (Custom & Permanent) */
+            --bg-checkbox: #2a2a2a;
+            --bg-url-box: var(--bg-inset);            /* monospace url / logbook wrap areas */
+            --bg-details: var(--bg-panel);            /* alias for info-details panels */
+            --bg-db-dropdown: #1a1a1a;
+            --dropdown-bg: var(--bg-input);               /* select & datalist panel background */
+			
+            /* --- Borders --- */
+            --border-color: #444444;
+            --border-width: 1px;
+            --border-ticket-note: #888888;
+            --border-ticket-military: #999999;
+			
+            /* --- Job tickets --- */
+            --bg-ticket-note: #2a2a2a;
+            --bg-ticket-military: #303030;
+			
+            /* --- Buttons --- */
+            --color-btn-bg: #666666; /* main buttons */
+            --color-btn-text: var(--text-on-accent);    /* standard button label */
+            --color-btn-hover-bg: #318F34;               /* green hover for most buttons */
+            --color-btn-hover-text: var(--text-on-accent); /* text on green hover */
+            --color-btn-backup-hover-bg: #E3AE36;  /* Export/Import yellow hover */
+            --color-btn-import-hover-bg: #318F34;  /* Import backup hover */
+            --color-btn-reset-hover-bg: #c75c5c;     /* Reset custom database hover (soft red) */
+            --color-panel-toggle-bg: #2a2a2a;              /* View Logbook / Settings button background */
+            --color-panel-toggle-text: #888888;            /* View Logbook / Settings button label */
+            --color-datalist-hover-bg: #555555;
+            --color-datalist-hover-text: #ffffff;
+            --color-db-stat-hover-bg: #333333; /* DB category button hover (Custom & Permanent) */
+			
+            /* --- Shadows --- */
+            --shadow-container: 0 4px 15px rgba(0,0,0,0.6);
+            --shadow-banner: 0 2px 8px rgba(0,0,0,0.4);
+            --shadow-ticket-note: 0 4px 10px rgba(0, 0, 0, 0.5);
+			
+            /* --- Logbook table --- */
+            --logbook-header-bg: #333333;
+            --logbook-header-text: #e0e0e0;
+            --logbook-row-bg: #666666;
+            --logbook-row-text: #e0e0e0;
+
+            /* --- Flight dispatch ticket --- */
+            --dispatch-release-bg: #222222;
+            --dispatch-details-label-bg: #222222;
+            --dispatch-details-value-bg: #222222;
+        }
+		/* ------------------------------- END -------------------------------- */
+        html {
+            color-scheme: dark;
+        }
+        body.light-mode {
+            color-scheme: light;
+        }
+        body.greyscale-mode {
+            color-scheme: dark;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            color-scheme: dark;
+        }
+        .container {
+            background-color: var(--bg-container);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-container);
+            margin-bottom: 20px;
+        }
+        .control-group, .settings-group {
+            margin-bottom: 20px;
+            background: var(--bg-section);
+            padding: var(--spacing-inner);
+            border-radius: 4px;
+            border: var(--border-width) solid var(--border-color);
+        }
+        .dispatch-control-group {
+            display: flow-root;
+        }
+        .dispatch-control-group #gliderAircraftNotice {
+            margin-top: 10px;
+            margin-bottom: 0;
+        }
+        .dispatch-control-group .additional-options-row {
+            min-height: 42px;
+        }
+        .dispatcher-banner-container {
+            width: 100%;
+            height: 180px; 
+            overflow: hidden;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-banner);
+        }
+        .dispatcher-banner-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; 
+            object-position: center;
+            display: block;
+        }
+        .dispatcher-banner-container.banner-med {
+            height: 300px;
+            margin-bottom: 25px;
+        }
+        .dispatcher-banner-container.banner-med .dispatcher-banner-img {
+            height: 300px;
+            object-fit: cover;
+        }
+        .owned-airport-icao {
+            color: var(--color-link-readme);
+        }
+        .settings-toggle-btn {
+            background-color: var(--color-panel-toggle-bg) !important;
+            color: var(--color-panel-toggle-text) !important;
+            border: var(--border-width) solid var(--border-color) !important;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: block;
+            margin-left: auto;
+            width: auto;
+        }
+        .settings-panel {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: var(--border-width) dashed var(--border-color);
+        }
+        .settings-panel h3 {
+            margin-top: 0;
+            margin-bottom: var(--spacing-section-title-bottom);
+            color: var(--text-primary);
+        }
+        h3 {
+            color: var(--text-primary);
+        }
+        .text-accent { color: var(--accent-color); }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: var(--font-size-label);
+            font-weight: var(--font-weight-label);
+            color: var(--accent-color);
+        }
+        label.flex-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        label.no-margin {
+            margin: 0;
+        }
+        label.slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        /* Shared note / hint text */
+        .note-text {
+            font-size: var(--font-size-nb);
+            color: var(--text-muted);
+            font-weight: var(--font-weight-body);
+        }
+        .hint-block {
+            font-size: var(--font-size-ui);
+            color: var(--text-muted);
+            font-weight: var(--font-weight-body);
+            margin-bottom: var(--spacing-hint-bottom);
+        }
+        .field-hint {
+            font-size: var(--font-size-nb);
+            color: var(--color-field-hint);
+            font-weight: var(--font-weight-body);
+            display: inline;
+            margin-left: 5px;
+        }
+        .field-hint a, .link-inline {
+            color: var(--color-link-inline);
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .field-hint-sep {
+            color: var(--color-field-hint-sep);
+            margin: 0 3px;
+        }
+        .link-danger {
+            color: var(--color-link-danger);
+            text-decoration: underline;
+        }
+        .footer-readme {
+            color: var(--color-link-readme);
+            text-decoration: underline;
+            font-weight: var(--font-weight-footer-link);
+        }
+        /* Checkbox option rows */
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .checkbox-option-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .checkbox-sub-option {
+            padding-left: 12px;
+        }
+        .checkbox-sub-prefix {
+            margin-right: 4px;
+            color: var(--text-muted);
+        }
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            font-size: var(--font-size-ui);
+            font-weight: var(--font-weight-body);
+            color: var(--text-muted);
+            cursor: pointer;
+            margin: 0;
+        }
+        .checkbox-option input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin: 0 6px 0 0;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .checkbox-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            margin: 0 6px 0 0;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .dispatch-form-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .dispatch-form-fields input[type="text"],
+        .dispatch-form-fields select {
+            margin-bottom: 0;
+        }
+        .dispatch-form-field {
+            display: flex;
+            flex-direction: column;
+        }
+        .dispatch-form-field > label.field-title,
+        .dispatch-form-field > label[for="callsignInput"],
+        .dispatch-form-field > label[for="aircraftInput"],
+        .dispatch-form-field > label[for="depOverrideInput"],
+        .dispatch-form-field > label[for="routingScopeSelect"],
+        .dispatch-form-field > .additional-options-title {
+            margin-bottom: 8px;
+        }
+        .dep-routing-labels {
+            margin-bottom: 0;
+        }
+        .dep-routing-inputs {
+            margin-top: 0;
+            align-items: stretch;
+        }
+        .dep-routing-inputs input[type="text"],
+        .dep-routing-inputs select {
+            width: 100%;
+            margin-bottom: 0;
+            min-height: 42px;
+            line-height: 1.25;
+        }
+        .additional-options-title {
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+        .additional-options-row {
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 2px;
+            box-sizing: border-box;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .additional-options-row .checkbox-option {
+            width: auto;
+            flex: 0 0 auto;
+            align-items: center;
+            margin: 0;
+            white-space: nowrap;
+        }
+        .checkbox-option label {
+            display: inline;
+            margin: 0;
+            font-weight: var(--font-weight-body);
+            color: var(--text-muted);
+            font-size: var(--font-size-ui);
+            cursor: pointer;
+        }
+        .accent-checkbox-label {
+            margin: 0;
+            font-size: var(--font-size-label);
+            font-weight: var(--font-weight-label);
+            color: var(--accent-color);
+            cursor: pointer;
+            display: inline;
+        }
+        .accent-checkbox-label .note-text {
+            font-weight: var(--font-weight-body);
+        }
+        /* Details / dropdown help blocks */
+        .info-details {
+            text-align: left;
+            font-size: var(--font-size-nb);
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .info-details summary {
+            text-decoration: underline;
+            margin-bottom: 5px;
+        }
+        .info-details-body {
+            background: var(--bg-details);
+            padding: 10px;
+            border-radius: 4px;
+            border: var(--border-width) solid var(--border-color);
+            margin-top: 5px;
+            line-height: 1.4;
+            color: var(--text-notice);
+        }
+        .info-details-body a {
+            color: var(--color-link-inline);
+            text-decoration: underline;
+        }
+        .info-details-body ul {
+            padding-left: 20px;
+            margin: 5px 0 0 0;
+        }
+        .settings-section {
+            text-align: left;
+        }
+        .settings-section > summary {
+            list-style: none;
+            cursor: pointer;
+            font-size: var(--font-size-section-summary);
+            font-weight: var(--font-weight-section-summary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 2px 0;
+        }
+        .settings-section > summary::-webkit-details-marker {
+            display: none;
+        }
+        .settings-section > summary::before {
+            content: "▸ ";
+            display: inline-block;
+            color: var(--text-muted);
+            transition: transform 0.15s ease;
+            margin-right: 2px;
+        }
+        .settings-section[open] > summary::before {
+            transform: rotate(90deg);
+        }
+        .settings-section-body {
+            padding-top: var(--spacing-inner);
+        }
+        .settings-section-body > .config-separator:first-child {
+            display: none;
+        }
+        .slider-section {
+            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .slider-header-row {
+            display: block;
+            margin-bottom: 8px;
+            width: 100%;
+            text-align: left;
+            line-height: 1.4;
+        }
+        label.slider-header-row {
+            display: block;
+            justify-content: flex-start;
+        }
+        .slider-section .slider-long-haul-note {
+            display: none;
+            box-sizing: border-box;
+            width: 100%;
+            margin: 0 0 8px;
+            padding: 10px;
+            background-color: var(--dropdown-bg);
+            color: var(--dropdown-text);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 4px;
+            font-size: var(--font-size-ui);
+            font-weight: var(--font-weight-body);
+            line-height: 1.45;
+            text-align: left;
+        }
+        .slider-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        .custom-airframe-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-bottom: var(--spacing-hint-bottom);
+        }
+        .custom-airframe-header-row .hint-block {
+            margin-bottom: 0;
+            flex: 1 1 240px;
+        }
+        .custom-airframe-header-row .info-details {
+            flex: 0 1 auto;
+            margin: 0;
+        }
+        .slider-section .slider-rotor-glider-note {
+            margin: 0;
+            text-align: right;
+        }
+        .slider-section--rotor-glider .slider-rotor-glider-note {
+            color: var(--accent-color);
+        }
+        html.greyscale-mode .slider-section--rotor-glider .slider-rotor-glider-note {
+            color: #ffffff;
+        }
+        .form-section-title {
+            margin-top: 0;
+            color: var(--accent-color);
+            margin-bottom: 6px;
+        }
+        /* Theme controls row — equal thirds */
+        .theme-controls {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 0;
+            width: 100%;
+        }
+        .theme-btn {
+            min-width: 0;
+            height: 48px;
+            background-color: var(--bg-section) !important;
+            color: var(--text-primary) !important;
+            border: var(--border-width) solid var(--border-color) !important;
+            font-weight: var(--font-weight-theme-btn) !important;
+            font-size: var(--font-size-btn) !important;
+            width: 100% !important;
+            box-sizing: border-box;
+        }
+        .theme-btn:hover {
+            background-color: var(--color-btn-hover-bg) !important;
+            color: var(--color-btn-hover-text) !important;
+        }
+        select, input[type="text"], input[type="number"], textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--dropdown-bg);
+            color: var(--dropdown-text);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 4px;
+            font-size: var(--font-size-ui);
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            color-scheme: dark;
+        }
+        select option {
+            background-color: var(--dropdown-bg);
+            color: var(--dropdown-text);
+        }
+        html.light-mode select,
+        html.light-mode input[type="text"],
+        html.light-mode input[type="number"],
+        html.light-mode textarea {
+            color-scheme: light;
+        }
+        html.greyscale-mode select,
+        html.greyscale-mode input[type="text"],
+        html.greyscale-mode input[type="number"],
+        html.greyscale-mode textarea {
+            color-scheme: dark;
+        }
+        html.light-mode select option {
+            background-color: var(--dropdown-bg);
+            color: var(--dropdown-text);
+        }
+		input[type="checkbox"],
+		input[type="radio"] {
+			appearance: none;
+			-webkit-appearance: none;
+			width: 16px;
+			height: 16px;
+			border: var(--border-width) solid var(--border-color);
+			border-radius: 3px;
+			background-color: var(--bg-checkbox);
+			cursor: pointer;
+			flex-shrink: 0;
+			position: relative;
+		}
+		input[type="checkbox"]:checked,
+		input[type="radio"]:checked {
+			background-color: var(--bg-checkbox);
+			border-color: var(--border-color);
+		}
+		input[type="checkbox"]:checked::after,
+		input[type="radio"]:checked::after {
+			content: "";
+			position: absolute;
+			width: 5px;
+			height: 9px;
+			border: solid var(--text-secondary);
+			border-width: 0 2px 2px 0;
+			left: 50%; top: 50%; transform: translate(-50%, -70%) rotate(45deg);
+		}
+		input[type="checkbox"]:focus,
+		input[type="radio"]:focus {
+			outline: 2px solid var(--accent-color);
+			outline-offset: 1px;
+		}
+		input::placeholder,
+		textarea::placeholder {
+			color: var(--placeholder-color);
+			font-size: var(--font-size-ui);
+			opacity: 1;
+		}
+        #aircraftInput {
+            font-size: var(--font-size-ui);
+            font-weight: var(--font-weight-input);
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="text"]:focus, select:focus, input[type="number"]:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+        optgroup {
+            color: var(--dropdown-text);
+            background-color: var(--dropdown-bg);
+            text-transform: uppercase; 
+            font-style: normal;
+            font-weight: var(--font-weight-optgroup);
+        }
+        optgroup option {
+            color: var(--dropdown-text);
+            background-color: var(--dropdown-bg);
+            text-transform: none;
+        }
+        .dispatch-release {
+            margin-top: 30px;
+            display: none;
+            background-color: var(--dispatch-release-bg);
+            --dispatch-release-inset: 20px;
+            padding: var(--dispatch-release-inset);
+            border-radius: 6px;
+            border: var(--border-width) solid var(--border-color);
+        }
+        .dispatch-release .dispatch-details-table {
+            table-layout: fixed;
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            border: var(--border-width) solid var(--border-color);
+        }
+        .dispatch-release .dispatch-details-table th,
+        .dispatch-release .dispatch-details-table td {
+            border: none;
+            border-bottom: var(--border-width) solid var(--border-color);
+        }
+        .dispatch-release .dispatch-details-table th {
+            width: 20%;
+            white-space: nowrap;
+            vertical-align: top;
+            border-right: var(--border-width) solid var(--border-color);
+            background-color: var(--dispatch-details-label-bg);
+            color: var(--dispatch-details-label-text);
+        }
+        .dispatch-release .dispatch-details-table tr:last-child th,
+        .dispatch-release .dispatch-details-table tr:last-child td {
+            border-bottom: none;
+        }
+        .dispatch-release .dispatch-details-table td {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            vertical-align: top;
+            background-color: var(--dispatch-details-value-bg);
+            color: var(--dispatch-details-value-text);
+        }
+        html.light-mode .ticket-note {
+            background-color: var(--bg-ticket-note);
+            border-left-color: var(--border-ticket-note);
+            color: var(--text-ticket-note);
+            box-shadow: var(--shadow-ticket-note);
+        }
+        .ticket-note {
+            background-color: var(--bg-ticket-note);
+            border-left: 5px solid var(--border-ticket-note);
+            padding: 15px 15px 30px;
+            margin: 15px 0 0;
+            font-style: normal;
+            color: var(--text-ticket-note);
+            box-shadow: var(--shadow-ticket-note);
+            border-radius: 6px;
+        }
+        html.light-mode .ticket-note-military {
+            background-color: var(--bg-ticket-military);
+            border-left-color: var(--border-ticket-military);
+            color: var(--text-ticket-military);
+            box-shadow: var(--shadow-ticket-note);
+        }
+        .ticket-note-military {
+            background-color: var(--bg-ticket-military);
+            border-left: 5px solid var(--border-ticket-military);
+            padding: 15px 15px 30px;
+            margin: 15px 0 0;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--text-ticket-military);
+            box-shadow: var(--shadow-ticket-note);
+            border-radius: 6px;
+        }
+        .ticket-note .ticket-lined-rows,
+        .ticket-note-military .ticket-lined-rows {
+            display: flex;
+            flex-direction: column;
+            gap: var(--ticket-row-spacing);
+        }
+        .ticket-note .ticket-row,
+        .ticket-note-military .ticket-row {
+            line-height: var(--ticket-line-height);
+        }
+        .ticket-note .ticket-mission-text,
+        .ticket-note-military .ticket-mission-text {
+            margin-top: calc(var(--ticket-row-spacing) + 1em);
+            line-height: var(--ticket-line-height);
+        }
+        .ticket-note .heli-warning,
+        .ticket-note-military .heli-warning {
+            display: none;
+            color: var(--color-link-danger);
+            font-weight: var(--font-weight-body);
+            margin: 20px 0 0;
+            line-height: var(--ticket-line-height);
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+        .dispatch-release .dispatch-actions-below-ticket {
+            margin-top: var(--dispatch-release-inset);
+        }
+        .url-box {
+            background-color: var(--bg-url-box);
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            word-break: break-all;
+            border: var(--border-width) solid var(--border-color);
+            margin-top: 10px;
+        }
+        /* ------ BUTTONS ------ */
+        .backup-btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .backup-btn-grid .backup-btn {
+            width: 100%;
+        }
+        .backup-btn-grid .backup-btn--manage { grid-column: 1; grid-row: 1; }
+        .backup-btn-grid .backup-btn--export { grid-column: 2; grid-row: 1; }
+        .backup-btn-grid .backup-btn--reset  { grid-column: 1; grid-row: 2; }
+        .backup-btn-grid .backup-btn--import { grid-column: 2; grid-row: 2; }
+        .backup-actions {
+            margin-bottom: 10px;
+        }
+        button, .backup-btn, .settings-toggle-btn, a.simbrief-btn {
+            height: 48px;
+            box-sizing: border-box;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: inherit;
+            font-size: var(--font-size-btn) !important;
+            font-weight: var(--font-weight-btn) !important;
+            padding: 0 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .settings-toggle-btn { margin-bottom: 15px; }
+        button { width: 100%; } 
+        #logbookToggleBtn, .settings-toggle-btn { width: auto; } 
+        html.light-mode button               { background-color: var(--color-btn-bg); color: var(--color-btn-text); }
+        button                 { background-color: var(--color-btn-bg); color: var(--color-btn-text); }
+        html.light-mode .backup-btn          { background-color: var(--color-btn-bg); color: var(--color-btn-text); }
+        .backup-btn            { background-color: var(--color-btn-bg); color: var(--color-btn-text); }
+        a.simbrief-btn         { background-color: var(--color-btn-bg); color: var(--color-btn-text); }
+        html.light-mode .settings-toggle-btn,
+        html.greyscale-mode .settings-toggle-btn,
+        .settings-toggle-btn {
+            background-color: var(--color-panel-toggle-bg) !important;
+            color: var(--color-panel-toggle-text) !important;
+            border: var(--border-width) solid var(--border-color) !important;
+            font-weight: var(--font-weight-panel-toggle) !important;
+        }
+        /* BUTTONS ROLLOVER */
+        html.light-mode button:hover               { background-color: var(--color-btn-hover-bg); color: var(--color-btn-hover-text); }
+        button:hover               { background-color: var(--color-btn-hover-bg); color: var(--color-btn-hover-text); }
+        html.light-mode .settings-toggle-btn:hover { background-color: var(--color-btn-hover-bg) !important; color: var(--color-btn-hover-text) !important; }
+        .settings-toggle-btn:hover { background-color: var(--color-btn-hover-bg) !important; color: var(--color-btn-hover-text) !important; }
+        html.light-mode .backup-btn:hover          { background-color: var(--color-btn-backup-hover-bg); color: var(--color-btn-hover-text); }
+        .backup-btn:hover          { background-color: var(--color-btn-backup-hover-bg); color: var(--color-btn-hover-text); }
+        .backup-btn--import:hover  { background-color: var(--color-btn-import-hover-bg) !important; color: var(--color-btn-hover-text) !important; }
+        .backup-btn--reset:hover   { background-color: var(--color-btn-reset-hover-bg) !important; color: var(--text-on-accent) !important; }
+        .backup-btn--manage:hover  { background-color: var(--color-btn-hover-bg) !important; color: var(--color-btn-hover-text) !important; }
+        a.simbrief-btn:hover       { background-color: var(--color-btn-hover-bg); color: var(--color-btn-hover-text); }
+        /* UNIQUE EXCEPTIONS */
+        #generateFlightBtn {
+            font-weight: var(--font-weight-generate-btn) !important;
+            font-size: var(--font-size-generate-btn) !important; 
+        }
+        /* END BUTTONS */
+        table {
+            width: 100%;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: var(--border-width) solid var(--border-color);
+        }
+        td, th {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: var(--bg-table-header);
+            width: 20%;
+        }
+        #logbookTable,
+        .custom-db-table {
+            table-layout: fixed;
+            font-size: var(--font-size-small);
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #logbookTable th,
+        #logbookTable td,
+        .custom-db-table th,
+        .custom-db-table td {
+            padding: 6px 4px;
+            vertical-align: top;
+            overflow: hidden;
+            border: var(--border-width) solid var(--border-color);
+        }
+        #logbookTable th,
+        .custom-db-table th {
+            background-color: var(--logbook-header-bg);
+            color: var(--logbook-header-text);
+            font-weight: var(--font-weight-logbook-header);
+        }
+        #logbookTable td,
+        .custom-db-table td {
+            background-color: var(--logbook-row-bg);
+            color: var(--logbook-row-text);
+            font-weight: var(--font-weight-logbook-row);
+        }
+        #logbookTable strong {
+            font-weight: inherit;
+        }
+        #logbookTable .lb-date {
+            width: 10%;
+            white-space: nowrap;
+        }
+        #logbookTable .lb-route {
+            width: 72px;
+            max-width: 72px;
+            white-space: nowrap;
+            padding-right: 2px;
+        }
+        #logbookTable .lb-aircraft {
+            width: 28%;
+        }
+        #logbookTable .lb-mission {
+            width: auto;
+        }
+        #logbookTable .lb-aircraft,
+        #logbookTable .lb-mission {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        #logbookTable .lb-time {
+            width: 46px;
+            max-width: 46px;
+            white-space: nowrap;
+            text-align: left;
+            padding-left: 4px;
+            padding-right: 2px;
+        }
+        #logbookTable .lb-action {
+            width: 52px;
+            max-width: 52px;
+            text-align: center;
+            white-space: nowrap;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .custom-db-table .cdb-icao {
+            width: 48px;
+            max-width: 48px;
+            white-space: nowrap;
+        }
+        .custom-db-table .cdb-name {
+            width: auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .custom-db-table .cdb-rwy {
+            width: 88px;
+            max-width: 88px;
+            white-space: nowrap;
+        }
+        .custom-db-table .cdb-source,
+        .custom-db-table .cdb-mission {
+            width: auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .custom-db-table .cdb-action {
+            width: 52px;
+            max-width: 52px;
+            text-align: center;
+            white-space: nowrap;
+            padding-left: 0;
+            padding-right: 0;
+        }
+        #logbookTable .lb-remove,
+        .custom-db-table .lb-remove {
+            color: var(--color-link-danger);
+            text-decoration: none;
+            font-size: var(--font-size-ui);
+            line-height: 1;
+        }
+        .custom-db-table .manage-custom-db-remove {
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            min-width: 0;
+            width: auto;
+            height: auto;
+            font-weight: var(--font-weight-body) !important;
+            cursor: pointer;
+        }
+        #manageCustomDbPanel.manage-custom-db-inline {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: var(--border-width) dashed var(--border-color);
+            margin-bottom: 10px;
+        }
+        #manageCustomDbPanel .manage-custom-db-heading {
+            margin: 0 0 8px 0;
+            font-size: var(--font-size-ui);
+            font-weight: var(--font-weight-manage-heading);
+            color: var(--accent-color);
+        }
+        #manageCustomDbPanel .manage-custom-db-heading:not(:first-of-type) {
+            margin-top: 16px;
+        }
+        .custom-db-table-wrap {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 0;
+            margin-bottom: 10px;
+            border: none;
+        }
+        #manageCustomDbPanel .custom-db-table-wrap:last-child {
+            margin-bottom: 0;
+        }
+        .custom-db-table .cdb-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        hr, .config-separator {
+            border-color: var(--border-color);
+        }
+        .config-separator {
+            margin: 25px 0;
+        }
+        .settings-panel .config-separator {
+            margin: var(--spacing-inner) 0;
+            border: none;
+            border-top: var(--border-width) solid var(--border-color);
+        }
+        .settings-panel .db-stats-container {
+            margin-bottom: 0;
+        }
+        .settings-panel .permanent-db-categories .note-text {
+            margin-top: var(--spacing-inner);
+            margin-bottom: 0;
+        }
+        .settings-section-note {
+            text-align: left;
+        }
+        .settings-panel .theme-controls {
+            margin-bottom: 0;
+        }
+        .settings-panel > .info-details,
+        .backup-actions .reset-db-info {
+            margin-top: var(--spacing-inner);
+            margin-bottom: 0;
+        }
+        .reset-db-info {
+            text-align: left;
+        }
+        .settings-panel .btn-row {
+            margin-top: var(--spacing-inner);
+            margin-bottom: 0;
+        }
+        .settings-panel .btn-row--save-airframe {
+            margin-top: 0;
+        }
+        a.scenery-link {
+            color: var(--color-link-inline);
+            text-decoration: underline;
+        }
+        a.scenery-link:hover {
+            color: var(--color-link-readme);
+        }
+        .db-stats-container { margin-bottom: 15px; }
+        #appVersionLabel {
+            margin: 18px 0 4px 0;
+            text-align: center;
+            font-size: var(--font-size-small);
+            color: var(--color-version-label);
+            letter-spacing: 0.02em;
+        }
+        .db-stat-item--static,
+        .db-stat-item.db-stat-item--static {
+            cursor: default;
+            pointer-events: none;
+            transition: none;
+        }
+        .db-stat-item--static:hover,
+        .db-stat-item.db-stat-item--static:hover {
+            background-color: var(--bg-db-stat);
+            color: var(--db-stat-text);
+        }
+        .db-stat-item {
+            background-color: var(--bg-db-stat);
+            color: var(--db-stat-text);
+            padding: 10px;
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: var(--font-weight-db-stat);
+            transition: background 0.2s, color 0.2s;
+        }
+        .db-stat-item:hover {
+            background-color: var(--color-db-stat-hover-bg);
+        }
+        .db-dropdown {
+            background-color: var(--bg-db-dropdown);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .db-dropdown ul {
+            margin: 0;
+            padding-left: 20px;
+            color: var(--color-db-list-text);
+            font-size: var(--font-size-nb);
+        }
+        .db-dropdown li { margin-bottom: 4px; }
+        #timeVal {
+            color: var(--accent-color);
+            font-weight: var(--font-weight-time-val);
+        }
+        .custom-datalist {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 250px;
+            overflow-y: auto;
+            background-color: var(--dropdown-bg);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 4px;
+            z-index: 1000;
+            box-shadow: var(--shadow-container);
+            margin-top: -10px;
+        }
+        .custom-datalist div {
+            padding: 6px 10px;
+            cursor: pointer;
+            color: var(--dropdown-text);
+            font-size: var(--font-size-ui);
+        }
+        html.light-mode .custom-datalist div:hover {
+            background-color: var(--color-datalist-hover-bg);
+            color: var(--color-datalist-hover-text);
+        }
+        .custom-datalist div:hover {
+            background-color: var(--color-datalist-hover-bg);
+            color: var(--color-datalist-hover-text);
+        }
+        .footer-disclaimer {
+            margin-top: 5px;
+            text-align: center;
+            font-size: var(--font-size-small);
+            color: var(--text-muted);
+        }
+        .footer-bar {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: var(--font-size-small);
+            color: var(--text-muted);
+        }
+        .footer-bmc {
+            color: var(--color-footer-bmc);
+            text-decoration: none;
+            font-weight: var(--font-weight-footer-link);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        html.light-mode .footer-bmc {
+            color: var(--text-primary);
+        }
+        html.greyscale-mode .footer-bmc {
+            color: var(--text-primary);
+        }
+        .select-no-margin {
+            margin-bottom: 0;
+        }
+        .input-relative-wrap {
+            position: relative;
+            width: 100%;
+        }
+        .dep-field-wrap {
+            margin: 0;
+            position: relative;
+        }
+        .panel-btn-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px; /* margin around button */
+            margin-bottom: 15px;
+        }
+        .panel-btn-row .settings-toggle-btn {
+            margin: 0;
+            flex: 1 1 0;
+            min-width: 0;
+            width: auto;
+            text-align: center;
+        }
+        .logbook-table-wrap {
+            max-height: 250px;
+            overflow-y: auto;
+            padding: 0;
+            margin-bottom: 15px;
+            margin-top: 10px;
+            border: none;
+        }
+        .logbook-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .pagination-controls {
+            text-align: center;
+            margin-top: 5px;
+            font-size: var(--font-size-ui);
+            display: none;
+        }
+        .pagination-controls a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        .pagination-indicator {
+            margin: 0 10px;
+            color: var(--text-muted);
+        }
+        .logbook-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            font-size: var(--font-size-nb);
+        }
+        .logbook-actions a {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
+        .logbook-actions a.is-disabled,
+        .logbook-actions a.link-danger.is-disabled {
+            color: var(--text-muted);
+            opacity: 0.55;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .prefer-owned-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .prefer-owned-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin: 0;
+        }
+        .prefer-owned-row.military-airbase-row {
+            margin-top: 10px;
+        }
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .form-grid-2 > .info-details {
+            grid-column: 1 / -1;
+        }
+        .form-grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .form-grid-2-mt {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .btn-row--save-airframe {
+            margin-top: 0;
+        }
+        .aircraft-save-block {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .aircraft-save-block .btn-row--save-airframe {
+            margin-top: 0;
+        }
+        .form-grid-2-mt.section-before-mission-tags input {
+            margin-bottom: 0;
+        }
+        .mission-tags-section {
+            margin-top: var(--spacing-inner);
+            margin-bottom: var(--spacing-inner);
+        }
+        .form-section-subtitle {
+            margin: 16px 0 10px 0;
+            font-size: var(--font-size-label);
+            font-weight: var(--font-weight-label);
+            color: var(--accent-color);
+        }
+        .mission-category-hint {
+            margin: 8px 0 12px 0;
+        }
+        .engine-count-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+			margin-top: 15px; 
+            margin-bottom: 0;
+        }
+        .engine-count-grid select {
+            margin-bottom: 0;
+        }
+        .numbered-list {
+            list-style: none;
+            padding-left: 0;
+            margin: 5px 0 0 0;
+        }
+        .numbered-list li {
+            margin-bottom: 6px;
+        }
+        .mission-tags-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .tag-hint {
+            margin-top: 4px;
+        }
+        .dispatch-hr {
+            border-color: var(--border-color);
+        }
+        .dispatch-actions-row {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+            gap: 10px;
+        }
+        .dispatch-actions-row .dispatch-action-btn {
+            flex: 1 1 0;
+            min-width: 0;
+            width: auto;
+            gap: 8px;
+        }
+        .dispatch-action-btn-icon {
+            height: 20px;
+            width: auto;
+            flex-shrink: 0;
+            display: block;
+        }
+        .mission-image {
+            display: none;
+            width: 100%;
+            border-radius: 4px;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+            box-sizing: border-box;
+            object-fit: cover;
+        }
+    </style>
+<script>
+(function () {
+    var useFileProtocol = window.location.protocol === "file:";
+    var loaderUrl = useFileProtocol ? "loader.js" : ("loader.js?_=" + Date.now());
+    if (!useFileProtocol) {
+        try {
+            loaderUrl = new URL("loader.js", window.location.href).toString();
+            loaderUrl += (loaderUrl.indexOf("?") === -1 ? "?" : "&") + "_=" + Date.now();
+        } catch (e) {}
+    }
+    document.write('<script src="' + loaderUrl + '"><\/script>');
+})();
+</script>
+	<script>
+    // Apply theme immediately before the body renders
+    const preLoadTheme = localStorage.getItem("dispatcher_theme");
+    if (preLoadTheme === 'light') {
+        document.documentElement.classList.add('light-mode');
+    } else if (preLoadTheme === 'greyscale') {
+        document.documentElement.classList.add('greyscale-mode');
+    }
+</script>
+</head>
+<body>
+<div class="container">
+    <div class="dispatcher-banner-container banner-med">
+        <img id="dynamicWorkflowBanner" src="images/banner-dark.png" alt="Flight Dispatcher" class="dispatcher-banner-img">
+    </div>
+    <script>
+    (function () {
+        var theme = localStorage.getItem("dispatcher_theme") || "dark";
+        var banners = {
+            dark: "images/banner-dark.png",
+            light: "images/banner-light.png",
+            greyscale: "images/banner-grey.png"
+        };
+        var path = banners[theme] || banners.dark;
+        var img = document.getElementById("dynamicWorkflowBanner");
+        if (img) {
+            img.src = window.dispatcherAssetUrl ? window.dispatcherAssetUrl(path) : path;
+        }
+    })();
+    </script>
+    <div class="control-group dispatch-control-group">
+        <div class="dispatch-form-fields">
+        <div class="dispatch-form-field">
+        <label for="callsignInput">ATC Callsign:
+            <span class="field-hint">
+                <a class="link-inline" onclick="event.preventDefault(); saveCallsign();">Save Callsign</a>
+                <span class="field-hint-sep">/</span>
+                <a class="link-inline" href="https://123atc.com/call-signs" target="_blank" rel="noopener noreferrer">Lookup Callsign</a>
+                <span class="field-hint-sep">/</span>
+                <a class="link-inline" onclick="event.preventDefault(); generateRandomCallsign();">Generate Callsign</a>
+            </span>
+        </label>
+        <input type="text" id="callsignInput" placeholder="e.g. MRD275" maxlength="7" required>
+        </div>
+        <div class="dispatch-form-field">
+        <label for="aircraftInput" class="flex-label">Aircraft Type:</label>
+		<div class="input-relative-wrap">
+			<input type="text" id="aircraftInput" placeholder="Type to search or click to show all" autocomplete="off">
+			<div id="customAircraftList" class="custom-datalist"></div>
+		</div>
+        </div>
+        <div class="dispatch-form-field">
+            <div class="form-grid-2 dep-routing-labels">
+                <label for="depOverrideInput" class="field-title">Departure Airport:</label>
+                <label for="routingScopeSelect" class="field-title">Routing Options:</label>
+            </div>
+            <div class="form-grid-2 dep-routing-inputs">
+                <div class="dep-field-wrap">
+                    <input type="text" id="depOverrideInput" placeholder="Enter Airport Name or ICAO (Optional)" autocomplete="off">
+                    <div id="customAirportList" class="custom-datalist"></div>
+                </div>
+                <select id="routingScopeSelect">
+                    <option value="worldwide">🌐 Worldwide</option>
+                    <option value="americas">Americas Only</option>
+                    <option value="row">Europe &amp; Rest of World</option>
+                </select>
+            </div>
+            <script>
+            (function () {
+                var valid = { worldwide: true, americas: true, row: true };
+                try {
+                    var saved = localStorage.getItem("dispatcher_routing_scope");
+                    var sel = document.getElementById("routingScopeSelect");
+                    if (saved && valid[saved] && sel) sel.value = saved;
+                } catch (e) {}
+            })();
+            </script>
+        </div>
+        <div class="dispatch-form-field">
+            <div class="additional-options-row">
+                <label class="checkbox-option" for="useLastArrivalToggle">
+                    <input type="checkbox" id="useLastArrivalToggle" onchange="toggleLastArrival()"><strong>Continue from last airport?</strong></label>
+                <label class="checkbox-option" for="contractorToggle">
+                    <input type="checkbox" id="contractorToggle" onchange="syncContractorMilitaryOptions()">Contractor Mode (civilian aircraft fly military missions)</label>
+                <label class="checkbox-option" for="militaryBaseToggle">
+                    <input type="checkbox" id="militaryBaseToggle">Use Military airbases</label>
+            </div>
+        </div>
+        </div>
+        <details id="gliderAircraftNotice" class="info-details" style="display: none;">
+            <summary>Glider Aircraft Notice</summary>
+            <div class="info-details-body">
+                A glider can dispatch from any departure airport with sufficient runway length (not a helipad) if you enter an ICAO. If the departure airport is left blank, the dispatcher considers all suitable airports but strongly prefers routes from and to glider strips.
+            </div>
+        </details>
+</div>
+<div class="slider-section">
+    <label for="timeSlider" class="slider-header-row" id="timeSliderHeading">
+        Target Block Time: <span id="timeVal">60</span> <span id="timeUnit">minutes</span>
+    </label>
+    <div id="longHaulNote" class="slider-long-haul-note" role="note">⏳ <strong>NOTAM</strong>: Click below to generate a long-haul flight (between 6 and 16 hours) matched to your selected aircraft's specifications and operational limits. You can choose to fly from a specific airport, provided it is in either the core database or your custom database, or you can leave the field blank to generate a random flight. You can also choose to restrict long-haul flights to the Americas, Europe and the Rest of the World, or worldwide; the choice is yours.</div>
+    <input type="range" id="timeSlider" min="40" max="120" step="10" value="60" list="steplist" oninput="updateFlightTimeDisplay()" style="width: 100%; cursor: pointer;">
+
+    <datalist id="steplist">
+        <option value="40"></option>
+        <option value="50"></option>
+        <option value="60"></option>
+        <option value="70"></option>
+        <option value="80"></option>
+        <option value="90"></option>
+        <option value="100"></option>
+        <option value="110"></option>
+        <option value="120"></option>
+    </datalist>
+    <div class="slider-footer-row">
+        <label class="checkbox-option" for="longHaulToggle">
+            <input type="checkbox" id="longHaulToggle" onchange="toggleLongHaulMode()">⏳ Enable long-haul flights
+        </label>
+        <span class="note-text slider-rotor-glider-note">(N.B. Helicopter and Glider missions are unaffected by this slider.)</span>
+    </div>
+</div>
+
+<button id="generateFlightBtn" onclick="dispatchFlight()">🎲 GENERATE FLIGHT</button>
+<div class="panel-btn-row">
+    <button type="button" id="logbookToggleBtn" class="settings-toggle-btn" onclick="toggleLogbookPanel()">📋 View Pilot Logbook</button>
+    <button type="button" class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Settings & Database Tools</button>
+</div>
+    <hr class="dispatch-hr" style="margin-top: 20px;">
+    <div id="logbookPanel" class="settings-panel settings-group" style="display: none;">
+        <h3 style="margin-top: 0;">📋 Pilot Logbook</h3>
+        <div class="db-stats-container logbook-stats-grid">
+            <div class="db-stat-item db-stat-item--static">
+                <span>Total Flights</span>
+                <span id="lbTotalFlights">0</span>
+            </div>
+            <div class="db-stat-item db-stat-item--static">
+                <span>Flight Time (hrs)</span>
+                <span id="lbTotalHours">0.0</span>
+            </div>
+        </div>
+<div class="url-box logbook-table-wrap">
+<table id="logbookTable" style="margin-top: 0; text-align: left; width: 100%;">
+<thead>
+    <tr>
+        <th class="lb-date">Date</th>
+        <th class="lb-route">Route</th>
+        <th class="lb-aircraft">Aircraft</th>
+        <th class="lb-mission">Mission</th>
+        <th class="lb-time">Time</th>
+        <th class="lb-action">Remove</th>
+    </tr>
+</thead>
+                <tbody id="logbookTableBody">
+                    <tr><td colspan="6" style="text-align: center; opacity: 0.7;">No flights logged yet.</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="paginationControls" class="pagination-controls">
+            <a href="#" onclick="event.preventDefault(); changePage(-1);">&lt; Prev.</a>
+            <span id="pageIndicator" class="pagination-indicator"></span>
+            <a href="#" onclick="event.preventDefault(); changePage(1);">Next &gt;</a>
+        </div>
+        <div class="logbook-actions">
+            <a href="#" id="addLastFlightLink" onclick="event.preventDefault(); addLastFlightToLogbook();">Add last flight to logbook</a>
+            <a href="#" id="clearLogbookLink" class="link-danger is-disabled" aria-disabled="true" onclick="event.preventDefault(); clearLogbook();">Clear entire logbook</a>
+        </div>
+    </div>
+    <div id="settingsPanel" class="settings-panel settings-group">
+        <h3>User Preferences</h3>
+        <div class="theme-controls">
+            <button type="button" class="theme-btn" onclick="setMode('light')">☀️ Light Mode</button>
+            <button type="button" class="theme-btn" onclick="setMode('dark')">🌙 Dark Mode</button>
+            <button type="button" class="theme-btn" onclick="setMode('greyscale')">⬛ Greyscale Mode</button>
+        </div>
+        <hr class="config-separator">
+        <details class="settings-section">
+            <summary>⭐ Owned Airports Filter</summary>
+            <div class="settings-section-body">
+        <div class="hint-block">
+            Enter the ICAO codes for airport scenery that you own, separated by commas. As long as the ICAO is in the master database, or you have added it to your custom database below, and you have selected 'Enable Preferred Routing', the dispatcher will prioritize routes using these airports and highlight the ICAO code in a green colour on the dispatch form to indicate that you own this airport.
+        </div>
+        <textarea id="ownedAirportsInput" rows="3" placeholder="e.g. EGLL, KJFK, YSSY" style="resize: vertical;"></textarea>
+        <div class="prefer-owned-row">
+            <input type="checkbox" id="preferOwnedToggle">
+            <label for="preferOwnedToggle" class="accent-checkbox-label">Enable Preferred Routing</label>
+        </div>
+        <button type="button" onclick="saveOwnedAirports()">💾 Save Airport Preferences</button>
+            </div>
+        </details>
+        <hr class="config-separator">
+        <details class="settings-section">
+            <summary>📍 Add New Airport (to Local DB)</summary>
+            <div class="settings-section-body">
+        <div class="hint-block">
+            Adds a missing airport to your local database so it can be used for departures, arrivals, and owned-airport routing. Latitude and longitude are required for distance and route generation.
+        </div>
+		<div class="form-grid-2" style="margin-top: 10px;">
+			<div>
+			<label for="newLat">Latitude (Decimal):</label>
+			<input type="number" id="newLat" placeholder="e.g. 35.214" step="any">
+			</div>
+			<div>
+			<label for="newLon">Longitude (Decimal):</label>
+			<input type="number" id="newLon" placeholder="e.g. -80.943" step="any">
+			</div>
+		</div>
+		<div class="form-grid-4">
+            <div>
+                <label for="newIcao">Airport ICAO:</label>
+                <input type="text" id="newIcao" placeholder="e.g. EGLL" maxlength="4">
+            </div>
+            <div>
+                <label for="newName">Airport Name:</label>
+                <input type="text" id="newName" placeholder="e.g. Heathrow">
+            </div>
+            <div>
+                <label for="newElev">Elevation (ft):</label>
+                <input type="number" id="newElev" placeholder="e.g. 83">
+            </div>
+            <div>
+                <label for="newApLength">Runway Length (ft):</label>
+                <input type="number" id="newApLength" placeholder="e.g. 8000">
+            </div>
+        </div>
+		<div class="form-grid-2">
+            <div>
+                <label for="newRwyType">Largest aircraft type permitted:</label>
+                <select id="newRwyType">
+                    <option value="GA">Light GA only</option>
+                    <option value="TURBO">Turboprops (includes GA)</option>
+                    <option value="BIZ JET">Business jets (includes Turboprops &amp; GA)</option>
+                    <option value="JET">All fixed-wing jets (includes Business Jets and below)</option>
+                    <option value="HELI">Helipad/ Helicopters only</option>
+                    <option value="GLIDER">Glider strip / winch launch only</option>
+                </select>
+            </div>
+            <div>
+                <label for="newSource">Scenery source (display only):</label>
+                <select id="newSource">
+                    <option value="Contrail Store">Contrail</option>
+                    <option value="Flightsim.to">Flightsim.to</option>
+                    <option value="iniBuilds">iniBuilds</option>
+                    <option value="MSFS hand-crafted airport">MSFS Hand-Crafted</option>
+                    <option value="Asobo Gliderport">Asobo Gliderport</option>
+                    <option value="Asobo Detailed Airports">Asobo Detailed Airports</option>
+                    <option value="MSFS Marketplace">MSFS Marketplace</option>
+                    <option value="ORBX Store">ORBX</option>
+                    <option value="SimMarket Store">SimMarket</option>
+                    <option value="Other">Other Retail Channels</option>
+                </select>
+            </div>
+            <details class="info-details">
+                <summary>Why separate turboprop and business jet?</summary>
+                <div class="info-details-body">
+                    Even when a runway is long enough on paper, noise rules, weight limits, or missing FBO facilities may still restrict it to turboprops only. Set the highest aircraft category this airport actually supports. Runway length is entered separately and is also checked against each aircraft.
+                </div>
+            </details>
+        </div>
+        <div class="prefer-owned-row military-airbase-row">
+            <input type="checkbox" id="newApMilitary">
+            <label for="newApMilitary" class="accent-checkbox-label">Military airbase<span class="note-text"> (civilian missions are blocked from here unless contractor mode is enabled)</span></label>
+        </div>
+        <div class="btn-row">
+            <button type="button" onclick="saveCustomAirport()">💾 Save Custom Airport</button>
+        </div>
+            </div>
+        </details>
+        <hr class="config-separator">
+        <details class="settings-section">
+            <summary>🛩️ Add New Aircraft (to Local DB)</summary>
+            <div class="settings-section-body">
+        <div class="hint-block">
+            Adds a missing aircraft to your local fleet list.
+        </div>
+        <div class="form-grid-2">
+            <div>
+                <label for="newAcName">Aircraft Name:</label>
+                <input type="text" id="newAcName" placeholder="e.g. Guimbal Cabri G2">
+            </div>
+            <div>
+                <label for="newAcIcao">Aircraft ICAO Code: <span class="field-hint">(<a href="https://www.icao.int/operational-safety/doc-8643-aircraft-type-designators/search" target="_blank" rel="noopener noreferrer">Lookup Aircraft</a> / <a href="https://www.helihub.com/data/icao-code/" target="_blank" rel="noopener noreferrer">Lookup Helicopter</a>)</span></label>
+                <input type="text" id="newAcIcao" placeholder="e.g. CABG" maxlength="4">
+            </div>
+        </div>
+        <div class="form-grid-2">
+            <div>
+                <label for="newAcLength">Min Takeoff Distance (ft):</label>
+                <input type="number" id="newAcLength" placeholder="Refer to Aircraft Manual / 0ft for Helicopters">
+            </div>
+            <div>
+                <label for="newAcClass">Aircraft Type:</label>
+<select id="newAcClass" onchange="updateCustomAircraftForm()">
+    <optgroup label="Civilian">
+        <option value="GA">General Aviation / STOL</option>
+        <option value="TURBO">Turboprop</option>
+        <option value="BIZ JET">Business Jet</option>
+        <option value="JET">Commercial Airliners (Passenger &amp; Freight)</option>
+    </optgroup>
+    <optgroup label="Military / Special">
+        <option value="MIL_JET">Fighter Jet</option>
+        <option value="WARBIRD">Warbird (e.g. Spitfire)</option>
+        <option value="HELI">Helicopter</option>
+        <option value="GLIDER">Glider / Sailplane</option>
+    </optgroup>
+</select>
+            </div>
+        </div>
+        <div class="form-grid-2-mt">
+            <div>
+                <label for="newAcMaxD">Maximum range (nm):</label>
+                <input type="number" id="newAcMaxD" placeholder="e.g. 3115" min="1" oninput="this.dataset.touched='1'">
+            </div>
+        </div>
+        <div class="note-text" style="margin-bottom: 12px;">Minimum sector distance is set automatically from the aircraft class. Enter manufacturer still-air maximum range from the POH or AFM — the dispatcher uses this for long-haul routing and range-cap alerts.</div>
+        <div class="form-grid-2-mt">
+            <div>
+                <label for="newAcMaxPax">Max Passengers (excluding pilot):</label>
+                <input type="number" id="newAcMaxPax" placeholder="e.g. 180">
+            </div>
+            <div>
+                <label for="newAcMaxCargo">Max Cargo (kg):</label>
+                <input type="number" id="newAcMaxCargo" placeholder="e.g. 5000">
+            </div>
+            <div>
+                <label for="newAcMtow">MTOW (kg):</label>
+                <input type="number" id="newAcMtow" placeholder="e.g. 75000">
+            </div>
+            <div>
+                <label for="newAcOew">OEW (kg):<span class="field-hint">(<a href="https://ansperformance.eu/acronym/oew/" target="_blank" rel="noopener noreferrer">OEW definition</a>)</span></label>
+                <input type="number" id="newAcOew" placeholder="e.g. 42000">
+            </div>
+        </div>
+        <div class="form-grid-2-mt section-before-mission-tags">
+            <div>
+                <label for="newAcFuel">Fuel Burn (kg/nm):</label>
+                <input type="number" id="newAcFuel" placeholder="e.g. 6.0" step="0.1">
+            </div>
+        </div>
+	<div class="control-group mission-tags-section">
+            <h4 class="form-section-title">🎯 Mission tags</h4>
+            <div class="note-text" style="margin-bottom: 12px;">Mission tags are used to define how the dispatcher classifies aircraft. Pair with Primary mission use: e.g. Caravan cargo = GA + Cargo, E195-F = Regional + Cargo, 777F = Commercial wide-body + Cargo. Turboprop class uses Regional or GA depending on how you fly it.</div>
+            <div class="mission-tags-grid">
+				<div>
+					<label for="newAcRole">Mission category:</label>
+                    <select id="newAcRole" class="select-no-margin">
+                        <option value="LIGHT_GA">GA</option>
+                        <option value="REGIONAL">Regional</option>
+                        <option value="BIZ_JET">Business Jet</option>
+                        <option value="JETLINER" selected>Commercial narrow-body</option>
+                        <option value="JETLINER HEAVY">Commercial wide-body</option>
+                        <option value="HEAVY">Heavy Cargo / Airlifter</option>
+                        <option value="ROTORCRAFT">Helicopter</option>
+                        <option value="GLIDER">Glider</option>
+                        <option value="FAST_JET">Fighter Jet</option>
+                        <option value="VINTAGE">Vintage</option>
+                        <option value="WARBIRD">Warbird</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="newAcConfig">Primary mission use:</label>
+                    <select id="newAcConfig" class="select-no-margin">
+                        <option value="MEDEVAC">Air Ambulance / Medevac</option>
+						<option value="FREIGHTER">Cargo / Freight</option>
+						<option value="PAX">Passenger</option>
+                        <option value="TACTICAL">Tactical / Military</option>
+                        <option value="VIP">VIP / Executive Charter</option>
+                    </select>
+                    <div id="acAirlifterHint" class="note-text tag-hint" style="display: none; line-height: 1.4;">
+                        Military airlifter setup (e.g. A400): choose <strong>Cargo / freight</strong> above, tick <strong>Military Aircraft</strong> below, and use <strong>Heavy Cargo / Airlifter</strong> as the mission category.
+                    </div>
+                </div>
+            </div>
+            <div class="engine-count-grid">
+                <div>
+                    <label for="newAcEngineCount">Engine count:</label>
+                    <select id="newAcEngineCount" class="select-no-margin">
+                        <option value="SINGLE_ENGINE">Single engine</option>
+                        <option value="TWIN_ENGINE" selected>Twin engine</option>
+                        <option value="THREE_ENGINE">Three engines</option>
+                        <option value="FOUR_ENGINE">Four engines</option>
+                    </select>
+                </div>
+            </div>
+            <h4 class="form-section-subtitle">Additional Options</h4>
+            <div class="checkbox-grid">
+                <div class="checkbox-option-group">
+                    <label class="checkbox-option" for="newAcMilitary">
+                        <input type="checkbox" id="newAcMilitary" onchange="updateCustomAircraftForm()">Military Aircraft</label>
+                    <label class="checkbox-option checkbox-sub-option" id="acTagCivilOkWrap" for="newAcCivilOk" style="display: none;">
+                        <input type="checkbox" id="newAcCivilOk"><span class="checkbox-sub-prefix">&gt;</span>Can also fly civilian contracts</label>
+                </div>
+                <div id="acTagFighterWrap" class="checkbox-option" style="display: none;">
+                    <input type="checkbox" id="newAcFighter">
+                    <label for="newAcFighter">Fighter / tactical jet missions</label>
+                </div>
+                <label class="checkbox-option" for="newAcStol">
+                    <input type="checkbox" id="newAcStol">Short-field / STOL capable</label>
+                <label class="checkbox-option" for="newAcAmphibian">
+                    <input type="checkbox" id="newAcAmphibian">Amphibian (Water Runways not included in DB)</label>
+                <div id="acTagLightHeliWrap" class="checkbox-option" style="display: none;">
+                    <input type="checkbox" id="newAcLightHeli">
+                    <label for="newAcLightHeli">Light helicopter (R22-class)</label>
+                </div>
+                <div id="acTagMilHeliWrap" class="checkbox-option" style="display: none;">
+                    <input type="checkbox" id="newAcMilHeli">
+                    <label for="newAcMilHeli">Military helicopter</label>
+                </div>
+                <label class="checkbox-option" for="newAcSingleSeat">
+                    <input type="checkbox" id="newAcSingleSeat">Single-seat only (excludes air taxi missions)</label>
+                <label class="checkbox-option" for="newAcRecon">
+                    <input type="checkbox" id="newAcRecon">Strategic Reconnaissance Missions</label>
+            </div>
+            <div id="acTagGliderWrap" class="checkbox-grid" style="display: none;">
+                <label class="checkbox-option" for="newAcSelfLaunch">
+                    <input type="checkbox" id="newAcSelfLaunch">Self-launch (motor glider)</label>
+                <label class="checkbox-option" for="newAcSelfSustain">
+                    <input type="checkbox" id="newAcSelfSustain">Self-sustaining motor glider</label>
+                <label class="checkbox-option" for="newAcSailplane">
+                    <input type="checkbox" id="newAcSailplane">Pure sailplane (no engine)</label>
+                <label class="checkbox-option" for="newAcElectric">
+                    <input type="checkbox" id="newAcElectric">Electric self-launch</label>
+                <label class="checkbox-option" for="newAcTwinSeat">
+                    <input type="checkbox" id="newAcTwinSeat">Two-seat glider</label>
+            </div>
+        </div>
+        <div class="aircraft-save-block">
+        <div class="btn-row btn-row--save-airframe">
+            <button type="button" onclick="saveCustomAircraft()">💾 Save Custom Airframe</button>
+        </div>
+        <details class="info-details">
+            <summary>What does Add New Airport (to Local DB) or Add New Aircraft (to Local DB) do?</summary>
+            <div class="info-details-body">
+                <strong>📍 Add New Airport (to Local DB):</strong>
+                <ul>
+                    <li>Saves a missing airport to your browser so it appears in the departure search and route picker.</li>
+                    <li>Runway length and largest permitted aircraft type control which airframes can use the airport.</li>
+                    <li>Coordinates are used for distance, heading, and map routing — look them up if you are unsure.</li>
+                </ul>
+                <strong>🛩️ Add New Aircraft (to Local DB):</strong>
+                <ul>
+                    <li>Saves a missing aircraft to your local fleet dropdown.</li>
+                    <li>Mission tags are used to define how the dispatcher classifies aircraft. Gliders need class <strong>Glider / Sailplane</strong>, category <strong>Glider</strong>, and the appropriate glider options (self-launch, sailplane, etc.).</li>
+                    <li>Enter maximum range (nm) from the aircraft manual — this controls short-haul and long-haul routing. Minimum sector distance is set automatically by class.</li>
+                    <li>Military airlifters (e.g. A400): class <strong>Turboprop</strong>, tick <strong>Military Aircraft</strong>, category <strong>Heavy Cargo / Airlifter</strong>, primary use <strong>Cargo / freight</strong>.</li>
+                    <li>Custom glider strips: set largest permitted aircraft type to <strong>Glider strip / winch launch only</strong>.</li>
+                </ul>
+            </div>
+        </details>
+        </div>
+            </div>
+        </details>
+        <hr class="config-separator">
+        <details class="settings-section">
+            <summary>💾 Custom Database Management</summary>
+            <div class="settings-section-body">
+				<div class="hint-block" style="text-align: left; margin-bottom: 20px;">
+            N.B. Any custom aircraft and airports that you have added to your local database will be removed if you empty your browser cache. Use the buttons below to create and restore a local backup of your custom database before emptying your browser cache. Logbook Entries are included in the exported file.
+        </div>
+        <div class="backup-actions">
+            <div class="backup-btn-grid">
+                <button type="button" class="backup-btn backup-btn--manage" onclick="toggleManageCustomDb()">🔧 Manage Custom Database</button>
+                <button type="button" class="backup-btn backup-btn--export" onclick="exportDatabaseBackup()">📤 Export Backup</button>
+                <button type="button" class="backup-btn backup-btn--reset" onclick="resetCustomDatabase()">🗑️ Reset Custom Database</button>
+                <button type="button" class="backup-btn backup-btn--import" onclick="document.getElementById('importFileInput').click()">📥 Import Backup</button>
+            </div>
+            <div id="manageCustomDbPanel" class="manage-custom-db-inline" style="display: none;">
+                <h3 style="margin-top: 0;">🔧 Manage Custom Database</h3>
+                <h4 class="manage-custom-db-heading">📍 Custom Airports</h4>
+                <div class="url-box logbook-table-wrap custom-db-table-wrap">
+                    <table class="custom-db-table" style="margin-top: 0; text-align: left; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="cdb-icao">ICAO</th>
+                                <th class="cdb-name">Name</th>
+                                <th class="cdb-rwy">Runway Length</th>
+                                <th class="cdb-source">Scenery Source</th>
+                                <th class="cdb-action">Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manageCustomAirportsBody"></tbody>
+                    </table>
+                </div>
+                <h4 class="manage-custom-db-heading">🛩️ Custom Aircraft</h4>
+                <div class="url-box logbook-table-wrap custom-db-table-wrap">
+                    <table class="custom-db-table" style="margin-top: 0; text-align: left; width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="cdb-icao">ICAO</th>
+                                <th class="cdb-name">Name</th>
+                                <th class="cdb-mission">Mission Category</th>
+                                <th class="cdb-action">Remove</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manageCustomAircraftBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
+            <details class="info-details reset-db-info">
+                <summary>What does Reset Custom Database do?</summary>
+                <div class="info-details-body">
+                    <strong>Step-by-Step</strong>
+                    <ul class="numbered-list">
+                        <li><strong>1. Confirmation:</strong> A dialog asks for permission to wipe custom data.</li>
+                        <li><strong>2. Deletion:</strong> Only the (<code>dispatcher_custom_airports</code>, and <code>dispatcher_custom_fleet</code>) keys are removed from your browser's local memory.</li>
+                        <li><strong>3. Reassurance:</strong> This does not clear cookies, bookmarks, or browsing history; it only affects this specific dispatcher tool.</li>
+						<li><strong>4. What about my Logbook?:</strong> 'Reset Custom Database' only deletes custom airframes and custom airports that you have manually added. It does not clear your Logbook or remove your Owned Airport list.</li>
+                        <li><strong>5. Clean up:</strong> The interface instantly updates to reflect the empty database.</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+        <hr class="config-separator">
+        <div class="db-stats-container">
+            <div class="db-stat-item" onclick="toggleDropdown('customAirportsList')">
+                <span>📍 Saved Airports</span>
+                <span id="customAirportsCount">0</span>
+            </div>
+            <div id="customAirportsList" class="db-dropdown" style="display:none;"></div>
+            <div class="db-stat-item" onclick="toggleDropdown('savedAircraftList')">
+                <span>🛩️ Saved Aircraft</span>
+                <span id="customAircraftCount">0</span>
+            </div>
+<div id="savedAircraftList" class="db-dropdown" style="display:none;"></div>
+        </div>
+            </div>
+        </details>
+        <hr class="config-separator">
+        <details class="settings-section">
+            <summary>🔒 Permanent Database</summary>
+            <div class="settings-section-body">
+        <div class="db-stats-container permanent-db-categories">
+            <div class="db-stat-item" onclick="toggleDropdown('coreAircraftList')">
+                <span>✈️ Aircraft</span>
+                <span id="coreAircraftCount">0</span>
+            </div>
+            <div id="coreAircraftList" class="db-dropdown" style="display:none;"></div>
+            <div class="db-stat-item" onclick="toggleDropdown('coreHandcraftedList')">
+                <span>🛠️ Hand-Crafted Airports</span>
+                <span id="coreHandcraftedCount">0</span>
+            </div>
+            <div id="coreHandcraftedList" class="db-dropdown" style="display:none;"></div>
+			<div class="db-stat-item" onclick="toggleDropdown('coreThirdPartyList')">
+                <span>🛒 Third Party Airports</span>
+                <span id="coreThirdPartyCount">0</span>
+            </div>
+            <div id="coreThirdPartyList" class="db-dropdown" style="display:none;"></div>
+            <div class="db-stat-item" onclick="toggleDropdown('coreGliderportsList')">
+                <span>🪂 MSFS Gliderports</span>
+                <span id="coreGliderportsCount">0</span>
+            </div>
+            <div id="coreGliderportsList" class="db-dropdown" style="display:none;"></div>
+            <div class="db-stat-item" onclick="toggleDropdown('coreSmallDetailedList')">
+                <span>📌 MSFS Small Detailed</span>
+                <span id="coreSmallDetailedCount">0</span>
+            </div>
+            <div id="coreSmallDetailedList" class="db-dropdown" style="display:none;"></div>
+		<div class="db-stat-item" onclick="toggleDropdown('coreMilitaryList')">
+			<span>🪖 Military Bases</span> <span id="coreMilitaryCount">0</span>
+		</div>
+		<div id="coreMilitaryList" class="db-dropdown" style="display:none;"></div>
+
+		<div class="db-stat-item" onclick="toggleDropdown('coreMissionsList')">
+			<span>🎯 Missions</span> <span id="coreMissionsCount">0</span>
+		</div>
+		<div id="coreMissionsList" class="db-dropdown" style="display:none;"></div>
+            <div class="note-text settings-section-note">
+                N.B. Airports may be listed multiple times if available from different developers on different stores (e.g., Contrail, iniBuilds and ORBX).
+            </div>
+        </div>
+            </div>
+        </details>
+        <p id="appVersionLabel" aria-label="Application version"></p>
+    </div>
+    <div id="dispatchRelease" class="dispatch-release">
+        <h2>Flight Dispatch Details</h2>
+        <table class="dispatch-details-table">
+            <tr><th>Callsign</th><td><strong id="outCallsign" class="text-accent">---</strong></td></tr>
+            <tr><th>Airframe</th><td id="outAirframe"></td></tr>
+            <tr><th>Routing</th><td><strong id="outOrig"></strong> ➔ <strong id="outDest"></strong></td></tr>
+            <tr><th>Cruise Altitude</th><td id="outAlt"></span></td></tr>
+            <tr><th>Scenery Links</th><td id="outScenery"></td></tr>
+        </table>
+        <img id="outMissionImage" class="mission-image" alt="Mission Image">
+        <div id="outTicketWrap" class="ticket-note">
+            <div id="outTicket"></div>
+            <p id="heliMessage" class="heli-warning">Simbrief Dispatch is not available for this aircraft type.</p>
+        </div>
+        <div class="dispatch-actions-row dispatch-actions-below-ticket">
+            <a id="outLink" class="simbrief-btn dispatch-action-btn" href="#" target="_blank" rel="noopener noreferrer"><img src="images/icon_navi_color.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Send Plan to SimBrief</a>
+            <a id="downloadPlnBtn" class="simbrief-btn dispatch-action-btn" href="#" style="cursor: pointer;"><img src="images/MSFS2024.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Download MSFS.PLN</a>
+            <button id="logFlightBtn" type="button" class="dispatch-action-btn" style="display: none;" onclick="logCurrentFlight()">📋 Save Flight to Logbook</button>
+        </div>
+        <details class="info-details" style="margin-top: 15px;">
+            <summary>SimBrief Airport and Aircraft Profiles Notice</summary>
+            <div class="info-details-body">
+                <strong>NOTAM:</strong> Several Asobo airports use custom identifier codes instead of the real-world code. VECTOR sends the real-world identifier to SimBrief to avoid routing errors and the custom Asobo identifier code will be shown in the Job Ticket, so that you can find the airport in the MSFS 2024 world map.<br />
+				</br />Some airports and aircraft in VECTOR's database are not included in the <a href="https://www.simbrief.com/home/index.php?page=aircraft&sort=lastupdated_time" target="_blank" rel="noopener noreferrer" class="link-inline">SimBrief</a> database. To generate accurate flight plans in SimBrief, aircraft require an aircraft profile. If an airport or an aircraft is not included in the SimBrief database, and you cannot add it as a custom aircraft, you can use <a href="https://albar965.github.io/littlenavmap.html" target="_blank" rel="noopener noreferrer" class="link-inline">LittleNavMap</a> to plan and follow your flight instead. Jonathan Beckett has a comprehensive set of LNM aircraft profiles that you can purchase <a href="https://ko-fi.com/s/80ce405120" target="_blank" rel="noopener noreferrer" class="link-inline">here</a>.
+            </div>
+        </details>
+    </div>
+    <div class="footer-disclaimer">
+        <strong>Disclaimer:</strong> For flight simulation use only. Do not use for real-world aviation or dispatch. Third-party names and links belong to their respective owners.
+    </div>
+    <div class="footer-bar">
+        <div style="text-align: left;">
+           <a href="https://www.buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" class="footer-bmc">
+                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 48px !important;width: 174px !important;">
+            </a>
+        </div>
+        <div style="text-align: right;">
+            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" class="footer-readme">READ ME</a> for details.
+        </div>
+    </div>
+</div>
+</body>
+</html>
