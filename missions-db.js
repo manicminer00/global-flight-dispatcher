@@ -41,8 +41,8 @@ const LONG_HAUL_SCENARIOS_BY_MISSION = {
 
 const missionMatrix = [
     // UNIQUE MISSION TEMPLATES — one mission (imgId) each via pool "uniqueMissions"
-    { type: 1, name: "Noise Abatement Departure (EGLC)", detail: "Execute a steep climb out of EGLC.", pool: "uniqueMissions", weight: 10,  requiredDep: "EGLC", allowedAircraft: EGLC_JET_MISSION_TYPES, maxMTOW: 75500 },
-    { type: 2, name: "Noise Abatement Departure (EGNS)", detail: "Execute a steep climb out of EGNS.", pool: "uniqueMissions", weight: 10, requiredDep: "EGNS", allowedAircraft: RESTRICTED_JET_MISSION_TYPES, maxMTOW: 75500 },
+    { type: 1, name: "Noise Abatement Departure (EGLC)", detail: "Execute a steep climb out of EGLC.", pool: "uniqueMissions", weight: 5,  requiredDep: "EGLC", allowedAircraft: EGLC_JET_MISSION_TYPES, maxMTOW: 75500 },
+    { type: 2, name: "Noise Abatement Departure (EGNS)", detail: "Execute a steep climb out of EGNS.", pool: "uniqueMissions", weight: 5, requiredDep: "EGNS", allowedAircraft: RESTRICTED_JET_MISSION_TYPES, maxMTOW: 75500 },
     { type: 3, name: "Ponte Aérea Commuter", detail: "Departing SBRJ requires precision due to the short runway and surrounding terrain. Utilize maximum takeoff thrust and be prepared for an immediate tight climbing turn after rotation.", pool: "uniqueMissions", weight: 10, requiredDep: "SBRJ", allowedAircraft: ["A319", "E190", "E195"], maxMTOW: 75500 },
     { type: 4, name: "Classic Cross-Country Rally", detail: "Pushing the Comanche to its cruise limits today. Monitor your cylinder head temperatures and carefully manage your mixture to optimize fuel burn for the rally.", pool: "uniqueMissions", weight: 10, allowedAircraft: ["PA24"] },
 	{ type: 5, name: "High-Altitude Express", detail: "Take advantage of the aircraft's pressurization and climb rate to get above the regional weather systems. Keep your block time tight.", pool: "uniqueMissions", weight: 10, minAlt: 10000, rules: "IFR", allowedAircraft: ["C414", "B58T", "BE60", "STAR", "P180", "TBM8"] },

@@ -1855,8 +1855,8 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * R;
 }
 const RESTRICTED_JET_BASE_TYPES = {
-    EGLC: ["A319", "E190", "E195", "RJ70", "RJ85", "RJ1H", "RJ1F", "B461", "B462", "B463", "F70"],
-    EGNS: ["A319", "E190", "E195", "RJ70", "RJ85", "RJ1H", "RJ1F", "B461", "B462", "B463"],
+    EGLC: ["A319", "E190", "E195", "RJ70", "RJ85", "RJ1H", "RJ1F", "B461", "B462", "B462_QT", "B463", "B463_QT", "F70"],
+    EGNS: ["A319", "E190", "E195", "RJ70", "RJ85", "RJ1H", "RJ1F", "B461", "B462", "B462_QT", "B463", "B463_QT"],
     SBRJ: ["A319", "E190", "E195"]
 };
 const RESTRICTED_AIRPORT_TURBO_MAX_MTOW = 25000;
@@ -2387,7 +2387,7 @@ function dispatchContractorMissionFirst(candidatePairs, spec, type, searchClass,
     for (let attempt = 0; attempt < 12; attempt++) {
         const remaining = missionPool.filter(m => !triedTypes.has(m.type));
         if (!remaining.length) break;
-        const selectionPoolWithGuard = filterWithRecentGuard(remaining, lastMissions, m => m.type, 1);
+        const selectionPoolWithGuard = filterWithRecentGuard(remaining, lastMissions, m => m.type, 3);
         const weightedMissions = applyContractorMissionWeighting(
             applyCivilOkWeighting(selectionPoolWithGuard, spec, searchClass),
             isContractorMode
@@ -2627,7 +2627,7 @@ function dispatchFlight() {
 
     let chosenMission = preChosenMission;
     if (!chosenMission) {
-        let selectionPoolWithGuard = filterWithRecentGuard(filteredMissions, lastMissions, m => m.type, 1);
+        let selectionPoolWithGuard = filterWithRecentGuard(filteredMissions, lastMissions, m => m.type, 3);
         const weightedMissions = applyContractorMissionWeighting(
             applyCivilOkWeighting(selectionPoolWithGuard, spec, searchClass),
             isContractorMode
@@ -2636,7 +2636,7 @@ function dispatchFlight() {
         chosenMission = pickedEntry ? pickedEntry.mission : filteredMissions[0];
     }
     lastMissions.push(chosenMission.type);
-    if (lastMissions.length > 1) lastMissions.shift(); 
+    if (lastMissions.length > 3) lastMissions.shift(); 
 
     // --- PHASE 3: APPLY MISSION OVERRIDES ---
     if (chosenMission.minAlt) spec.minAlt = Math.max(spec.minAlt, chosenMission.minAlt);
@@ -2946,17 +2946,8 @@ function dispatchFlight() {
     document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
     
     const missionImgEl = document.getElementById("outMissionImage");
-    const templateFallbackFile = (chosenMission.type >= 13 && chosenMission.type <= 32)
-        ? `mission${chosenMission.type}.jpg`
-        : "";
-    const templateFallback = templateFallbackFile ? missionImageUrl(templateFallbackFile) : "";
     missionImgEl.onerror = function () {
-        if (templateFallbackFile && !missionImgEl.src.includes(templateFallbackFile)) {
-            missionImgEl.onerror = null;
-            missionImgEl.src = templateFallback;
-        } else {
-            missionImgEl.style.display = "none";
-        }
+        missionImgEl.style.display = "none";
     };
     missionImgEl.src = missionImageUrl(`mission${imageId}.jpg`);
     missionImgEl.style.display = "block";
