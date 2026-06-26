@@ -1,0 +1,893 @@
+ED45 Oppingen-Au Airfield
+ED47 Roßfeld Airfield
+ED48 Schwann-Conweiler Airfield
+ED50 Boberg Airfield
+ED52 Schreckhof Airfield
+ED61 Heilbronn-Bockingen Airfield
+ED62 Mulben Airfield
+ED69 Mittelfischach UL
+ED70 Munsingen-Eisberg Airfield
+ED71 Crawinkel
+ED72 Gopfersdorf Airfield
+ED80 Segelfluggelande Haiterbach
+ED81 Flugplatz Riedlingen
+ED83 Hayingen Airfield
+ED84 Hilzingen Airfield
+ED85 Malmsheim Airfield
+ED86 Rastatt Airfield
+ED90 UL-Flugplatz Imsweiler-Donnersberg
+ED91 Isny Glider Field
+ED92 Leuzendorf Glider Field
+ED93 Schafhalde Airfield
+ED94 Sinsheim Airfield
+ED98 Segelflugplatz Iserlohn-Summern
+EDAA Aichach Airport
+EDAD Dessau
+EDAE Eisenhuttenstadt
+EDAG Grossruckerswalde
+EDAN Neustadt-Glewe
+EDAO Nordhausen
+EDAR Pratzschwitz
+EDAS Heinrichsruh
+EDAT Nardt
+EDAW Roitzschjora
+EDBA Wulfershausen
+EDBB Altotting Airfield
+EDBE Muehlenfeld
+EDBI Zwickau
+EDBJ Schongleina
+EDBK Kyritz
+EDBL Laucha
+EDBP Pinnow
+EDBQ Bronkow
+EDBU Sommersberg
+EDBV Stralsund
+EDBX Gorlitz
+EDBY Schmoldow
+EDBZ Scharzheide/Schipkau
+EDCA Anklam
+EDCB Ballenstedt
+EDCC Cham-Janahof Airfield
+EDCE Eggersdorf
+EDCG Rugen
+EDCI Klix
+EDCK Kothen
+EDCM Kamenz
+EDCQ Aschersleben
+EDCS Saarmund
+EDCT Taucha
+EDCU Gustrow
+EDCV Pasewalk
+EDCW Wismar
+EDCX Purkshof
+EDCZ Antersberg Airfield
+EDDA Benediktbeuern Airfield
+EDDJ Oeventrop Airfield
+EDDO Agathazell Airfield
+EDDQ Großes Moor Airfield
+EDDU Holtorfsloh Airfield
+EDDX Bad Zwischenahn - Rostrup Airfield
+EDDY Steinberg at Wessein Airfield
+EDDZ Buckeburg-Weinberg Airfield
+EDEA Wenzendorf Airfield
+EDEB Bad Langensalza
+EDEC Amoneburg Airfield
+EDED Erbendorf Airfield
+EDEE Altfeld Airport
+EDEG Gotha-Ost
+EDEH Herrenteich
+EDEI Hienheim Airfield
+EDEJ Aßlarer Hutte Airfield
+EDEK Braunfels Airfield
+EDEL Langenlonsheim
+EDEM Mosenberg
+EDEN Bad Hersfeld
+EDEP Heppenheim
+EDEQ Muhlhausen
+EDER Wasserkuppe
+EDET Gießen Airfield
+EDEU Bensheimer Stadtwiessen Airfield
+EDEV Pfingstweide Airfield
+EDEW Walldurn
+EDEX Platzer Airfield
+EDEY Stauffenbuhl Airfield
+EDEZ Michelbach Airfield
+EDFA Anspach/Taunus
+EDFC Aschaffenburg
+EDFD Grasberg
+EDFF Brannenburg Airfield
+EDFG Gelnhausen
+EDFI Hirzenhain
+EDFJ Lager Hammelburg
+EDFK Bad Kissingen
+EDFL Lutzellinden
+EDFN Marburg-Schonstadt
+EDFP Ober-Morlen
+EDFQ Allendorf/Eder
+EDFR Rothenburg O.D. Tauber
+EDFS Schweinfurt Sud
+EDFU Mainbullau
+EDFV Worms
+EDFW Schenkenturm
+EDFX Hockenheim
+EDFY Elz
+EDGA Ailertchen
+EDGB Breitscheid
+EDGD Füssen Glider Airfield
+EDGF Fulda-Jossa
+EDGG Geitau Airfield
+EDGH Hettstadt
+EDGI Buhlhof
+EDGJ Ochsenfurt
+EDGK Korbach
+EDGP Oppenheim
+EDGQ Schameder
+EDGR Giessen-Reiskirchen
+EDGT Bottenhorn
+EDGU Unterschupf
+EDGV Greding Airfield
+EDGW Graner Berg
+EDGX Walldorf
+EDGY Greiling Airfield
+EDGZ Weinheim/Bergstrasse
+EDHB Grube
+EDHC Rehbeck
+EDHD Eichsfeld
+EDHE Uetersen
+EDHH Hallertau Airfield
+EDHJ Alte Ems Airfield
+EDHN Neumunster
+EDHQ Hellenhagen Airfield
+EDHR Hersbruck Airfield
+EDHS Stade
+EDHT Wulzburg Airport
+EDHU Lauenbruck
+EDHV Rote Wiese Glider Field
+EDHW Wahlstedt
+EDHY Hoya Airfield
+EDIA Bisperode Airfield
+EDIB Bohlenbergerfeld Airfield
+EDIC Bollrich Airfield
+EDID Weper Airfield
+EDIE Der Dingel" Airfield"
+EDIF Gedern Airfield
+EDIG Edermunde-Grifte Airfield
+EDIH Hessisch Lichtenau Airfield
+EDIJ Johannisau Airfield
+EDIK Homberg/Ohm Airfield
+EDIL Fichtelbrunn Airfield
+EDIM Oberems Airfield
+EDIN Arnsberg-Ruhrwiese Airfield
+EDIO Bergheim Airfield
+EDIP Buren Airfield
+EDIQ Dorsten Airfield
+EDIR Duren-Hurtgenwald Airfield
+EDIS Emmerich Airfield
+EDISS Parchim
+EDIT Gustorfer Hohe Airfield
+EDIU Hengsen-Opherdicke Airfield
+EDIUY Schnuckenheide-Repke
+EDIV Stolberg-Diepenlinchen Airfield
+EDIW Iserlohn-Rheinermark Airfield
+EDIX Aukrug Airfield
+EDJD Meiersberg Airfield
+EDJE Segelfluggelande Lochgau
+EDJF Wanlo Airfield
+EDJH Vinsebeck Airfield
+EDJJ Bad Waldsee-Reute
+EDJQ Heiligenberg
+EDJS Irsingen-Hesselberg
+EDJT Landau-Ebenberg
+EDJU Klippeneck Airfield
+EDJV Nastatten Airfield
+EDJW Montabaur Airfield
+EDJX Neu-Gulze Airfield
+EDJY Monchsheide Airfield
+EDJZ Grambeker Heide Airfield
+EDKB Hangelar
+EDKD Hegenscheid
+EDKE Dobenreuth Airfield
+EDKF Auf Dem Dumpel
+EDKG Königsdorf Gliding Center
+EDKH Hunsborn
+EDKI Betzdorf-Kirchen
+EDKJ Langenberg Airfield
+EDKK Kamen-Heeren Airfield
+EDKL Leverkusen
+EDKM Schuren
+EDKN Neye
+EDKO Brilon/Hochsauerlandkreis Airfield
+EDKP Plettenberg-Huinghausen
+EDKR Schmallenberg-Rennefeld
+EDKRB Merkers Mine Experience
+EDKS Karlstadt-Saupurzel Airport
+EDKT Kell Airfield
+EDKU Attendorn-Finnentrop
+EDKV Dahlemer Binz
+EDKW Kuntrop
+EDKX Segelflugplatz Konz-Konen
+EDKY Kilegg Airfield
+EDKZ Meinerzhagen
+EDLA Menden
+EDLB Borkenberge
+EDLC Kamp-Lintfort
+EDLF Grefrath-Niershorst
+EDLG Asperden
+EDLH Lippewiesen
+EDLI Bielefeld
+EDLJ Detmold
+EDLK Egelsberg
+EDLL Am Salzgittersee Airfield
+EDLM Loemuhle
+EDLO Oerlinghausen
+EDLR Haxterberg
+EDLS Vreden
+EDLT Munster-Telgte
+EDLX Romerwardt
+EDLY Borken-Hoxfeld
+EDLZ Bad Sassendorf
+EDMC Blaubeuren
+EDMD Dachau-Grobenried
+EDMF Furstenzell
+EDMG Donauried
+EDMH Reutberg
+EDMI Illertissen
+EDMJ Jesenwang
+EDMK Durach
+EDMM Kronach Airfield
+EDMR Bischofsberg Airfield
+EDMT Tannheim
+EDMU Gundelfingen
+EDMV Vilshofen
+EDMW Deggendorf
+EDMY Muhldorf
+EDMZ Hellingst Airfield
+EDNB Arnbruck
+EDNC Beilngries
+EDNE Erbach
+EDNG Giengen/Brenz
+EDNH Bad Worishofen-Nord
+EDNJ Neuburg-Egweil
+EDNL Unterzeil
+EDNN Segelfluggelande Farrenberg
+EDNO Nordlingen
+EDNP Pfarrkirchen
+EDNQ Bopfingen
+EDNR Oberhub
+EDNS Schwabmunchen
+EDNT Treuchtlingen-Bubenheim
+EDNU Thannhausen
+EDNV Vogtareuth
+EDNW Weissenhorn
+EDNX Oberschleissheim
+EDNZ Haidberg
+EDOB Bad Berka
+EDOC Gardelegen
+EDOD Reinsdorf
+EDOF Bad Frankenhausen
+EDOH Langennersdorf
+EDOI Bienenfarm
+EDOJ Lusse
+EDOK Rudolstadt-Groschwitz
+EDOL Oschersleben
+EDONR Ochsenhausen
+EDONT Bei Hattorf
+EDOO Altdorf-Hagenhausen Airfield
+EDOPM Berneck
+EDOPS Kammermark
+EDOQ Oschatz
+EDOR Stoelln/Rhinow
+EDOS Pennewitz
+EDOSN Sassberg Glider Field
+EDOSV Stillberghof
+EDOT Obergrochlitz
+EDOV Stendal-Borstel
+EDOW Vielist
+EDOX Renneritz
+EDOZ Schonebeck-Zackmunde
+EDPA Elchingen
+EDPB Bad Ditzenbach
+EDPC Jolling
+EDPD Dingolfing
+EDPE Eichstatt
+EDPF Schwandorf
+EDPH Heidenberg
+EDPI Moosburg auf der Kippe
+EDPJ Laichingen
+EDPK Schonberg
+EDPL Ohlstadt Airfield
+EDPM Donzdorf
+EDPMH Lunen-Lippeweiden
+EDPMR Hulben
+EDPN Paterzell Airfield
+EDPNR Bad Bruckenau-Oberleichtersbach
+EDPOP Aventoft
+EDPP Rammertshof Amberg Airfield
+EDPPM Locktow
+EDPT Gerstetten
+EDPU Amalienhof
+EDPV Buchig Airfield
+EDPW Thalmassing-Waizenhofen
+EDPX Oberhinkofen Airfield
+EDPY Ellwangen
+EDPZ Ottenberg Airfield
+EDQA Bamberg AAF
+EDQB Bad Windsheim
+EDQC Brandensteinsebene
+EDQD Bayreuth
+EDQE Burg Feuerstein
+EDQF Petersdorf
+EDQG Giebelstadt AAF
+EDQH Herzogenaurach
+EDQI Lauf-Lillinghof
+EDQJ Große Hohe Airfield
+EDQK Kulmach
+EDQL Lichtenfels
+EDQM Hof-Plauen
+EDQN Neustadt/Aisch
+EDQO Ottengruner Heide
+EDQQ Große Wiese Airfield
+EDQR Ebern-Sendelbach
+EDQS Goldlauter
+EDQU Oppershausen Airfield
+EDQW Weiden
+EDQX Hetzleser Berg
+EDQY Steinrucken
+EDQZ Zipser Berg
+EDRA Bad Neuenahr-Ahrweiler Airfield
+EDRC Gronau Airfield
+EDRD Neumagen-Dhron
+EDRF Bad Durkheim
+EDRG Gottschied
+EDRI Linkenheim
+EDRM Mont Royal
+EDRN Nannhausen
+EDRQ Quakenbruck Airfield
+EDRR Osterholz-Scharmbeck Airfield
+EDRS Bad Sobernheim-Domberg
+EDRSG Sundern-Seidfeld
+EDRT Fohren
+EDRU Peine-Glindbruchkippe Airfield
+EDRV Wershofen/Eifel
+EDRW Wienau
+EDRX Neunkirchen-Bexbach Airport
+EDSA Degerfeld
+EDSC Hopen Airfield
+EDSD Am Kreuzberg Glider Field
+EDSER Scheuen Celle
+EDSF Furth-Seckendorf Airfield
+EDSG Grabenstetten
+EDSH Backnang-Heiningen
+EDSI Binningen
+EDSJ Berliner Heide Airfield
+EDSK Kehl-Sundheim
+EDSL Blumberg
+EDSM Stude Bernsteinsee Airfield
+EDSO Nortel
+EDSP Poltringen Airport
+EDSQ Dornberg-Sontra Airfield
+EDSR Stahringen
+EDSS Zellhausen
+EDST Hahnweide
+EDSU Steinberg in Surwold Glider Airfield
+EDSV Waechtersberg
+EDSW Altdorf-Wallburg
+EDSX Horbach Airfield
+EDSY Huhnrain Airfield
+EDSZ Zepfenhan
+EDTA Eibinger Forstwiese Airfield
+EDTB Oos
+EDTC Bruchsal
+EDTD Donaueschingen-Villingen
+EDTE Eutingen Im Gaeu
+EDTF Freiburg/Breisgau
+EDTG Bremgarten
+EDTI Tirschenreuth Airfield
+EDTJ Langenselbold Airfield
+EDTK Forchheim
+EDTN Nabern/Teck
+EDTP Pfullendorf
+EDTQ Pattonville
+EDTSM Wildberg Glider Airfield
+EDTT Tröstau Glider Field
+EDTU Saulgau
+EDTV Laufenselden Airfield
+EDTW Winzeln-Schramberg
+EDTZ Konstanz
+EDUA Ferchesar
+EDUC Utscheid Segelflugplatz
+EDUD Reinheim Airfield
+EDUE Unterwssen Airfield
+EDUG Pohlheim Airfield
+EDUH Rothenberg Airfield
+EDUI Schotten Airfield
+EDUIN Kleve-Wisseler Dunen
+EDUJ Nidda Airfield
+EDUK Vielbrunn Airfield
+EDUL Uslar Airfield
+EDUM Ummern Airfield
+EDUN Geratshof Airfield
+EDUP Ziegenhain Airfield - Der Ring
+EDUQ Borghorst Airfield
+EDUR Hoherodskopf Airfield
+EDUU Dsseldorf-Wolfsaap Airfield
+EDUX Langenfeld Airfield
+EDUZ Zerbst
+EDVA Bad Gandersheim
+EDVB Lindlar Airfield
+EDVC Arloh
+EDVD Segelfluggelande Altenbachtal
+EDVF Blomberg-Borkhausen
+EDVH Hodenhagen
+EDVI Hoxter-Holzminden
+EDVJ Schaferstuhl
+EDVK Calden
+EDVL Holleberg
+EDVN Northeim
+EDVO Dehausen Airfield
+EDVQ Wilsche
+EDVR Rinteln
+EDVS Drutte
+EDVT Ithwiesen
+EDVU Uelzen
+EDVV Kerken UL
+EDVW Bad Pyrmont
+EDWC Damme
+EDWEB Meidelstetten Gliderfield
+EDWG Wangerooge
+EDWN Lingen
+EDWO Atterheide
+EDWQ Atlas Airfield
+EDWT Blexen
+EDWU Varrelbusch
+EDWV Scharnhorst
+EDWW Warngau Airfield
+EDWX Westerstede-Felde
+EDXA Achmer
+EDXC Schleswig-Kropp
+EDXD Bad Essen
+EDXE Eschendorf
+EDXF Schaferhaus
+EDXG Melle-Gronegau
+EDXI Nienburg-Holzbalge
+EDXM St Michaelisdonn
+EDXO St Peter-Ording
+EDXR Schachtholm
+EDXU Huttenbusch
+EDXV Berlinchen Airfield
+EDXX Witzenhausen-Burgberg Airport
+EDYA Brockzetel Airfield
+EDYB Tarmstedt Airfield
+EDYC Walsrode Airfield
+EDYD Garbenheimer Wiesen Airfield
+EDYE Eudenbach Glider Field
+EDYF Riedelbach Airfield
+EDYG Welzheim Airfield
+EDYI Menden-Barge Airfield
+EDYK Siegen-Eisernhardt Airfield
+EDYL Warburg Airfield
+EDYM Weipertshofen Airfield
+EDYN Ludwigshafen Airfield
+EDYO Waldeck Airfield
+EDYR Ehingen-Schlechtenfeld
+EDYS Riesa-Canitz Airfield
+EDYSN Gammelsdorf
+EDYT Grunstadt Airfield
+EDYTR Sultmer Berg
+EDYW Wildberg
+EDYX Volkleshofen Airfield
+EDYY Vaihingen an der Enz Airfield
+EDZA Ubersberg Airfield
+EDZB Titschendorf Airfield
+EDZC Tauberbischofsheim Airfield
+EDZD Singhofen Airfield
+EDZG Aero-Club Perleberg e.V.
+EDZI Zierenberg Airfield
+EDZJ Kusel-Langenbach Airfield
+EDZK Klein Gartz Airfield
+EDZL Kirn Airfield
+EDZM Fischbek Airfield
+EDZN Eßweiler Airfield
+EDZO Flugplatz Daun
+EDZQ Dillingen Airfield
+EDZS Bundenthal-Rumbach Airfield
+EDZT Esslingen-Jagerhaus Airfield
+EDZU Bad Marienberg Airfield
+EDZV Baumerlenbach Airfield
+EDZW UL-Flugplatz Auf der Schaufel
+EFME Menkijarvi
+EFNU Nummela
+EFSO Sodankyla
+EG3L Milfield Glider Field
+EG50 Eight Ash Green Airport
+EGAI Yorkshire Gliding Club
+EGAP Skelling Farm Airstrip
+EGBG Leicester Airport
+EGBH Dorset Gliding Club (Eyres Field)
+EGBI Bidford Airfield
+EGBS Shobdon
+EGBY Burn Airfield
+EGCJ Sherburn-in-Elmet
+EGCR Aston Down Airfield
+EGDB Hinton-in-the-Hedges Airfield
+EGDD Bicester Airfield
+EGDH Channel Gliding Club
+EGDJ1 Upavon
+EGFTR Chipping
+EGGY Falgunzeon Glider Field
+EGHU Eaglescott
+EGHV Camphill Airfield
+EGIG Seighford Airfield
+EGIU RAF Weston-on-the-Green
+EGIV RAF Keevil
+EGIW Shenington Gliding Club
+EGJD Lleweni Parc Glyndwr Soaring Club
+EGJL Easteron Glider Field
+EGKC Bognor Regis
+EGKE Challock Airfield
+EGKN Kenley Aerodrome
+EGKW RAF Kirknewton Air Base
+EGKX Kirton-in-Lindsey Glider Field
+EGLV Bellarena
+EGME Bath Wilts & North Dorset Gliding Club
+EGMMK Tuxford Road Darlton Gliding
+EGMW North Wales Gliding Club
+EGMX South Wales Gliding Club
+EGNCG Currock Hill
+EGNMH Dunstable Downs
+EGNP Midland Glider Club
+EGOF Norfolk Glider Club
+EGOPK Sackville Farm
+EGPPO Lyveden
+EGPUD Kitson Field / Ringmer
+EGQJ Pocklington Airfield
+EGRM Upwood Glider Field
+EGSER Halesland
+EGSIN Ridgewell
+EGSM Beccles
+EGSOL Talgarth
+EGSON North Hill
+EGSZ Bristol and Gloucestershire Gliding Club
+EGTP Perranporth
+EGTV Brent Tor Airfield
+EGUG Sandhill Farm Airstrip
+EGVM Shifnal Airfield
+EGVP Middle Wallop Army
+EGVS Southdown Gliding Club
+EGVV Stratford-upon-Avon Gliding Club
+EGWER Gransden Lodge
+EGWN Halton AB
+EGXCS Postland / Spalding (Crowland)
+EGXY Syerston
+EGXZ Topcliffe AB
+EGYB Rattlesden
+EGYD Cranwell AB
+EGYI Strubby
+EGYV Portmoak Glider Field
+EGZE Saltby Glider Field
+EGZL Feshiebridge Airfield
+EGZM Aboyne Airfield
+EGZN Rivar Hill Glider Field
+EHAX Axel Glider Airfield
+EHBE Maldens Vlak Glider Field
+EHBI Glider Field Biddinghuizen
+EHCA Glider Field Castricum
+EHNO Langeveld Glider Field
+EHVE Veendam Glider Site
+EHVN Venlo Airfield
+EHVO Glider Field De Voorst
+EIGN Gowran Grange Aerodrome
+EIKH Kildare Aerodrome
+EIOHR Cloneygath Airfield
+EKBA Bolhede Glider Field
+EKFI Frederikssund Nord Glider Field
+EKFS Vjstrup Glider Field
+EKGL Gørløse Glider Field
+EKHM Hammer Glider Field
+EKHO Holstebro Glider Field
+EKKS Kongsted Svveflyveplads Glider
+EKTD Tonder
+EKVE Gesten Glider Field
+EKVI Ejstruphede Glider Field
+ELUS Useldange Glider
+ELZC Glider Site Schinveld
+EMSUI Slootdorp Glidersite
+ENFG Leirin
+ENLN Ler Airfield
+ENLU Lunde Nome Airfield
+ENSD Anda
+EPKP Pobiednik Wielki
+EPOMY Wieringermeer Glider Field
+EPZR Zar
+ESPMY Odestugu Glider Field
+ETT1 Etting-Adelmannsberg Glider Field
+FA42 Sheets
+FAOHR Kroonstad Glider Field
+FAOI Orient Glider Airport
+FATW Tswalu Game Reserve
+FAWC Worcester Glider Airport
+FYPO Pokweni Glider Airport
+H07 Highland-Winet
+I64 Wakeman
+I99 Alexandria
+ID36 Murray
+Il59 Chicago Glider Club
+K34 Gardner Mun
+KAQW Harriman and West
+KBTA Blair Mun
+KCBK Shalz
+KCZG Tri-Cities
+KFRR Front Royal-Warren Co
+KLXV Lake Co
+KRFG Rooke
+KSCD Merkel Sylacauga Mun
+KSYN Stanton
+KWAY Greene Co
+LA54 Gilliam
+LCYSH Cyprus Gliding Club
+LDRG Grobnicko Polje
+LDRO Otocac
+LDSS Sinj
+LECA La Nava - Corral De Aylln Airport
+LECF Calaf-Sallavinera Airport
+LEJE Aeródromo Juan Espadafor
+LEMW Aeródromo de Jaen - Las Infantas
+LENV Aeròdrom del Pla de Bages
+LEPSD Mollerussa UL
+LERM Robledillo De Mohernando
+LETD Aeroclub l’Estartit
+LEUM Aeródromo de Lumbier
+LF0429 Sainte Croix sur Verdon
+LFAD Margny
+LFAM Berck sur Mer
+LFAO Couterne
+LFAQ Bray
+LFAS Monts D'Eraines
+LFAU Vauville
+LFBK Montlucon-Gueret
+LFBN Souche
+LFBS Parentis
+LFBU Brie-Champniers
+LFBX Bassillac
+LFCB Bagneres de Luchon
+LFCE Saint Laurent
+LFCG Antichan
+LFCM Larzac
+LFCO Herrere
+LFCS Leognan-Saucats
+LFCT Thouars
+LFCX Moissac
+LFDA Aire-sur-l'Adour
+LFDF Sainte Foy la Grande
+LFDM Virazeil
+LFDN St Agnant
+LFDT Laloubere
+LFDW Chauvigny
+LFEB Trelivan
+LFEF Dierre
+LFEK Le Fay
+LFEM Vimory
+LFET Til-Chatel
+LFEU Les Hauts de Chee
+LFEV Saint Adrien
+LFEY Le Grand Phare
+LFEZ Malzeville
+LFFB Buno Bonnevaux
+LFFC Cherence
+LFFJ Mussey
+LFFK Fontenay-le Comte
+LFFL Bailleau Armenonville Airfield
+LFFT Neufchateau
+LFFV Mereau
+LFFW St Georges
+LFFZ St Remy
+LFGB Habsheim
+LFGC Neuhof
+LFGG Chaux
+LFGP Cheu
+LFGU Neunkirch
+LFHD Pierrelatte
+LFHE Saint Paul
+LFHG L'Horme
+LFHN Vouvray
+LFHQ Coltines
+LFHR Beaumont
+LFHS Ceyzeriat
+LFID Valence-sur-Baise
+LFIF Belmont
+LFIL Rion Des Landes
+LFIM Montrejeau
+LFIT Bourg-St Bernard
+LFIX Itxassou
+LFJF Aubenasson
+LFJH Palaminy
+LFJR Marce
+LFJS Courmelles
+LFJT Le Louroux
+LFKD Sollieres Sardieres
+LFKG Alzitone
+LFKI Aron Airport
+LFKN Eauze Airport
+LFKP La Tour Du Pin Airfield
+LFLN St Yan
+LFLO Renaison
+LFLR St Rambert d'Albon
+LFLZ Chambeon
+LFMF Fayence
+LFMG La Montagne Noire
+LFMU Vias
+LFMX St Auban
+LFMZ Lezignan-Corbieres
+LFNB Brenoux
+LFNC Saint Crepin
+LFNF Vinon
+LFNH Carpentras
+LFNJ Aspres Sur Buech
+LFNL St Martin De Londres
+LFNN Narbonne
+LFNO Florac Ste Enimie Airport
+LFNQ La Quillane
+LFNS Vaumeilh
+LFNT Pujaut
+LFNW Puivert
+LFNX La Tour-Sur-Orb
+LFNY St Etienne En Devoluy Airport
+LFNZ Le Mazet De Romanin Airport
+LFOD St Florent
+LFOF Valframbert
+LFOL Saint Michel
+LFOR Champhol
+LFOW Roupy
+LFOY Saint Romain
+LFOZ St Denis de l'Hotel
+LFPF Thiverval
+LFPK Voisins
+LFPU Episy
+LFQC Croismare
+LFQD Roclincourt
+LFQH Chatillon-sur-Seine
+LFQK Ecury-sur-Coole
+LFQM La Veze
+LFQW Frotey
+LFRP Loyat
+LFRW Le Val St Pere
+LFSA Thise
+LFSE Dogneville
+LFSP Pontarlier
+LFSS Saint Sulpice des Landes
+LFSU Langres-Rolampont
+LFSV Pont St Vincent
+LFTM Montsaleon
+LFTN La Grand'Combe
+LFUK La Motte du Caire Glider Field
+LFUP Seyne les Alpes Glider Field
+LFXB Thenac AB
+LFYG Niergnies AB
+LFZY Saint-Hilaire-Saint-Mesmin Airport
+LHGO Atkár Margit-kút
+LIAA Aviosuperficie Alvaro Leonardi
+LIAF Foligno
+LIAL Sant’Illuminato
+LIEH Aviosuperficie Olivola
+LIFF Agriturismo Podere Santa Apollonia
+LIHP Aviosuperficie Serristori
+LILB Alzate Brianza Airport
+LILC Calcinate Del Pesce
+LILO Sondrio Caiolo Airport
+LIMA Aeritalia
+LIPN Boscomantico
+LIQB Arezzo
+LIVD Dobbiaco - Toblach Airport
+LJMS Murska Sobota Airport
+LKBA Breclav
+LKHN Hranice
+LKKT Klatovy
+LKKY Kyjov
+LKLN Line
+LKPL Letkov
+LKRY Rokycany
+LLMG Meddido Mil
+LOAS Spitzerberg Airport
+LOGF Fuerstenfeld Airport
+LOGG Punitz-Gussing
+LOIH Dornbirn
+LRSA Aerodromul Sânpetru-Brașov
+LSGY Yverdon-Les-Bains
+LSZF Birrfeld
+LSZG Grenchen
+LZHR Cerin-Cacin Airstrip
+LZNZ Nove Zamky
+LZOC Hrochot,Slovakia Airport
+LZPT Male Bielice
+LZRY Raznany
+MT48 Flying Y Ranch
+N82 Wurtsboro-Sullivan Co
+P15 Brokenstraw
+RCYSU Mingli Gliderport
+RJBD2 Nagano City Gliderport
+RJBET Kuju Gliderport
+RJBNV Menuma Gliderport
+RJCTO Shinshinotsu Gliderport
+RJCUJ Kirigamine Gliderport
+RJCUN Yoshiigawa Eku Gliderport
+RJDOP Biei Gliderport
+RJEER Ichishicho Gliderport
+RJERE Nirasaki Gliderport
+RJETY Hanyu Gliderport
+RJKND Hoshubana Gliderport
+RJLKO Tohma Gliderport
+RJMLX Fukagawa Gliderport
+RJMSJ Kushidagawa Gliderport
+RJNWE Oyama Kinu Gliderport
+RJPPO Kisogawa Gliderport
+RJPPR Makado Gliderport
+RJRGT Haneda Gliderport
+RJRPE Tsukuba Gliderport
+RJSEP Hamakita Gliderport
+RJSOR Menuma Gliderport #2
+RJSSE Sekiyado Gliderport
+RJSSK Makabe Gliderport
+RJT1 Itakura Gliderport
+RJXXC Kinugawa Gliding Field
+RJZCD Ono Gliderport
+RPJST Gliders Philippines
+S36 Grier
+SAOL Laboulaye
+SAZC Zarate Airport
+SAZE Pigue
+SBAQ Araquara
+SBAX Araxa
+SBBU Bauru
+SBCH Chapeco
+SBGW Guaratingueta
+SBIX Clube CEU Airport
+SBLF Goianira Airport
+SBNJ Barreiras Airport
+SBPC Pocos De Caldas
+SBPN Porto Nacional
+SBUG Rubem Berta Intl
+SBYS Campo Fontenelle
+SC79 Bermuda High
+SCOM Olmué Airport
+SOUNR Bahia Gliding
+South America
+TE71 Ghsa-Wallis Gliderport
+TX23 Flf
+U14 Nephi Mun
+UAZV Azov Airport
+UGIZ Gizel’ Airport
+UKVZ Buzova Glider Field
+ULRH Krasnyy Kurgan Airport
+UMOPS Novosibirsk Glider Strip
+UPAA Borki Airfield
+UPOI Podosinki Airport
+URME Yessentuki Airport
+USEG Vikhrevo Airfield
+USRER Aeroklub Almi
+UUBM Myachkovo Airport
+UUEH Istra Airport
+UUYE Uyemskiy Airport
+VA85 New Castle Intl
+VG22 Rockfish Arpk
+W73 Mid-Atlantic Soaring Center
+WAKIF Citeurup Paraglider Airport
+WN76 Bergseth Field
+YBEV Beverley Airport
+YBLA Benalla
+YBSP Bond Springs Airport
+YBUY Bunyan Airfield
+YCAB Caboolture Airport
+YCUN Cunderdin
+YGCR Gloucester Airport
+YILW Inglewood Airport
+YKEP Lake Keepit Airport
+YMGF Sunraysia Gliding Club
+YMVM Mangrove Mountain Airport
+YRYW Epsom Airport
+YSCN Camden
+YSFL Stonefield Gliding
+YTMU Tumut
+YTWG Lockyersleigh Field
+YTYH Tyagarah Airport
+YWKI Waikerie
+YWKW Warkworth Airport

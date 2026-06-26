@@ -1,0 +1,2967 @@
+{
+  "schema": 1,
+  "airports": {
+    "airports-db-gliders.js": {
+      "verified": true,
+      "verifiedAt": "2026-06-25T07:25:42Z",
+      "checksum": "6a5a97082e4dce0094a6f6f34849b6fff6997565fe2244f1058cfecbcefff306",
+      "entryCount": 345,
+      "entries": {
+        "03G": true,
+        "0PA0": true,
+        "14OI": true,
+        "1CD4": true,
+        "20H9": true,
+        "3IL1": true,
+        "4AR5": true,
+        "4CO2": true,
+        "4DRTG": true,
+        "4NY8": true,
+        "50M": true,
+        "55LL": true,
+        "79N": true,
+        "92A": true,
+        "AZ67": true,
+        "AZ86": true,
+        "CA69": true,
+        "CA84": true,
+        "CCN4": true,
+        "CEH2": true,
+        "CL35": true,
+        "CN12": true,
+        "CNV4": true,
+        "CPC3": true,
+        "CPL3": true,
+        "CSL7": true,
+        "CYBS": true,
+        "E68": true,
+        "EBKH": true,
+        "EBSH": true,
+        "EBTX": true,
+        "EBTY": true,
+        "EBZH": true,
+        "EBZW": true,
+        "ED10": true,
+        "ED21": true,
+        "ED22": true,
+        "ED23": true,
+        "ED28": true,
+        "ED31": true,
+        "ED33": true,
+        "ED34": true,
+        "ED35": true,
+        "ED36": true,
+        "ED37": true,
+        "ED38": true,
+        "ED39": true,
+        "ED42": true,
+        "ED43": true,
+        "ED44": true,
+        "ED45": true,
+        "ED47": true,
+        "ED50": true,
+        "ED52": true,
+        "ED61": true,
+        "ED62": true,
+        "ED70": true,
+        "ED71": true,
+        "ED72": true,
+        "ED80": true,
+        "ED81": true,
+        "ED83": true,
+        "ED84": true,
+        "ED86": true,
+        "ED91": true,
+        "ED92": true,
+        "ED93": true,
+        "ED98": true,
+        "EDAA": true,
+        "EDAG": true,
+        "EDBB": true,
+        "EDBE": true,
+        "EDCC": true,
+        "EDDA": true,
+        "EDDJ": true,
+        "EDDO": true,
+        "EDDQ": true,
+        "EDDU": true,
+        "EDDX": true,
+        "EDDY": true,
+        "EDDZ": true,
+        "EDEA": true,
+        "EDEC": true,
+        "EDED": true,
+        "EDEE": true,
+        "EDEI": true,
+        "EDEJ": true,
+        "EDEK": true,
+        "EDEM": true,
+        "EDEP": true,
+        "EDER": true,
+        "EDET": true,
+        "EDEU": true,
+        "EDEV": true,
+        "EDEX": true,
+        "EDEY": true,
+        "EDEZ": true,
+        "EDFF": true,
+        "EDGD": true,
+        "EDGG": true,
+        "EDGV": true,
+        "EDGY": true,
+        "EDHH": true,
+        "EDHQ": true,
+        "EDHR": true,
+        "EDHT": true,
+        "EDHV": true,
+        "EDHY": true,
+        "EDIA": true,
+        "EDIB": true,
+        "EDIC": true,
+        "EDIE": true,
+        "EDIF": true,
+        "EDIH": true,
+        "EDIJ": true,
+        "EDIK": true,
+        "EDIM": true,
+        "EDIN": true,
+        "EDIO": true,
+        "EDIP": true,
+        "EDIQ": true,
+        "EDIR": true,
+        "EDIV": true,
+        "EDIW": true,
+        "EDIX": true,
+        "EDJE": true,
+        "EDJF": true,
+        "EDJQ": true,
+        "EDJU": true,
+        "EDJV": true,
+        "EDJX": true,
+        "EDJY": true,
+        "EDKE": true,
+        "EDKG": true,
+        "EDKK": true,
+        "EDKS": true,
+        "EDKT": true,
+        "EDKX": true,
+        "EDKY": true,
+        "EDLA": true,
+        "EDNN": true,
+        "EDOL": true,
+        "EDOPM": true,
+        "EDOPS": true,
+        "EDOSN": true,
+        "EDPMH": true,
+        "EDPMR": true,
+        "EDPV": true,
+        "EDQJ": true,
+        "EDQQ": true,
+        "EDQU": true,
+        "EDRQ": true,
+        "EDRR": true,
+        "EDRX": true,
+        "EDSC": true,
+        "EDSD": true,
+        "EDSER": true,
+        "EDSI": true,
+        "EDSM": true,
+        "EDSQ": true,
+        "EDSU": true,
+        "EDSV": true,
+        "EDTA": true,
+        "EDTK": true,
+        "EDTSM": true,
+        "EDTT": true,
+        "EDTV": true,
+        "EDUC": true,
+        "EDUD": true,
+        "EDUH": true,
+        "EDUI": true,
+        "EDUJ": true,
+        "EDUK": true,
+        "EDUL": true,
+        "EDUQ": true,
+        "EDUR": true,
+        "EDUU": true,
+        "EDUX": true,
+        "EDVB": true,
+        "EDVD": true,
+        "EDVL": true,
+        "EDVQ": true,
+        "EDVT": true,
+        "EDVW": true,
+        "EDWEB": true,
+        "EDWW": true,
+        "EDXD": true,
+        "EDXR": true,
+        "EDXX": true,
+        "EDYA": true,
+        "EDYB": true,
+        "EDYC": true,
+        "EDYD": true,
+        "EDYE": true,
+        "EDYI": true,
+        "EDYK": true,
+        "EDYL": true,
+        "EDYM": true,
+        "EDYN": true,
+        "EDYR": true,
+        "EDYS": true,
+        "EDYSN": true,
+        "EDYT": true,
+        "EDYTR": true,
+        "EDYW": true,
+        "EDYX": true,
+        "EDYY": true,
+        "EDZA": true,
+        "EDZB": true,
+        "EDZC": true,
+        "EDZG": true,
+        "EDZK": true,
+        "EDZM": true,
+        "EDZN": true,
+        "EDZO": true,
+        "EDZQ": true,
+        "EDZS": true,
+        "EDZV": true,
+        "EG3L": true,
+        "EGAI": true,
+        "EGAP": true,
+        "EGBH": true,
+        "EGDH": true,
+        "EGGY": true,
+        "EGHV": true,
+        "EGIG": true,
+        "EGIW": true,
+        "EGJD": true,
+        "EGJL": true,
+        "EGKC": true,
+        "EGKE": true,
+        "EGKN": true,
+        "EGKX": true,
+        "EGLV": true,
+        "EGME": true,
+        "EGMMK": true,
+        "EGMW": true,
+        "EGMX": true,
+        "EGNCG": true,
+        "EGNMH": true,
+        "EGNP": true,
+        "EGOF": true,
+        "EGPUD": true,
+        "EGQJ": true,
+        "EGRM": true,
+        "EGSER": true,
+        "EGSIN": true,
+        "EGSOL": true,
+        "EGSON": true,
+        "EGSZ": true,
+        "EGTV": true,
+        "EGVS": true,
+        "EGVV": true,
+        "EGWER": true,
+        "EGXCS": true,
+        "EGYB": true,
+        "EGYI": true,
+        "EGYV": true,
+        "EGZE": true,
+        "EGZL": true,
+        "EGZM": true,
+        "EGZN": true,
+        "EHAX": true,
+        "EHBE": true,
+        "EHCA": true,
+        "EHNO": true,
+        "EHVE": true,
+        "EHVN": true,
+        "EHVO": true,
+        "EKBA": true,
+        "EKFI": true,
+        "EKFS": true,
+        "EKGL": true,
+        "EKHM": true,
+        "EKHO": true,
+        "EKKS": true,
+        "EKVE": true,
+        "EKVI": true,
+        "ELUS": true,
+        "ELZC": true,
+        "EMSUI": true,
+        "ENLN": true,
+        "EPOMY": true,
+        "EPZR": true,
+        "ESPMY": true,
+        "ETT1": true,
+        "FAOI": true,
+        "FAWC": true,
+        "FYPO": true,
+        "ID36": true,
+        "IL59": true,
+        "KSYN": true,
+        "LCYSH": true,
+        "LFAU": true,
+        "LFMG": true,
+        "LFMX": true,
+        "LFNN": true,
+        "LFNW": true,
+        "LFNZ": true,
+        "LFUK": true,
+        "LFUP": true,
+        "RCYSU": true,
+        "RJBD2": true,
+        "RJBET": true,
+        "RJBNV": true,
+        "RJCTO": true,
+        "RJCUJ": true,
+        "RJCUN": true,
+        "RJDOP": true,
+        "RJEER": true,
+        "RJERE": true,
+        "RJETY": true,
+        "RJKND": true,
+        "RJLKO": true,
+        "RJMLX": true,
+        "RJMSJ": true,
+        "RJNWE": true,
+        "RJPPO": true,
+        "RJPPR": true,
+        "RJRGT": true,
+        "RJRPE": true,
+        "RJSEP": true,
+        "RJSOR": true,
+        "RJSSE": true,
+        "RJSSK": true,
+        "RJT1": true,
+        "RJXXC": true,
+        "RJZCD": true,
+        "RPJST": true,
+        "SC79": true,
+        "SOUNR": true,
+        "TE71": true,
+        "TX23": true,
+        "UKVZ": true,
+        "ULRH": true,
+        "UMOPS": true,
+        "VG22": true,
+        "W73": true,
+        "WAKIF": true,
+        "YBSP": true,
+        "YKEP": true,
+        "YMGF": true,
+        "YMVM": true,
+        "YSFL": true,
+        "YTWG": true
+      }
+    },
+    "airports-db-UK2000.js": {
+      "verified": true,
+      "verifiedAt": "2026-06-25T08:23:02Z",
+      "checksum": "ec23196d7171e3ca8eb5dce3cf5ef31b748a5ebc41b5a6e2c062e65aaa10cf5c",
+      "entryCount": 37,
+      "entries": {
+        "9NM9": {
+          "fp": "8e780c48ea43cb8d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGAC": {
+          "fp": "e74eba87ecdb9b87",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGAE": {
+          "fp": "f88850151a161820",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGBB": {
+          "fp": "63dbe4447dd89ea4",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGCJ": {
+          "fp": "c6cd9b30b675951e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGFF": {
+          "fp": "dbc09f89bdd1c670",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGGW": {
+          "fp": "2dc1145c068ceb9c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGHH": {
+          "fp": "b1b538ff81affc18",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGHQ": {
+          "fp": "86994b7b90f6ce69",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGJB": {
+          "fp": "033af69ef91ee56d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGJJ": {
+          "fp": "6fca051b7b1454d2",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGLC": {
+          "fp": "428a50af47b00a13",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGNC": {
+          "fp": "95fc3870c1891884",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGNS": {
+          "fp": "815c971cc4316adc",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGPD": {
+          "fp": "ca780de0cdad2190",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGPE": {
+          "fp": "ee13257107631c7c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGPF": {
+          "fp": "735bc20c37097b7e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGPK": {
+          "fp": "2b107e9ea40fe0f0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGSH": {
+          "fp": "3289c7adb344a975",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGTE": {
+          "fp": "905fa1bf8bdaf102",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "F45": {
+          "fp": "cd2c88f0f7f38f35",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KARR": {
+          "fp": "659e6bbfc6d80af4",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KCMI": {
+          "fp": "a3dc37e8d948617c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KCON": {
+          "fp": "d6f57ef1467f834b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KFLG": {
+          "fp": "4d90eee417d5c6b6",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KGYY": {
+          "fp": "950721109c5b1a48",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KHND": {
+          "fp": "b490b0f060151600",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KJOT": {
+          "fp": "2a47d499e792063b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KJYO": {
+          "fp": "cc9d4e037d5f84d6",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KOSH": {
+          "fp": "0c4e10abed221f08",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPSM": {
+          "fp": "ab124ef279b02368",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KSNA": {
+          "fp": "ef3cb1a20c56b5be",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KTEX": {
+          "fp": "91eb97284d439b36",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KTRK": {
+          "fp": "07b234c55a7c269b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KTYQ": {
+          "fp": "a55f870c95aa86e5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "L35": {
+          "fp": "cac5e3397ef3e856",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "SBSM": {
+          "fp": "03527429a4c78b33",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        }
+      },
+      "verifiedCount": 37
+    },
+    "airports-db-small-detailed.js": {
+      "verified": true,
+      "verifiedAt": "2026-06-25T07:25:42Z",
+      "checksum": "4b68cbee16c5d875a2d4f7c12e76001b1423bc9bef47d31223ff17ff04009f08",
+      "entryCount": 627,
+      "entries": {
+        "02FA": true,
+        "06N": true,
+        "0B7": true,
+        "0C2": true,
+        "0L7": true,
+        "1B5": true,
+        "1I5": true,
+        "2B9": true,
+        "2O8": true,
+        "2VA3": true,
+        "33V": true,
+        "3B3": true,
+        "3VA8": true,
+        "40I": true,
+        "42B": true,
+        "4CL3": true,
+        "69G": true,
+        "6A1": true,
+        "6MS1": true,
+        "79NC": true,
+        "7N1": true,
+        "87MO": true,
+        "9A0": true,
+        "C56": true,
+        "C62": true,
+        "C98": true,
+        "CAA8": true,
+        "CBS8": true,
+        "CFR7": true,
+        "CFU3": true,
+        "CJD2": true,
+        "CJD3": true,
+        "CKJ7": true,
+        "CNF3": true,
+        "CO15": true,
+        "CPT3": true,
+        "CSK5": true,
+        "CSS4": true,
+        "CYHE": true,
+        "CYRC": true,
+        "CZPC": true,
+        "EBGG": true,
+        "EBTN": true,
+        "EBWE": true,
+        "EBZR": true,
+        "ED41": true,
+        "ED69": true,
+        "ED85": true,
+        "ED90": true,
+        "ED94": true,
+        "EDAD": true,
+        "EDAE": true,
+        "EDAN": true,
+        "EDAO": true,
+        "EDAR": true,
+        "EDAS": true,
+        "EDAT": true,
+        "EDAW": true,
+        "EDBA": true,
+        "EDBI": true,
+        "EDBJ": true,
+        "EDBK": true,
+        "EDBL": true,
+        "EDBP": true,
+        "EDBQ": true,
+        "EDBU": true,
+        "EDBV": true,
+        "EDBX": true,
+        "EDBY": true,
+        "EDBZ": true,
+        "EDCA": true,
+        "EDCB": true,
+        "EDCE": true,
+        "EDCG": true,
+        "EDCI": true,
+        "EDCK": true,
+        "EDCM": true,
+        "EDCQ": true,
+        "EDCS": true,
+        "EDCT": true,
+        "EDCU": true,
+        "EDCV": true,
+        "EDCW": true,
+        "EDCX": true,
+        "EDCZ": true,
+        "EDEB": true,
+        "EDEG": true,
+        "EDEH": true,
+        "EDEL": true,
+        "EDEN": true,
+        "EDEQ": true,
+        "EDEW": true,
+        "EDFA": true,
+        "EDFC": true,
+        "EDFD": true,
+        "EDFG": true,
+        "EDFI": true,
+        "EDFJ": true,
+        "EDFK": true,
+        "EDFL": true,
+        "EDFN": true,
+        "EDFP": true,
+        "EDFQ": true,
+        "EDFR": true,
+        "EDFS": true,
+        "EDFU": true,
+        "EDFV": true,
+        "EDFW": true,
+        "EDFX": true,
+        "EDFY": true,
+        "EDGA": true,
+        "EDGB": true,
+        "EDGF": true,
+        "EDGH": true,
+        "EDGI": true,
+        "EDGJ": true,
+        "EDGK": true,
+        "EDGP": true,
+        "EDGQ": true,
+        "EDGR": true,
+        "EDGT": true,
+        "EDGU": true,
+        "EDGW": true,
+        "EDGX": true,
+        "EDGZ": true,
+        "EDHB": true,
+        "EDHC": true,
+        "EDHD": true,
+        "EDHE": true,
+        "EDHJ": true,
+        "EDHN": true,
+        "EDHS": true,
+        "EDHU": true,
+        "EDHW": true,
+        "EDID": true,
+        "EDIG": true,
+        "EDIL": true,
+        "EDIS": true,
+        "EDISS": true,
+        "EDIT": true,
+        "EDIU": true,
+        "EDJD": true,
+        "EDJH": true,
+        "EDJJ": true,
+        "EDJS": true,
+        "EDJT": true,
+        "EDJW": true,
+        "EDJZ": true,
+        "EDKB": true,
+        "EDKD": true,
+        "EDKF": true,
+        "EDKH": true,
+        "EDKI": true,
+        "EDKJ": true,
+        "EDKL": true,
+        "EDKM": true,
+        "EDKN": true,
+        "EDKO": true,
+        "EDKP": true,
+        "EDKR": true,
+        "EDKU": true,
+        "EDKV": true,
+        "EDKW": true,
+        "EDKZ": true,
+        "EDLB": true,
+        "EDLC": true,
+        "EDLF": true,
+        "EDLG": true,
+        "EDLH": true,
+        "EDLI": true,
+        "EDLJ": true,
+        "EDLK": true,
+        "EDLL": true,
+        "EDLM": true,
+        "EDLO": true,
+        "EDLR": true,
+        "EDLS": true,
+        "EDLT": true,
+        "EDLX": true,
+        "EDLY": true,
+        "EDLZ": true,
+        "EDMC": true,
+        "EDMD": true,
+        "EDMF": true,
+        "EDMG": true,
+        "EDMH": true,
+        "EDMI": true,
+        "EDMJ": true,
+        "EDMK": true,
+        "EDMM": true,
+        "EDMR": true,
+        "EDMT": true,
+        "EDMU": true,
+        "EDMV": true,
+        "EDMW": true,
+        "EDMY": true,
+        "EDMZ": true,
+        "EDNB": true,
+        "EDNC": true,
+        "EDNE": true,
+        "EDNG": true,
+        "EDNH": true,
+        "EDNJ": true,
+        "EDNL": true,
+        "EDNO": true,
+        "EDNP": true,
+        "EDNQ": true,
+        "EDNR": true,
+        "EDNS": true,
+        "EDNT": true,
+        "EDNU": true,
+        "EDNV": true,
+        "EDNW": true,
+        "EDNX": true,
+        "EDNZ": true,
+        "EDOB": true,
+        "EDOC": true,
+        "EDOD": true,
+        "EDOF": true,
+        "EDOH": true,
+        "EDOI": true,
+        "EDOJ": true,
+        "EDOK": true,
+        "EDONT": true,
+        "EDOO": true,
+        "EDOQ": true,
+        "EDOR": true,
+        "EDOS": true,
+        "EDOSV": true,
+        "EDOT": true,
+        "EDOV": true,
+        "EDOW": true,
+        "EDOX": true,
+        "EDOZ": true,
+        "EDPA": true,
+        "EDPB": true,
+        "EDPC": true,
+        "EDPD": true,
+        "EDPE": true,
+        "EDPF": true,
+        "EDPH": true,
+        "EDPI": true,
+        "EDPJ": true,
+        "EDPK": true,
+        "EDPL": true,
+        "EDPM": true,
+        "EDPN": true,
+        "EDPNR": true,
+        "EDPOP": true,
+        "EDPP": true,
+        "EDPPM": true,
+        "EDPT": true,
+        "EDPU": true,
+        "EDPW": true,
+        "EDPX": true,
+        "EDPY": true,
+        "EDPZ": true,
+        "EDQA": true,
+        "EDQB": true,
+        "EDQC": true,
+        "EDQD": true,
+        "EDQE": true,
+        "EDQF": true,
+        "EDQG": true,
+        "EDQH": true,
+        "EDQI": true,
+        "EDQK": true,
+        "EDQL": true,
+        "EDQM": true,
+        "EDQN": true,
+        "EDQO": true,
+        "EDQR": true,
+        "EDQS": true,
+        "EDQW": true,
+        "EDQX": true,
+        "EDQY": true,
+        "EDQZ": true,
+        "EDRA": true,
+        "EDRC": true,
+        "EDRD": true,
+        "EDRF": true,
+        "EDRG": true,
+        "EDRI": true,
+        "EDRM": true,
+        "EDRN": true,
+        "EDRS": true,
+        "EDRT": true,
+        "EDRU": true,
+        "EDRV": true,
+        "EDRW": true,
+        "EDSA": true,
+        "EDSF": true,
+        "EDSG": true,
+        "EDSH": true,
+        "EDSJ": true,
+        "EDSK": true,
+        "EDSL": true,
+        "EDSO": true,
+        "EDSP": true,
+        "EDSR": true,
+        "EDSS": true,
+        "EDST": true,
+        "EDSW": true,
+        "EDSX": true,
+        "EDSY": true,
+        "EDSZ": true,
+        "EDTB": true,
+        "EDTC": true,
+        "EDTD": true,
+        "EDTE": true,
+        "EDTF": true,
+        "EDTG": true,
+        "EDTI": true,
+        "EDTJ": true,
+        "EDTN": true,
+        "EDTP": true,
+        "EDTQ": true,
+        "EDTU": true,
+        "EDTW": true,
+        "EDTZ": true,
+        "EDUA": true,
+        "EDUE": true,
+        "EDUG": true,
+        "EDUM": true,
+        "EDUN": true,
+        "EDUP": true,
+        "EDUZ": true,
+        "EDVA": true,
+        "EDVC": true,
+        "EDVF": true,
+        "EDVH": true,
+        "EDVI": true,
+        "EDVJ": true,
+        "EDVK": true,
+        "EDVN": true,
+        "EDVO": true,
+        "EDVR": true,
+        "EDVU": true,
+        "EDVV": true,
+        "EDWC": true,
+        "EDWG": true,
+        "EDWN": true,
+        "EDWO": true,
+        "EDWQ": true,
+        "EDWT": true,
+        "EDWU": true,
+        "EDWV": true,
+        "EDWX": true,
+        "EDXA": true,
+        "EDXC": true,
+        "EDXE": true,
+        "EDXF": true,
+        "EDXG": true,
+        "EDXI": true,
+        "EDXM": true,
+        "EDXO": true,
+        "EDXU": true,
+        "EDXV": true,
+        "EDYF": true,
+        "EDYG": true,
+        "EDYO": true,
+        "EDZD": true,
+        "EDZI": true,
+        "EDZJ": true,
+        "EDZL": true,
+        "EDZT": true,
+        "EDZU": true,
+        "EDZW": true,
+        "EFME": true,
+        "EFNU": true,
+        "EFSO": true,
+        "EGBG": true,
+        "EGBI": true,
+        "EGBS": true,
+        "EGBY": true,
+        "EGCJ": true,
+        "EGCR": true,
+        "EGDB": true,
+        "EGDD": true,
+        "EGDJ1": true,
+        "EGFTR": true,
+        "EGHU": true,
+        "EGIU": true,
+        "EGIV": true,
+        "EGKW": true,
+        "EGOPK": true,
+        "EGPPO": true,
+        "EGSM": true,
+        "EGTP": true,
+        "EGUG": true,
+        "EGVM": true,
+        "EGVP": true,
+        "EGWN": true,
+        "EGXY": true,
+        "EGXZ": true,
+        "EGYD": true,
+        "EIGN": true,
+        "EIKH": true,
+        "EKTD": true,
+        "ENFG": true,
+        "ENLU": true,
+        "ENSD": true,
+        "EPKP": true,
+        "FA42": true,
+        "FATW": true,
+        "H07": true,
+        "I64": true,
+        "I99": true,
+        "K34": true,
+        "KAQW": true,
+        "KBTA": true,
+        "KCBK": true,
+        "KCZG": true,
+        "KFRR": true,
+        "KLXV": true,
+        "KRFG": true,
+        "KSCD": true,
+        "KWAY": true,
+        "LA54": true,
+        "LDRG": true,
+        "LDRO": true,
+        "LDSS": true,
+        "LECA": true,
+        "LECF": true,
+        "LEJE": true,
+        "LEMW": true,
+        "LENV": true,
+        "LEPSD": true,
+        "LERM": true,
+        "LETD": true,
+        "LEUM": true,
+        "LF0429": true,
+        "LFAD": true,
+        "LFAM": true,
+        "LFAO": true,
+        "LFAQ": true,
+        "LFAS": true,
+        "LFBK": true,
+        "LFBN": true,
+        "LFBS": true,
+        "LFBU": true,
+        "LFBX": true,
+        "LFCB": true,
+        "LFCE": true,
+        "LFCG": true,
+        "LFCM": true,
+        "LFCO": true,
+        "LFCS": true,
+        "LFCT": true,
+        "LFCX": true,
+        "LFDA": true,
+        "LFDF": true,
+        "LFDM": true,
+        "LFDN": true,
+        "LFDT": true,
+        "LFDW": true,
+        "LFEB": true,
+        "LFEF": true,
+        "LFEK": true,
+        "LFEM": true,
+        "LFET": true,
+        "LFEU": true,
+        "LFEV": true,
+        "LFEY": true,
+        "LFEZ": true,
+        "LFFB": true,
+        "LFFC": true,
+        "LFFJ": true,
+        "LFFK": true,
+        "LFFL": true,
+        "LFFT": true,
+        "LFFV": true,
+        "LFFW": true,
+        "LFFZ": true,
+        "LFGB": true,
+        "LFGC": true,
+        "LFGG": true,
+        "LFGP": true,
+        "LFGU": true,
+        "LFHD": true,
+        "LFHE": true,
+        "LFHG": true,
+        "LFHN": true,
+        "LFHQ": true,
+        "LFHR": true,
+        "LFHS": true,
+        "LFID": true,
+        "LFIF": true,
+        "LFIL": true,
+        "LFIM": true,
+        "LFIT": true,
+        "LFIX": true,
+        "LFJF": true,
+        "LFJH": true,
+        "LFJR": true,
+        "LFJS": true,
+        "LFJT": true,
+        "LFKD": true,
+        "LFKG": true,
+        "LFKI": true,
+        "LFKP": true,
+        "LFLN": true,
+        "LFLO": true,
+        "LFLR": true,
+        "LFLZ": true,
+        "LFMF": true,
+        "LFMU": true,
+        "LFMZ": true,
+        "LFNB": true,
+        "LFNC": true,
+        "LFNF": true,
+        "LFNH": true,
+        "LFNJ": true,
+        "LFNL": true,
+        "LFNO": true,
+        "LFNQ": true,
+        "LFNS": true,
+        "LFNT": true,
+        "LFNX": true,
+        "LFNY": true,
+        "LFOD": true,
+        "LFOF": true,
+        "LFOL": true,
+        "LFOR": true,
+        "LFOW": true,
+        "LFOY": true,
+        "LFOZ": true,
+        "LFPF": true,
+        "LFPK": true,
+        "LFPU": true,
+        "LFQC": true,
+        "LFQD": true,
+        "LFQH": true,
+        "LFQK": true,
+        "LFQM": true,
+        "LFQW": true,
+        "LFRP": true,
+        "LFRW": true,
+        "LFSA": true,
+        "LFSE": true,
+        "LFSP": true,
+        "LFSS": true,
+        "LFSU": true,
+        "LFSV": true,
+        "LFTM": true,
+        "LFTN": true,
+        "LFXB": true,
+        "LFYG": true,
+        "LFZY": true,
+        "LHGO": true,
+        "LIAA": true,
+        "LIAF": true,
+        "LIAL": true,
+        "LIEH": true,
+        "LIFF": true,
+        "LIHP": true,
+        "LILB": true,
+        "LILC": true,
+        "LILO": true,
+        "LIMA": true,
+        "LIPN": true,
+        "LIQB": true,
+        "LIVD": true,
+        "LJMS": true,
+        "LKBA": true,
+        "LKHN": true,
+        "LKKT": true,
+        "LKKY": true,
+        "LKLN": true,
+        "LKPL": true,
+        "LKRY": true,
+        "LLMG": true,
+        "LOAS": true,
+        "LOGF": true,
+        "LOGG": true,
+        "LOIH": true,
+        "LRSA": true,
+        "LSGY": true,
+        "LSZF": true,
+        "LSZG": true,
+        "LZHR": true,
+        "LZNZ": true,
+        "LZOC": true,
+        "LZPT": true,
+        "LZRY": true,
+        "MT48": true,
+        "N82": true,
+        "P15": true,
+        "S36": true,
+        "SAOL": true,
+        "SAZC": true,
+        "SAZE": true,
+        "SBAQ": true,
+        "SBAX": true,
+        "SBBU": true,
+        "SBCH": true,
+        "SBGW": true,
+        "SBPC": true,
+        "SBPN": true,
+        "SBUG": true,
+        "SBYS": true,
+        "SCOM": true,
+        "U14": true,
+        "UAZV": true,
+        "UGIZ": true,
+        "UPAA": true,
+        "UPOI": true,
+        "URME": true,
+        "USEG": true,
+        "UUBM": true,
+        "UUEH": true,
+        "UUYE": true,
+        "VA85": true,
+        "WN76": true,
+        "YBEV": true,
+        "YBLA": true,
+        "YBUY": true,
+        "YCAB": true,
+        "YCUN": true,
+        "YGCR": true,
+        "YILW": true,
+        "YRYW": true,
+        "YSCN": true,
+        "YTMU": true,
+        "YTYH": true,
+        "YWKI": true,
+        "YWKW": true
+      }
+    },
+    "airports-db-other.js": {
+      "verified": true,
+      "verifiedAt": "2026-06-25T08:22:45Z",
+      "checksum": "1b702c14d798041599880ee00c660908f8ea7536849661177266aa32f99a34e9",
+      "entryCount": 27,
+      "entries": {
+        "CYSE": {
+          "fp": "334c6b62732cc599",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "EGHP": {
+          "fp": "701a1733b5857302",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "EGHR": {
+          "fp": "5503521b137f3e63",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "EGLD": {
+          "fp": "ffad113a09932ec9",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "EGLF": {
+          "fp": "177cf74a1567cafa",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "EGLK": {
+          "fp": "ed85d6c6b55796da",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "EGMD": {
+          "fp": "d81b15a391ebdd6e",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "EGSF": {
+          "fp": "880f780f237aa28b",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "EGTF": {
+          "fp": "1879b2cf38224351",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "EKYT": {
+          "fp": "7635cdffe71e0049",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "KACK": {
+          "fp": "e7d64995e5e5148a",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "KBUR": {
+          "fp": "cf724df5d684614e",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "KMRY": {
+          "fp": "c1b96b50829c6218",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "KSLC": {
+          "fp": "370eda26948cefe8",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "LATI": {
+          "fp": "15e5c8ecdac33e2d",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "LIPY": {
+          "fp": "e0b2dcf08724a34e",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "LIRZ": {
+          "fp": "ac233fdcd64458bc",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "LROP": {
+          "fp": "ba854b80edf79330",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "LSGC": {
+          "fp": "4c4b479098fd6306",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "LSGS": {
+          "fp": "56e83bc6fa3f094b",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "LSZI": {
+          "fp": "8ec0184a06dd9adb",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "SBGR": {
+          "fp": "7a7c6179c4386d69",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "SBRJ": {
+          "fp": "b89d9c5a49819e58",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "SEQM": {
+          "fp": "678cdca8ae2569c2",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "SKBO": {
+          "fp": "7747dad5c99fdaf2",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "SKRG": {
+          "fp": "79a50b6011fb671f",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        },
+        "SUMU": {
+          "fp": "4965f0a6d81d5903",
+          "verifiedAt": "2026-06-25T08:22:45Z"
+        }
+      },
+      "verifiedCount": 27
+    },
+    "airports-db-contrail.js": {
+      "verified": true,
+      "verifiedAt": "2026-06-25T08:23:02Z",
+      "checksum": "3a99c10f4d81db87b3a4c2d72d7174d9f4a27efa92b8901d41774c4b368d4f62",
+      "entryCount": 337,
+      "entries": {
+        "07FA": {
+          "fp": "bc9c9d57ed6a41cb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "0CN2": {
+          "fp": "555cf0d009b4ab6b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "0OR8": {
+          "fp": "46788d38e9d5b3fa",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "2NC0": {
+          "fp": "81856a795bf5f07a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "7A0": {
+          "fp": "1e2b652a5a84b563",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "7S3": {
+          "fp": "7fdc23eafc6a6415",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "BGGH": {
+          "fp": "a43ec8b72dc61095",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "BGSF": {
+          "fp": "f982620e58db1dc0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "BIAR": {
+          "fp": "aedcc2ddc1e0bf03",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "BIEG": {
+          "fp": "4d0a98b67608e312",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "BIKF": {
+          "fp": "7a209f5f10927ac6",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "BIVM": {
+          "fp": "f3ef829f142ae981",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "BKPR": {
+          "fp": "edfffa2c6de985ca",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CBBC": {
+          "fp": "f193583e01441b4c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CBH4": {
+          "fp": "90619d00cf9deb93",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CPL3": {
+          "fp": "fae020c02f552c45",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CRL2": {
+          "fp": "b50c3d5b9d84620f",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CYHZ": {
+          "fp": "d8bfef4955340245",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CYKF": {
+          "fp": "d765051b860d1d52",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CYQB": {
+          "fp": "311cb18e820df6fa",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CYQG": {
+          "fp": "ca2479acc9ba016e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CYSH": {
+          "fp": "ee264f6736bc4781",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CYUL": {
+          "fp": "a696ca78e524e493",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CYWG": {
+          "fp": "e19883cc7ff27489",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "CYYC": {
+          "fp": "04c8ff2596260abe",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "DAAG": {
+          "fp": "6bff8f665a037b45",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "DAAT": {
+          "fp": "43a50bb7b2b0b435",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "DATG": {
+          "fp": "74c09e33e982e1ff",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EBBR": {
+          "fp": "8a91d702c26ed589",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EBLG": {
+          "fp": "f6560cb9175a4736",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDB": {
+          "fp": "7a822d0a22604cdb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDC": {
+          "fp": "0ccb79cb5b7687d6",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDF": {
+          "fp": "30c132a3ce60cc3c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDG": {
+          "fp": "d05fc5987dfd9841",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDH": {
+          "fp": "e98d515ec512952d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDK": {
+          "fp": "61efd888554250b4",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDL": {
+          "fp": "4cba358d45f542eb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDM": {
+          "fp": "0880c029d6d3f4e0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDN": {
+          "fp": "1903a8e9154e24a7",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDP": {
+          "fp": "67ec7943c650e306",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDS": {
+          "fp": "c34f54b685256dbe",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDDV": {
+          "fp": "cbf1db14a48bc852",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDFH": {
+          "fp": "064d5f3b308afa06",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDLP": {
+          "fp": "4d4d491f844bcd74",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDLW": {
+          "fp": "efc1a84c5151bd57",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EDWQ": {
+          "fp": "95c5a854a58d6852",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EETN": {
+          "fp": "df84489724d899f3",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EFHK": {
+          "fp": "a1c406fc44fbcecd",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EFKI": {
+          "fp": "398869452144c49a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EFOU": {
+          "fp": "ffa7b57945ca134d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EFRO": {
+          "fp": "0bb7101daeabf6f5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EFTU": {
+          "fp": "af407fb261b6faf0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGAA": {
+          "fp": "e36fb495a6858bb9",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGBB": {
+          "fp": "c06d983ac55ca809",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGCC": {
+          "fp": "f13b5c5ce948c1d8",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGFF": {
+          "fp": "dbc09f89bdd1c670",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGGD": {
+          "fp": "255adb40b128919b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGGP": {
+          "fp": "61fcb278a3d2ccc8",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGNJ": {
+          "fp": "0adfd77c072be64b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGNX": {
+          "fp": "d32c69a4a987cbb9",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGPF": {
+          "fp": "7d80d43249f51307",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGPH": {
+          "fp": "01e3297f6bc87a7b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGUL": {
+          "fp": "8a617850bce42a41",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGUN": {
+          "fp": "1b001fe25215e2ff",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGXC": {
+          "fp": "4c909f9c53cc458f",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGXH": {
+          "fp": "fce71aa36ff3c3ef",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGXP": {
+          "fp": "68c50531a8f63fcd",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EHAM": {
+          "fp": "49b6370dbce0f04b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EHBK": {
+          "fp": "0da14da0469d7256",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EHLE": {
+          "fp": "fe3cb577cab2b938",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EHRD": {
+          "fp": "609242b1c056c048",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EICK": {
+          "fp": "56a0931791b27ec5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EIDW": {
+          "fp": "53a8e839e38a7e59",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EINN": {
+          "fp": "0026a268cba175c4",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EKCH": {
+          "fp": "c76da1983dd403d9",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ELLX": {
+          "fp": "036e7aa604855453",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ENAT": {
+          "fp": "c76d039876399836",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ENBR": {
+          "fp": "007de32bcb03668c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ENEV": {
+          "fp": "34bd07d7c96b4664",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ENGM": {
+          "fp": "d970dd84c5590939",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ENTC": {
+          "fp": "42a30eebafd50733",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ENVA": {
+          "fp": "dce2c3fc89efc826",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPBY": {
+          "fp": "9e5e6a24d4191d2a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPGD": {
+          "fp": "d4790be3ece13e72",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPKK": {
+          "fp": "0a05efde4e120699",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPKT": {
+          "fp": "17deb5c0f38e9b69",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPLB": {
+          "fp": "39cf72ddc5cb36a5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPMO": {
+          "fp": "b2121ecedb67708b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPRA": {
+          "fp": "ad81e11d68ad692b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPRZ": {
+          "fp": "cea86e85efba8d6a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPSC": {
+          "fp": "7a30969f970af39c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPSY": {
+          "fp": "a06d6b2ed623fd67",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPWA": {
+          "fp": "4e8460d5c1408a10",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPWR": {
+          "fp": "c557bfc92e624184",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EPZG": {
+          "fp": "240843e32ffe18d3",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ESOW": {
+          "fp": "6daff9cb0f3cc8e7",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EVRA": {
+          "fp": "84d740673192fbbe",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EYPA": {
+          "fp": "86d85b3cfcdaab8e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EYVI": {
+          "fp": "6e819c28b64946a1",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "FMMI": {
+          "fp": "f3cff2b6c5f87d66",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "GCHI": {
+          "fp": "5a58fbded21526a2",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "GCLP": {
+          "fp": "e5399500536a0071",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "GCTS": {
+          "fp": "f76eeab30af44954",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "HI01": {
+          "fp": "41ed3e327828c705",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "HTKJ": {
+          "fp": "9818a0fc00ab6139",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KATW": {
+          "fp": "4551224c7db2a597",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KBCT": {
+          "fp": "0f5fd9870c6090e4",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KBDL": {
+          "fp": "ae886f75fa41cf72",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KBFI": {
+          "fp": "04fa485ceab8a66c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KBOI": {
+          "fp": "29d4c90982c83675",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KBOS": {
+          "fp": "1bfc06816fab7608",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KBWI": {
+          "fp": "7477a7af997f7fcc",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KBZN": {
+          "fp": "cb0cb05a9b2d4c98",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KCDK": {
+          "fp": "ffc169a1fb00eddb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KCRQ": {
+          "fp": "f6758fe36ac57625",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KDAL": {
+          "fp": "b5e2439584df8d56",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KDCA": {
+          "fp": "63b7521b11cee69b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KDEN": {
+          "fp": "b2f6fc05552138b1",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KDPA": {
+          "fp": "f1b2417a4f694ef4",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KEWR": {
+          "fp": "12742c9c3e261ac1",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KEYW": {
+          "fp": "a4b58cb3805048fb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KFDK": {
+          "fp": "842e7be69766ff09",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KFLL": {
+          "fp": "92b331504bbdee6b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KHOU": {
+          "fp": "7e8c5c58c7d063d3",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KHTS": {
+          "fp": "f5eab4db92fd3693",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KIAD": {
+          "fp": "de3ef25dc7e57906",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KJAC": {
+          "fp": "9eaa8dd635cf95f8",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KJQF": {
+          "fp": "24daf11578745ba5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KLAS": {
+          "fp": "8d2203773a08e6b2",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KLGA": {
+          "fp": "64f9f9eea64b592d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KLSV": {
+          "fp": "cb45b9e3fe0ac5e0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KLYH": {
+          "fp": "ffbb446b0d6e0ae1",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KMDW": {
+          "fp": "09c23461d9bd4ad9",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KMHT": {
+          "fp": "47d506e524fa0e10",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KMIA": {
+          "fp": "debfebf7e6473848",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KMSP": {
+          "fp": "4847b9ae7e02d07f",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KMSY": {
+          "fp": "510cef4e584d1c54",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KMYR": {
+          "fp": "a40c82bd86da5678",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KNKX": {
+          "fp": "f21b6ff2793a0a82",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KOMA": {
+          "fp": "16ae66d059c3fd62",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KONT": {
+          "fp": "b232f78979765d99",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KORF": {
+          "fp": "4b70ef32321eac55",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPAE": {
+          "fp": "fb05ce8e50c85324",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPAO": {
+          "fp": "e842b47f451c9212",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPBI": {
+          "fp": "01ad086d174b1ff9",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPDX": {
+          "fp": "c6cba9dcbe8e0509",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPHL": {
+          "fp": "c7db3fbd22160e6a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPIE": {
+          "fp": "6e7ad95241a8c01e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPVD": {
+          "fp": "e3cde03ffb9f3be0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPVU": {
+          "fp": "b06bc0e15a1268ae",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPWK": {
+          "fp": "157c798927ecb83c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPWM": {
+          "fp": "87ec736a38bcaffa",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KRNT": {
+          "fp": "6c424b61b077e558",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KRSW": {
+          "fp": "8f129eba152a5008",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KSAN": {
+          "fp": "db7489489336b584",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KSEA": {
+          "fp": "a8706e62daade865",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KSFB": {
+          "fp": "28b4f28c4d20afdf",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KSFO": {
+          "fp": "fb81120e210e8b75",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KSMO": {
+          "fp": "27b9e7c2c0b4ace3",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KSRQ": {
+          "fp": "c27adfcb4729f84f",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KSYR": {
+          "fp": "6c434a87a2d45921",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KTEB": {
+          "fp": "70fe631cdc5f889e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KTNP": {
+          "fp": "f32cd38e691685e0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KTPA": {
+          "fp": "727c295465060ff9",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KTPF": {
+          "fp": "fd0072f58ec9d102",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LBBG": {
+          "fp": "164d2a63144efa1d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LBWN": {
+          "fp": "387a3c5557729033",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LDZA": {
+          "fp": "3598a6bc15e349ad",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LEAL": {
+          "fp": "4d5f8877ae51b3c7",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LEBL": {
+          "fp": "5d205d5c22eec7e3",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LEGE": {
+          "fp": "36892ff451323d89",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LEIB": {
+          "fp": "4e275b48263e5859",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LEMD": {
+          "fp": "69c3bda3d115a43e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LEMG": {
+          "fp": "f60754df25e203a7",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LEMH": {
+          "fp": "1c22995c91d65391",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LESO": {
+          "fp": "633fb0e975c3f642",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LEZL": {
+          "fp": "9b1086e2ad34551a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LFAC": {
+          "fp": "4b5ede3ea31545c7",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LFBO": {
+          "fp": "650e446e94de9ece",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LFBZ": {
+          "fp": "0cc44a88e13c43f5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LFLL": {
+          "fp": "8cd2a36b9c800dd3",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LFML": {
+          "fp": "3681a57747b82646",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LFPO": {
+          "fp": "4b925cc9a116dcbe",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LFRS": {
+          "fp": "8196381831fa3b4a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGAV": {
+          "fp": "266b1d764c04a139",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGIR": {
+          "fp": "2cfafc37ba1e5967",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGKO": {
+          "fp": "09bf29d98d909651",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGKR": {
+          "fp": "3ed0fb1a76c98e9d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGKV": {
+          "fp": "0482b547117cc5aa",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGMK": {
+          "fp": "1dfa29fc048f81d7",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGSA": {
+          "fp": "c02fdebdf5f8a4c1",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGSM": {
+          "fp": "a65b621eff2c6b43",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGSR": {
+          "fp": "f82b3d37697bb1bd",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LICG": {
+          "fp": "101f200dba16131d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LICJ": {
+          "fp": "4c7ef348b1899c32",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LICR": {
+          "fp": "3a1f0819e6880821",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LIMC": {
+          "fp": "ab9a547657b91621",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LIME": {
+          "fp": "03c18df748027898",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LIML": {
+          "fp": "15735140848ad66f",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LIMP": {
+          "fp": "db716f37880565b1",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LIRF": {
+          "fp": "7803295fdc7e4786",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LIRN": {
+          "fp": "d2cb7c676def5998",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LJBO": {
+          "fp": "53e9f362c8caa1ab",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LKPR": {
+          "fp": "805b8b376ebf9ee7",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LOWS": {
+          "fp": "7a6ec53eabd104ec",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LPFR": {
+          "fp": "5c3223b5883634be",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LPHR": {
+          "fp": "ffac3539125cef08",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LPMA": {
+          "fp": "5293b0b21f13b48e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LPPR": {
+          "fp": "e1d0c0818f13cd57",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LPPT": {
+          "fp": "d06da8395dc1b325",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LRIA": {
+          "fp": "357884ef7d14c7ae",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LRTR": {
+          "fp": "f2ea6c328d66dcf6",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LSGG": {
+          "fp": "ee794b2a1f392587",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LSPV": {
+          "fp": "cc1fab0bcfbc8806",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LSTS": {
+          "fp": "8fc3330298b9c1c8",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LSZE": {
+          "fp": "8cbb26affcc8cf29",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LSZH": {
+          "fp": "73e0e1a611236808",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LSZM": {
+          "fp": "00448564a45300fb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LSZP": {
+          "fp": "01800818e505a847",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LSZT": {
+          "fp": "681bb39e9ed9bf1e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LSZX": {
+          "fp": "f58253ac7cfcddf6",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LTAC": {
+          "fp": "99ecf20e3a3d0df7",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LTAF": {
+          "fp": "2f77a2a67ecd7adb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LTBJ": {
+          "fp": "44cb3288d5c9633f",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LTBS": {
+          "fp": "cf5639ba66a2bea2",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LTCG": {
+          "fp": "4a858745d408742c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LTFG": {
+          "fp": "cb33929b889af82a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LTFJ": {
+          "fp": "507e13f48ea1c7a0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LWOH": {
+          "fp": "43240d921224f6b3",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LXGB": {
+          "fp": "49c22fe682bdcc7c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LYTV": {
+          "fp": "cf06ba40f9223638",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LZIB": {
+          "fp": "11f318e0f66a6818",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "MDPP": {
+          "fp": "d7068a5a404e6cff",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "MMOX": {
+          "fp": "eea1905bdd92c91a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "MMUN": {
+          "fp": "dea5d1b7af262d94",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "MWCR": {
+          "fp": "bce3f2f5a19b0a66",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "NZAA": {
+          "fp": "141414473d869369",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "NZNV": {
+          "fp": "6d3d2d2ad4b1ada3",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "NZWN": {
+          "fp": "d326fc523eb59505",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "OEDF": {
+          "fp": "834a856d8fbc352b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "OG13": {
+          "fp": "c18c6a441412dd6d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "OG31": {
+          "fp": "b1c8827de143d822",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "OPSD": {
+          "fp": "e6b9fa89ecbf6b00",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "OR74": {
+          "fp": "8871fe1714569836",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PAEN": {
+          "fp": "4838314812967001",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PAJN": {
+          "fp": "ce3dc047adc1a752",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PAKT": {
+          "fp": "6c8df4f8dea5d7fa",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PANC": {
+          "fp": "b3c632392c2faf1e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PAPG": {
+          "fp": "3bb36c4b862ad168",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PASI": {
+          "fp": "b379dabf5ee2a134",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PATK": {
+          "fp": "c6bf97b211b02443",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PAWD": {
+          "fp": "b56e2aa0f834bc54",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PAWG": {
+          "fp": "51ded1607bb10981",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PAYA": {
+          "fp": "6d9da046b25f170e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PHDH": {
+          "fp": "b4604bcd4115ddf5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PHHN": {
+          "fp": "bf535e0c6f619a24",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PHLI": {
+          "fp": "b7766dbe1051fc81",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PHMK": {
+          "fp": "62c2b7877e34ab67",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PHMU": {
+          "fp": "461680c114ca6d35",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PHNY": {
+          "fp": "831bfe9dbfe44f9f",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PHOG": {
+          "fp": "bc4473dc3c850f4d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "RCKH": {
+          "fp": "b0d114aeabc11194",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "RCSS": {
+          "fp": "ffd96f907e709dcb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "RCTP": {
+          "fp": "d70825cb951c1e49",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "RJAA": {
+          "fp": "012bc7eb8e6d0936",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "RKPC": {
+          "fp": "17ea59d8b7890a1a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "RKPK": {
+          "fp": "cc47a0c572636161",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ROAH": {
+          "fp": "eb1c3a96e892085f",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "RPLC": {
+          "fp": "df435a6880d0193e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "RPLL": {
+          "fp": "838944796d14e929",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "RPVM": {
+          "fp": "a57821518d765dec",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "RPVP": {
+          "fp": "f8a196a86168ff98",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "SAME": {
+          "fp": "3ed1d1b4c25e0c23",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "SANT": {
+          "fp": "705fbab39903fd13",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "SASA": {
+          "fp": "c135b62c675fc9f0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "SASJ": {
+          "fp": "faca0561993eb1fd",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "SCEL": {
+          "fp": "f42c5065dc76ff75",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "SCIP": {
+          "fp": "e6eb8e4b989c39c5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "SOCA": {
+          "fp": "25f1834949fb07c2",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "SULS": {
+          "fp": "3ad5dc605e7a6b1b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TDPD": {
+          "fp": "266808bdf8eae3fb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TFFA": {
+          "fp": "bf2c969a412636ff",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TFFG": {
+          "fp": "cea8f6951124242a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TFFJ": {
+          "fp": "341636222b7dba58",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TFFM": {
+          "fp": "89a8a8c72f9f2cfd",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TFFR": {
+          "fp": "501bc3c4a630a336",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TGPY": {
+          "fp": "430e4e4bca43a1fb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TJCP": {
+          "fp": "df1e17a73cac74ff",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TJSJ": {
+          "fp": "c98e82588c1137f0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TKPK": {
+          "fp": "038e19e25ed614a4",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TNCB": {
+          "fp": "2f5341ac218b77be",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TQPF": {
+          "fp": "8c0de40e2f21cdd3",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TRPG": {
+          "fp": "2f8b20007b2317f5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TUPJ": {
+          "fp": "ba909aa6a0a9ff49",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "TXKF": {
+          "fp": "d39e57a5582942db",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "UAAA": {
+          "fp": "2b8fee0c171600a2",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "UKLL": {
+          "fp": "55c1ec0cb075b579",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "UKLN": {
+          "fp": "60a9ac41caa0587b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "UKOO": {
+          "fp": "177a382489531ae4",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ULLI": {
+          "fp": "79769fe37dabfe91",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "URSS": {
+          "fp": "9d7e524c70518607",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "UUDD": {
+          "fp": "af68faa73ba421e7",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "UUEE": {
+          "fp": "85326412019c0272",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "VGHS": {
+          "fp": "743d71d3cbdcf3b8",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "VHHH": {
+          "fp": "77ebd9bb909c7afb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "VIJP": {
+          "fp": "f4d2619db8bd257a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "VMMC": {
+          "fp": "3839ab2a381c52f9",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "VOBL": {
+          "fp": "10a871e45b04148a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "VRMM": {
+          "fp": "75fac5496d866588",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "WMBT": {
+          "fp": "248cb5a0404e2f31",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "WSSS": {
+          "fp": "ab1149d89c898f04",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YAYE": {
+          "fp": "795527150361bf2c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YBHM": {
+          "fp": "204af7ebf861c2a6",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YBNA": {
+          "fp": "0d823c2843409abd",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YBWW": {
+          "fp": "14c0674035ac8c76",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YLHI": {
+          "fp": "adc312313179c29d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YPAD": {
+          "fp": "e7144f673cebf12e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YPPF": {
+          "fp": "7a6299a4484010ad",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YPPH": {
+          "fp": "4f20598e35128225",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YSPT": {
+          "fp": "23517e14acfa4587",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YSWS": {
+          "fp": "63e95b9bbcb30f38",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZBAA": {
+          "fp": "0ebad28f7604e3c6",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZBAD": {
+          "fp": "03c387b3e2824652",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZBTJ": {
+          "fp": "aebd0176da54576e",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZGGG": {
+          "fp": "597442ccaefcef29",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZJHK": {
+          "fp": "cb9d1bc09e10944b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZJSY": {
+          "fp": "91bcabd8ef580f3b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZPPP": {
+          "fp": "2bcb2dfc91530cff",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZSAM": {
+          "fp": "d1f3ef207b679e8b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZSHC": {
+          "fp": "6725b454c6cdf65c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZSNJ": {
+          "fp": "6cc8aeee7a3ab2d2",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZSPD": {
+          "fp": "0da561497dd0965b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZSQD": {
+          "fp": "3349c18e885ee09a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZSSS": {
+          "fp": "345b62718a8939df",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZUGY": {
+          "fp": "0a36dd376f976d76",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZULS": {
+          "fp": "219fce124a52f3e4",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ZYHB": {
+          "fp": "91d2dea51fd72817",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        }
+      },
+      "verifiedCount": 337
+    },
+    "airports-db-iniBuilds.js": {
+      "verified": true,
+      "verifiedAt": "2026-06-25T08:23:02Z",
+      "checksum": "0df211ac65f5140c24e5fedf6c0adca3ec00b7cb2fa440fe289edd6be2574d90",
+      "entryCount": 42,
+      "entries": {
+        "AT98": {
+          "fp": "ece6126685185868",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EFKT": {
+          "fp": "2d28f4cdfc002678",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGCC": {
+          "fp": "f13b5c5ce948c1d8",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGGP": {
+          "fp": "61fcb278a3d2ccc8",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGGW": {
+          "fp": "2dc1145c068ceb9c",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGHI": {
+          "fp": "78590b3a904d2747",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGKK": {
+          "fp": "36f05f3de2d9a508",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGLL": {
+          "fp": "9cf671b8c309fd86",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGNM": {
+          "fp": "42d66b248cbda0f7",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EGSS": {
+          "fp": "5cfb8fa623ed2b50",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "EIKY": {
+          "fp": "1f4cd3de62ad8a43",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ENHD": {
+          "fp": "ec588af391594798",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "ENSB": {
+          "fp": "c0472cb2da5524d3",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "FACT": {
+          "fp": "b52e0e140ca045c5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "FAOR": {
+          "fp": "c0c51c54cdaecf7a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "HKJK": {
+          "fp": "1f648dcebe88f536",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KBUF": {
+          "fp": "68c9d47d248c2765",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KDFW": {
+          "fp": "df2ed584c341528b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KDTW": {
+          "fp": "ec37f57620aadf92",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KJFK": {
+          "fp": "a1c006d1cf7e7c74",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KLAX": {
+          "fp": "38032f93031137f9",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KMKE": {
+          "fp": "907685fed2aec88f",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KOKC": {
+          "fp": "391da6e4b5cea734",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPSP": {
+          "fp": "02e06c3f464dd01a",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KPVD": {
+          "fp": "e3cde03ffb9f3be0",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KSAT": {
+          "fp": "492c7a8b9a393b8d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "KSQL": {
+          "fp": "9920dd8adb327d67",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LCLK": {
+          "fp": "f73f89e70343116b",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LDDU": {
+          "fp": "e7272fce2477ca17",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LEIB": {
+          "fp": "4e275b48263e5859",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGHI": {
+          "fp": "a30b833b599dca84",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGKF": {
+          "fp": "d93e918a119259ef",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LGZA": {
+          "fp": "cf62b3bfd5758702",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LOWI": {
+          "fp": "416f6e0aa5d5d2bc",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "LPPD": {
+          "fp": "7e5e11e031908eb8",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "NFFN": {
+          "fp": "44ee64a3ccd766f5",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "OMAA": {
+          "fp": "31ff2fab370aeee4",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "OMDB": {
+          "fp": "eff2516a30dfa84d",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "OTHH": {
+          "fp": "bf456dc6ee2ee9d1",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "PHNL": {
+          "fp": "028b2126a91969b1",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "VHHH": {
+          "fp": "77ebd9bb909c7afb",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        },
+        "YBBN": {
+          "fp": "f3305803ea1efd30",
+          "verifiedAt": "2026-06-25T08:23:02Z"
+        }
+      },
+      "verifiedCount": 42
+    }
+  },
+  "fleet": {
+    "verified": true,
+    "verifiedAt": "2026-06-25T08:12:01Z",
+    "checksum": "7d963650e84bd3fef96d0e7816aff24c546d69ebdf296aaa8d34c27e3c962f2a",
+    "aircraft": {
+      "A319": true,
+      "A320": true,
+      "A321": true,
+      "A33E": true,
+      "A346": true,
+      "A359": true,
+      "A388": true,
+      "A400": true,
+      "A6M5": true,
+      "AEST": true,
+      "ALO3": true,
+      "AT46": true,
+      "AT76": true,
+      "B105": true,
+      "B36T": true,
+      "B38M": true,
+      "B461": true,
+      "B461_MIL": true,
+      "B462": true,
+      "B462_MIL": true,
+      "B462_QT": true,
+      "B463": true,
+      "B463_QT": true,
+      "B58T": true,
+      "B60T": true,
+      "B722": true,
+      "B72F": true,
+      "B736": true,
+      "B737": true,
+      "B738": true,
+      "B738_BCF": true,
+      "B738_BDSF": true,
+      "B77W": true,
+      "BE20": true,
+      "BE36": true,
+      "BE60": true,
+      "BF109": true,
+      "C160": true,
+      "C172": true,
+      "C208": true,
+      "C20F": true,
+      "C30J": true,
+      "C310": true,
+      "C414": true,
+      "C680": true,
+      "C700": true,
+      "C750": true,
+      "CRJ7": true,
+      "DA42": true,
+      "DC2F": true,
+      "DC6A": true,
+      "DC6B": true,
+      "DG1E": true,
+      "E190": true,
+      "E195": true,
+      "E55P": true,
+      "FA50": true,
+      "F14A": true,
+      "F14B": true,
+      "F28": true,
+      "F6F": true,
+      "F70": true,
+      "F100": true,
+      "FW08": true,
+      "H145": true,
+      "H14M": true,
+      "H47D": true,
+      "H500": true,
+      "HAWK": true,
+      "HDJT": true,
+      "JAGR": true,
+      "KODF": true,
+      "KODI": true,
+      "LAMA": true,
+      "LEG2": true,
+      "LEG2_T": true,
+      "LJ35": true,
+      "LS18": true,
+      "M600": true,
+      "MD11": true,
+      "MD1F": true,
+      "MD82": true,
+      "MD88": true,
+      "P180": true,
+      "P28A": true,
+      "P38": true,
+      "P46T": true,
+      "PA24": true,
+      "PA28": true,
+      "PA38": true,
+      "PC12": true,
+      "PC1F": true,
+      "PITA": true,
+      "R22": true,
+      "RJ1F": true,
+      "RJ1H": true,
+      "RJ70": true,
+      "RJ85": true,
+      "S12G": true,
+      "SF50": true,
+      "SPIT": true,
+      "STAR": true,
+      "T210": true,
+      "TBM8": true,
+      "TOR": true,
+      "U16": true,
+      "UH1": true,
+      "V10": true,
+      "VULC": true
+    }
+  },
+  "missions": {
+    "verified": true,
+    "verifiedAt": "2026-06-25T08:11:10Z",
+    "checksum": "464c28415078dccba1a5108e7c05c426fe208b23cbec8faab7293b76f9d0c564",
+    "types": {
+      "1": true,
+      "2": true,
+      "3": true,
+      "4": true,
+      "5": true,
+      "6": true,
+      "7": true,
+      "10": true,
+      "11": true,
+      "12": true,
+      "13": true,
+      "14": true,
+      "15": true,
+      "16": true,
+      "17": true,
+      "18": true,
+      "19": true,
+      "20": true,
+      "21": true,
+      "22": true,
+      "23": true,
+      "24": true,
+      "25": true,
+      "26": true,
+      "27": true,
+      "28": true,
+      "29": true,
+      "30": true,
+      "31": true,
+      "32": true,
+      "33": true,
+      "34": true,
+      "35": true,
+      "36": true,
+      "37": true,
+      "38": true
+    }
+  },
+  "code": {
+    "dispatch": {
+      "verified": true,
+      "verifiedAt": "2026-06-25T08:11:10Z",
+      "checksum": "1b809ce1f77b735e3bd5fd8ad42125933fe42fb4f236fc6a2271e87baf50bcd5"
+    }
+  }
+}

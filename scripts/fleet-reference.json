@@ -1,0 +1,20 @@
+{
+  "_readme": "Developer / POH reference specs for fleet verification. Add aircraft types you have validated. tolerance_pct allows small rounding vs POH.",
+  "STAR": {
+    "source": "Black Square developer / Beech Starship POH",
+    "tolerance_pct": 5,
+    "spec": {
+      "maxPax": 8,
+      "maxCargo": 650,
+      "minD": 70,
+      "maxD": 1500,
+      "minAlt": 15000,
+      "maxAlt": 41000,
+      "minRunwayLength": 3112,
+      "class": "BIZ JET",
+      "mtow": 6759,
+      "oew": 4574,
+      "fuelPerNm": 1.5
+    }
+  }
+}

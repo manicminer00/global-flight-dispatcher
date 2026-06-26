@@ -2,7 +2,7 @@
 
 <h1 align="center">VECTOR FLIGHT DISPATCH</h1>
 
-**[VECTOR](https://manicminer00.github.io/global-flight-dispatcher/)** is a browser-based dispatcher that builds aircraft-specific routes, missions, and job tickets in one click. No spreadsheets, no guesswork - just suitable runways, realistic payloads, and routes that favour the add-on airports you’ve already bought. Built for MSFS 2024.
+**[VECTOR](https://manicminer00.github.io/global-flight-dispatcher/)** is a browser-based flight dispatcher that builds aircraft-specific routes, missions, and job tickets in one click. No spreadsheets, no guesswork - just suitable runways, realistic payloads, and routes that favour the add-on airports you’ve already bought. Built for MSFS 2024.
 
 ## Quick start
 
@@ -25,17 +25,17 @@
 
 ## In the database
 <table>
+  
 <tr><td width="180" valign="top"><strong>Aircraft</strong></td><td valign="top">105 aircraft (GA, turboprop, business jet, airliner, warbird, military jet, helicopter, glider).</td></tr>
-<tr><td valign="top"><strong>Airports</strong></td><td valign="top">133 MSFS Hand-Crafted · 972 MSFS GA and Glider airfields · 338 Contrail · 42 iniBuilds · 209 ORBX · 37 UK2000 · 122 Flightsim.to · 33 other · 54 military airbases<strong></td></tr>
-<tr><td valign="top"><strong>Missions</strong></td><td valign="top">259 distinct scenarios - VIP charters, passenger, freight, medevac, survey, vintage, tactical, <strong>gliding operations</strong>, long-haul, and more.</td></tr>
+<tr><td valign="top"><strong>Airports</strong></td><td valign="top">175 MSFS Hand-Crafted · 345 MSFS Glider airfields · 619 MSFS Small Detailed Airfields · 337 Contrail · 42 iniBuilds · 208 ORBX · 37 UK2000 · 122 Flightsim.to · 27 other · 54 military airbases<strong></td></tr>
+<tr><td valign="top"><strong>Missions</strong></td><td valign="top">259 distinct scenarios - VIP charters, passenger, freight, medevac, survey, vintage, tactical, gliding operations, long-haul, military operations and more.</td></tr>
 </table>
-
-**Gliding Operations** are fully supported. Pick a glider and VECTOR will dispatch VFR missions between suitable strips.
-*Add missing aircraft or airports under **Settings & Database Tools**. Your logbook and preferences persist in the browser.*
-*Mission images created with generative AI software.*
 
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
 
-© 2026 manicminer — [Support my work on Buy Me A Coffee](https://buymeacoffee.com/manicminer/)
+*© 2026 manicminer — Disclaimer: For flight simulation use only. Do not use for real-world aviation or dispatch. Third-party names and links belong to their respective owners. Mission images created with generative AI software.*
 
-*Created and maintained by manicminer. A free tool for the flight simulation community.*
+<a href="https://www.buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" class="footer-bmc">
+<img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 48px !important;width: 174px !important;">
+</a>
+
