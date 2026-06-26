@@ -27,8 +27,8 @@
 <table>
   
 <tr><td width="180" valign="top"><strong>Aircraft</strong></td><td valign="top">105 aircraft (GA, turboprop, business jet, airliner, warbird, military jet, helicopter, glider).</td></tr>
-<tr><td valign="top"><strong>Airports</strong></td><td valign="top">175 MSFS Hand-Crafted · 345 MSFS Glider airfields · 619 MSFS Small Detailed Airfields · 337 Contrail · 42 iniBuilds · 208 ORBX · 37 UK2000 · 122 Flightsim.to · 27 other · 54 military airbases<strong></td></tr>
-<tr><td valign="top"><strong>Missions</strong></td><td valign="top">259 distinct scenarios - VIP charters, passenger, freight, medevac, survey, vintage, tactical, gliding operations, long-haul, military operations and more.</td></tr>
+<tr><td valign="top"><strong>Airports</strong></td><td valign="top"><strong>Total: 1141 Asobo + 605 Third Party</strong> (175 MSFS Hand-Crafted · 345 MSFS Glider airfields · 619 MSFS Small Detailed Airfields · 337 Contrail · 42 iniBuilds · 208 ORBX · 37 UK2000 · 122 Flightsim.to · 27 other · 54 military airbases)<strong></td></tr>
+<tr><td valign="top"><strong>Missions</strong></td><td valign="top">250 missions - VIP charters, passenger, freight, medevac, survey, vintage, tactical, gliding operations, long-haul, military operations and more.</td></tr>
 </table>
 
 *Dedicated to Michael Greenblatt and the good folks at Andras Meridian.*
