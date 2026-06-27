@@ -1467,16 +1467,6 @@
         .mission-category-hint {
             margin: 8px 0 12px 0;
         }
-        .engine-count-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-			margin-top: 15px; 
-            margin-bottom: 0;
-        }
-        .engine-count-grid select {
-            margin-bottom: 0;
-        }
         .numbered-list {
             list-style: none;
             padding-left: 0;
@@ -1774,7 +1764,7 @@
                     <option value="GA">Light GA only</option>
                     <option value="TURBO">Turboprops (includes GA)</option>
                     <option value="BIZ JET">Business jets (includes Turboprops &amp; GA)</option>
-                    <option value="JET">All fixed-wing jets (includes Business Jets and below)</option>
+                    <option value="JET">Full jet field (airliners, fighters, bombers, biz jets, and all smaller types)</option>
                     <option value="HELI">Helipad/ Helicopters only</option>
                     <option value="GLIDER">Glider strip / winch launch only</option>
                 </select>
@@ -1803,7 +1793,7 @@
         </div>
         <div class="prefer-owned-row military-airbase-row">
             <input type="checkbox" id="newApMilitary">
-            <label for="newApMilitary" class="accent-checkbox-label">Military airbase<span class="note-text"> (civilian missions are blocked from here unless contractor mode is enabled)</span></label>
+            <label for="newApMilitary" class="accent-checkbox-label">Military airbase<span class="note-text"> (Civilian aircraft require Contractor mode selected when dispatching to use this field.)</span></label>
         </div>
         <div class="btn-row">
             <button type="button" onclick="saveCustomAirport()">💾 Save Custom Airport</button>
@@ -1907,17 +1897,6 @@
                     </select>
                 </div>
             </div>
-            <div class="engine-count-grid">
-                <div>
-                    <label for="newAcEngineCount">Engine count:</label>
-                    <select id="newAcEngineCount" class="select-no-margin">
-                        <option value="SINGLE_ENGINE">Single engine</option>
-                        <option value="TWIN_ENGINE" selected>Twin engine</option>
-                        <option value="THREE_ENGINE">Three engines</option>
-                        <option value="FOUR_ENGINE">Four engines</option>
-                    </select>
-                </div>
-            </div>
             <h4 class="form-section-subtitle">Additional Options</h4>
             <div class="checkbox-grid">
                 <div class="checkbox-option-group">
@@ -1932,8 +1911,6 @@
                 </div>
                 <label class="checkbox-option" for="newAcStol">
                     <input type="checkbox" id="newAcStol">Short-field / STOL capable</label>
-                <label class="checkbox-option" for="newAcAmphibian">
-                    <input type="checkbox" id="newAcAmphibian">Amphibian (Water Runways not included in DB)</label>
                 <div id="acTagLightHeliWrap" class="checkbox-option" style="display: none;">
                     <input type="checkbox" id="newAcLightHeli">
                     <label for="newAcLightHeli">Light helicopter (R22-class)</label>
@@ -1942,8 +1919,6 @@
                     <input type="checkbox" id="newAcMilHeli">
                     <label for="newAcMilHeli">Military helicopter</label>
                 </div>
-                <label class="checkbox-option" for="newAcSingleSeat">
-                    <input type="checkbox" id="newAcSingleSeat">Single-seat only (excludes air taxi missions)</label>
                 <label class="checkbox-option" for="newAcRecon">
                     <input type="checkbox" id="newAcRecon">Strategic Reconnaissance Missions</label>
             </div>

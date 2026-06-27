@@ -1533,9 +1533,8 @@ function readCustomMissionRolesFromForm(rawClass, isMilitary) {
     }
     return roles;
 }
-function buildCustomAircraftTagsFromRoles(rawClass, engineTag, missionRoles, options) {
+function buildCustomAircraftTagsFromRoles(rawClass, missionRoles, options) {
     const tags = new Set();
-    tags.add(engineTag);
     if (rawClass === "HELI") tags.add("ROTORCRAFT");
     if (rawClass === "WARBIRD") tags.add("WARBIRD");
     if (rawClass === "GLIDER") tags.add("GLIDER");
@@ -1551,11 +1550,9 @@ function buildCustomAircraftTagsFromRoles(rawClass, engineTag, missionRoles, opt
     if (rawClass === "JET" && (options.mtow || 0) >= HEAVY_JET_MTOW_MIN) tags.add("HEAVY");
     if (options.civilOk) tags.add("CIVIL_OK");
     if (options.stol) tags.add("STOL");
-    if (options.amphibian) tags.add("AMPHIBIAN");
     if (options.lightHeli) tags.add("LIGHT_HELI");
     if (options.militaryHeli) tags.add("MILITARY_HELI");
     if (options.fighter || rawClass === "MIL_JET") tags.add("FIGHTER");
-    if (options.singleSeat) tags.add("SINGLE_SEAT");
     if (options.recon) tags.add("RECON");
     if (rawClass === "GLIDER") {
         if (options.selfLaunch) tags.add("SELF_LAUNCH");
@@ -1642,8 +1639,6 @@ function clearCustomAircraftForm() {
     });
     const classEl = document.getElementById("newAcClass");
     if (classEl) classEl.value = "JET";
-    const engineEl = document.getElementById("newAcEngineCount");
-    if (engineEl) engineEl.value = "TWIN_ENGINE";
     const paxRole = document.getElementById("newAcRolePassenger");
     if (paxRole) paxRole.checked = true;
     ["newAcRoleCargo", "newAcRoleExecutive", "newAcRoleMilitary", "newAcRoleMedevac"].forEach(id => {
@@ -1652,7 +1647,7 @@ function clearCustomAircraftForm() {
     });
     const cargoTier = document.getElementById("newAcCargoTier");
     if (cargoTier) cargoTier.value = "light";
-    ["newAcMilitary", "newAcCivilOk", "newAcFighter", "newAcStol", "newAcAmphibian", "newAcLightHeli", "newAcMilHeli", "newAcSingleSeat", "newAcRecon", "newAcSelfLaunch", "newAcSelfSustain", "newAcSailplane", "newAcElectric", "newAcTwinSeat"].forEach(id => {
+    ["newAcMilitary", "newAcCivilOk", "newAcFighter", "newAcStol", "newAcLightHeli", "newAcMilHeli", "newAcRecon", "newAcSelfLaunch", "newAcSelfSustain", "newAcSailplane", "newAcElectric", "newAcTwinSeat"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.checked = false;
     });
@@ -1697,7 +1692,6 @@ function saveCustomAircraft() {
         alert("OEW must be lower than MTOW.");
         return;
     }
-    const engineTag = document.getElementById("newAcEngineCount") ? document.getElementById("newAcEngineCount").value : "TWIN_ENGINE";
     const missionRoles = readCustomMissionRolesFromForm(rawClass, isMilitary);
     if (rawClass !== "GLIDER" && rawClass !== "MIL_JET") {
         if (!missionRoles.passenger && !missionRoles.cargo && !missionRoles.executive && !missionRoles.military && !missionRoles.medevac) {
@@ -1713,11 +1707,9 @@ function saveCustomAircraft() {
         isMilitary: isMilitary,
         civilOk: document.getElementById("newAcCivilOk") && document.getElementById("newAcCivilOk").checked,
         stol: document.getElementById("newAcStol") && document.getElementById("newAcStol").checked,
-        amphibian: document.getElementById("newAcAmphibian") && document.getElementById("newAcAmphibian").checked,
         lightHeli: document.getElementById("newAcLightHeli") && document.getElementById("newAcLightHeli").checked,
         militaryHeli: document.getElementById("newAcMilHeli") && document.getElementById("newAcMilHeli").checked,
         fighter: document.getElementById("newAcFighter") && document.getElementById("newAcFighter").checked,
-        singleSeat: document.getElementById("newAcSingleSeat") && document.getElementById("newAcSingleSeat").checked,
         recon: document.getElementById("newAcRecon") && document.getElementById("newAcRecon").checked,
         selfLaunch: document.getElementById("newAcSelfLaunch") && document.getElementById("newAcSelfLaunch").checked,
         selfSustain: document.getElementById("newAcSelfSustain") && document.getElementById("newAcSelfSustain").checked,
@@ -1727,7 +1719,7 @@ function saveCustomAircraft() {
         mtow: mtow,
         regionalJet: acClass === "JET" && mtow < 50000
     };
-    const selectedTags = buildCustomAircraftTagsFromRoles(rawClass, engineTag, missionRoles, tagOptions);
+    const selectedTags = buildCustomAircraftTagsFromRoles(rawClass, missionRoles, tagOptions);
     const altDefaults = acClass === "GLIDER"
         ? { minAlt: 4000, maxAlt: 30000, rules: "VFR/Scenic" }
         : acClass === "HELI"
