@@ -366,25 +366,46 @@ function filterPoolToAssignedOnly(aircraftType, pool) {
     });
 }
 
+function formatMissionTemplateRange(types) {
+    if (!types || !types.length) return "";
+    var sorted = types.slice().sort(function (a, b) { return a - b; });
+    if (sorted.length === 1) return String(sorted[0]);
+    var consecutive = true;
+    for (var i = 1; i < sorted.length; i++) {
+        if (sorted[i] !== sorted[i - 1] + 1) {
+            consecutive = false;
+            break;
+        }
+    }
+    if (consecutive) return sorted[0] + "\u2013" + sorted[sorted.length - 1];
+    return sorted.join(", ");
+}
+
 function buildPoolMetadata(scenarioDB, missionMatrix) {
     var pools = {};
     MISSION_POOL_ORDER.forEach(function (poolKey) {
         if (!scenarioDB[poolKey]) return;
         var scenarios = scenarioDB[poolKey];
-        var missionType = scenarios[0] && scenarios[0].missionType;
-        if (!missionType) {
-            var tmpl = missionMatrix.find(function (m) { return m.pool === poolKey; });
-            missionType = tmpl ? tmpl.type : null;
-        }
+        var templatesForPool = missionMatrix.filter(function (m) { return m.pool === poolKey; });
+        var missionTypes = templatesForPool.map(function (m) { return m.type; }).sort(function (a, b) { return a - b; });
+        var missionType = missionTypes.length === 1
+            ? missionTypes[0]
+            : ((scenarios[0] && scenarios[0].missionType) || missionTypes[0] || null);
         var missionName = "";
-        if (missionType) {
+        var missionNames = templatesForPool.map(function (m) { return m.name; });
+        if (missionTypes.length === 1) {
+            missionName = missionNames[0] || "";
+        } else if (missionType) {
             var mt = missionMatrix.find(function (m) { return m.type === missionType; });
             missionName = mt ? mt.name : "";
         }
         pools[poolKey] = {
             label: MISSION_POOL_LABELS[poolKey] || poolKey,
             missionType: missionType,
+            missionTypes: missionTypes,
             missionName: missionName,
+            missionNames: missionNames,
+            templateLabel: formatMissionTemplateRange(missionTypes),
             imgIds: scenarios.map(function (s) { return s.imgId; }),
             scenarios: scenarios
         };
