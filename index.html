@@ -484,12 +484,15 @@
             cursor: pointer;
             margin: 0;
         }
-        .checkbox-option input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            margin: 0 6px 0 0;
-            cursor: pointer;
-            flex-shrink: 0;
+        .checkbox-option input[type="checkbox"]:disabled {
+            cursor: not-allowed;
+        }
+        .checkbox-option--unavailable {
+            display: none;
+        }
+        #longHaulToggleLabel:has(#longHaulToggle:checked) {
+            font-weight: var(--font-weight-label);
+            color: var(--text-primary);
         }
         .checkbox-option input[type="radio"] {
             width: 16px;
@@ -1581,7 +1584,7 @@
         <div class="dispatch-form-field">
         <label for="aircraftInput" class="flex-label">Aircraft Type:</label>
 		<div class="input-relative-wrap">
-			<input type="text" id="aircraftInput" placeholder="Type to search or click to show all" autocomplete="off">
+			<input type="text" id="aircraftInput" placeholder="Search by name or ICAO code" autocomplete="off">
 			<div id="customAircraftList" class="custom-datalist"></div>
 		</div>
         </div>
@@ -1629,6 +1632,12 @@
                 A glider can dispatch from any departure airport with sufficient runway length (not a helipad) if you enter an ICAO. If the departure airport is left blank, the dispatcher considers all suitable airports but strongly prefers routes from and to glider strips.
             </div>
         </details>
+        <details id="longHaulUnavailableNotice" class="info-details" style="display: none;">
+            <summary>Long-haul flights</summary>
+            <div class="info-details-body" id="longHaulUnavailableNoticeText">
+                Long-haul mode is not available for this aircraft. Details update when you select an airframe.
+            </div>
+        </details>
 </div>
 <div class="slider-section">
     <label for="timeSlider" class="slider-header-row" id="timeSliderHeading">
@@ -1649,7 +1658,7 @@
         <option value="120"></option>
     </datalist>
     <div class="slider-footer-row">
-        <label class="checkbox-option" for="longHaulToggle">
+        <label class="checkbox-option" for="longHaulToggle" id="longHaulToggleLabel">
             <input type="checkbox" id="longHaulToggle" onchange="toggleLongHaulMode()">⏳ Enable long-haul flights
         </label>
         <span class="note-text slider-rotor-glider-note">(N.B. Helicopter and Glider missions are unaffected by this slider.)</span>
@@ -1873,37 +1882,29 @@
             </div>
         </div>
 	<div class="control-group mission-tags-section">
-            <h4 class="form-section-title">🎯 Mission tags</h4>
-            <div class="note-text" style="margin-bottom: 12px;">Mission tags are used to define how the dispatcher classifies aircraft. Pair with Primary mission use: e.g. Caravan cargo = GA + Cargo, E195-F = Regional + Cargo, 777F = Commercial wide-body + Cargo. Turboprop class uses Regional or GA depending on how you fly it.</div>
-            <div class="mission-tags-grid">
-				<div>
-					<label for="newAcRole">Mission category:</label>
-                    <select id="newAcRole" class="select-no-margin">
-                        <option value="LIGHT_GA">GA</option>
-                        <option value="REGIONAL">Regional</option>
-                        <option value="BIZ_JET">Business Jet</option>
-                        <option value="JETLINER" selected>Commercial narrow-body</option>
-                        <option value="JETLINER HEAVY">Commercial wide-body</option>
-                        <option value="HEAVY">Heavy Cargo / Airlifter</option>
-                        <option value="ROTORCRAFT">Helicopter</option>
-                        <option value="GLIDER">Glider</option>
-                        <option value="FAST_JET">Fighter Jet</option>
-                        <option value="VINTAGE">Vintage</option>
-                        <option value="WARBIRD">Warbird</option>
-                    </select>
-                </div>
+            <h4 class="form-section-title">🎯 Mission roles</h4>
+            <div class="note-text" style="margin-bottom: 12px;">Tick what this aircraft flies. VECTOR builds the mission list automatically — you do not pick individual briefings here.</div>
+            <div class="checkbox-grid">
+                <label class="checkbox-option" for="newAcRolePassenger">
+                    <input type="checkbox" id="newAcRolePassenger" checked onchange="updateCustomAircraftForm()">Passenger</label>
+                <label class="checkbox-option" for="newAcRoleCargo">
+                    <input type="checkbox" id="newAcRoleCargo" onchange="updateCustomAircraftForm()">Cargo / freight</label>
+                <label class="checkbox-option" for="newAcRoleExecutive">
+                    <input type="checkbox" id="newAcRoleExecutive" onchange="updateCustomAircraftForm()">Executive (business jet / VIP)</label>
+                <label class="checkbox-option" for="newAcRoleMilitary">
+                    <input type="checkbox" id="newAcRoleMilitary" onchange="updateCustomAircraftForm()">Military operations</label>
+                <label class="checkbox-option" for="newAcRoleMedevac">
+                    <input type="checkbox" id="newAcRoleMedevac">Air ambulance / medevac</label>
+            </div>
+            <div id="acCargoTierWrap" class="form-grid-2-mt" style="display: none;">
                 <div>
-                    <label for="newAcConfig">Primary mission use:</label>
-                    <select id="newAcConfig" class="select-no-margin">
-                        <option value="MEDEVAC">Air Ambulance / Medevac</option>
-						<option value="FREIGHTER">Cargo / Freight</option>
-						<option value="PAX">Passenger</option>
-                        <option value="TACTICAL">Tactical / Military</option>
-                        <option value="VIP">VIP / Executive Charter</option>
+                    <label for="newAcCargoTier">Cargo type:</label>
+                    <select id="newAcCargoTier" class="select-no-margin">
+                        <option value="light">Light cargo</option>
+                        <option value="regional">Regional cargo</option>
+                        <option value="heavy">Heavy cargo (civil)</option>
+                        <option value="military">Military cargo / airlifter</option>
                     </select>
-                    <div id="acAirlifterHint" class="note-text tag-hint" style="display: none; line-height: 1.4;">
-                        Military airlifter setup (e.g. A400): choose <strong>Cargo / freight</strong> above, tick <strong>Military Aircraft</strong> below, and use <strong>Heavy Cargo / Airlifter</strong> as the mission category.
-                    </div>
                 </div>
             </div>
             <div class="engine-count-grid">

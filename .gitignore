@@ -9,6 +9,8 @@
 !index.html
 !loader.js
 !dispatch-engine.js
+!mission-assignment-core.js
+!mission-assignments-data.js
 !missions-db.js
 !fleet-db.js
 !airports-asobo-db.js

@@ -1,6 +1,12 @@
 let lastMissions = [];
 let lastScenarioImgIds = [];
+const DEFAULT_HAT_WEIGHT = 10;
+const MEDEVAC_TARGET_SHARE = 0.2;
 let activeAirportDatabase = [];
+let activeAirportDatabaseNeedsRebuild = true;
+function markAirportDatabaseDirty() {
+    activeAirportDatabaseNeedsRebuild = true;
+}
 let activeFleetSpecs = {};
 
 function readSeedAirportArray(globalName) {
@@ -83,22 +89,29 @@ const GLIDER_MAX_ROUTE_NM = 50;
 const GLIDER_LOCAL_ROUTE_NM = 35;
 
 function buildGliderRoutePairs(validAirports, depOverride, spec) {
+    const gliderFields = validAirports.filter(ap => isGliderSuitableAirport(ap, spec));
     const sources = depOverride
-        ? validAirports.filter(ap => ap.icao === depOverride)
-        : validAirports;
+        ? gliderFields.filter(ap => ap.icao === depOverride)
+        : gliderFields;
+    const searchMax = GLIDER_MAX_ROUTE_NM;
+    const latDelta = nmToLatDeltaDeg(searchMax + 5);
+    const fieldGrid = buildAirportSpatialGrid(gliderFields, HELI_GRID_CELL_DEG);
     const crossCountryPairs = [];
     for (const src of sources) {
-        for (const dst of validAirports) {
-            if (src.icao === dst.icao) continue;
-            if (!isGliderSuitableAirport(dst, spec)) continue;
+        const lonDelta = nmToLonDeltaDeg(searchMax + 5, src.lat);
+        forEachAirportNearGrid(fieldGrid, src, HELI_GRID_CELL_DEG, latDelta, lonDelta, (dst) => {
+            if (src.icao === dst.icao) return;
+            if (!isGliderSuitableAirport(dst, spec)) return;
             const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
-            if (!dist || isNaN(dist)) continue;
+            if (!dist || isNaN(dist)) return;
             if (dist >= GLIDER_MIN_ROUTE_NM && dist <= GLIDER_MAX_ROUTE_NM) {
                 crossCountryPairs.push({ src, dst, dist });
             }
-        }
+        });
     }
-    if (crossCountryPairs.length > 0) return crossCountryPairs;
+    if (crossCountryPairs.length > 0) {
+        return capRoutePairPool(crossCountryPairs, HELI_ROUTE_PAIR_CAP);
+    }
     const localPairs = [];
     for (const src of sources) {
         localPairs.push({ src, dst: src, dist: GLIDER_LOCAL_ROUTE_NM });
@@ -161,6 +174,7 @@ function loadRoutingScope() {
 const LONG_HAUL_BLOCK_TIME_PAD_MINS = 30;
 const LONG_HAUL_MIN_BLOCK_MINS = 360;
 const LONG_HAUL_MAX_BLOCK_MINS = 960;
+const LONG_HAUL_UNAVAILABLE_MESSAGE = "Why can't I use long-haul mode? Long-haul mode targets 6-16 hour sectors. Try turning off long-haul, choosing a different departure, or selecting an airframe with greater range.";
 // Short-haul slider = target block time; routing uses cruise (slider minus pad) so SimBrief block stays near the slider.
 const SHORT_HAUL_BLOCK_TIME_PAD_MINS = LONG_HAUL_BLOCK_TIME_PAD_MINS;
 const SHORT_HAUL_ROUTE_PLANNING_TRIM_MINS = 10;
@@ -168,6 +182,39 @@ const SCHEDULED_COMMERCIAL_LOAD_MIN = 0.70;
 const SCHEDULED_COMMERCIAL_LOAD_MAX = 0.80;
 const FAST_BIZ_JET_TYPES = new Set(["C750", "C680", "C700"]);
 const VINTAGE_PROPLINER_TYPES = new Set(["DC6A", "DC6B"]);
+const LONG_HAUL_ALLOWED_TURBOPROP_TYPES = new Set(["AT46", "AT76"]);
+const REGIONAL_JET_MTOW_MAX = 50000;
+const HEAVY_JET_MTOW_MIN = 136000;
+const FREIGHT_MISSION_TYPES = new Set([6, 17, 18, 29, 33, 36, 38, 39]);
+const PASSENGER_MISSION_TYPES = new Set([14, 15, 16, 19, 20, 21, 22, 25, 26, 27, 28, 30, 31, 34, 35, 37]);
+// Vintage & Heritage scenarios gated to long-haul for airliners; warbirds need them in short-haul too.
+const WARBIRD_HERITAGE_SCENARIO_IMGIDS = new Set([149, 151, 155, 156, 157]);
+function specHasPaxCapacity(spec) {
+    return !!spec && (spec.maxPax || 0) > 0;
+}
+function specHasCargoCapacity(spec) {
+    return !!spec && (spec.maxCargo || 0) > 0;
+}
+function specIsHeavyJet(spec) {
+    if (!spec || spec.class !== "JET") return false;
+    if (spec.tags && spec.tags.includes("HEAVY")) return true;
+    return (spec.mtow || 0) >= HEAVY_JET_MTOW_MIN;
+}
+function isShortHaulOnlyAirframe(type, spec) {
+    if (!spec) return false;
+    if (LONG_HAUL_ALLOWED_TURBOPROP_TYPES.has(type)) return false;
+    if (spec.class === "TURBO") return true;
+    if (spec.class === "JET" && (spec.mtow || 0) < REGIONAL_JET_MTOW_MAX) return true;
+    return false;
+}
+function requireMissionAssignmentsLoaded() {
+    if (typeof usesMissionAssignments !== "function" || !usesMissionAssignments()) {
+        throw new Error("VECTOR: mission assignments are required but not loaded.");
+    }
+}
+function getMissionAssignmentsUnavailableMessage(type) {
+    return "No missions are assigned to " + type + " in the mission editor. Assign briefings for this aircraft, export, regenerate mission-assignments-data.js, and hard-refresh (Ctrl+F5).";
+}
 const BLOCK_SPEED_KTS = {
     JET: 440,
     HEAVY_JET: 485,
@@ -184,8 +231,7 @@ const BLOCK_SPEED_KTS = {
     GA: 90
 };
 function isScheduledCommercialMission(mission) {
-    const tags = mission.requiredTags || [];
-    return tags.includes("PAX") && (tags.includes("JETLINER") || tags.includes("REGIONAL"));
+    return !!(mission && [14, 15, 35].includes(mission.type));
 }
 function getVipPassengerTarget(spec, blockMinutes, chosenMission) {
     const seats = spec.maxPax;
@@ -193,7 +239,7 @@ function getVipPassengerTarget(spec, blockMinutes, chosenMission) {
     const isBizJet = spec.class === "BIZ JET";
     const isLightExecutive = isBizJet
         || (spec.class === "TURBO" && seats <= 12)
-        || (spec.class === "GA" && seats <= 8 && spec.tags && spec.tags.includes("VIP"));
+        || (spec.class === "GA" && seats <= 8);
     if (isLightExecutive) {
         let loadFactor;
         if (blockMinutes < 75) loadFactor = 0.22;
@@ -215,9 +261,9 @@ function getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes) {
     if (!missionRequiresPassengers(chosenMission, spec) || maxSafePax <= 0) {
         return { minPax: 0, effectiveMax: 0 };
     }
-    const requiredTags = chosenMission.requiredTags || [];
     const isScheduledCommercial = isScheduledCommercialMission(chosenMission);
-    const isVipMission = requiredTags.includes("VIP");
+    const isVipMission = chosenMission && (chosenMission.type === 16 || chosenMission.type === 37
+        || chosenMission.pool === "executive" || chosenMission.pool === "longHaulExecutive");
 
     let minPax = 1;
     let maxPaxTarget = spec.maxPax;
@@ -230,9 +276,9 @@ function getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes) {
         if (spec.class === "BIZ JET" && maxPaxTarget >= 3) {
             minPax = 2;
         }
-    } else if (spec.class === "JET" && requiredTags.includes("PAX")) {
+    } else if (spec.class === "JET" && isPassengerMission(chosenMission)) {
         minPax = Math.floor(spec.maxPax * 0.5);
-    } else if (requiredTags.includes("PAX")) {
+    } else if (isPassengerMission(chosenMission)) {
         minPax = 1;
     } else if (spec.class === "JET") {
         minPax = Math.floor(spec.maxPax * 0.5);
@@ -244,25 +290,23 @@ function getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes) {
 }
 function isFreightMission(mission) {
     if (!mission) return false;
-    const requiredTags = mission.requiredTags || [];
-    if (requiredTags.includes("FREIGHTER")) return true;
-    if (requiredTags.includes("PAX")) return false;
+    if (FREIGHT_MISSION_TYPES.has(mission.type)) return true;
     if (mission.minCargo) return true;
+    const pool = mission.pool || "";
+    if (/freight/i.test(pool)) return true;
     const name = (mission.name || "").toLowerCase();
     return /\bfreight\b/.test(name) || /\bcargo\b/.test(name);
 }
 function isPassengerMission(mission) {
     if (!mission || isFreightMission(mission)) return false;
-    const requiredTags = mission.requiredTags || [];
-    if (requiredTags.includes("PAX")) return true;
-    if (requiredTags.includes("FREIGHTER")) return false;
+    if (PASSENGER_MISSION_TYPES.has(mission.type)) return true;
     const name = (mission.name || "").toLowerCase();
     if (/\bairliner\b/.test(name) || /\bpassenger\b/.test(name) || /\bcommuter\b/.test(name)) return true;
     if (mission.allowedAircraft && mission.allowedAircraft.length > 0) {
         return mission.allowedAircraft.every(code => {
             const acSpec = (typeof activeFleetSpecs !== "undefined" && activeFleetSpecs[code])
                 || (typeof coreFleetSpecs !== "undefined" && coreFleetSpecs[code]);
-            return acSpec && acSpec.tags && acSpec.tags.includes("PAX") && (acSpec.maxPax || 0) > 0;
+            return acSpec && (acSpec.maxPax || 0) > 0;
         });
     }
     return false;
@@ -276,11 +320,9 @@ function missionRequiresPassengers(chosenMission, spec) {
     if (isFreightMission(chosenMission)) return false;
     if ((spec.maxPax || 0) <= 0) return false;
     if (isPassengerMission(chosenMission)) return true;
-    const requiredTags = chosenMission.requiredTags || [];
-    if (requiredTags.includes("PAX")) return true;
     const tags = spec.tags || [];
-    if (!tags.includes("PAX")) return false;
-    if (!tags.includes("FREIGHTER")) return true;
+    if (!specHasPaxCapacity(spec)) return false;
+    if (!specHasCargoCapacity(spec)) return true;
     // Dual-role military airlifters (C-130J, C-160, CH-47D, etc.): troop/passenger loads on logistics/heli missions.
     if (tags.includes("MILITARY_TRANSPORT") || tags.includes("MILITARY_HELI")) {
         return isMilitaryTroopPassengerMission(chosenMission);
@@ -371,7 +413,7 @@ function getBlockSpeedForSpec(spec, aircraftType) {
         return BLOCK_SPEED_KTS.VINTAGE_PROPLINER;
     }
     if (spec.class === "JET") {
-        if (isLongHaulModeEnabled() && spec.tags && spec.tags.includes("HEAVY")) {
+        if (isLongHaulModeEnabled() && specIsHeavyJet(spec)) {
             return BLOCK_SPEED_KTS.HEAVY_JET;
         }
         return BLOCK_SPEED_KTS.JET;
@@ -467,32 +509,34 @@ function formatBlockTimeHoursMinutes(totalMins) {
     return `${hrs} hour${hrs === 1 ? "" : "s"} ${rem} minutes`;
 }
 function buildNoLongHaulMissionsMessage(spec, type, isContractorMode) {
-    const tags = spec.tags || [];
+    if (!canAircraftUseLongHaulMode(spec, type)) {
+        return getLongHaulUnavailableReason(spec, type);
+    }
 
     if (spec.class === "GLIDER" || spec.class === "HELI") {
         return "Long-haul dispatch is not available for this aircraft type. Turn off Long Haul or choose a fixed-wing jet or turboprop.";
     }
 
     if (spec.class === "BIZ JET") {
-        if (!tags.includes("PAX") || !tags.includes("VIP")) {
-            return "Your dispatcher could not assign a long-haul mission. This business jet needs a passenger and VIP configuration. If you added it manually, review the settings under Custom Aircraft.";
+        if (!specHasPaxCapacity(spec)) {
+            return "Your dispatcher could not assign a long-haul mission. This business jet needs passenger capacity configured. If you added it manually, review the settings under Custom Aircraft.";
         }
         return "Your dispatcher could not assign a long-haul executive mission for this routing. Try choosing a different departure or turning off long-haul for a shorter sector.";
     }
 
-    if (tags.includes("FREIGHTER") && spec.isMilitary) {
+    if (specHasCargoCapacity(spec) && !specHasPaxCapacity(spec) && spec.isMilitary) {
         return "Your dispatcher could not assign a long-haul military cargo mission for this airframe and routing. Try a different departure or turn off Long Haul for a shorter sector.";
     }
 
-    if (tags.includes("FREIGHTER")) {
+    if (specHasCargoCapacity(spec) && !specHasPaxCapacity(spec)) {
         return "Your dispatcher could not assign a long-haul freight mission for this airframe and routing. Try choosing a different departure or turning off Long Haul for a shorter sector.";
     }
 
-    if (tags.includes("JETLINER") && tags.includes("PAX")) {
+    if (spec.class === "JET" && specHasPaxCapacity(spec)) {
         return "Your dispatcher could not assign a long-haul airline mission for this routing. Try choosing a different departure region.";
     }
 
-    if (spec.isMilitary && !isContractorMode && !tags.includes("CIVIL_OK")) {
+    if (spec.isMilitary && !isContractorMode && !(spec.tags && spec.tags.includes("CIVIL_OK"))) {
         return "Your dispatcher could not assign a long-haul mission for this military aircraft. Enable Contractor Mode for civilian-style missions, or turn off Long Haul for a shorter sector.";
     }
 
@@ -620,47 +664,36 @@ function buildJetRoutePairs(sources, destinations, depOverride, spec, minTarget,
         return { candidatePairs, usedRelaxedRouting };
     }
     let primaryPairs = [];
-    for (const src of sources) {
-        if (depCode && normalizeIcao(src.icao) !== depCode) continue;
-        for (const dst of destinations) {
-            if (normalizeIcao(src.icao) === normalizeIcao(dst.icao) && spec.class === "HELI") {
-                primaryPairs.push({ src, dst: src, dist: 25 });
-                continue;
-            }
-            if (normalizeIcao(src.icao) === normalizeIcao(dst.icao)) continue;
-            const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
-            if (!dist || isNaN(dist)) continue;
-            if (!routeWithinAircraftRange(dist, spec)) continue;
-            if (dist >= minTarget && dist <= maxTarget) {
-                if (fixedDepShortHaul && !pairPassesFixedDepartureBlockWindow(dist, routingTargetMins, spec, aircraftType, SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS)) {
-                    continue;
-                }
-                primaryPairs.push({ src, dst, dist });
-            }
-        }
-    }
-    if (primaryPairs.length === 0) {
-        usedRelaxedRouting = true;
+    const searchMax = Math.max(maxTarget, relaxedMax, minTarget);
+    const latDelta = nmToLatDeltaDeg(searchMax + 10);
+    const destGrid = buildAirportSpatialGrid(destinations, HELI_GRID_CELL_DEG);
+    const collectPairs = (distMin, distMax, toleranceMins) => {
+        const found = [];
         for (const src of sources) {
             if (depCode && normalizeIcao(src.icao) !== depCode) continue;
-            for (const dst of destinations) {
-                if (normalizeIcao(src.icao) === normalizeIcao(dst.icao) && spec.class === "HELI") continue;
-                if (normalizeIcao(src.icao) === normalizeIcao(dst.icao)) continue;
+            const lonDelta = nmToLonDeltaDeg(searchMax + 10, src.lat);
+            forEachAirportNearGrid(destGrid, src, HELI_GRID_CELL_DEG, latDelta, lonDelta, (dst) => {
+                if (normalizeIcao(src.icao) === normalizeIcao(dst.icao)) return;
                 const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
-                if (!dist || isNaN(dist)) continue;
-                if (!routeWithinAircraftRange(dist, spec)) continue;
-                if (dist >= relaxedMin && dist <= relaxedMax) {
-                    if (fixedDepShortHaul && !pairPassesFixedDepartureBlockWindow(dist, routingTargetMins, spec, aircraftType, FIXED_DEPARTURE_BLOCK_RELAXED_MINS)) {
-                        continue;
-                    }
-                    candidatePairs.push({ src, dst, dist });
+                if (!dist || isNaN(dist)) return;
+                if (!routeWithinAircraftRange(dist, spec)) return;
+                if (dist < distMin || dist > distMax) return;
+                if (fixedDepShortHaul && !pairPassesFixedDepartureBlockWindow(dist, routingTargetMins, spec, aircraftType, toleranceMins)) {
+                    return;
                 }
-            }
+                found.push({ src, dst, dist });
+            });
         }
+        return found;
+    };
+    primaryPairs = collectPairs(minTarget, maxTarget, SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS);
+    if (primaryPairs.length === 0) {
+        usedRelaxedRouting = true;
+        candidatePairs.push(...collectPairs(relaxedMin, relaxedMax, FIXED_DEPARTURE_BLOCK_RELAXED_MINS));
     } else {
         candidatePairs.push(...primaryPairs);
     }
-    return { candidatePairs, usedRelaxedRouting };
+    return { candidatePairs: capRoutePairPool(candidatePairs, JET_ROUTE_PAIR_CAP), usedRelaxedRouting };
 }
 function routeWithinAircraftRange(dist, spec) {
     const minD = spec.minD || 0;
@@ -668,6 +701,7 @@ function routeWithinAircraftRange(dist, spec) {
     return dist >= minD && dist <= maxD;
 }
 const HELI_ROUTE_PAIR_CAP = 8000;
+const JET_ROUTE_PAIR_CAP = 12000;
 const HELI_GRID_CELL_DEG = 0.45;
 function nmToLatDeltaDeg(nm) {
     return nm / 60;
@@ -790,7 +824,15 @@ function pickShortHaulRoute(pool, targetMins, spec, aircraftType) {
 function pickLongHaulRoute(pool, spec, aircraftType) {
     const valid = pool.filter(p => passesLongHaulDurationBand(p.dist, spec, aircraftType));
     if (!valid.length) return null;
-    return valid[Math.floor(Math.random() * valid.length)];
+    const ranked = valid
+        .map(pair => ({
+            pair,
+            blockEst: estimateLongHaulBlockMinutesForRoute(pair.dist, spec, aircraftType)
+        }))
+        .sort((a, b) => b.blockEst - a.blockEst);
+    const best = ranked[0].blockEst;
+    const tier = ranked.filter(entry => entry.blockEst >= best - 5);
+    return tier[Math.floor(Math.random() * tier.length)].pair;
 }
 function pickRouteByTimeFit(pool, targetMins, targetDistNm, spec, aircraftType, longHaul) {
     if (!pool.length) return null;
@@ -812,20 +854,27 @@ function getLongHaulScenarioIdsForMission(missionType) {
     const ids = LONG_HAUL_SCENARIOS_BY_MISSION[missionType];
     return ids && ids.length ? ids : null;
 }
-function filterScenariosForHaulMode(pool, missionType, longHaul) {
+function filterScenariosForHaulMode(pool, missionType, longHaul, spec) {
     const restrictedIds = getLongHaulScenarioIdsForMission(missionType);
     if (!restrictedIds || !pool.length) return pool;
     const allowed = new Set(restrictedIds);
     if (longHaul) {
-        const longHaulPool = pool.filter(s => allowed.has(s.imgId));
-        return longHaulPool.length > 0 ? longHaulPool : pool;
+        return pool.filter(s => allowed.has(s.imgId));
     }
-    const shortHaulPool = pool.filter(s => !allowed.has(s.imgId));
-    const minShortHaulScenarios = 3;
-    if (shortHaulPool.length < minShortHaulScenarios && pool.length > shortHaulPool.length) {
+    let shortHaulPool = pool.filter(s => !allowed.has(s.imgId));
+    if (spec && spec.class === "WARBIRD" && missionType === 25) {
+        shortHaulPool = pool.filter(s =>
+            !allowed.has(s.imgId) || WARBIRD_HERITAGE_SCENARIO_IMGIDS.has(s.imgId)
+        );
+    }
+    // Avoid a single short-haul briefing when most of the pool was tagged long-haul-only in data.
+    if (shortHaulPool.length <= 1 && pool.length > shortHaulPool.length) {
         return pool;
     }
-    return shortHaulPool.length > 0 ? shortHaulPool : pool;
+    if (shortHaulPool.length === 0) {
+        return pool;
+    }
+    return shortHaulPool;
 }
 function missionAllowedForHaulMode(m, longHaul) {
     if (longHaul) return isLongHaulMissionType(m.type);
@@ -851,26 +900,86 @@ function saveFlightTimeMinutes(mins) {
     } catch (e) { /* private browsing / storage full */ }
 }
 function getSelectedAircraftType() {
-    const selectedName = document.getElementById("aircraftInput").value.trim();
-    return Object.keys(activeFleetSpecs).find(key => activeFleetSpecs[key].name === selectedName) || null;
+    const inputValue = document.getElementById("aircraftInput").value.trim();
+    return resolveAircraftTypeFromInput(inputValue);
+}
+function aircraftMatchesFilter(type, spec, filterText) {
+    if (!filterText) return true;
+    const lower = filterText.trim().toLowerCase();
+    if (!lower) return true;
+    if (spec.name && spec.name.toLowerCase().includes(lower)) return true;
+    if (type && type.toLowerCase().includes(lower)) return true;
+    if (spec.simbriefIcao && spec.simbriefIcao.toLowerCase().includes(lower)) return true;
+    return false;
+}
+function resolveAircraftTypeFromInput(inputValue) {
+    const raw = (inputValue || "").trim();
+    if (!raw || typeof activeFleetSpecs === "undefined") return null;
+    const upper = raw.toUpperCase();
+    if (activeFleetSpecs[raw]) return raw;
+    const exactKey = Object.keys(activeFleetSpecs).find(key => key.toUpperCase() === upper);
+    if (exactKey) return exactKey;
+    const exactName = Object.keys(activeFleetSpecs).find(key => activeFleetSpecs[key].name === raw);
+    if (exactName) return exactName;
+    const simbriefMatches = Object.keys(activeFleetSpecs).filter(key => {
+        const spec = activeFleetSpecs[key];
+        return (spec.simbriefIcao || key).toUpperCase() === upper;
+    });
+    if (simbriefMatches.length === 1) return simbriefMatches[0];
+    return null;
 }
 function canAircraftUseLongHaulMode(spec, type) {
     if (!spec || isSliderIgnoredAircraft(spec)) return false;
+    if (spec.class === "GA" && !VINTAGE_PROPLINER_TYPES.has(type)) return false;
+    if (spec.class === "TURBO" && !LONG_HAUL_ALLOWED_TURBOPROP_TYPES.has(type)) return false;
     const maxBlock = getLongHaulMaxBlockForAircraft(spec, type);
     if (maxBlock < LONG_HAUL_MIN_BLOCK_MINS) return false;
     return getLongHaulMinBlockForAircraft(spec, type) <= maxBlock;
 }
+function getLongHaulUnavailableReason(spec, type) {
+    if (!spec || !type) return LONG_HAUL_UNAVAILABLE_MESSAGE;
+    if (spec.class === "GA" && !VINTAGE_PROPLINER_TYPES.has(type)) {
+        return "Long-haul intercontinental sectors are not offered for light general-aviation types like this one. Vintage propliners such as the DC-6 are the exception. Use the block-time slider for shorter flights instead.";
+    }
+    if (isSliderIgnoredAircraft(spec)) {
+        return "Helicopter and glider flights use fixed local block times rather than long-haul mode.";
+    }
+    if (isShortHaulOnlyAirframe(type, spec)) {
+        const maxBlock = getMaxAchievableBlockMinutes(spec, type);
+        const approx = formatBlockTimeHoursMinutes(maxBlock);
+        const role = spec.class === "JET" ? "Regional jets" : "Regional turboprops";
+        return `${role} like this one cannot support 6–16 hour long-haul sectors — the longest practical block time is about ${approx} at full range. Long-haul mode is for intercontinental mainline types; use the block-time slider for typical regional routes.`;
+    }
+    return LONG_HAUL_UNAVAILABLE_MESSAGE;
+}
 function syncLongHaulToggleForAircraft() {
     const toggle = document.getElementById("longHaulToggle");
+    const label = document.getElementById("longHaulToggleLabel");
+    const notice = document.getElementById("longHaulUnavailableNotice");
+    const noticeText = document.getElementById("longHaulUnavailableNoticeText");
     if (!toggle) return;
     const type = getSelectedAircraftType();
     const spec = type ? activeFleetSpecs[type] : null;
     if (!spec || !type) {
         toggle.disabled = false;
+        if (label) label.classList.remove("checkbox-option--unavailable");
+        if (notice) notice.style.display = "none";
         return;
     }
     const canLongHaul = canAircraftUseLongHaulMode(spec, type);
     toggle.disabled = !canLongHaul;
+    if (label) {
+        label.classList.toggle("checkbox-option--unavailable", !canLongHaul);
+    }
+    if (notice) {
+        if (!canLongHaul) {
+            const reason = getLongHaulUnavailableReason(spec, type);
+            if (noticeText) noticeText.textContent = reason;
+            notice.style.display = "block";
+        } else {
+            notice.style.display = "none";
+        }
+    }
     if (!canLongHaul && toggle.checked) {
         toggle.checked = false;
         try {
@@ -928,7 +1037,7 @@ function toggleLongHaulMode() {
         const spec = type ? activeFleetSpecs[type] : null;
         if (spec && type && !canAircraftUseLongHaulMode(spec, type)) {
             toggle.checked = false;
-            alert(`Long haul flights are not available for this aircraft. Maximum block time is approximately ${formatBlockTimeHoursMinutes(getMaxAchievableBlockMinutes(spec, type))}.`);
+            alert(getLongHaulUnavailableReason(spec, type));
             return;
         }
     }
@@ -1074,17 +1183,6 @@ function onManageCustomDbTableClick(e) {
     if (airportIcao) removeCustomAirport(airportIcao);
     else if (aircraftIcao) removeCustomAircraft(aircraftIcao);
 }
-const AIRCRAFT_MISSION_CATEGORY_LABELS = {
-    LIGHT_GA: "GA",
-    REGIONAL: "Regional",
-    BIZ_JET: "Business Jet",
-    JETLINER: "Commercial narrow-body",
-    HEAVY: "Heavy Cargo / Airlifter",
-    ROTORCRAFT: "Helicopter",
-    FAST_JET: "Fighter Jet",
-    VINTAGE: "Vintage",
-    WARBIRD: "Warbird"
-};
 function formatCustomAirportRunwayLength(airport) {
     if (airport.rwy === "HELI") return "Helipad";
     const length = parseInt(airport.length, 10);
@@ -1095,17 +1193,19 @@ function formatCustomAirportScenerySource(airport) {
     return airport.source || airport.linkText || "—";
 }
 function formatAircraftMissionCategory(aircraft) {
-    const tags = Array.isArray(aircraft.tags) ? aircraft.tags : [];
-    if (tags.includes("JETLINER") && tags.includes("HEAVY")) {
-        return "Commercial wide-body";
-    }
-    const roleOrder = ["WARBIRD", "FAST_JET", "ROTORCRAFT", "HEAVY", "JETLINER", "BIZ_JET", "REGIONAL", "LIGHT_GA", "VINTAGE"];
-    for (const role of roleOrder) {
-        if (tags.includes(role)) {
-            return AIRCRAFT_MISSION_CATEGORY_LABELS[role] || role;
-        }
-    }
-    return "—";
+    if (!aircraft) return "—";
+    if (aircraft.class === "WARBIRD") return "Warbird";
+    if (aircraft.class === "HELI") return "Helicopter";
+    if (aircraft.class === "GLIDER") return "Gliding";
+    if (aircraft.class === "BIZ JET") return "Business Jet";
+    if (aircraft.class === "GA") return "GA";
+    if (aircraft.isTactical) return "Fighter Jet";
+    if (aircraft.isMilitary && aircraft.class === "JET") return "Military Jet";
+    if (aircraft.class === "JET" && specIsHeavyJet(aircraft)) return "Commercial wide-body";
+    if (aircraft.class === "JET") return "Commercial narrow-body";
+    if (aircraft.class === "TURBO" && aircraft.isMilitary) return "Military Turboprop";
+    if (aircraft.class === "TURBO") return "Turboprop";
+    return aircraft.class || "—";
 }
 function updateManageCustomDbUI() {
     const apBody = document.getElementById("manageCustomAirportsBody");
@@ -1153,6 +1253,7 @@ function removeCustomAirport(icao) {
     if (!confirm(`Remove custom airport ${airport.icao} - ${airport.name}?\n\nThis cannot be undone.`)) return;
     customAirports = customAirports.filter(a => String(a.icao).toUpperCase() !== String(icao).toUpperCase());
     localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(customAirports));
+    markAirportDatabaseDirty();
     rebuildActiveDatabase();
     rebuildAirportDropdown();
     updateDatabaseStats();
@@ -1388,6 +1489,7 @@ function saveCustomAirport() {
     localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(customAirports));
     alert(`${icao} added successfully to your local airport database.`);
     clearCustomAirportForm();
+    markAirportDatabaseDirty();
     rebuildActiveDatabase();
     updateDatabaseStats();
 }
@@ -1399,20 +1501,41 @@ function clearCustomAirportForm() {
     const mil = document.getElementById("newApMilitary");
     if (mil) mil.checked = false;
 }
-function buildCustomAircraftTags(rawClass, engineTag, categoryRaw, configTag, options) {
+function readCustomMissionRolesFromForm(rawClass, isMilitary) {
+    const passenger = document.getElementById("newAcRolePassenger");
+    const cargo = document.getElementById("newAcRoleCargo");
+    const executive = document.getElementById("newAcRoleExecutive");
+    const military = document.getElementById("newAcRoleMilitary");
+    const medevac = document.getElementById("newAcRoleMedevac");
+    const cargoTierEl = document.getElementById("newAcCargoTier");
+    const roles = {
+        passenger: !!(passenger && passenger.checked),
+        cargo: !!(cargo && cargo.checked),
+        executive: !!(executive && executive.checked),
+        military: !!(military && military.checked) || isMilitary || rawClass === "MIL_JET" || rawClass === "WARBIRD",
+        medevac: !!(medevac && medevac.checked),
+        cargoTier: cargoTierEl ? cargoTierEl.value : "light"
+    };
+    if (rawClass === "GLIDER") {
+        roles.passenger = true;
+        roles.cargo = false;
+        roles.executive = false;
+        roles.military = false;
+    }
+    if (rawClass === "MIL_JET") {
+        roles.military = true;
+        roles.passenger = false;
+        roles.cargo = false;
+        roles.executive = false;
+    }
+    if (rawClass === "BIZ JET" && !roles.executive && roles.passenger) {
+        roles.executive = true;
+    }
+    return roles;
+}
+function buildCustomAircraftTagsFromRoles(rawClass, engineTag, missionRoles, options) {
     const tags = new Set();
     tags.add(engineTag);
-    categoryRaw.split(" ").filter(Boolean).forEach(tag => tags.add(tag));
-    if (configTag === "FREIGHTER") {
-        tags.add("FREIGHTER");
-    } else if (configTag === "TACTICAL") {
-        // Role tags come from MIL_JET class (FAST_JET + FIGHTER) and isTactical flag.
-    } else {
-        tags.add(configTag);
-        if (configTag === "VIP" || configTag === "MEDEVAC" || configTag === "PAX") {
-            tags.add("PAX");
-        }
-    }
     if (rawClass === "HELI") tags.add("ROTORCRAFT");
     if (rawClass === "WARBIRD") tags.add("WARBIRD");
     if (rawClass === "GLIDER") tags.add("GLIDER");
@@ -1422,15 +1545,16 @@ function buildCustomAircraftTags(rawClass, engineTag, categoryRaw, configTag, op
         tags.add("FAST_JET");
         tags.add("FIGHTER");
     }
-    if (options.civilOk) tags.add("CIVIL_OK");
-    if (options.isMilitary && (configTag === "FREIGHTER" || categoryRaw === "HEAVY")) {
-        tags.add("MILITARY_TRANSPORT");
+    if (missionRoles.military || options.isMilitary) {
+        if (missionRoles.cargo && missionRoles.cargoTier === "military") tags.add("MILITARY_TRANSPORT");
     }
+    if (rawClass === "JET" && (options.mtow || 0) >= HEAVY_JET_MTOW_MIN) tags.add("HEAVY");
+    if (options.civilOk) tags.add("CIVIL_OK");
     if (options.stol) tags.add("STOL");
     if (options.amphibian) tags.add("AMPHIBIAN");
     if (options.lightHeli) tags.add("LIGHT_HELI");
     if (options.militaryHeli) tags.add("MILITARY_HELI");
-    if (options.fighter) tags.add("FIGHTER");
+    if (options.fighter || rawClass === "MIL_JET") tags.add("FIGHTER");
     if (options.singleSeat) tags.add("SINGLE_SEAT");
     if (options.recon) tags.add("RECON");
     if (rawClass === "GLIDER") {
@@ -1442,11 +1566,26 @@ function buildCustomAircraftTags(rawClass, engineTag, categoryRaw, configTag, op
     }
     return [...tags];
 }
+function saveCustomMissionAssignmentsForSpec(icao, spec, missionRoles) {
+    if (typeof buildCustomAssignmentImgIds !== "function" || typeof saveCustomMissionAssignment !== "function") return 0;
+    if (typeof scenarioDB === "undefined" || typeof missionMatrix === "undefined") return 0;
+    const imgIds = buildCustomAssignmentImgIds(spec, missionRoles, scenarioDB, missionMatrix);
+    if (!imgIds.length) return 0;
+    saveCustomMissionAssignment(icao, imgIds);
+    return imgIds.length;
+}
+function migrateCustomMissionAssignmentsOnLoad() {
+    if (typeof migrateCustomMissionAssignments !== "function") return;
+    if (typeof scenarioDB === "undefined" || typeof missionMatrix === "undefined") return;
+    const result = migrateCustomMissionAssignments(coreFleetSpecs, scenarioDB, missionMatrix);
+    if (result.migrated > 0) {
+        console.info("VECTOR: migrated mission assignments for " + result.migrated + " custom aircraft (existing airframes unchanged).");
+    }
+}
 function updateCustomAircraftForm() {
     const classEl = document.getElementById("newAcClass");
-    const roleEl = document.getElementById("newAcRole");
     const militaryEl = document.getElementById("newAcMilitary");
-    if (!classEl || !roleEl) return;
+    if (!classEl) return;
     const rawClass = classEl.value;
     const isMilitary = (militaryEl && militaryEl.checked) || rawClass === "MIL_JET";
     const toggleWrap = (id, show, useFlex = true) => {
@@ -1457,38 +1596,28 @@ function updateCustomAircraftForm() {
     toggleWrap("acTagFighterWrap", rawClass === "WARBIRD");
     toggleWrap("acTagLightHeliWrap", rawClass === "HELI");
     toggleWrap("acTagMilHeliWrap", isMilitary && rawClass === "HELI");
-    toggleWrap("acAirlifterHint", isMilitary && rawClass === "TURBO", false);
     toggleWrap("acTagGliderWrap", rawClass === "GLIDER", false);
+    const cargoRole = document.getElementById("newAcRoleCargo");
+    toggleWrap("acCargoTierWrap", !!(cargoRole && cargoRole.checked), false);
     const lengthEl = document.getElementById("newAcLength");
     if (lengthEl && rawClass === "HELI" && lengthEl.value === "") lengthEl.value = "0";
     if (lengthEl && rawClass === "GLIDER" && lengthEl.value === "") lengthEl.value = "1300";
     applyCustomAircraftRangeDefaults();
-    Array.from(roleEl.options).forEach(option => {
-        option.hidden = false;
-        option.disabled = false;
-    });
-    const exclusiveClassRoles = {
-        WARBIRD: "WARBIRD",
-        MIL_JET: "FAST_JET",
-        HELI: "ROTORCRAFT",
-        GLIDER: "GLIDER"
-    };
-    if (exclusiveClassRoles[rawClass]) {
-        roleEl.value = exclusiveClassRoles[rawClass];
-    }
     const fighterEl = document.getElementById("newAcFighter");
     if (fighterEl) fighterEl.checked = rawClass === "MIL_JET" ? true : (rawClass === "WARBIRD" ? fighterEl.checked : false);
-    const configEl = document.getElementById("newAcConfig");
-    if (configEl) {
-        Array.from(configEl.options).forEach(option => {
-            option.hidden = false;
-            option.disabled = false;
+    const milRole = document.getElementById("newAcRoleMilitary");
+    if (milRole && (rawClass === "MIL_JET" || rawClass === "WARBIRD")) milRole.checked = true;
+    if (rawClass === "BIZ JET") {
+        const execRole = document.getElementById("newAcRoleExecutive");
+        if (execRole) execRole.checked = true;
+    }
+    if (rawClass === "GLIDER") {
+        ["newAcRoleCargo", "newAcRoleExecutive", "newAcRoleMilitary", "newAcRoleMedevac"].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.checked = false;
         });
-        if (rawClass === "MIL_JET") {
-            configEl.value = "TACTICAL";
-        } else if (rawClass === "GLIDER") {
-            configEl.value = "PAX";
-        }
+        const paxRole = document.getElementById("newAcRolePassenger");
+        if (paxRole) paxRole.checked = true;
     }
 }
 function applyCustomAircraftRangeDefaults() {
@@ -1513,12 +1642,16 @@ function clearCustomAircraftForm() {
     });
     const classEl = document.getElementById("newAcClass");
     if (classEl) classEl.value = "JET";
-    const roleEl = document.getElementById("newAcRole");
-    if (roleEl) roleEl.value = "JETLINER";
-    const configEl = document.getElementById("newAcConfig");
-    if (configEl) configEl.value = "PAX";
     const engineEl = document.getElementById("newAcEngineCount");
     if (engineEl) engineEl.value = "TWIN_ENGINE";
+    const paxRole = document.getElementById("newAcRolePassenger");
+    if (paxRole) paxRole.checked = true;
+    ["newAcRoleCargo", "newAcRoleExecutive", "newAcRoleMilitary", "newAcRoleMedevac"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.checked = false;
+    });
+    const cargoTier = document.getElementById("newAcCargoTier");
+    if (cargoTier) cargoTier.value = "light";
     ["newAcMilitary", "newAcCivilOk", "newAcFighter", "newAcStol", "newAcAmphibian", "newAcLightHeli", "newAcMilHeli", "newAcSingleSeat", "newAcRecon", "newAcSelfLaunch", "newAcSelfSustain", "newAcSailplane", "newAcElectric", "newAcTwinSeat"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.checked = false;
@@ -1565,29 +1698,18 @@ function saveCustomAircraft() {
         return;
     }
     const engineTag = document.getElementById("newAcEngineCount") ? document.getElementById("newAcEngineCount").value : "TWIN_ENGINE";
-    const categoryRaw = document.getElementById("newAcRole") ? document.getElementById("newAcRole").value : "JETLINER";
-    const configTag = document.getElementById("newAcConfig") ? document.getElementById("newAcConfig").value : "PAX";
-    if (rawClass === "WARBIRD" && categoryRaw !== "WARBIRD") {
-        alert("Warbird class must use the Warbird mission category.");
+    const missionRoles = readCustomMissionRolesFromForm(rawClass, isMilitary);
+    if (rawClass !== "GLIDER" && rawClass !== "MIL_JET") {
+        if (!missionRoles.passenger && !missionRoles.cargo && !missionRoles.executive && !missionRoles.military && !missionRoles.medevac) {
+            alert("Please tick at least one mission role (Passenger, Cargo, Executive, Military, or Medevac).");
+            return;
+        }
+    }
+    if (missionRoles.cargo && missionRoles.cargoTier === "military" && !isMilitary) {
+        alert("Military cargo requires the Military Aircraft option to be ticked.");
         return;
     }
-    if (rawClass === "MIL_JET" && categoryRaw !== "FAST_JET") {
-        alert("Military Jet class must use the Fast jet / fighter mission category.");
-        return;
-    }
-    if (rawClass === "HELI" && categoryRaw !== "ROTORCRAFT") {
-        alert("Helicopter class must use the Helicopter mission category.");
-        return;
-    }
-    if (rawClass === "GLIDER" && categoryRaw !== "GLIDER") {
-        alert("Glider class must use the Glider mission category.");
-        return;
-    }
-    if (rawClass === "MIL_JET" && configTag !== "TACTICAL") {
-        alert("Military Jet class must use the Tactical primary mission use.");
-        return;
-    }
-    const selectedTags = buildCustomAircraftTags(rawClass, engineTag, categoryRaw, configTag, {
+    const tagOptions = {
         isMilitary: isMilitary,
         civilOk: document.getElementById("newAcCivilOk") && document.getElementById("newAcCivilOk").checked,
         stol: document.getElementById("newAcStol") && document.getElementById("newAcStol").checked,
@@ -1601,8 +1723,11 @@ function saveCustomAircraft() {
         selfSustain: document.getElementById("newAcSelfSustain") && document.getElementById("newAcSelfSustain").checked,
         sailplane: document.getElementById("newAcSailplane") && document.getElementById("newAcSailplane").checked,
         electric: document.getElementById("newAcElectric") && document.getElementById("newAcElectric").checked,
-        twinSeat: document.getElementById("newAcTwinSeat") && document.getElementById("newAcTwinSeat").checked
-    });
+        twinSeat: document.getElementById("newAcTwinSeat") && document.getElementById("newAcTwinSeat").checked,
+        mtow: mtow,
+        regionalJet: acClass === "JET" && mtow < 50000
+    };
+    const selectedTags = buildCustomAircraftTagsFromRoles(rawClass, engineTag, missionRoles, tagOptions);
     const altDefaults = acClass === "GLIDER"
         ? { minAlt: 4000, maxAlt: 30000, rules: "VFR/Scenic" }
         : acClass === "HELI"
@@ -1613,7 +1738,8 @@ function saveCustomAircraft() {
                     ? { minAlt: 4000, maxAlt: 20000, rules: "VFR/Scenic" }
                     : { minAlt: 15000, maxAlt: 35000, rules: "IFR" };
     let customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
-    customFleet[icao] = {
+    const existingEntry = customFleet[icao] || {};
+    customFleet[icao] = Object.assign({}, existingEntry, {
         name: name,
         maxPax: maxPax,
         maxCargo: maxCargo,
@@ -1629,15 +1755,22 @@ function saveCustomAircraft() {
         fuelPerNm: fuelPerNm,
         isMilitary: isMilitary,
         isTactical: rawClass === "MIL_JET" || (rawClass === "WARBIRD" && document.getElementById("newAcFighter") && document.getElementById("newAcFighter").checked),
-        tags: selectedTags
-    };
+        tags: selectedTags,
+        missionRoles: missionRoles
+    });
     localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(customFleet));
-    alert(`${icao} saved to your local fleet.`);
+    const assignmentCount = saveCustomMissionAssignmentsForSpec(icao, customFleet[icao], missionRoles);
+    if (!assignmentCount) {
+        alert(`${icao} saved, but no missions could be generated for the selected roles. Adjust roles or airframe class.`);
+    } else {
+        alert(`${icao} saved to your local fleet (${assignmentCount} mission briefings).`);
+    }
     clearCustomAircraftForm();
     rebuildFleetDropdown();
     updateDatabaseStats();
 }
 function rebuildActiveDatabase() {
+    if (!activeAirportDatabaseNeedsRebuild && activeAirportDatabase.length > 0) return;
     const liveSeedDB = getMergedSeedAirports();
     const legacyData = localStorage.getItem("dispatcher_custom_airports");
     if (legacyData) {
@@ -1688,6 +1821,7 @@ function rebuildActiveDatabase() {
         finalAirport.allOptions = variants;
         return finalAirport;
     });
+    activeAirportDatabaseNeedsRebuild = false;
 }
 function getSelectedAircraftSpec() {
     const type = getSelectedAircraftType();
@@ -1706,6 +1840,7 @@ function updateFlightTimeSliderState() {
     if (gliderNotice) gliderNotice.style.display = spec && spec.class === "GLIDER" ? "block" : "none";
 }
 function rebuildFleetDropdown() {
+    migrateCustomMissionAssignmentsOnLoad();
     const customFleet = JSON.parse(localStorage.getItem("dispatcher_custom_fleet")) || {};
     activeFleetSpecs = { ...coreFleetSpecs, ...customFleet };
     const inputEl = document.getElementById("aircraftInput");
@@ -1713,8 +1848,8 @@ function rebuildFleetDropdown() {
     const sortedFleetEntries = Object.entries(activeFleetSpecs).sort((a, b) => a[1].name.localeCompare(b[1].name));
     function renderList(filterText = "") {
         listEl.innerHTML = "";
-        const filtered = sortedFleetEntries.filter(entry => 
-            entry[1].name.toLowerCase().includes(filterText.toLowerCase())
+        const filtered = sortedFleetEntries.filter(entry =>
+            aircraftMatchesFilter(entry[0], entry[1], filterText)
         );
         if (filtered.length === 0) {
             listEl.style.display = "none";
@@ -1803,6 +1938,7 @@ function exportDatabaseBackup() {
     const backupObject = {
         airports: JSON.parse(localStorage.getItem("dispatcher_custom_user_airports") || "[]"),
         fleet: JSON.parse(localStorage.getItem("dispatcher_custom_fleet") || "{}"),
+        custom_assignments: JSON.parse(localStorage.getItem("dispatcher_custom_assignments") || "{}"),
         logbook: JSON.parse(localStorage.getItem("dispatcher_logbook") || "[]")
     };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObject, null, 2));
@@ -1820,9 +1956,11 @@ function importDatabaseBackup(inputElement) {
             const d = JSON.parse(e.target.result);
             if (d.airports) localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(d.airports));
             if (d.fleet) localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(d.fleet));
+            if (d.custom_assignments) localStorage.setItem("dispatcher_custom_assignments", JSON.stringify(d.custom_assignments));
             if (d.logbook) localStorage.setItem("dispatcher_logbook", JSON.stringify(d.logbook));
             syncLastArrivalFromLogbook();
             refreshLastArrivalDepField();
+            markAirportDatabaseDirty();
             rebuildActiveDatabase();
             rebuildFleetDropdown();
             updateDatabaseStats();
@@ -1839,6 +1977,7 @@ function resetCustomDatabase() {
         localStorage.removeItem("dispatcher_custom_user_airports");
         localStorage.removeItem("dispatcher_custom_airports");
         localStorage.removeItem("dispatcher_custom_fleet");
+        localStorage.removeItem("dispatcher_custom_assignments");
         rebuildActiveDatabase();
         rebuildFleetDropdown();
         updateDatabaseStats();
@@ -1880,17 +2019,16 @@ function passesLowiAirport(type, spec) {
         return true;
     }
     if (spec.class === "JET") {
-        if (spec.tags && spec.tags.includes("JETLINER")) {
-            return LOWI_NARROWBODY_JETLINERS.includes(type);
-        }
-        if (spec.tags && (spec.tags.includes("HEAVY") || spec.tags.includes("BOMBER"))) return false;
+        if (LOWI_NARROWBODY_JETLINERS.includes(type)) return true;
+        if (spec.tags && spec.tags.includes("BOMBER")) return false;
+        if (specIsHeavyJet(spec)) return false;
         if (spec.mtow > 50000) return false;
         return true;
     }
     return true;
 }
 function isLowiNarrowbodyJetliner(type, spec) {
-    return spec.class === "JET" && spec.tags && spec.tags.includes("JETLINER") && LOWI_NARROWBODY_JETLINERS.includes(type);
+    return spec.class === "JET" && LOWI_NARROWBODY_JETLINERS.includes(type);
 }
 function matchesApprovedAircraftType(type, spec, approvedBases) {
     const simbrief = (spec.simbriefIcao || type || "").toUpperCase();
@@ -2058,17 +2196,9 @@ function buildRouteFailureMessage(depOverride, type, spec, validAirports, depart
 }
 function passesMissionAircraftRole(m, spec) {
     if (isFreightMission(m)) {
-        const tags = spec.tags || [];
-        if (!tags.includes("FREIGHTER")) return false;
         if ((spec.maxCargo || 0) <= 0) return false;
     }
-    if (isPassengerMission(m)) {
-        const tags = spec.tags || [];
-        if ((spec.maxPax || 0) <= 0) return false;
-        if (!tags.includes("PAX")) return false;
-    }
-    const requiredTags = m.requiredTags || [];
-    if (requiredTags.includes("PAX") && !requiredTags.includes("FREIGHTER") && (spec.maxPax || 0) <= 0) {
+    if (isPassengerMission(m) && (spec.maxPax || 0) <= 0) {
         return false;
     }
     return true;
@@ -2089,43 +2219,6 @@ function isMilitaryHelicopterMission(m) {
     if (m.pool === "helicopterOps-MIL") return true;
     const classes = m.allowedClasses;
     return !!(classes && classes.length === 1 && classes[0] === "HELI" && m.militaryOnly);
-}
-function passesMissionTemplateAircraft(m, type, searchClass, isContractorMode) {
-    if (isMilitaryHelicopterMission(m) && searchClass !== "HELI") return false;
-    if (isContractorMode && m.militaryOnly && !m.tacticalOnly && !isMilitaryHelicopterMission(m)) return true;
-    const classes = m.allowedClasses;
-    const aircraft = m.allowedAircraft;
-    const hasClassRule = classes && classes.length > 0;
-    const hasAircraftRule = aircraft && aircraft.length > 0;
-    if (!hasClassRule && !hasAircraftRule) return true;
-    // allowedClasses = eligible class list; allowedAircraft = type-only missions (OR, not AND).
-    // e.g. type 4 (PA24 only) or type 25 (DC6B only) with no class rule.
-    if (hasClassRule && hasAircraftRule) {
-        return classes.includes(searchClass) || aircraft.includes(type);
-    }
-    if (hasAircraftRule) return aircraft.includes(type);
-    return classes.includes(searchClass);
-}
-function passesHardMissionLocks(m, type, searchClass, spec, origin, isContractorMode) {
-    if (!passesMissionTemplateAircraft(m, type, searchClass, isContractorMode)) return false;
-    if (searchClass === "BIZ JET" && type !== "LJ35") {
-        if (isFreightMission(m)) return false;
-        const requiredTags = m.requiredTags || [];
-        if (requiredTags.includes("MEDEVAC")) return false;
-    }
-    if (m.minCargo && spec.maxCargo < m.minCargo) return false;
-    if (!passesTemplateMtowCap(m, searchClass, spec)) return false;
-    if (!passesTemplateMinPaxSeats(m, searchClass, spec)) return false;
-    if (m.excludedAircraft && m.excludedAircraft.includes(type)) return false;
-    if (!passesMissionAircraftRole(m, spec)) return false;
-    if (m.requiredDep) {
-        if (Array.isArray(m.requiredDep)) {
-            if (!m.requiredDep.includes(origin.icao)) return false;
-        } else if (origin.icao !== m.requiredDep) {
-            return false;
-        }
-    }
-    return true;
 }
 function isMilitaryMissionRestricted(spec) {
     if (!spec.isMilitary) return false;
@@ -2156,29 +2249,35 @@ function passesAircraftCivilMissionAllowlist(m, type, spec) {
     return m.type === 18;
 }
 function filterScenariosForLimitedCivilAircraft(pool, type, spec, mission) {
+    if (typeof usesMissionAssignments === "function" && usesMissionAssignments()) return pool;
     if (!spec.isMilitary || mission.militaryOnly) return pool;
     const allowlist = getMilAirlifterCivilScenarioAllowlist(type);
     if (!allowlist) return pool;
     return pool.filter(s => allowlist.includes(s.imgId));
 }
-function passesMissionContextFilter(m, spec, origin, isContractorMode) {
-    const isTacticalAirframe = !!spec.isTactical;
+function isWarbirdHeritageMission(m) {
+    return !!(m && (m.type === 25 || m.pool === "vintageOps"));
+}
+function isTacticalAirframeForMission(spec, aircraftType, missionType) {
+    return !!spec.isTactical
+        || (aircraftType === "H47D" && missionType === 23)
+        || (aircraftType === "VULC" && missionType === 23);
+}
+function passesMissionContextFilter(m, spec, origin, isContractorMode, aircraftType) {
+    const isTacticalAirframe = isTacticalAirframeForMission(spec, aircraftType, m.type);
     if (isMilitaryHelicopterMission(m) && spec.class !== "HELI") return false;
     if (m.tacticalOnly && !isTacticalAirframe) return false;
     if (m.civilianOnly && spec.isMilitary) return false;
     if (m.militaryOnly && !spec.isMilitary && !isContractorMode) return false;
     if (!m.militaryOnly && isMilitaryMissionRestricted(spec)) return false;
     const isFreight = isFreightMission(m);
-    if (origin && origin.isMilitary && !m.militaryOnly && !isFreight) return false;
+    if (origin && origin.isMilitary && !m.militaryOnly && !isFreight) {
+        if (!(spec.class === "WARBIRD" && isWarbirdHeritageMission(m))) return false;
+    }
     if (isContractorMode && !spec.isMilitary && origin) {
         if (m.militaryOnly && !origin.isMilitary) return false;
     }
     return true;
-}
-function scenarioHasExcludedTags(s, spec) {
-    if (s.excludedTags && spec.tags && s.excludedTags.some(tag => spec.tags.includes(tag))) return true;
-    if (s.excludedGaTags && spec.class === "GA" && spec.tags && s.excludedGaTags.some(tag => spec.tags.includes(tag))) return true;
-    return false;
 }
 function scenarioAllowsAircraft(s, type, spec) {
     if (s.allowedAircraft && s.allowedAircraft.includes(type)) return true;
@@ -2186,17 +2285,22 @@ function scenarioAllowsAircraft(s, type, spec) {
     if (!s.allowedAircraft && !s.allowedClasses) return true;
     return false;
 }
+function scenarioEligibleForAircraft(s, type, spec) {
+    return passesScenarioPhysicalHardLocks(s, type, spec);
+}
+function passesScenarioPhysicalHardLocks(s, type, spec) {
+    if (s.minCargo && spec.maxCargo < s.minCargo) return false;
+    if (s.excludedAircraft && s.excludedAircraft.includes(type)) return false;
+    return true;
+}
 function getExcludedScenarioImgIdsForPool(pool, aircraftType, spec) {
     const excluded = new Set();
     if (!Array.isArray(pool)) return excluded;
+    const assigned = getAssignedImgIdSetForAircraft(aircraftType) || new Set();
     pool.forEach(s => {
-        if (!scenarioAllowsAircraft(s, aircraftType, spec)) {
+        if (!assigned.has(s.imgId)) {
             excluded.add(s.imgId);
-        }
-        if (s.excludedAircraft && s.excludedAircraft.includes(aircraftType)) {
-            excluded.add(s.imgId);
-        }
-        if (scenarioHasExcludedTags(s, spec)) {
+        } else if (!passesScenarioPhysicalHardLocks(s, aircraftType, spec)) {
             excluded.add(s.imgId);
         }
     });
@@ -2204,22 +2308,144 @@ function getExcludedScenarioImgIdsForPool(pool, aircraftType, spec) {
 }
 function scenarioPassesHardLocks(s, type, spec, excludedImgIds) {
     if (excludedImgIds.has(s.imgId)) return false;
-    if (s.minCargo && spec.maxCargo < s.minCargo) return false;
-    if (s.excludedAircraft && s.excludedAircraft.includes(type)) return false;
-    if (s.requiredTags && (!spec.tags || !s.requiredTags.every(tag => spec.tags.includes(tag)))) return false;
-    if (scenarioHasExcludedTags(s, spec)) return false;
-    if (!scenarioAllowsAircraft(s, type, spec)) return false;
+    if (isScenarioAllowedForAircraft(type, s.imgId) !== true) return false;
+    return passesScenarioPhysicalHardLocks(s, type, spec);
+}
+function filterScenariosByMissionType(activePool, mission) {
+    if (!activePool || !activePool.length) return activePool || [];
+    const hasTypedScenarios = activePool.some(s => s.missionType != null);
+    if (hasTypedScenarios) {
+        return activePool.filter(s => s.missionType === mission.type);
+    }
+    return activePool.filter(s => !s.missionType || s.missionType === mission.type);
+}
+function passesAssignmentOnlyMissionLocks(m, type, searchClass, spec, origin) {
+    if (isMilitaryHelicopterMission(m) && searchClass !== "HELI") return false;
+    if (m.type === 23 && spec.class === "HELI" && type !== "H47D") return false;
+    if (m.minCargo && spec.maxCargo < m.minCargo) return false;
+    if (!passesTemplateMtowCap(m, searchClass, spec)) return false;
+    if (!passesTemplateMinPaxSeats(m, searchClass, spec)) return false;
+    if (m.excludedAircraft && m.excludedAircraft.includes(type)) return false;
+    if (m.requiredDep) {
+        if (Array.isArray(m.requiredDep)) {
+            if (!m.requiredDep.includes(origin.icao)) return false;
+        } else if (origin.icao !== m.requiredDep) {
+            return false;
+        }
+    }
     return true;
 }
-function filterScenarioPool(pool, type, spec, excludedImgIds) {
-    const eligible = pool.filter(s => scenarioPassesHardLocks(s, type, spec, excludedImgIds));
-    if (eligible.length > 0) return eligible;
-    return pool.filter(s => {
-        if (excludedImgIds.has(s.imgId) || s.minCargo || s.requiredTags || s.allowedAircraft || s.allowedClasses) return false;
-        if (s.excludedAircraft && s.excludedAircraft.includes(type)) return false;
-        if (scenarioHasExcludedTags(s, spec)) return false;
-        return true;
+function passesHardMissionLocksForAssignments(m, type, searchClass, spec, origin, isContractorMode) {
+    return passesAssignmentOnlyMissionLocks(m, type, searchClass, spec, origin || { icao: "", isMilitary: false });
+}
+function applyAssignmentScenarioFilters(activePool, mission, type, spec, longHaul, isLocalFlight) {
+    let pool = filterScenariosForHaulMode(activePool, mission.type, longHaul, spec);
+    pool = filterScenariosByMissionType(pool, mission);
+    if (mission.type === 31) {
+        const staffOnly = pool.filter(s => s.staffShuttle && !s.heliOps);
+        if (staffOnly.length > 0) pool = staffOnly;
+    } else if (mission.type === 30) {
+        const heliOnly = pool.filter(s => s.heliOps);
+        if (heliOnly.length > 0) pool = heliOnly;
+    }
+    if (spec.class !== "HELI") {
+        pool = pool.filter(s => !s.heliOps);
+    }
+    if (mission.pool === "gliderOps" && typeof isLocalFlight === "boolean") {
+        if (isLocalFlight) {
+            const localOnly = pool.filter(s => s.isLocal);
+            if (localOnly.length > 0) pool = localOnly;
+        } else {
+            const transitOnly = pool.filter(s => !s.isLocal);
+            if (transitOnly.length > 0) pool = transitOnly;
+        }
+    }
+    return pool;
+}
+function missionHasAssignedPlayableScenario(mission, type, spec, longHaul, isLocalFlight) {
+    if (!mission.pool || typeof scenarioDB === "undefined" || !scenarioDB[mission.pool]) return false;
+    const assigned = getAssignedImgIdSetForAircraft(type);
+    if (!assigned || assigned.size === 0) return false;
+    const missionPool = scenarioDB[mission.pool];
+    let activePool = missionPool.filter(s => assigned.has(s.imgId) && passesScenarioPhysicalHardLocks(s, type, spec));
+    activePool = filterScenariosForLimitedCivilAircraft(activePool, type, spec, mission);
+    activePool = applyAssignmentScenarioFilters(activePool, mission, type, spec, longHaul, isLocalFlight);
+    return activePool.length > 0;
+}
+function buildFilteredMissionListFromAssignments(spec, type, searchClass, origin, isContractorMode, longHaul, isLocalFlight) {
+    const originForLocks = origin || { icao: "", isMilitary: false };
+    const assigned = getAssignedImgIdSetForAircraft(type);
+    if (!assigned || assigned.size === 0) return [];
+    let filteredMissions = missionMatrix.filter(m => {
+        if (!missionAllowedForHaulMode(m, longHaul)) return false;
+        if (!passesHardMissionLocksForAssignments(m, type, searchClass, spec, originForLocks, isContractorMode)) return false;
+        if (m.requiredDep && !origin) return false;
+        if (!usesMissionAssignments() && !passesAircraftCivilMissionAllowlist(m, type, spec)) return false;
+        if (origin && !passesMissionContextFilter(m, spec, origin, isContractorMode, type)) return false;
+        if (!origin) {
+            if (m.civilianOnly && spec.isMilitary) return false;
+            if (m.militaryOnly && !spec.isMilitary && !isContractorMode) return false;
+            if (!m.militaryOnly && isMilitaryMissionRestricted(spec)) return false;
+            if (isMilitaryHelicopterMission(m) && spec.class !== "HELI") return false;
+            if (m.tacticalOnly && !isTacticalAirframeForMission(spec, type, m.type)) return false;
+        }
+        return missionHasAssignedPlayableScenario(m, type, spec, longHaul, isLocalFlight);
     });
+    if (typeof isLocalFlight === "boolean") {
+        filteredMissions = filteredMissions.filter(m => !m.isLocal || isLocalFlight);
+        if (spec.class === "HELI" && isLocalFlight) {
+            const localMissions = filteredMissions.filter(m => m.isLocal);
+            if (localMissions.length > 0) filteredMissions = localMissions;
+        }
+    }
+    return filteredMissions;
+}
+function applyAssignedOnlyScenarioFilter(activePool, aircraftType) {
+    if (typeof filterPoolToAssignedOnly === "function") {
+        return filterPoolToAssignedOnly(aircraftType, activePool);
+    }
+    if (typeof usesMissionAssignments === "function" && usesMissionAssignments()) {
+        return activePool.filter(s => isScenarioAllowedForAircraft(aircraftType, s.imgId) === true);
+    }
+    return activePool;
+}
+function buildActiveScenarioPoolForMission(mission, type, spec, longHaul, isLocalFlight) {
+    if (!mission.pool || typeof scenarioDB === "undefined" || !scenarioDB[mission.pool]) {
+        return [];
+    }
+    const missionPool = scenarioDB[mission.pool];
+    const excludedImgIds = getExcludedScenarioImgIdsForPool(missionPool, type, spec);
+    let activePool = filterScenarioPool(missionPool, type, spec, excludedImgIds);
+    activePool = filterScenariosForLimitedCivilAircraft(activePool, type, spec, mission);
+    activePool = filterScenariosForHaulMode(activePool, mission.type, longHaul, spec);
+    activePool = filterScenariosByMissionType(activePool, mission);
+    if (mission.type === 31) {
+        const staffOnly = activePool.filter(s => s.staffShuttle && !s.heliOps);
+        if (staffOnly.length > 0) activePool = staffOnly;
+    } else if (mission.type === 30) {
+        const heliOnly = activePool.filter(s => s.heliOps);
+        if (heliOnly.length > 0) activePool = heliOnly;
+    }
+    if (spec.class !== "HELI") {
+        activePool = activePool.filter(s => !s.heliOps);
+    }
+    if (mission.pool === "gliderOps" && typeof isLocalFlight === "boolean") {
+        if (isLocalFlight) {
+            const localOnly = activePool.filter(s => s.isLocal);
+            if (localOnly.length > 0) activePool = localOnly;
+        } else {
+            const transitOnly = activePool.filter(s => !s.isLocal);
+            if (transitOnly.length > 0) activePool = transitOnly;
+        }
+    }
+    return applyAssignedOnlyScenarioFilter(activePool, type);
+}
+function missionHasPlayableScenario(mission, type, spec, longHaul, isLocalFlight) {
+    if (!mission.pool) return true;
+    return buildActiveScenarioPoolForMission(mission, type, spec, longHaul, isLocalFlight).length > 0;
+}
+function filterScenarioPool(pool, type, spec, excludedImgIds) {
+    return pool.filter(s => scenarioPassesHardLocks(s, type, spec, excludedImgIds));
 }
 function pickWeightedRandom(items, defaultWeight = 10, getWeight) {
     if (!items.length) return null;
@@ -2233,19 +2459,120 @@ function pickWeightedRandom(items, defaultWeight = 10, getWeight) {
     }
     return items[0];
 }
-function filterWithRecentGuard(items, recentIds, getId, maxRecent = 2) {
+function filterWithRecentGuard(items, recentIds, getId) {
     if (!items.length) return items;
-    const recent = recentIds.slice(-maxRecent);
-    let guarded = items.filter(item => !recent.includes(getId(item)));
-    if (guarded.length === 0 && recent.length > 0) {
-        const lastId = recent[recent.length - 1];
-        guarded = items.filter(item => getId(item) !== lastId);
-    }
-    return guarded.length > 0 ? guarded : items;
+    const lastId = recentIds.length ? recentIds[recentIds.length - 1] : null;
+    if (lastId == null) return items;
+    const withoutLast = items.filter(item => getId(item) !== lastId);
+    // Never block the whole pool — skip only the immediate last pick; repeat is allowed when it is the sole option.
+    return withoutLast.length > 0 ? withoutLast : items;
 }
-function applyCivilOkWeighting(missions, spec, searchClass) {
+function isMedevacMission(m) {
+    return !!(m && (m.type === 19 || m.pool === "medical"));
+}
+function applyMedevacHatWeighting(hat) {
+    const medevac = hat.filter(e => isMedevacMission(e.mission));
+    if (!medevac.length) return hat;
+    const nonMedevacSum = hat
+        .filter(e => !isMedevacMission(e.mission))
+        .reduce((sum, e) => sum + e.weight, 0);
+    if (nonMedevacSum <= 0) return hat;
+    const medevacSum = medevac.reduce((sum, e) => sum + e.weight, 0);
+    if (medevacSum <= 0) return hat;
+    const targetMedevacSum = nonMedevacSum * (MEDEVAC_TARGET_SHARE / (1 - MEDEVAC_TARGET_SHARE));
+    const scale = targetMedevacSum / medevacSum;
+    return hat.map(e => (
+        isMedevacMission(e.mission) ? { mission: e.mission, scenario: e.scenario, weight: e.weight * scale } : e
+    ));
+}
+function isU16ExclusiveUniqueMission(mission) {
+    return !!(mission && mission.pool === "uniqueMissions" && Array.isArray(mission.allowedAircraft)
+        && mission.allowedAircraft.length === 1 && mission.allowedAircraft[0] === "U16");
+}
+function getAircraftExclusiveMissionWeight(mission, aircraftType) {
+    if (!mission || !aircraftType) return null;
+    if (isU16ExclusiveUniqueMission(mission) && aircraftType === "U16") {
+        return mission.weight || 10;
+    }
+    if (mission.type === 26 && aircraftType === "DC6B" && mission.pool === "vintageAirliner") {
+        return mission.weight || 40;
+    }
+    if (mission.type === 33 && aircraftType === "DC6A" && mission.pool === "vintageProplinerFreight") {
+        return mission.weight || 40;
+    }
+    return null;
+}
+function getScenarioHatWeight(scenario, mission, searchClass, aircraftType) {
+    if (scenario.weight != null) return scenario.weight;
+    const exclusiveWeight = getAircraftExclusiveMissionWeight(mission, aircraftType);
+    if (exclusiveWeight != null) return exclusiveWeight;
+    if (searchClass === "GA" && isSpiritualGuruScenario(scenario)) return 2;
+    if (mission.type <= 13) return getMissionTemplateWeight(mission, searchClass, aircraftType);
+    if (typeof usesMissionAssignments === "function" && usesMissionAssignments()
+        && (scenario.imgId === 4 || scenario.imgId === 5)) {
+        return DEFAULT_HAT_WEIGHT * 0.25;
+    }
+    return DEFAULT_HAT_WEIGHT;
+}
+function buildMissionScenarioHat(missions, type, spec, searchClass, longHaul, isLocalFlight) {
+    const hat = [];
+    for (const mission of missions) {
+        const activePool = buildActiveScenarioPoolForMission(mission, type, spec, longHaul, isLocalFlight);
+        if (!activePool.length) continue;
+        if (mission.type <= 13) {
+            const scenario = activePool.find(s => s.imgId === mission.type);
+            if (scenario) {
+                hat.push({
+                    mission,
+                    scenario,
+                    weight: getScenarioHatWeight(scenario, mission, searchClass, type)
+                });
+            }
+            continue;
+        }
+        for (const scenario of activePool) {
+            hat.push({
+                mission,
+                scenario,
+                weight: getScenarioHatWeight(scenario, mission, searchClass, type)
+            });
+        }
+    }
+    return hat;
+}
+function pickFromMissionScenarioHat(hat) {
+    if (!hat.length) return null;
+    const weightedHat = applyMedevacHatWeighting(hat);
+    return pickWeightedRandom(weightedHat, DEFAULT_HAT_WEIGHT, entry => entry.weight);
+}
+function isSpiritualGuruScenario(scenario) {
+    return !!(scenario && scenario.payload && scenario.payload.includes("spiritual guru"));
+}
+function buildWeightedMissionSelectionPool(missions, spec, searchClass, type, isContractorMode) {
+    return applyReconMissionWeighting(
+        applyContractorMissionWeighting(
+            applyCivilOkWeighting(missions, spec, searchClass, type),
+            isContractorMode
+        ),
+        type,
+        spec
+    );
+}
+function getMissionTemplateWeight(m, searchClass, aircraftType) {
     const defaultWeight = 10;
-    const baseWeight = (m) => (searchClass === "GA" ? defaultWeight : (m.weight || defaultWeight));
+    const exclusiveWeight = getAircraftExclusiveMissionWeight(m, aircraftType);
+    if (exclusiveWeight != null) return exclusiveWeight;
+    const base = searchClass === "GA" ? defaultWeight : (m.weight || defaultWeight);
+    if (m.type === 7) return base * 0.1;
+    if (typeof usesMissionAssignments === "function" && usesMissionAssignments() && m.pool === "uniqueMissions") {
+        if (m.type === 4 || m.type === 5) return base * 0.08;
+        return base * 0.35;
+    }
+    return base;
+}
+function applyCivilOkWeighting(missions, spec, searchClass, aircraftType) {
+    const defaultWeight = 10;
+    const baseWeight = (m) => getMissionTemplateWeight(m, searchClass, aircraftType);
     if (!spec.isMilitary || !spec.tags || !spec.tags.includes("CIVIL_OK")) {
         return missions.map(m => ({ mission: m, weight: baseWeight(m) }));
     }
@@ -2261,6 +2588,14 @@ function applyCivilOkWeighting(missions, spec, searchClass) {
     return missions.map(m => ({
         mission: m,
         weight: m.militaryOnly ? baseWeight(m) * milMult : baseWeight(m)
+    }));
+}
+function applyReconMissionWeighting(weightedMissions, aircraftType, spec) {
+    const tags = (spec && spec.tags) || [];
+    if (aircraftType !== "VULC" && !tags.includes("RECON")) return weightedMissions;
+    return weightedMissions.map(entry => ({
+        mission: entry.mission,
+        weight: entry.mission.type === 32 ? entry.weight * 4 : entry.weight
     }));
 }
 function applyContractorMissionWeighting(weightedMissions, isContractorMode) {
@@ -2293,89 +2628,12 @@ function filterRoutesForContractorMission(candidatePairs, mission, spec) {
     return matched;
 }
 function buildFilteredMissionList(spec, type, searchClass, origin, isContractorMode, longHaul, isLocalFlight) {
-    const originForLocks = origin || { icao: "", isMilitary: false };
-    let filteredMissions = missionMatrix.filter(m => {
-        if (!missionAllowedForHaulMode(m, longHaul)) return false;
-        if (!passesHardMissionLocks(m, type, searchClass, spec, originForLocks, isContractorMode)) return false;
-        if (m.requiredDep && !origin) return false;
-        if (m.excludedTags && spec.tags && m.excludedTags.some(tag => spec.tags.includes(tag))) return false;
-        if (m.requiredTags && (!spec.tags || !m.requiredTags.every(tag => spec.tags.includes(tag)))) return false;
-        if (!passesAircraftCivilMissionAllowlist(m, type, spec)) return false;
-        if (origin && !passesMissionContextFilter(m, spec, origin, isContractorMode)) return false;
-        if (!origin && isContractorMode && !spec.isMilitary) {
-            if (m.civilianOnly && spec.isMilitary) return false;
-            if (m.militaryOnly && !isContractorMode) return false;
-            if (!m.militaryOnly && isMilitaryMissionRestricted(spec)) return false;
-            if (isMilitaryHelicopterMission(m) && spec.class !== "HELI") return false;
-            if (m.tacticalOnly && !spec.isTactical) return false;
-        } else if (!origin) {
-            if (m.civilianOnly && spec.isMilitary) return false;
-            if (m.militaryOnly && !spec.isMilitary && !isContractorMode) return false;
-            if (!m.militaryOnly && isMilitaryMissionRestricted(spec)) return false;
-            if (isMilitaryHelicopterMission(m) && spec.class !== "HELI") return false;
-            if (m.tacticalOnly && !spec.isTactical) return false;
-        }
-        return true;
-    });
-    if (filteredMissions.length < 5 && origin) {
-        const strictOverrides = filteredMissions.filter(m => m.requiredDep);
-        const failsafeTemplates = missionMatrix.filter(m => {
-            if (!missionAllowedForHaulMode(m, longHaul)) return false;
-            if (!m.pool) return false;
-            if (!passesHardMissionLocks(m, type, searchClass, spec, originForLocks, isContractorMode)) return false;
-            if (m.requiredTags && (!spec.tags || !m.requiredTags.every(tag => spec.tags.includes(tag)))) return false;
-            if (!passesAircraftCivilMissionAllowlist(m, type, spec)) return false;
-            if (!passesMissionContextFilter(m, spec, origin, isContractorMode)) return false;
-            if (m.excludedTags && spec.tags && m.excludedTags.some(tag => spec.tags.includes(tag))) return false;
-            return true;
-        });
-        const seenTypes = new Set();
-        filteredMissions = [];
-        for (const mission of [...strictOverrides, ...failsafeTemplates]) {
-            if (!seenTypes.has(mission.type)) {
-                seenTypes.add(mission.type);
-                filteredMissions.push(mission);
-            }
-        }
+    requireMissionAssignmentsLoaded();
+    const assigned = getAssignedImgIdSetForAircraft(type);
+    if (!assigned || assigned.size === 0) {
+        return [];
     }
-    if (spec.class === "HELI" && isLocalFlight) {
-        const localMissions = filteredMissions.filter(m => m.isLocal);
-        if (localMissions.length > 0) filteredMissions = localMissions;
-    } else if (spec.class === "HELI" && isLocalFlight === false) {
-        filteredMissions = filteredMissions.filter(m => !m.isLocal);
-    }
-    if (filteredMissions.length === 0 && origin) {
-        filteredMissions = missionMatrix.filter(m => {
-            if (!missionAllowedForHaulMode(m, longHaul)) return false;
-            if (!passesHardMissionLocks(m, type, searchClass, spec, originForLocks, isContractorMode)) return false;
-            if (m.excludedTags && spec.tags && m.excludedTags.some(tag => spec.tags.includes(tag))) return false;
-            if (m.requiredTags && (!spec.tags || !m.requiredTags.every(tag => spec.tags.includes(tag)))) return false;
-            if (!passesAircraftCivilMissionAllowlist(m, type, spec)) return false;
-            if (!passesMissionContextFilter(m, spec, origin, isContractorMode)) return false;
-            return true;
-        });
-    }
-    if (filteredMissions.length === 0 && origin) {
-        filteredMissions = missionMatrix.filter(m => {
-            if (!missionAllowedForHaulMode(m, longHaul)) return false;
-            if (!passesHardMissionLocks(m, type, searchClass, spec, originForLocks, isContractorMode)) return false;
-            if (m.excludedTags && spec.tags && m.excludedTags.some(tag => spec.tags.includes(tag))) return false;
-            if (m.requiredTags && (!spec.tags || !m.requiredTags.every(tag => spec.tags.includes(tag)))) return false;
-            if (!passesAircraftCivilMissionAllowlist(m, type, spec)) return false;
-            if (m.civilianOnly && spec.isMilitary) return false;
-            if (m.militaryOnly && !spec.isMilitary && !isContractorMode) return false;
-            if (isMilitaryHelicopterMission(m) && spec.class !== "HELI") return false;
-            return true;
-        });
-    }
-    if (typeof isLocalFlight === "boolean") {
-        filteredMissions = filteredMissions.filter(m => !m.isLocal || isLocalFlight);
-        if (spec.class === "HELI" && isLocalFlight) {
-            const localMissions = filteredMissions.filter(m => m.isLocal);
-            if (localMissions.length > 0) filteredMissions = localMissions;
-        }
-    }
-    return filteredMissions;
+    return buildFilteredMissionListFromAssignments(spec, type, searchClass, origin, isContractorMode, longHaul, isLocalFlight);
 }
 function pickWeightedMissionEntry(weightedMissions) {
     if (!weightedMissions.length) return null;
@@ -2416,10 +2674,9 @@ function dispatchContractorMissionFirst(candidatePairs, spec, type, searchClass,
     for (let attempt = 0; attempt < 12; attempt++) {
         const remaining = missionPool.filter(m => !triedTypes.has(m.type));
         if (!remaining.length) break;
-        const selectionPoolWithGuard = filterWithRecentGuard(remaining, lastMissions, m => m.type, 3);
-        const weightedMissions = applyContractorMissionWeighting(
-            applyCivilOkWeighting(selectionPoolWithGuard, spec, searchClass),
-            isContractorMode
+        const selectionPoolWithGuard = remaining;
+        const weightedMissions = buildWeightedMissionSelectionPool(
+            selectionPoolWithGuard, spec, searchClass, type, isContractorMode
         );
         const pickedEntry = pickWeightedMissionEntry(weightedMissions);
         if (!pickedEntry) break;
@@ -2433,24 +2690,6 @@ function dispatchContractorMissionFirst(candidatePairs, spec, type, searchClass,
         return { mission, route: selectedRoute };
     }
     return null;
-}
-function isSpiritualGuruScenario(scenario) {
-    return !!(scenario && scenario.payload && scenario.payload.includes("spiritual guru"));
-}
-function getScenarioPickWeight(scenario, aircraftType, searchClass) {
-    if (searchClass === "GA") {
-        return isSpiritualGuruScenario(scenario) ? 2 : 10;
-    }
-    let weight = scenario.weight || 10;
-    if (scenario.preferredAircraft && scenario.preferredAircraft.includes(aircraftType)) {
-        const celebrityVip = searchClass === "BIZ JET"
-            && (scenario.requiredTags || []).includes("VIP");
-        const mult = celebrityVip && typeof CELEBRITY_VIP_SCENARIO_WEIGHT_MULT !== "undefined"
-            ? CELEBRITY_VIP_SCENARIO_WEIGHT_MULT
-            : 3;
-        weight *= mult;
-    }
-    return weight;
 }
 function calculateBearing(lat1, lon1, lat2, lon2) {
     const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -2525,8 +2764,7 @@ function probeDispatchFlight(config) {
     const contractorMissionFirst = usesContractorMissionFirstRouting(isContractorMode, spec);
     const routingMilitaryOnly = getRoutingMilitaryOnlyMode(isContractorMode, spec, militaryBasesToggle);
     if (longHaulRequested && !canAircraftUseLongHaulMode(spec, type)) {
-        return fail("long_haul_unavailable",
-            `Long haul flights are not available for this aircraft. Maximum block time is approximately ${formatBlockTimeHoursMinutes(getMaxAchievableBlockMinutes(spec, type))}.`);
+        return fail("long_haul_unavailable", getLongHaulUnavailableReason(spec, type));
     }
     const longHaul = longHaulRequested && canAircraftUseLongHaulMode(spec, type);
     const routingTargetMins = longHaul ? 0 : targetMins;
@@ -2638,9 +2876,13 @@ function probeDispatchFlight(config) {
         : buildFilteredMissionList(spec, type, searchClass, origin, isContractorMode, longHaul, isLocalFlight);
 
     if (filteredMissions.length === 0) {
-        const message = longHaul
-            ? buildNoLongHaulMissionsMessage(spec, type, isContractorMode)
-            : "No valid missions found for this routing.";
+        const assigned = typeof getAssignedImgIdSetForAircraft === "function"
+            ? getAssignedImgIdSetForAircraft(type) : null;
+        const message = (!assigned || assigned.size === 0)
+            ? getMissionAssignmentsUnavailableMessage(type)
+            : (longHaul
+                ? buildNoLongHaulMissionsMessage(spec, type, isContractorMode)
+                : "No valid missions found for this routing.");
         return fail(longHaul ? "no_long_haul_missions" : "no_missions", message, {
             candidatePairCount: candidatePairs.length,
             origin: origin.icao,
@@ -2650,18 +2892,23 @@ function probeDispatchFlight(config) {
     }
 
     let chosenMission = preChosenMission;
+    let hatPick = null;
     if (!chosenMission) {
-        let selectionPoolWithGuard = filterWithRecentGuard(filteredMissions, lastMissions, m => m.type, 3);
-        const weightedMissions = applyContractorMissionWeighting(
-            applyCivilOkWeighting(selectionPoolWithGuard, spec, searchClass),
-            isContractorMode
+        const hat = buildMissionScenarioHat(
+            filteredMissions, type, spec, searchClass, longHaul, isLocalFlight
         );
-        const pickedEntry = pickWeightedMissionEntry(weightedMissions);
-        chosenMission = pickedEntry ? pickedEntry.mission : filteredMissions[0];
-    }
-    if (mutateHistory) {
-        lastMissions.push(chosenMission.type);
-        if (lastMissions.length > 3) lastMissions.shift();
+        if (!hat.length) {
+            return fail("no_scenario",
+                "No mission briefing images are available for this aircraft with the current settings.",
+                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+        }
+        hatPick = pickFromMissionScenarioHat(hat);
+        if (!hatPick) {
+            return fail("no_scenario",
+                "No mission briefing could be selected for this aircraft.",
+                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+        }
+        chosenMission = hatPick.mission;
     }
 
     // --- PHASE 3: APPLY MISSION OVERRIDES ---
@@ -2778,55 +3025,51 @@ function probeDispatchFlight(config) {
     // --- PHASE 6: SCENARIO SELECTION ---
     let rPayload = "standard manifest";
     let rInstruction = "Execute standard procedures.";
-    let imageId = chosenMission.type;
     let scenarioImgId = null;
+    let imageId = chosenMission.type <= 13 ? chosenMission.type : null;
 
     if (chosenMission.pool && typeof scenarioDB !== 'undefined' && scenarioDB[chosenMission.pool]) {
-        const missionPool = scenarioDB[chosenMission.pool];
-        const excludedImgIds = getExcludedScenarioImgIdsForPool(missionPool, type, spec);
-        let activePool = filterScenarioPool(missionPool, type, spec, excludedImgIds);
-        activePool = filterScenariosForLimitedCivilAircraft(activePool, type, spec, chosenMission);
-        activePool = filterScenariosForHaulMode(activePool, chosenMission.type, longHaul);
-        const typedPool = activePool.filter(s => s.missionType === chosenMission.type);
-        if (typedPool.length > 0) activePool = typedPool;
-        if (chosenMission.type === 31) {
-            const staffOnly = activePool.filter(s => s.staffShuttle && !s.heliOps);
-            if (staffOnly.length > 0) activePool = staffOnly;
-        } else if (chosenMission.type === 30) {
-            const heliOnly = activePool.filter(s => s.heliOps);
-            if (heliOnly.length > 0) activePool = heliOnly;
-        }
-        if (spec.class !== "HELI") {
-            activePool = activePool.filter(s => !s.heliOps);
-        }
-        if (chosenMission.pool === "gliderOps") {
-            if (isLocalFlight) {
-                const localOnly = activePool.filter(s => s.isLocal);
-                if (localOnly.length > 0) activePool = localOnly;
-            } else {
-                const transitOnly = activePool.filter(s => !s.isLocal);
-                if (transitOnly.length > 0) activePool = transitOnly;
+        let scenario = hatPick ? hatPick.scenario : null;
+        if (!scenario) {
+            const hat = buildMissionScenarioHat(
+                [chosenMission], type, spec, searchClass, longHaul, isLocalFlight
+            );
+            if (!hat.length) {
+                return fail("no_scenario",
+                    "No mission briefing images are available for this aircraft on the selected mission type. Try another airframe or mission settings.",
+                    { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
             }
+            hatPick = pickFromMissionScenarioHat(hat);
+            scenario = hatPick ? hatPick.scenario : null;
         }
-        let scenarioPool = filterWithRecentGuard(activePool, lastScenarioImgIds, s => s.imgId, 1);
-        let scenario = pickWeightedRandom(scenarioPool, 10, function (s) {
-            return getScenarioPickWeight(s, type, searchClass);
-        });
-        if (scenario) {
-            rPayload = scenario.payload;
-            rInstruction = scenario.instruction;
-            scenarioImgId = scenario.imgId;
-            imageId = scenario.imgId;
-        } else {
-            rPayload = chosenMission.name;
-            rInstruction = chosenMission.detail || "Execute standard procedures.";
-            imageId = chosenMission.type;
+        if (!scenario) {
+            return fail("no_scenario",
+                "No mission briefing could be selected for this aircraft.",
+                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
         }
+        if (chosenMission.type <= 13 && scenario.imgId !== chosenMission.type) {
+            return fail("no_scenario",
+                "No briefing image matches this exclusive mission type for the selected aircraft.",
+                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+        }
+        if (typeof usesMissionAssignments === "function" && usesMissionAssignments()
+            && isScenarioAllowedForAircraft(type, scenario.imgId) !== true) {
+            return fail("no_scenario",
+                "Selected scenario is not in mission-assignments.json for this aircraft. Regenerate mission-assignments-data.js and hard-refresh (Ctrl+F5).",
+                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+        }
+        rPayload = scenario.payload;
+        rInstruction = scenario.instruction;
+        scenarioImgId = scenario.imgId;
+        imageId = scenario.imgId;
+    } else if (chosenMission.type > 13) {
+        return fail("no_scenario",
+            "No mission briefing is configured for this mission template.",
+            { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
     }
 
-    if (mutateHistory) {
-        lastScenarioImgIds.push(scenarioImgId || imageId);
-        if (lastScenarioImgIds.length > 1) lastScenarioImgIds.shift();
+    if (!imageId) {
+        imageId = chosenMission.type;
     }
 
     if (scenarioImgId === 156) cargoKg = Math.floor(hardCargoLimit * 0.70);
@@ -2839,6 +3082,7 @@ function probeDispatchFlight(config) {
     return {
         ok: true,
         warnings,
+        type,
         aircraftType: type,
         spec,
         chosenMission,
@@ -2868,14 +3112,18 @@ function probeDispatchFlight(config) {
         isContractorMode
     };
 }
+function resetDispatchProbeHistory() {
+    lastMissions = [];
+    lastScenarioImgIds = [];
+}
 if (typeof globalThis !== "undefined") {
     globalThis.probeDispatchFlight = probeDispatchFlight;
+    globalThis.resetDispatchProbeHistory = resetDispatchProbeHistory;
 }
 
 // START OF DISPATCH FLIGHT FUNCTION
 function dispatchFlight() {
-    const selectedName = document.getElementById("aircraftInput").value.trim();
-    const aircraftType = Object.keys(activeFleetSpecs).find(key => activeFleetSpecs[key].name === selectedName);
+    const aircraftType = resolveAircraftTypeFromInput(document.getElementById("aircraftInput").value.trim());
     const result = probeDispatchFlight({
         aircraftType,
         targetMins: parseInt(document.getElementById("timeSlider").value, 10),
@@ -3056,7 +3304,7 @@ function dispatchFlight() {
     
     const cargoParam = (cargoKg / 1000).toFixed(3);
     const isGlider = spec.class === "GLIDER";
-    const dispatchType = spec.simbriefIcao || type;
+    const dispatchType = (spec.simbriefIcao || type || aircraftType || "").toUpperCase();
     
     let flightCounter = parseInt(localStorage.getItem("dispatcher_flt_num")) || 1;
     let paddedFltNum = String(flightCounter).padStart(3, '0');
