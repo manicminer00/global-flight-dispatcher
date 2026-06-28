@@ -1995,6 +1995,125 @@ const RESTRICTED_AIRPORT_OPERATIONAL_MTOW = {
     EGNS: 75500,
     SBRJ: 75500
 };
+// Weight-limited runway ops: JET-class airliners at JET-rated fields shorter than MTOW takeoff distance.
+const JET_WEIGHT_LIMITED_RUNWAY_EXPONENT = 1.0;
+const JET_BLOCK_TAXI_FUEL_KG = 300;
+const JET_RESERVE_HOLD_MINUTES = 30;
+const JET_RESERVE_HOLD_NM_PER_MIN = 3.5;
+const WEIGHT_LIMITED_MIN_LOAD_FACTOR = 0.20;
+const WEIGHT_LIMITED_LOAD_FACTOR_STEP = 0.01;
+
+function isJetWeightLimitedRunwayAirport(ap, spec) {
+    if (!ap || !spec || spec.class !== "JET") return false;
+    if (ap.rwy !== "JET") return false;
+    const minRw = Number(spec.minRunwayLength) || 0;
+    if (minRw <= 0 || !ap.length) return false;
+    return ap.length < minRw;
+}
+function isRouteWeightLimitedByRunway(origin, destination, spec) {
+    if (!spec || spec.class !== "JET") return false;
+    const minRw = Number(spec.minRunwayLength) || 0;
+    if (minRw <= 0) return false;
+    const origLen = origin && origin.length ? origin.length : Infinity;
+    const destLen = destination && destination.length ? destination.length : Infinity;
+    return Math.min(origLen, destLen) < minRw;
+}
+function getRunwayOperationalMtowKg(runwayLengthFt, spec) {
+    const minRw = Number(spec.minRunwayLength) || 0;
+    const mtow = Number(spec.mtow) || 0;
+    const oew = Number(spec.oew) || 0;
+    if (minRw <= 0 || !runwayLengthFt || runwayLengthFt <= 0) return mtow;
+    if (runwayLengthFt >= minRw) return mtow;
+    const ratio = runwayLengthFt / minRw;
+    const variableMass = Math.max(0, mtow - oew);
+    return oew + variableMass * Math.pow(ratio, JET_WEIGHT_LIMITED_RUNWAY_EXPONENT);
+}
+function getRouteRunwayOperationalMtow(origin, destination, spec) {
+    const origLen = origin && origin.length ? origin.length : 99999;
+    const destLen = destination && destination.length ? destination.length : 99999;
+    return getRunwayOperationalMtowKg(Math.min(origLen, destLen), spec);
+}
+function getWeightLimitedRunwayIcaos(origin, destination, spec) {
+    const icaos = [];
+    [origin, destination].forEach(function (ap) {
+        if (ap && ap.icao && isJetWeightLimitedRunwayAirport(ap, spec)) {
+            const code = ap.icao.trim().toUpperCase();
+            if (!icaos.includes(code)) icaos.push(code);
+        }
+    });
+    return icaos;
+}
+function estimateJetBlockFuelBudgetKg(tripDistanceNm, spec) {
+    const fuelPerNm = Number(spec.fuelPerNm) || 6;
+    const tripNm = Math.max(0, Number(tripDistanceNm) || 0);
+    const tripFuel = tripNm * fuelPerNm;
+    const reserveFuel = fuelPerNm * JET_RESERVE_HOLD_MINUTES * JET_RESERVE_HOLD_NM_PER_MIN;
+    return tripFuel + JET_BLOCK_TAXI_FUEL_KG + reserveFuel;
+}
+function allocateWeightLimitedJetPayload(spec, type, chosenMission, blockMinutes, operationalTow, tripDistanceNm) {
+    const safeOew = Number(spec.oew) || 42000;
+    const blockFuel = estimateJetBlockFuelBudgetKg(tripDistanceNm, spec);
+    const maxPayloadAtTow = operationalTow - safeOew - blockFuel;
+    if (maxPayloadAtTow <= 0) {
+        return { ok: false };
+    }
+    const bizJetPassengerOnly = spec.class === "BIZ JET" && type !== "LJ35" && !isFreightMission(chosenMission);
+    let loadFactor = 1.0;
+    while (loadFactor + 1e-9 >= WEIGHT_LIMITED_MIN_LOAD_FACTOR) {
+        const scaledMaxPax = Math.floor((spec.maxPax || 0) * loadFactor);
+        const scaledMaxCargo = Math.floor((spec.maxCargo || 0) * loadFactor);
+        if (missionRequiresPassengers(chosenMission, spec) && (spec.maxPax || 0) > 0) {
+            const { minPax, effectiveMax } = getPassengerLoadLimits(
+                chosenMission, spec, scaledMaxPax, blockMinutes
+            );
+            if (effectiveMax <= 0) {
+                loadFactor -= WEIGHT_LIMITED_LOAD_FACTOR_STEP;
+                continue;
+            }
+            const pax = Math.floor(Math.random() * (effectiveMax - minPax + 1)) + minPax;
+            const paxWeight = pax * 104;
+            if (paxWeight > maxPayloadAtTow) {
+                loadFactor -= WEIGHT_LIMITED_LOAD_FACTOR_STEP;
+                continue;
+            }
+            const remainingPayload = maxPayloadAtTow - paxWeight;
+            const paxRatio = spec.maxPax > 0 ? (pax / spec.maxPax) : 0;
+            const proportionalCargoLimit = (spec.maxCargo || 0) * (1 - paxRatio);
+            const hardCargoLimit = Math.floor(Math.min(proportionalCargoLimit, remainingPayload, scaledMaxCargo));
+            let cargoKg = 0;
+            if (!bizJetPassengerOnly && hardCargoLimit > 0) {
+                if (hardCargoLimit >= MIN_ASSIGNED_PAYLOAD_KG) {
+                    cargoKg = Math.floor(Math.random() * (hardCargoLimit - MIN_ASSIGNED_PAYLOAD_KG + 1)) + MIN_ASSIGNED_PAYLOAD_KG;
+                } else {
+                    cargoKg = hardCargoLimit;
+                }
+            }
+            if (paxWeight + cargoKg > maxPayloadAtTow) {
+                cargoKg = Math.max(0, Math.floor(maxPayloadAtTow - paxWeight));
+            }
+            return { ok: true, pax: pax, cargoKg: cargoKg, hardCargoLimit: hardCargoLimit, loadFactor: loadFactor };
+        }
+        if ((spec.maxCargo || 0) > 0 && !missionRequiresPassengers(chosenMission, spec)) {
+            const hardCargoLimit = Math.floor(Math.min(scaledMaxCargo, maxPayloadAtTow));
+            if (hardCargoLimit <= 0) {
+                loadFactor -= WEIGHT_LIMITED_LOAD_FACTOR_STEP;
+                continue;
+            }
+            let cargoKg = 0;
+            if (hardCargoLimit >= MIN_ASSIGNED_PAYLOAD_KG) {
+                cargoKg = Math.floor(Math.random() * (hardCargoLimit - MIN_ASSIGNED_PAYLOAD_KG + 1)) + MIN_ASSIGNED_PAYLOAD_KG;
+            } else {
+                cargoKg = hardCargoLimit;
+            }
+            return { ok: true, pax: 0, cargoKg: cargoKg, hardCargoLimit: hardCargoLimit, loadFactor: loadFactor };
+        }
+        if ((spec.maxPax || 0) <= 0 && (spec.maxCargo || 0) <= 0) {
+            return { ok: true, pax: 0, cargoKg: 0, hardCargoLimit: 0, loadFactor: loadFactor };
+        }
+        loadFactor -= WEIGHT_LIMITED_LOAD_FACTOR_STEP;
+    }
+    return { ok: false };
+}
 const LOWI_NARROWBODY_JETLINERS = ["B736", "B737", "B738", "B738_BDSF", "B738_BCF", "A319", "A320", "A321"];
 const LOWI_UNRESTRICTED_CLASSES = ["GA", "TURBO", "HELI", "WARBIRD", "BIZ JET"];
 const LOWI_LARGE_PROPLINER_MTOW = 40000;
@@ -2086,6 +2205,9 @@ function applyRunwayFieldExceptions(ap, type, spec, isAllowedType, meetsLength) 
             allowed = true;
             lengthOk = true;
         }
+    }
+    if (!lengthOk && isJetWeightLimitedRunwayAirport(ap, spec)) {
+        lengthOk = true;
     }
     return { isAllowedType: allowed, meetsLength: lengthOk };
 }
@@ -2952,21 +3074,15 @@ function probeDispatchFlight(config) {
     // --- PHASE 5: CALCULATE PAYLOAD ---
     const operationalMtowCap = getRestrictedRouteOperationalMtowCap(origin, destination, type, spec);
     let safeMtow = spec.mtow || (spec.class === "JET" ? 75000 : 3500);
-    let mtowReducedForAirport = false;
+    let mtowReducedForRestrictedAirport = false;
     if (operationalMtowCap !== null && safeMtow > operationalMtowCap) {
         safeMtow = operationalMtowCap;
-        mtowReducedForAirport = true;
+        mtowReducedForRestrictedAirport = true;
     }
     const safeOew = spec.oew || (spec.class === "JET" ? 42000 : 2000);
     const safeFuelPerNm = spec.fuelPerNm || (spec.class === "JET" ? 6 : 0.5);
-    let effectiveRunway = Math.min(origin.length || 99999, destination.length || 99999);
-    let runwayWeightPenalty = 0;
-    const maxVariablePayload = safeMtow - safeOew;
-    if (effectiveRunway < spec.minRunwayLength && spec.minRunwayLength > 0) {
-        const runwayRatio = Math.max(0, effectiveRunway / spec.minRunwayLength);
-        const shortFieldPenalty = maxVariablePayload * (0.55 + (1 - runwayRatio) * 0.35);
-        runwayWeightPenalty = shortFieldPenalty;
-    }
+    const weightLimitedRunway = spec.class === "JET" && isRouteWeightLimitedByRunway(origin, destination, spec);
+    const weightLimitedRunwayIcaos = weightLimitedRunway ? getWeightLimitedRunwayIcaos(origin, destination, spec) : [];
     let fuelDistanceNm = distanceNm;
     if (origin.icao === "LOWI" && isLowiNarrowbodyJetliner(type, spec)) {
         fuelDistanceNm = Math.min(distanceNm, 900);
@@ -2974,44 +3090,69 @@ function probeDispatchFlight(config) {
     const blockMinutes = longHaul
         ? estimateLongHaulBlockMinutes(distanceNm, spec, type)
         : Math.max(10, targetMins);
-    let minReservedPaxWeight = 0;
-    if (missionRequiresPassengers(chosenMission, spec) && spec.maxPax > 0) {
-        const { minPax } = getPassengerLoadLimits(chosenMission, spec, spec.maxPax, blockMinutes);
-        minReservedPaxWeight = Math.max(1, minPax) * 104;
-    }
-    const rawBlockFuel = fuelDistanceNm * safeFuelPerNm;
-    const availableForFuel = Math.max(0, safeMtow - safeOew - runwayWeightPenalty - minReservedPaxWeight);
-    const estimatedBlockFuel = Math.min(rawBlockFuel, availableForFuel);
-
-    const maxStructuralPayload = Math.max(0, safeMtow - safeOew - estimatedBlockFuel - runwayWeightPenalty);
     let pax = 0;
-    if (missionRequiresPassengers(chosenMission, spec) && spec.maxPax > 0) {
-        let maxSafePax = Math.max(0, Math.min(spec.maxPax, Math.floor(maxStructuralPayload / 104)));
-        if (maxSafePax > 0) {
-            const { minPax, effectiveMax } = getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes);
-            if (effectiveMax > 0) {
-                pax = Math.floor(Math.random() * (effectiveMax - minPax + 1)) + minPax;
+    let cargoKg = 0;
+    let hardCargoLimit = 0;
+    if (weightLimitedRunway) {
+        safeMtow = Math.min(safeMtow, getRouteRunwayOperationalMtow(origin, destination, spec));
+        const weightLimitedAlloc = allocateWeightLimitedJetPayload(
+            spec, type, chosenMission, blockMinutes, safeMtow, fuelDistanceNm
+        );
+        if (!weightLimitedAlloc.ok) {
+            return fail("runway_performance",
+                "Runway length and sector distance do not allow a feasible takeoff weight for this aircraft. Try a shorter sector, a different airport, or another airframe.",
+                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+        }
+        pax = weightLimitedAlloc.pax;
+        cargoKg = weightLimitedAlloc.cargoKg;
+        hardCargoLimit = weightLimitedAlloc.hardCargoLimit;
+    } else {
+        let effectiveRunway = Math.min(origin.length || 99999, destination.length || 99999);
+        let runwayWeightPenalty = 0;
+        const maxVariablePayload = safeMtow - safeOew;
+        if (effectiveRunway < spec.minRunwayLength && spec.minRunwayLength > 0) {
+            const runwayRatio = Math.max(0, effectiveRunway / spec.minRunwayLength);
+            const shortFieldPenalty = maxVariablePayload * (0.55 + (1 - runwayRatio) * 0.35);
+            runwayWeightPenalty = shortFieldPenalty;
+        }
+        let minReservedPaxWeight = 0;
+        if (missionRequiresPassengers(chosenMission, spec) && spec.maxPax > 0) {
+            const { minPax } = getPassengerLoadLimits(chosenMission, spec, spec.maxPax, blockMinutes);
+            minReservedPaxWeight = Math.max(1, minPax) * 104;
+        }
+        const rawBlockFuel = fuelDistanceNm * safeFuelPerNm;
+        const availableForFuel = Math.max(0, safeMtow - safeOew - runwayWeightPenalty - minReservedPaxWeight);
+        const estimatedBlockFuel = Math.min(rawBlockFuel, availableForFuel);
+
+        const maxStructuralPayload = Math.max(0, safeMtow - safeOew - estimatedBlockFuel - runwayWeightPenalty);
+        if (missionRequiresPassengers(chosenMission, spec) && spec.maxPax > 0) {
+            let maxSafePax = Math.max(0, Math.min(spec.maxPax, Math.floor(maxStructuralPayload / 104)));
+            if (maxSafePax > 0) {
+                const { minPax, effectiveMax } = getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes);
+                if (effectiveMax > 0) {
+                    pax = Math.floor(Math.random() * (effectiveMax - minPax + 1)) + minPax;
+                }
+            }
+            if (pax === 0) {
+                pax = 1;
             }
         }
-        if (pax === 0) {
-            pax = 1;
+        const paxWeight = pax * 104;
+        const paxRatio = spec.maxPax > 0 ? (pax / spec.maxPax) : 0;
+        const proportionalCargoLimit = spec.maxCargo * (1 - paxRatio);
+        const remainingPayload = Math.max(0, maxStructuralPayload - paxWeight);
+        hardCargoLimit = Math.floor(Math.min(proportionalCargoLimit, remainingPayload));
+        const bizJetPassengerOnly = spec.class === "BIZ JET" && type !== "LJ35" && !isFreightMission(chosenMission);
+        if (!bizJetPassengerOnly && hardCargoLimit > 0) {
+            if (hardCargoLimit >= MIN_ASSIGNED_PAYLOAD_KG) {
+                const cargoSpan = hardCargoLimit - MIN_ASSIGNED_PAYLOAD_KG + 1;
+                cargoKg = Math.floor(Math.random() * cargoSpan) + MIN_ASSIGNED_PAYLOAD_KG;
+            } else {
+                cargoKg = hardCargoLimit;
+            }
         }
     }
-    const paxWeight = pax * 104;
-    const paxRatio = spec.maxPax > 0 ? (pax / spec.maxPax) : 0;
-    const proportionalCargoLimit = spec.maxCargo * (1 - paxRatio);
-    const remainingPayload = Math.max(0, maxStructuralPayload - paxWeight);
-    const hardCargoLimit = Math.floor(Math.min(proportionalCargoLimit, remainingPayload));
-    let cargoKg = 0;
-    const bizJetPassengerOnly = spec.class === "BIZ JET" && type !== "LJ35" && !isFreightMission(chosenMission);
-    if (!bizJetPassengerOnly && hardCargoLimit > 0) {
-        if (hardCargoLimit >= MIN_ASSIGNED_PAYLOAD_KG) {
-            const cargoSpan = hardCargoLimit - MIN_ASSIGNED_PAYLOAD_KG + 1;
-            cargoKg = Math.floor(Math.random() * cargoSpan) + MIN_ASSIGNED_PAYLOAD_KG;
-        } else {
-            cargoKg = hardCargoLimit;
-        }
-    }
+    const mtowReducedForAirport = mtowReducedForRestrictedAirport;
     const payout = "$ " + (Math.floor(Math.random() * 6200) + 1950).toLocaleString('en-GB');
 
     // --- PHASE 6: SCENARIO SELECTION ---
@@ -3067,7 +3208,10 @@ function probeDispatchFlight(config) {
     if (scenarioImgId === 156) cargoKg = Math.floor(hardCargoLimit * 0.70);
     cargoKg = finalizeAssignedPayloadKg(cargoKg, hardCargoLimit);
 
-    if (mtowReducedForAirport) {
+    if (weightLimitedRunwayIcaos.length) {
+        warnings.push("Takeoff weight reduced for runway length at " + weightLimitedRunwayIcaos.join(" / ") + ". Payload limited; plan fuel normally.");
+    }
+    if (mtowReducedForRestrictedAirport) {
         warnings.push("MTOW has been reduced for this flight due to airport restrictions. You will need to check fuel before departing.");
     }
 
