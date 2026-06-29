@@ -143,6 +143,27 @@ function getRoutingScope() {
     const value = el ? el.value : "worldwide";
     return value === "americas" || value === "row" ? value : "worldwide";
 }
+const ROUTING_SCOPE_LABELS = {
+    worldwide: "Worldwide",
+    americas: "Americas Only",
+    row: "Europe & Rest of World",
+};
+function getRoutingScopeLabel(scope) {
+    return ROUTING_SCOPE_LABELS[scope] || ROUTING_SCOPE_LABELS.worldwide;
+}
+function getDepartureRoutingScopeMismatchMessage(depOverride, scope) {
+    if (!depOverride || scope === "worldwide") return null;
+    if (isLongHaulModeEnabled()) return null;
+    const code = normalizeIcao(depOverride);
+    if (!code) return null;
+    const depAp = activeAirportDatabase.find(ap => normalizeIcao(ap.icao) === code);
+    if (!depAp) return null;
+    const airportRegion = getAirportRoutingRegion(depAp);
+    if (airportRegion === scope) return null;
+    const currentLabel = getRoutingScopeLabel(scope);
+    const suggestedLabel = getRoutingScopeLabel(airportRegion);
+    return `Routing Options: ${currentLabel} is selected; change this to ${suggestedLabel} or Worldwide for ${code}.`;
+}
 function getRoutingOverrideIcaos(depOverride) {
     const set = new Set();
     const code = (depOverride || "").trim().toUpperCase();
@@ -3151,9 +3172,11 @@ function buildRouteFailureMessage(depOverride, type, spec, validAirports, depart
                 return `Military airbases only is enabled, but ${depOverride} is not a military airbase. Clear that option or choose a military departure airport.`;
             }
         }
+        const scope = getRoutingScope();
+        const routingMismatch = getDepartureRoutingScopeMismatchMessage(depOverride, scope);
+        if (routingMismatch) return routingMismatch;
         const depIsValid = departureAvailable;
         if (depIsValid) {
-            const scope = getRoutingScope();
             if (scope !== "worldwide") {
                 const longHaulHint = isLongHaulModeEnabled()
                     ? ""
