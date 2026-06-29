@@ -4,8 +4,10 @@ const DEFAULT_HAT_WEIGHT = 10;
 const MEDEVAC_TARGET_SHARE = 0.2;
 let activeAirportDatabase = [];
 let activeAirportDatabaseNeedsRebuild = true;
+let cachedActiveAirportIcaoSet = null;
 function markAirportDatabaseDirty() {
     activeAirportDatabaseNeedsRebuild = true;
+    cachedActiveAirportIcaoSet = null;
 }
 let activeFleetSpecs = {};
 
@@ -174,12 +176,43 @@ function loadRoutingScope() {
 const LONG_HAUL_BLOCK_TIME_PAD_MINS = 30;
 const LONG_HAUL_MIN_BLOCK_MINS = 360;
 const LONG_HAUL_MAX_BLOCK_MINS = 960;
-const LONG_HAUL_UNAVAILABLE_MESSAGE = "Why can't I use long-haul mode? Long-haul mode targets 6-16 hour sectors. Try turning off long-haul, choosing a different departure, or selecting an airframe with greater range.";
+/** Set false to restore legacy long-haul (no duration slider; picks longest feasible sector). */
+const LONG_HAUL_DURATION_SLIDER_ENABLED = true;
+const LONG_HAUL_SLIDER_MIN_BLOCK_MINS = 480;
+const LONG_HAUL_SLIDER = { min: 480, max: 960, step: 240, defaultValue: 720, listId: "longHaulSteplist" };
+/** Curated tier distance windows (nm) — wide enough for classics, not every hub in a band. */
+const LONG_HAUL_TIER_DISTANCE_LIMITS_NM = { 480: { min: 2300, max: 4200 }, 720: { min: 4000, max: 6500 }, 960: { min: 5500, max: 10500 } };
+/** Narrowbody transatlantic: North Atlantic, eastern Canada, Med/Gulf — not US East Coast trunk routes. */
+const LONG_HAUL_NARROWBODY_TRANSATLANTIC_MIN_NM = 1600;
+/** US East trunk (e.g. JFK ~2,991 nm from LHR) exceeds practical narrowbody tank + payload envelope. */
+const LONG_HAUL_NARROWBODY_TRANSATLANTIC_MAX_NM = 2800;
+/** Minimum unique destinations kept in weighted long-haul pick (pair boosts must not collapse variety). */
+const LONG_HAUL_PICK_MIN_UNIQUE_DESTINATIONS = 8;
+/** Unpinned long-haul: sample departure hubs per dispatch (avoids 380×380 pair scan). */
+const LONG_HAUL_UNPINNED_SOURCE_SAMPLE = 56;
+const LONG_HAUL_CURATED_ROUTING_ENABLED = true;
+/** Caps iconic-route boost so weighted picks still rotate through the full feasible pool. */
+const LONG_HAUL_ROUTE_PICK_WEIGHT_CAP = 10;
+/** When picking, include any route within this fraction of the top weight (more variety). */
+const LONG_HAUL_ROUTE_PICK_WEIGHT_FLOOR_RATIO = 0.22;
+const LONG_HAUL_TIER_BY_MINS = {
+    480: { label: "Transatlantic", blurb: "Atlantic, Canada & US East (wide-body); North Atlantic for narrow-body" },
+    720: { label: "Pacific", blurb: "US West Coast & deep Asia" },
+    960: { label: "Ultra", blurb: "Australia & ultra-long" }
+};
+const LONG_HAUL_PICK_TOLERANCE_MINS = 45;
+const LONG_HAUL_PRIMARY_DISTANCE_BAND = 0.10;
+const LONG_HAUL_RELAXED_DISTANCE_BAND = 0.18;
+const LONG_HAUL_UNAVAILABLE_MESSAGE = "Why can't I use long-haul mode? Long-haul targets Transatlantic, Pacific, or Ultra routes (or the maximum your aircraft can achieve). Try turning off long-haul, choosing a different departure, or selecting an airframe with greater range.";
 // Short-haul slider = target block time; routing uses cruise (slider minus pad) so SimBrief block stays near the slider.
 const SHORT_HAUL_BLOCK_TIME_PAD_MINS = LONG_HAUL_BLOCK_TIME_PAD_MINS;
 const SHORT_HAUL_ROUTE_PLANNING_TRIM_MINS = 10;
+// Scheduled commercial assignment band (70–80%): economic target for normal sectors, not a legal minimum.
+// Ultra-long or weight-limited routes may assign below this when MTOW/fuel caps payload (ghost-flight economics).
 const SCHEDULED_COMMERCIAL_LOAD_MIN = 0.70;
 const SCHEDULED_COMMERCIAL_LOAD_MAX = 0.80;
+const DEFAULT_SIMBRIEF_PAX_WEIGHT_KG = 79;
+const DEFAULT_SIMBRIEF_BAGGAGE_PER_PAX_KG = 25;
 const FAST_BIZ_JET_TYPES = new Set(["C750", "C680", "C700"]);
 const VINTAGE_PROPLINER_TYPES = new Set(["DC6A", "DC6B"]);
 const LONG_HAUL_ALLOWED_TURBOPROP_TYPES = new Set(["AT46", "AT76"]);
@@ -195,10 +228,39 @@ function specHasPaxCapacity(spec) {
 function specHasCargoCapacity(spec) {
     return !!spec && (spec.maxCargo || 0) > 0;
 }
+function getPaxWeightKg(spec) {
+    const v = Number(spec && spec.paxWeightKg);
+    return v > 0 ? v : DEFAULT_SIMBRIEF_PAX_WEIGHT_KG;
+}
+function getBaggagePerPaxKg(spec) {
+    const v = Number(spec && spec.baggagePerPaxKg);
+    return v > 0 ? v : DEFAULT_SIMBRIEF_BAGGAGE_PER_PAX_KG;
+}
+/** SimBrief passenger payload: body weight + per-pax baggage (airframe defaults, not URL cargo). */
+function getPaxAllInWeightKg(spec) {
+    return getPaxWeightKg(spec) + getBaggagePerPaxKg(spec);
+}
+function getSimBriefPassengerPayloadKg(spec, paxCount) {
+    return Math.max(0, paxCount) * getPaxAllInWeightKg(spec);
+}
 function specIsHeavyJet(spec) {
     if (!spec || spec.class !== "JET") return false;
     if (spec.tags && spec.tags.includes("HEAVY")) return true;
     return (spec.mtow || 0) >= HEAVY_JET_MTOW_MIN;
+}
+/** Large military turboprops (A400-class) — require airliner/military strips, not local GA. */
+function specIsHeavyAirlifter(spec) {
+    return !!(spec && spec.tags && spec.tags.includes("HEAVY_AIRLIFTER"));
+}
+function passesHeavyAirlifterAirport(ap, spec) {
+    if (!specIsHeavyAirlifter(spec) || !ap) return true;
+    const minLen = Number(spec.minRunwayLength) || 0;
+    const len = Number(ap.length) || 0;
+    if (minLen > 0 && len > 0 && len < minLen) return false;
+    const rwy = ap.rwy || "";
+    if (rwy === "JET" || rwy === "BIZ JET") return true;
+    if (ap.isMilitary && (rwy === "TURBO" || rwy === "JET")) return true;
+    return false;
 }
 function isShortHaulOnlyAirframe(type, spec) {
     if (!spec) return false;
@@ -285,7 +347,11 @@ function getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes) {
     }
 
     const effectiveMax = Math.min(maxPaxTarget, maxSafePax, spec.maxPax);
-    if (effectiveMax < minPax) minPax = effectiveMax;
+    if (effectiveMax < minPax) {
+        // Below commercial target (fuel/MTOW cap) — partial loads OK, not forced to maxSafePax every time.
+        minPax = Math.max(1, Math.floor(effectiveMax * SCHEDULED_COMMERCIAL_LOAD_MIN));
+        if (minPax > effectiveMax) minPax = effectiveMax;
+    }
     return { minPax, effectiveMax };
 }
 function isFreightMission(mission) {
@@ -369,13 +435,40 @@ function passesLongHaulDurationBand(dist, spec, aircraftType) {
     return est >= getLongHaulMinBlockForAircraft(spec, aircraftType)
         && est <= getLongHaulMaxBlockForAircraft(spec, aircraftType);
 }
+function getLongHaulTierMinBlockMinutes(spec, aircraftType, tierMins) {
+    const stepped = clampLongHaulBlockMinutes(tierMins || getSavedLongHaulBlockMinutes());
+    if (stepped === 480 && spec && spec.class === "JET" && !specIsHeavyJet(spec)) {
+        const floorDist = Math.max(spec.minD || 0, LONG_HAUL_NARROWBODY_TRANSATLANTIC_MIN_NM);
+        return estimateLongHaulBlockMinutes(floorDist, spec, aircraftType) - LONG_HAUL_PICK_TOLERANCE_MINS;
+    }
+    return getLongHaulMinBlockForAircraft(spec, aircraftType);
+}
+/** Tier slider: Ultra allows full aircraft block envelope; shorter tiers keep the 16h cap. */
+function passesLongHaulTierDurationBand(dist, spec, aircraftType, tierMins) {
+    if (!dist || isNaN(dist)) return false;
+    if (!routeWithinAircraftRange(dist, spec)) return false;
+    const est = estimateLongHaulBlockMinutesForRoute(dist, spec, aircraftType);
+    const minBlock = getLongHaulTierMinBlockMinutes(spec, aircraftType, tierMins);
+    const maxAch = getMaxAchievableBlockMinutes(spec, aircraftType);
+    if (est < minBlock || est > maxAch) return false;
+    if (LONG_HAUL_DURATION_SLIDER_ENABLED && tierMins != null) {
+        const tier = clampLongHaulBlockMinutes(tierMins);
+        if (tier >= 960) return true;
+    }
+    return est <= getLongHaulMaxBlockForAircraft(spec, aircraftType);
+}
+function longHaulTierHasFeasibleRange(spec, tierMins) {
+    if (!LONG_HAUL_DURATION_SLIDER_ENABLED || !spec) return true;
+    const limits = getLongHaulTierDistanceLimits(tierMins, spec);
+    return limits.min <= limits.max;
+}
 function getLongHaulBlockDistanceLimits(spec, aircraftType) {
     const minBlock = getLongHaulMinBlockForAircraft(spec, aircraftType);
     const maxBlock = getLongHaulMaxBlockForAircraft(spec, aircraftType);
     let minDist = longHaulBlockMinutesToDistanceNm(minBlock, spec, aircraftType);
     let maxDist = longHaulBlockMinutesToDistanceNm(maxBlock, spec, aircraftType);
     const aircraftMin = spec.minD || 0;
-    const aircraftMax = spec.maxD || Infinity;
+    const aircraftMax = getJetAllowedMaxGcNm(spec);
     minDist = Math.max(aircraftMin, minDist);
     maxDist = Math.min(aircraftMax, maxDist);
     if (minDist > maxDist) {
@@ -390,9 +483,8 @@ function getLongHaulBlockDistanceLimits(spec, aircraftType) {
 function getEffectiveBlockMinutes(targetMins, spec, longHaul, aircraftType) {
     if (isSliderIgnoredAircraft(spec)) return 20;
     if (longHaul) {
-        const midBlock = (getLongHaulMinBlockForAircraft(spec, aircraftType)
-            + getLongHaulMaxBlockForAircraft(spec, aircraftType)) / 2;
-        return Math.max(60, midBlock - LONG_HAUL_BLOCK_TIME_PAD_MINS);
+        const targetBlock = getLongHaulTargetBlockMinutes(spec, aircraftType, targetMins);
+        return Math.max(60, targetBlock - LONG_HAUL_BLOCK_TIME_PAD_MINS);
     }
     return Math.max(10, targetMins - SHORT_HAUL_BLOCK_TIME_PAD_MINS - SHORT_HAUL_ROUTE_PLANNING_TRIM_MINS);
 }
@@ -451,15 +543,17 @@ function getShortHaulSimbriefProxyBlockMinutes(dist, spec, aircraftType) {
     return estimateShortHaulBlockMinutesForRoute(dist, spec, aircraftType) + SHORT_HAUL_SIMBRIEF_OVERHEAD_MINS;
 }
 function passesShortHaulSimbriefTarget(dist, targetMins, spec, aircraftType, toleranceMins) {
-    return getShortHaulSimbriefProxyBlockMinutes(dist, spec, aircraftType) <= targetMins + toleranceMins;
+    const proxy = getShortHaulSimbriefProxyBlockMinutes(dist, spec, aircraftType);
+    const tol = Math.max(0, Number(toleranceMins) || 0);
+    return proxy >= targetMins - tol && proxy <= targetMins + tol;
 }
 function getRouteDistanceLimits(targetMins, spec, aircraftType, longHaul, depOverride) {
     const blockSpeed = getBlockSpeedForSpec(spec, aircraftType);
     const effectiveMins = getEffectiveBlockMinutes(targetMins, spec, longHaul, aircraftType);
     let targetDist = (blockSpeed * effectiveMins) / 60;
-    const aircraftMax = spec.maxD || targetDist;
+    const aircraftMax = getJetAllowedMaxGcNm(spec);
     const aircraftMin = spec.minD || 0;
-    targetDist = Math.min(targetDist, aircraftMax);
+    targetDist = Math.min(targetDist, aircraftMax === Infinity ? targetDist : aircraftMax);
     if (aircraftMin > 0 && targetDist < aircraftMin) {
         targetDist = aircraftMin;
     }
@@ -477,6 +571,16 @@ function getRouteDistanceLimits(targetMins, spec, aircraftType, longHaul, depOve
         };
     }
     if (longHaul) {
+        if (LONG_HAUL_DURATION_SLIDER_ENABLED) {
+            const limits = getLongHaulTierDistanceLimits(targetMins, spec);
+            return {
+                minTarget: limits.min,
+                maxTarget: limits.max,
+                relaxedMin: limits.min,
+                relaxedMax: limits.max,
+                targetDist: limits.mid
+            };
+        }
         const blockLimits = getLongHaulBlockDistanceLimits(spec, aircraftType);
         return {
             minTarget: blockLimits.minTarget,
@@ -587,6 +691,9 @@ function getRoutingMilitaryOnlyMode(isContractorMode, spec, forceMilitaryBases) 
 }
 function passesDispatchAirportFilters(ap, spec, type, overrideIcao, forceMilitaryBases, isContractorMode) {
     const apIcao = normalizeIcao(ap.icao);
+    if (spec.class === "JET" && JET_SIMBRIEF_EXCLUDED_ICAOS.has(apIcao) && apIcao !== overrideIcao) {
+        return false;
+    }
     if (spec.class === "GLIDER" && !isGliderSuitableAirport(ap, spec)) {
         return false;
     }
@@ -599,24 +706,38 @@ function passesDispatchAirportFilters(ap, spec, type, overrideIcao, forceMilitar
     const exceptions = applyRunwayFieldExceptions(ap, type, spec, isAllowedType, finalMeetsLength);
     isAllowedType = exceptions.isAllowedType;
     finalMeetsLength = exceptions.meetsLength;
+    if (!passesHeavyAirlifterAirport(ap, spec)) return false;
     return isAllowedType && finalMeetsLength;
 }
-function buildDispatchRoutingPools(depOverride, routingScope, spec, type, forceMilitaryBases, isContractorMode) {
+function buildDispatchRoutingPools(depOverride, routingScope, spec, type, forceMilitaryBases, isContractorMode, longHaul) {
     const overrideIcao = normalizeIcao(depOverride);
     const eligible = activeAirportDatabase.filter(ap =>
         passesDispatchAirportFilters(ap, spec, type, overrideIcao, forceMilitaryBases, isContractorMode)
     );
+    let departureAirports = eligible;
+    let destinationAirports = eligible;
+    if (longHaul) {
+        destinationAirports = filterLongHaulHubAirports(destinationAirports, spec);
+        if (!overrideIcao) {
+            departureAirports = filterLongHaulHubAirports(departureAirports, spec);
+        }
+    }
     if (routingScope === "worldwide") {
-        return { departureAirports: eligible, destinationAirports: eligible };
+        return { departureAirports, destinationAirports };
     }
     const overrideIcaos = getRoutingOverrideIcaos(depOverride);
-    const regionalDestinations = eligible.filter(ap =>
+    const regionalDestinations = destinationAirports.filter(ap =>
         airportAllowedForRouting(ap, routingScope, overrideIcaos)
     );
     if (!overrideIcao) {
-        return { departureAirports: regionalDestinations, destinationAirports: regionalDestinations };
+        return {
+            departureAirports: departureAirports.filter(ap =>
+                airportAllowedForRouting(ap, routingScope, overrideIcaos)
+            ),
+            destinationAirports: regionalDestinations
+        };
     }
-    const depAp = eligible.find(ap => normalizeIcao(ap.icao) === overrideIcao);
+    const depAp = departureAirports.find(ap => normalizeIcao(ap.icao) === overrideIcao);
     return {
         departureAirports: depAp ? [depAp] : [],
         destinationAirports: regionalDestinations
@@ -625,8 +746,33 @@ function buildDispatchRoutingPools(depOverride, routingScope, spec, type, forceM
 function pairPassesFixedDepartureBlockWindow(dist, routingTargetMins, spec, aircraftType, toleranceMins) {
     return passesShortHaulSimbriefTarget(dist, routingTargetMins, spec, aircraftType, toleranceMins);
 }
-function buildJetRoutePairs(sources, destinations, depOverride, spec, minTarget, maxTarget, relaxedMin, relaxedMax, longHaul, routingTargetMins, aircraftType) {
+function buildJetRoutePairs(sources, destinations, depOverride, destOverride, spec, minTarget, maxTarget, relaxedMin, relaxedMax, longHaul, routingTargetMins, aircraftType) {
     const depCode = normalizeIcao(depOverride);
+    const destCode = normalizeIcao(destOverride);
+    if (depCode && destCode) {
+        const src = sources.find(ap => normalizeIcao(ap.icao) === depCode);
+        const dst = destinations.find(ap => normalizeIcao(ap.icao) === destCode);
+        if (src && dst && normalizeIcao(src.icao) !== normalizeIcao(dst.icao)) {
+            const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
+            if (dist && !isNaN(dist) && routeWithinAircraftRange(dist, spec)
+                && isJetSimBriefRouteFeasible(dist, spec, src, dst)) {
+                if (longHaul) {
+                    if (isLongHaulScenicDestinationBlocked(dst, spec, aircraftType)) {
+                        return { candidatePairs: [], usedRelaxedRouting: false };
+                    }
+                    if (!passesLongHaulTierDurationBand(dist, spec, aircraftType, routingTargetMins)) {
+                        return { candidatePairs: [], usedRelaxedRouting: false };
+                    }
+                    const tierLimits = getLongHaulTierDistanceLimits(routingTargetMins, spec);
+                    if (dist < tierLimits.min || dist > tierLimits.max) {
+                        return { candidatePairs: [], usedRelaxedRouting: false };
+                    }
+                }
+                return { candidatePairs: [{ src, dst, dist }], usedRelaxedRouting: false };
+            }
+        }
+        return { candidatePairs: [], usedRelaxedRouting: false };
+    }
     const fixedDepShortHaul = !!(depCode && !longHaul && !isSliderIgnoredAircraft(spec));
     const candidatePairs = [];
     let usedRelaxedRouting = false;
@@ -637,18 +783,34 @@ function buildJetRoutePairs(sources, destinations, depOverride, spec, minTarget,
         );
     }
     if (longHaul) {
+        const curatedSet = shouldUseLongHaulCuratedDestinationWhitelist(spec)
+            ? getLongHaulCuratedDestinationSet(routingTargetMins)
+            : null;
+        const longHaulJetFeasCtx = spec.class === "JET" ? buildJetRouteFeasibilityContext(spec) : null;
         const collectLongHaulPairs = (distMin, distMax) => {
             const pairs = [];
+            const searchMax = Math.max(distMax, distMin) * 1.05;
+            const latDelta = nmToLatDeltaDeg(searchMax + 10);
+            const destGrid = buildAirportSpatialGrid(destinations, HELI_GRID_CELL_DEG);
             for (const src of sources) {
                 if (depCode && normalizeIcao(src.icao) !== depCode) continue;
-                for (const dst of destinations) {
-                    if (normalizeIcao(src.icao) === normalizeIcao(dst.icao) && spec.class !== "HELI") continue;
+                const lonDelta = nmToLonDeltaDeg(searchMax + 10, src.lat);
+                forEachAirportNearGrid(destGrid, src, HELI_GRID_CELL_DEG, latDelta, lonDelta, (dst) => {
+                    if (destCode && normalizeIcao(dst.icao) !== destCode) return;
+                    if (curatedSet && !curatedSet.has(normalizeIcao(dst.icao))) return;
+                    if (normalizeIcao(src.icao) === normalizeIcao(dst.icao) && spec.class !== "HELI") return;
                     const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
-                    if (!dist || isNaN(dist)) continue;
-                    if (dist < distMin || dist > distMax) continue;
-                    if (!passesLongHaulDurationBand(dist, spec, aircraftType)) continue;
+                    if (!dist || isNaN(dist)) return;
+                    if (dist < distMin || dist > distMax) return;
+                    if (longHaulJetFeasCtx) {
+                        if (!isJetRouteDistanceFeasible(dist, longHaulJetFeasCtx)) return;
+                        if (narrowbodyLongHaulTankCriticalRouteBlocked(dist, spec)) return;
+                        if (!isJetSimBriefDepartureFeasible(dist, spec, src, longHaulJetFeasCtx)) return;
+                    }
+                    if (isLongHaulScenicDestinationBlocked(dst, spec, aircraftType)) return;
+                    if (!passesLongHaulTierDurationBand(dist, spec, aircraftType, routingTargetMins)) return;
                     pairs.push({ src, dst, dist });
-                }
+                });
             }
             return pairs;
         };
@@ -661,43 +823,55 @@ function buildJetRoutePairs(sources, destinations, depOverride, spec, minTarget,
                 maxTarget * (1 + widen)
             ));
         }
-        return { candidatePairs, usedRelaxedRouting };
+        return { candidatePairs: capRoutePairPool(candidatePairs, JET_ROUTE_PAIR_CAP), usedRelaxedRouting };
     }
     let primaryPairs = [];
     const searchMax = Math.max(maxTarget, relaxedMax, minTarget);
     const latDelta = nmToLatDeltaDeg(searchMax + 10);
     const destGrid = buildAirportSpatialGrid(destinations, HELI_GRID_CELL_DEG);
+    const jetFeasCtx = spec.class === "JET" ? buildJetRouteFeasibilityContext(spec) : null;
     const collectPairs = (distMin, distMax, toleranceMins) => {
         const found = [];
         for (const src of sources) {
             if (depCode && normalizeIcao(src.icao) !== depCode) continue;
             const lonDelta = nmToLonDeltaDeg(searchMax + 10, src.lat);
             forEachAirportNearGrid(destGrid, src, HELI_GRID_CELL_DEG, latDelta, lonDelta, (dst) => {
+                if (destCode && normalizeIcao(dst.icao) !== destCode) return;
                 if (normalizeIcao(src.icao) === normalizeIcao(dst.icao)) return;
                 const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
                 if (!dist || isNaN(dist)) return;
-                if (!routeWithinAircraftRange(dist, spec)) return;
                 if (dist < distMin || dist > distMax) return;
+                if (!routeWithinAircraftRange(dist, spec, fixedDepShortHaul ? { ignoreCatalogMinD: true } : undefined)) return;
                 if (fixedDepShortHaul && !pairPassesFixedDepartureBlockWindow(dist, routingTargetMins, spec, aircraftType, toleranceMins)) {
                     return;
+                }
+                if (jetFeasCtx) {
+                    if (!isJetRouteDistanceFeasible(dist, jetFeasCtx)) return;
+                    if (!isJetSimBriefDepartureFeasible(dist, spec, src, jetFeasCtx)) return;
                 }
                 found.push({ src, dst, dist });
             });
         }
         return found;
     };
-    primaryPairs = collectPairs(minTarget, maxTarget, SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS);
-    if (primaryPairs.length === 0) {
-        usedRelaxedRouting = true;
-        candidatePairs.push(...collectPairs(relaxedMin, relaxedMax, FIXED_DEPARTURE_BLOCK_RELAXED_MINS));
+    if (fixedDepShortHaul) {
+        // Pinned departure: block-time window defines feasible sectors, not catalog minD or cruise-distance band.
+        candidatePairs.push(...collectPairs(0, relaxedMax, FIXED_DEPARTURE_BLOCK_RELAXED_MINS));
     } else {
-        candidatePairs.push(...primaryPairs);
+        primaryPairs = collectPairs(minTarget, maxTarget, SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS);
+        if (primaryPairs.length === 0) {
+            usedRelaxedRouting = true;
+            candidatePairs.push(...collectPairs(relaxedMin, relaxedMax, FIXED_DEPARTURE_BLOCK_RELAXED_MINS));
+        } else {
+            candidatePairs.push(...primaryPairs);
+        }
     }
     return { candidatePairs: capRoutePairPool(candidatePairs, JET_ROUTE_PAIR_CAP), usedRelaxedRouting };
 }
-function routeWithinAircraftRange(dist, spec) {
-    const minD = spec.minD || 0;
-    const maxD = spec.maxD || Infinity;
+function routeWithinAircraftRange(dist, spec, options) {
+    const opts = options || {};
+    const minD = opts.ignoreCatalogMinD ? 0 : (spec.minD || 0);
+    const maxD = spec.class === "JET" ? getJetAllowedMaxGcNm(spec) : (spec.maxD || Infinity);
     return dist >= minD && dist <= maxD;
 }
 const HELI_ROUTE_PAIR_CAP = 8000;
@@ -735,6 +909,19 @@ function forEachAirportNearGrid(grid, ap, cellDeg, latDeltaDeg, lonDeltaDeg, cal
             for (const candidate of bucket) callback(candidate);
         }
     }
+}
+function sampleAirportsForLongHaulSources(airports, cap) {
+    const list = airports || [];
+    if (list.length <= cap) return list;
+    const picked = [];
+    const used = new Set();
+    while (picked.length < cap && used.size < list.length) {
+        const idx = Math.floor(Math.random() * list.length);
+        if (used.has(idx)) continue;
+        used.add(idx);
+        picked.push(list[idx]);
+    }
+    return picked;
 }
 function capRoutePairPool(pairs, cap) {
     if (pairs.length <= cap) return pairs;
@@ -806,24 +993,48 @@ function pickShortHaulRoute(pool, targetMins, spec, aircraftType) {
     ]) {
         const ranked = pool
             .map(rank)
-            .filter(entry => entry.proxy <= targetMins + tol)
+            .filter((entry) => entry.proxy >= targetMins - tol && entry.proxy <= targetMins + tol)
             .sort((a, b) => {
-                if (a.proxyOvershoot !== b.proxyOvershoot) return a.proxyOvershoot - b.proxyOvershoot;
                 if (a.proxyDelta !== b.proxyDelta) return a.proxyDelta - b.proxyDelta;
-                if (a.estOvershoot !== b.estOvershoot) return a.estOvershoot - b.estOvershoot;
-                return a.estDelta - b.estDelta;
+                if (a.proxyOvershoot !== b.proxyOvershoot) return a.proxyOvershoot - b.proxyOvershoot;
+                if (a.estDelta !== b.estDelta) return a.estDelta - b.estDelta;
+                return a.estOvershoot - b.estOvershoot;
             });
         if (!ranked.length) continue;
-        const bestOvershoot = ranked[0].proxyOvershoot;
-        const close = ranked.filter(entry => entry.proxyOvershoot <= bestOvershoot + 1);
-        return close[Math.floor(Math.random() * close.length)].pair;
+        const weights = ranked.map((entry) => {
+            const proximity = Math.max(1, 8 - entry.proxyDelta);
+            return proximity + getShortHaulPairRouteBoost(entry.pair);
+        });
+        const total = weights.reduce((sum, w) => sum + w, 0);
+        let roll = Math.random() * total;
+        for (let i = 0; i < ranked.length; i++) {
+            roll -= weights[i];
+            if (roll <= 0) return ranked[i].pair;
+        }
+        return ranked[ranked.length - 1].pair;
     }
     const ranked = pool.map(rank).sort((a, b) => a.proxyDelta - b.proxyDelta);
     return ranked[0].pair;
 }
-function pickLongHaulRoute(pool, spec, aircraftType) {
-    const valid = pool.filter(p => passesLongHaulDurationBand(p.dist, spec, aircraftType));
+function pickLongHaulRouteByTarget(pool, targetBlockMins, spec, aircraftType) {
+    const valid = pool.filter((p) => routeWithinAircraftRange(p.dist, spec)
+        && isJetSimBriefRouteFeasible(p.dist, spec, p.src, p.dst)
+        && !isLongHaulScenicDestinationBlocked(p.dst, spec, aircraftType));
     if (!valid.length) return null;
+    return pickWeightedLongHaulRoute(valid, targetBlockMins, spec);
+}
+function pickLongHaulRoute(pool, spec, aircraftType) {
+    let valid = pool.filter((p) => passesLongHaulDurationBand(p.dist, spec, aircraftType)
+        && isJetSimBriefRouteFeasible(p.dist, spec, p.src, p.dst)
+        && !isLongHaulScenicDestinationBlocked(p.dst, spec, aircraftType));
+    if (!valid.length) return null;
+    if (LONG_HAUL_CURATED_ROUTING_ENABLED) {
+        const allCurated = getAllLongHaulCuratedDestinationSet();
+        if (allCurated) {
+            const curated = valid.filter((p) => allCurated.has(normalizeIcao(p.dst.icao)));
+            if (curated.length) valid = curated;
+        }
+    }
     const ranked = valid
         .map(pair => ({
             pair,
@@ -838,6 +1049,9 @@ function pickRouteByTimeFit(pool, targetMins, targetDistNm, spec, aircraftType, 
     if (!pool.length) return null;
     if (!longHaul) {
         return pickShortHaulRoute(pool, targetMins, spec, aircraftType);
+    }
+    if (LONG_HAUL_DURATION_SLIDER_ENABLED) {
+        return pickLongHaulRouteByTarget(pool, targetMins, spec, aircraftType);
     }
     return pickLongHaulRoute(pool, spec, aircraftType);
 }
@@ -879,6 +1093,104 @@ function filterScenariosForHaulMode(pool, missionType, longHaul, spec) {
 function missionAllowedForHaulMode(m, longHaul) {
     if (longHaul) return isLongHaulMissionType(m.type);
     return !isLongHaulExclusiveMissionType(m.type);
+}
+function getLongHaulTierForMinutes(mins) {
+    const stepped = clampLongHaulBlockMinutes(mins);
+    return LONG_HAUL_TIER_BY_MINS[stepped] || LONG_HAUL_TIER_BY_MINS[720];
+}
+function getLongHaulTierDistanceLimits(tierMins, spec) {
+    const stepped = clampLongHaulBlockMinutes(tierMins || getSavedLongHaulBlockMinutes());
+    const base = LONG_HAUL_TIER_DISTANCE_LIMITS_NM[stepped] || LONG_HAUL_TIER_DISTANCE_LIMITS_NM[720];
+    const aircraftMax = getJetAllowedMaxGcNm(spec);
+    const aircraftMin = spec.minD || 0;
+    let min = Math.max(aircraftMin, base.min);
+    let max = Math.min(aircraftMax === Infinity ? base.max : aircraftMax, base.max);
+    if (stepped === 480 && spec && spec.class === "JET" && !specIsHeavyJet(spec)) {
+        const maxLh = getJetMaxLongHaulDispatchNm(spec);
+        min = Math.max(aircraftMin, LONG_HAUL_NARROWBODY_TRANSATLANTIC_MIN_NM);
+        max = Math.min(maxLh, base.max);
+    }
+    if (min > max) max = Math.max(max, aircraftMin);
+    return { min, max, mid: (min + max) / 2 };
+}
+function shouldUseLongHaulCuratedDestinationWhitelist(spec) {
+    if (!LONG_HAUL_CURATED_ROUTING_ENABLED || !LONG_HAUL_DURATION_SLIDER_ENABLED) return false;
+    if (!spec || spec.class === "HELI" || isGliderAircraft(spec)) return false;
+    // Heavy jets: iconic hub whitelist. Narrow-body: any curated-MSFS hub in the distance band.
+    return spec.class !== "JET" || specIsHeavyJet(spec);
+}
+function getActiveAirportIcaoSet() {
+    if (!activeAirportDatabaseNeedsRebuild && cachedActiveAirportIcaoSet) {
+        return cachedActiveAirportIcaoSet;
+    }
+    const set = new Set();
+    const db = typeof activeAirportDatabase !== "undefined" ? activeAirportDatabase : [];
+    db.forEach((ap) => {
+        if (ap && ap.icao) set.add(normalizeIcao(ap.icao));
+    });
+    cachedActiveAirportIcaoSet = set;
+    return set;
+}
+function isIcaoInActiveAirportDatabase(icao) {
+    if (!icao) return false;
+    return getActiveAirportIcaoSet().has(normalizeIcao(icao));
+}
+function getLongHaulCuratedDestinationSet(tierMins) {
+    if (!LONG_HAUL_CURATED_ROUTING_ENABLED) return null;
+    if (typeof LONG_HAUL_CURATED_DESTINATIONS === "undefined") return null;
+    const stepped = clampLongHaulBlockMinutes(tierMins || getSavedLongHaulBlockMinutes());
+    const list = LONG_HAUL_CURATED_DESTINATIONS[stepped];
+    if (!list || !list.length) return null;
+    const dbIcaos = getActiveAirportIcaoSet();
+    return new Set(list.map(normalizeIcao).filter((icao) => dbIcaos.has(icao)));
+}
+function getAllLongHaulCuratedDestinationSet() {
+    if (typeof LONG_HAUL_CURATED_DESTINATIONS === "undefined") return null;
+    const dbIcaos = getActiveAirportIcaoSet();
+    const all = new Set();
+    Object.values(LONG_HAUL_CURATED_DESTINATIONS).forEach((list) => {
+        list.forEach((icao) => {
+            const code = normalizeIcao(icao);
+            if (dbIcaos.has(code)) all.add(code);
+        });
+    });
+    return all;
+}
+function clampLongHaulBlockMinutes(value) {
+    const cfg = LONG_HAUL_SLIDER;
+    const num = parseInt(value, 10);
+    if (isNaN(num)) return cfg.defaultValue;
+    const stepped = Math.round((num - cfg.min) / cfg.step) * cfg.step + cfg.min;
+    return Math.max(cfg.min, Math.min(cfg.max, stepped));
+}
+function getSavedLongHaulBlockMinutes() {
+    const cfg = LONG_HAUL_SLIDER;
+    try {
+        const saved = localStorage.getItem("dispatcher_flight_time_longhaul");
+        if (saved !== null) return clampLongHaulBlockMinutes(saved);
+    } catch (e) { /* private browsing / storage full */ }
+    return cfg.defaultValue;
+}
+function saveLongHaulBlockMinutes(mins) {
+    try {
+        localStorage.setItem("dispatcher_flight_time_longhaul", String(mins));
+    } catch (e) { /* private browsing / storage full */ }
+}
+function getLongHaulTargetBlockMinutes(spec, aircraftType, sliderMins) {
+    if (!LONG_HAUL_DURATION_SLIDER_ENABLED) {
+        return (getLongHaulMinBlockForAircraft(spec, aircraftType)
+            + getLongHaulMaxBlockForAircraft(spec, aircraftType)) / 2;
+    }
+    let target = clampLongHaulBlockMinutes(sliderMins || getSavedLongHaulBlockMinutes());
+    const minAch = getLongHaulMinBlockForAircraft(spec, aircraftType);
+    const maxAch = getLongHaulMaxBlockForAircraft(spec, aircraftType);
+    return Math.max(minAch, Math.min(maxAch, target));
+}
+function passesLongHaulTargetBlock(dist, targetBlockMins, spec, aircraftType) {
+    if (!dist || isNaN(dist)) return false;
+    if (!routeWithinAircraftRange(dist, spec)) return false;
+    const limits = getLongHaulTierDistanceLimits(targetBlockMins, spec);
+    return dist >= limits.min && dist <= limits.max;
 }
 function clampFlightTimeMinutes(value, cfg) {
     const num = parseInt(value, 10);
@@ -934,7 +1246,13 @@ function canAircraftUseLongHaulMode(spec, type) {
     if (spec.class === "TURBO" && !LONG_HAUL_ALLOWED_TURBOPROP_TYPES.has(type)) return false;
     const maxBlock = getLongHaulMaxBlockForAircraft(spec, type);
     if (maxBlock < LONG_HAUL_MIN_BLOCK_MINS) return false;
-    return getLongHaulMinBlockForAircraft(spec, type) <= maxBlock;
+    if (getLongHaulMinBlockForAircraft(spec, type) > maxBlock) return false;
+    if (spec.class === "JET" && !specIsHeavyJet(spec)) {
+        const maxLh = getJetMaxLongHaulDispatchNm(spec);
+        const minD = Number(spec.minD) || 0;
+        if (maxLh < Math.max(2500, minD + 500)) return false;
+    }
+    return true;
 }
 function getLongHaulUnavailableReason(spec, type) {
     if (!spec || !type) return LONG_HAUL_UNAVAILABLE_MESSAGE;
@@ -952,55 +1270,103 @@ function getLongHaulUnavailableReason(spec, type) {
     }
     return LONG_HAUL_UNAVAILABLE_MESSAGE;
 }
-function syncLongHaulToggleForAircraft() {
-    const toggle = document.getElementById("longHaulToggle");
-    const label = document.getElementById("longHaulToggleLabel");
-    const notice = document.getElementById("longHaulUnavailableNotice");
-    const noticeText = document.getElementById("longHaulUnavailableNoticeText");
-    if (!toggle) return;
-    const type = getSelectedAircraftType();
-    const spec = type ? activeFleetSpecs[type] : null;
-    if (!spec || !type) {
-        toggle.disabled = false;
-        if (label) label.classList.remove("checkbox-option--unavailable");
-        if (notice) notice.style.display = "none";
+function isLongHaulModeEnabled() {
+    return !!(typeof globalThis !== "undefined" && globalThis.___vectorMockLongHaul);
+}
+function formatLongHaulDistanceNm(nm) {
+    const n = Math.max(0, Math.round(Number(nm) || 0));
+    return n.toLocaleString("en-US");
+}
+function getAircraftLongHaulPracticalMaxNm(spec) {
+    if (!spec) return 0;
+    if (spec.class === "JET") return getJetMaxLongHaulDispatchNm(spec);
+    return Number(spec.maxD) || 0;
+}
+function getLongHaulTierDistanceBandLabel(tierMins, spec) {
+    const stepped = clampLongHaulBlockMinutes(tierMins);
+    const base = LONG_HAUL_TIER_DISTANCE_LIMITS_NM[stepped] || LONG_HAUL_TIER_DISTANCE_LIMITS_NM[720];
+    if (!spec) {
+        return `(${formatLongHaulDistanceNm(base.min)}–${formatLongHaulDistanceNm(base.max)} nm)`;
+    }
+    const limits = getLongHaulTierDistanceLimits(tierMins, spec);
+    if (longHaulTierHasFeasibleRange(spec, tierMins)) {
+        return `(${formatLongHaulDistanceNm(limits.min)}–${formatLongHaulDistanceNm(limits.max)} nm)`;
+    }
+    const aircraftMax = getAircraftLongHaulPracticalMaxNm(spec);
+    return `(${formatLongHaulDistanceNm(base.min)}–${formatLongHaulDistanceNm(base.max)} nm tier · aircraft ~${formatLongHaulDistanceNm(aircraftMax)} nm)`;
+}
+function updateLongHaulTierDistanceLabels() {
+    const row = document.getElementById("longHaulTierTicks");
+    const note = document.getElementById("longHaulTierFeasibilityNote");
+    if (!row || !isLongHaulModeEnabled() || !LONG_HAUL_DURATION_SLIDER_ENABLED) {
+        if (note) note.style.display = "none";
         return;
     }
-    const canLongHaul = canAircraftUseLongHaulMode(spec, type);
-    toggle.disabled = !canLongHaul;
-    if (label) {
-        label.classList.toggle("checkbox-option--unavailable", !canLongHaul);
-    }
-    if (notice) {
-        if (!canLongHaul) {
-            const reason = getLongHaulUnavailableReason(spec, type);
-            if (noticeText) noticeText.textContent = reason;
-            notice.style.display = "block";
+    const type = getSelectedAircraftType();
+    const spec = type && typeof activeFleetSpecs !== "undefined" ? activeFleetSpecs[type] : null;
+    const tierLabels = { 480: "Transatlantic", 720: "Pacific", 960: "Ultra" };
+    Array.from(row.children).forEach((el) => {
+        const tierMins = parseInt(el.getAttribute("data-tier-mins"), 10);
+        if (!tierMins || isNaN(tierMins)) return;
+        const label = tierLabels[tierMins] || getLongHaulTierForMinutes(tierMins).label;
+        const band = getLongHaulTierDistanceBandLabel(tierMins, spec);
+        const feasible = !spec || longHaulTierHasFeasibleRange(spec, tierMins);
+        el.classList.toggle("long-haul-tier-tick--unavailable", !!spec && !feasible);
+        el.innerHTML = `${label} <span class="long-haul-tier-tick-distance">${band}</span>`;
+    });
+    const slider = document.getElementById("timeSlider");
+    const currentMins = slider ? parseInt(slider.value, 10) : getSavedLongHaulBlockMinutes();
+    if (note && spec) {
+        const stepped = clampLongHaulBlockMinutes(currentMins);
+        const tier = getLongHaulTierForMinutes(stepped);
+        if (!longHaulTierHasFeasibleRange(spec, stepped)) {
+            const aircraftMax = formatLongHaulDistanceNm(getAircraftLongHaulPracticalMaxNm(spec));
+            note.className = "long-haul-tier-feasibility-note long-haul-tier-feasibility-note--warn";
+            note.textContent = `${tier.label} needs longer sectors than this aircraft can fly (about ${aircraftMax} nm practical max). Try a shorter tier or a wide-body.`;
+            note.style.display = "block";
         } else {
-            notice.style.display = "none";
+            note.className = "long-haul-tier-feasibility-note";
+            note.textContent = "";
+            note.style.display = "none";
         }
-    }
-    if (!canLongHaul && toggle.checked) {
-        toggle.checked = false;
-        try {
-            localStorage.setItem("dispatcher_long_haul", "0");
-        } catch (e) { /* private browsing / storage full */ }
-        applyFlightTimeSliderMode(false, true);
+    } else if (note) {
+        note.style.display = "none";
     }
 }
-function isLongHaulModeEnabled() {
-    const el = document.getElementById("longHaulToggle");
-    return !!(el && el.checked);
+function updateLongHaulTierTicks(mins) {
+    const row = document.getElementById("longHaulTierTicks");
+    if (!row) return;
+    const stepped = clampLongHaulBlockMinutes(mins);
+    Array.from(row.children).forEach((el) => {
+        const tierMins = parseInt(el.getAttribute("data-tier-mins"), 10);
+        el.classList.toggle("long-haul-tier-tick--active", tierMins === stepped);
+    });
 }
 function updateFlightTimeDisplay() {
-    if (isLongHaulModeEnabled()) return;
     const slider = document.getElementById("timeSlider");
     const timeVal = document.getElementById("timeVal");
     const timeUnit = document.getElementById("timeUnit");
     if (!slider || !timeVal) return;
     const mins = parseInt(slider.value, 10);
+    if (isLongHaulModeEnabled() && LONG_HAUL_DURATION_SLIDER_ENABLED) {
+        const tier = getLongHaulTierForMinutes(mins);
+        timeVal.innerText = tier.label;
+        if (timeUnit) {
+            timeUnit.innerText = "";
+            timeUnit.style.display = "none";
+        }
+        updateLongHaulTierTicks(mins);
+        updateLongHaulTierDistanceLabels();
+        saveLongHaulBlockMinutes(mins);
+        return;
+    }
+    if (isLongHaulModeEnabled()) return;
     timeVal.innerText = String(mins);
-    if (timeUnit) timeUnit.innerText = "minutes";
+    if (timeUnit) {
+        timeUnit.innerText = "minutes";
+        timeUnit.className = "";
+        timeUnit.style.display = "";
+    }
     saveFlightTimeMinutes(mins);
 }
 function applyFlightTimeSliderMode(longHaul, useSavedValue) {
@@ -1008,13 +1374,46 @@ function applyFlightTimeSliderMode(longHaul, useSavedValue) {
     const heading = document.getElementById("timeSliderHeading");
     const longHaulNote = document.getElementById("longHaulNote");
     if (!slider) return;
+    if (longHaul && LONG_HAUL_DURATION_SLIDER_ENABLED) {
+        slider.style.display = "";
+        slider.disabled = false;
+        if (heading) {
+            heading.style.display = "";
+            heading.innerHTML = 'Long-haul route: <span id="timeVal">Pacific</span>';
+        }
+        const tierTicks = document.getElementById("longHaulTierTicks");
+        if (tierTicks) tierTicks.style.display = "";
+        const tierNote = document.getElementById("longHaulTierFeasibilityNote");
+        if (tierNote) tierNote.style.display = "";
+        if (longHaulNote) {
+            longHaulNote.style.display = "block";
+            longHaulNote.innerHTML = "⏳ <strong>Long-haul</strong>: Select <strong>Transatlantic</strong>, <strong>Pacific</strong>, or <strong>Ultra</strong> and VECTOR will find iconic hub routes from the curated MSFS airport list. Select a custom departure to fly from a specific airport.";
+        }
+        const cfg = LONG_HAUL_SLIDER;
+        slider.min = cfg.min;
+        slider.max = cfg.max;
+        slider.step = cfg.step;
+        slider.value = useSavedValue ? getSavedLongHaulBlockMinutes() : cfg.defaultValue;
+        slider.setAttribute("list", cfg.listId);
+        updateFlightTimeSliderState();
+        updateFlightTimeDisplay();
+        return;
+    }
     if (longHaul) {
         slider.style.display = "none";
         slider.disabled = true;
         if (heading) heading.style.display = "none";
+        const tierTicks = document.getElementById("longHaulTierTicks");
+        if (tierTicks) tierTicks.style.display = "none";
+        const tierNote = document.getElementById("longHaulTierFeasibilityNote");
+        if (tierNote) tierNote.style.display = "none";
         if (longHaulNote) longHaulNote.style.display = "block";
         return;
     }
+    const tierTicks = document.getElementById("longHaulTierTicks");
+    if (tierTicks) tierTicks.style.display = "none";
+    const tierNoteOff = document.getElementById("longHaulTierFeasibilityNote");
+    if (tierNoteOff) tierNoteOff.style.display = "none";
     slider.style.display = "";
     slider.disabled = false;
     if (heading) {
@@ -1030,34 +1429,11 @@ function applyFlightTimeSliderMode(longHaul, useSavedValue) {
     slider.setAttribute("list", cfg.listId);
     updateFlightTimeDisplay();
 }
-function toggleLongHaulMode() {
-    const toggle = document.getElementById("longHaulToggle");
-    if (toggle && toggle.checked) {
-        const type = getSelectedAircraftType();
-        const spec = type ? activeFleetSpecs[type] : null;
-        if (spec && type && !canAircraftUseLongHaulMode(spec, type)) {
-            toggle.checked = false;
-            alert(getLongHaulUnavailableReason(spec, type));
-            return;
-        }
-    }
-    const enabled = isLongHaulModeEnabled();
-    applyFlightTimeSliderMode(enabled, !enabled);
-    try {
-        localStorage.setItem("dispatcher_long_haul", enabled ? "1" : "0");
-    } catch (e) { /* private browsing / storage full */ }
-}
 function loadLongHaulPreference() {
-    let enabled = false;
     try {
-        enabled = localStorage.getItem("dispatcher_long_haul") === "1";
-    } catch (e) {
-        enabled = false;
-    }
-    const toggle = document.getElementById("longHaulToggle");
-    if (toggle) toggle.checked = enabled;
-    syncLongHaulToggleForAircraft();
-    applyFlightTimeSliderMode(!!(toggle && toggle.checked), true);
+        localStorage.setItem("dispatcher_long_haul", "0");
+    } catch (e) { /* private browsing / storage full */ }
+    applyFlightTimeSliderMode(false, true);
 }
 let routingScopeListenersBound = false;
 function initRoutingScope() {
@@ -1547,6 +1923,10 @@ function buildCustomAircraftTagsFromRoles(rawClass, missionRoles, options) {
     if (missionRoles.military || options.isMilitary) {
         if (missionRoles.cargo && missionRoles.cargoTier === "military") tags.add("MILITARY_TRANSPORT");
     }
+    if (rawClass === "TURBO" && missionRoles.cargo && missionRoles.cargoTier === "military"
+        && (options.mtow || 0) >= 100000) {
+        tags.add("HEAVY_AIRLIFTER");
+    }
     if (rawClass === "JET" && (options.mtow || 0) >= HEAVY_JET_MTOW_MIN) tags.add("HEAVY");
     if (options.civilOk) tags.add("CIVIL_OK");
     if (options.stol) tags.add("STOL");
@@ -1814,6 +2194,11 @@ function rebuildActiveDatabase() {
         return finalAirport;
     });
     activeAirportDatabaseNeedsRebuild = false;
+    const icaoSet = new Set();
+    activeAirportDatabase.forEach((ap) => {
+        if (ap && ap.icao) icaoSet.add(normalizeIcao(ap.icao));
+    });
+    cachedActiveAirportIcaoSet = icaoSet;
 }
 function getSelectedAircraftSpec() {
     const type = getSelectedAircraftType();
@@ -1826,7 +2211,6 @@ function updateFlightTimeSliderState() {
     const spec = getSelectedAircraftSpec();
     const sliderIgnored = spec && isSliderIgnoredAircraft(spec);
     slider.disabled = false;
-    syncLongHaulToggleForAircraft();
     if (section) section.classList.toggle("slider-section--rotor-glider", !!sliderIgnored);
     const gliderNotice = document.getElementById("gliderAircraftNotice");
     if (gliderNotice) gliderNotice.style.display = spec && spec.class === "GLIDER" ? "block" : "none";
@@ -1871,7 +2255,6 @@ function rebuildFleetDropdown() {
         }
     };
     document.addEventListener('click', window._fleetDropdownClickHandler);
-    syncLongHaulToggleForAircraft();
 }
 function rebuildAirportDropdown() {
     const inputEl = document.getElementById("depOverrideInput");
@@ -1997,11 +2380,31 @@ const RESTRICTED_AIRPORT_OPERATIONAL_MTOW = {
 };
 // Weight-limited runway ops: JET-class airliners at JET-rated fields shorter than MTOW takeoff distance.
 const JET_WEIGHT_LIMITED_RUNWAY_EXPONENT = 1.0;
+/** Heavy jets need roughly this runway length for structural MTOW (SimBrief PMRTW ≈ MFPTW). */
+const JET_HEAVY_FULL_PERFORMANCE_RUNWAY_FT = 10500;
+/** Long-haul hub proxy: runway length floors (no per-aircraft landing tables). */
+const LONG_HAUL_HEAVY_JET_HUB_RUNWAY_FT = 9000;
+const LONG_HAUL_REGIONAL_JET_HUB_RUNWAY_FT = 8000;
+const LONG_HAUL_BIZ_JET_HUB_RUNWAY_FT = 6000;
+const LONG_HAUL_TURBO_HUB_RUNWAY_FT = 5500;
+/** Exponent >1 = conservative vs linear (calibrated to A350-class PMRTW at ~8600 ft). */
+const JET_HEAVY_RUNWAY_MTOW_EXPONENT = 1.10;
 const JET_BLOCK_TAXI_FUEL_KG = 300;
 const JET_RESERVE_HOLD_MINUTES = 30;
 const JET_RESERVE_HOLD_NM_PER_MIN = 3.5;
+/** Trip fuel at or above this fraction of max tank → plan at max tank for MTOW payload math. */
+const JET_SIMBRIEF_TANK_FILL_THRESHOLD = 0.88;
+/** Narrowbody tank-range: catalog trip fuel must stay below this fraction of max tank. */
+const JET_NARROWBODY_TANK_RANGE_MARGIN = 0.96;
+/** Filed route is often longer than GC on Atlantic/Pacific tracks. */
+const JET_NARROWBODY_FUEL_DISTANCE_FACTOR = 1.06;
 const WEIGHT_LIMITED_MIN_LOAD_FACTOR = 0.20;
 const WEIGHT_LIMITED_LOAD_FACTOR_STEP = 0.01;
+// Phase-C SimBrief calibration: GC may exceed catalog maxD (winds, filed route vs still-air range).
+const JET_ALLOWED_MAXD_FACTOR = 1.025;
+const JET_HEAVY_ALLOWED_MAXD_FACTOR = 1.08;
+/** ICAOs invalid for JET SimBrief dispatch (MSFS/airport DB out of sync with Navdata). */
+const JET_SIMBRIEF_EXCLUDED_ICAOS = new Set(["LLMG"]);
 
 function isJetWeightLimitedRunwayAirport(ap, spec) {
     if (!ap || !spec || spec.class !== "JET") return false;
@@ -2010,13 +2413,148 @@ function isJetWeightLimitedRunwayAirport(ap, spec) {
     if (minRw <= 0 || !ap.length) return false;
     return ap.length < minRw;
 }
+function getLongHaulHubMinRunwayFt(spec) {
+    if (!spec) return LONG_HAUL_HEAVY_JET_HUB_RUNWAY_FT;
+    if (specIsHeavyJet(spec)) return LONG_HAUL_HEAVY_JET_HUB_RUNWAY_FT;
+    if (spec.class === "JET") return LONG_HAUL_REGIONAL_JET_HUB_RUNWAY_FT;
+    if (spec.class === "BIZ JET") return LONG_HAUL_BIZ_JET_HUB_RUNWAY_FT;
+    if (spec.class === "TURBO") return LONG_HAUL_TURBO_HUB_RUNWAY_FT;
+    return Number(spec.minRunwayLength) || 5000;
+}
+function isLongHaulScenicHubIcao(icao) {
+    if (typeof LONG_HAUL_SCENIC_HUB_ICAOS === "undefined") return false;
+    const code = normalizeIcao(icao);
+    return (LONG_HAUL_SCENIC_HUB_ICAOS || []).some((entry) => normalizeIcao(entry) === code);
+}
+function isLongHaulScenicDestinationBlocked(destination, spec, aircraftType) {
+    if (!destination || !isLongHaulScenicHubIcao(destination.icao)) return false;
+    if (typeof LONG_HAUL_SCENIC_HUB_BLOCKED_AIRCRAFT_TYPES !== "undefined"
+        && LONG_HAUL_SCENIC_HUB_BLOCKED_AIRCRAFT_TYPES.includes(aircraftType)) {
+        return true;
+    }
+    const maxMtow = Number(LONG_HAUL_SCENIC_HUB_MAX_MTOW_KG) || 0;
+    const mtow = Number(spec && spec.mtow) || 0;
+    return maxMtow > 0 && mtow > maxMtow;
+}
+function getLongHaulOriginRegionKey(originIcao) {
+    const origin = normalizeIcao(originIcao);
+    if (typeof LONG_HAUL_EUROPEAN_ORIGIN_ICAOS !== "undefined"
+        && LONG_HAUL_EUROPEAN_ORIGIN_ICAOS.some((entry) => normalizeIcao(entry) === origin)) {
+        return "europe";
+    }
+    if (typeof LONG_HAUL_MIDDLE_EAST_ORIGIN_ICAOS !== "undefined"
+        && LONG_HAUL_MIDDLE_EAST_ORIGIN_ICAOS.some((entry) => normalizeIcao(entry) === origin)) {
+        return "middleEast";
+    }
+    if (/^K/.test(origin) || /^CY/.test(origin) || /^C[A-Z]{2}$/.test(origin)) {
+        return "northAmerica";
+    }
+    return null;
+}
+function getCuratedPairRouteBoost(fromIcao, toIcao, table, tierMins) {
+    if (!table || !table.length) return 0;
+    const from = normalizeIcao(fromIcao);
+    const to = normalizeIcao(toIcao);
+    if (!isIcaoInActiveAirportDatabase(from) || !isIcaoInActiveAirportDatabase(to)) return 0;
+    const stepped = tierMins != null ? clampLongHaulBlockMinutes(tierMins) : null;
+    let boost = 0;
+    for (const entry of table) {
+        if (stepped != null && entry.tier != null && entry.tier !== stepped) continue;
+        if (normalizeIcao(entry.from) === from && normalizeIcao(entry.to) === to) {
+            boost = Math.max(boost, entry.weight || 0);
+        }
+    }
+    return boost;
+}
+function getShortHaulPairRouteBoost(pair) {
+    if (!pair || typeof SHORT_HAUL_CURATED_PAIR_BOOST === "undefined") return 0;
+    return getCuratedPairRouteBoost(
+        pair.src && pair.src.icao,
+        pair.dst && pair.dst.icao,
+        SHORT_HAUL_CURATED_PAIR_BOOST,
+        null
+    );
+}
+function getLongHaulRoutePickWeight(pair, tierMins) {
+    let weight = 1;
+    if (typeof LONG_HAUL_CURATED_PAIR_BOOST !== "undefined") {
+        weight += getCuratedPairRouteBoost(
+            pair.src && pair.src.icao,
+            pair.dst && pair.dst.icao,
+            LONG_HAUL_CURATED_PAIR_BOOST,
+            tierMins
+        );
+    }
+    if (typeof LONG_HAUL_CURATED_ROUTE_BOOST === "undefined") return weight;
+    const stepped = clampLongHaulBlockMinutes(tierMins || getSavedLongHaulBlockMinutes());
+    const tierBoost = LONG_HAUL_CURATED_ROUTE_BOOST[stepped];
+    if (!tierBoost) return weight;
+    const region = getLongHaulOriginRegionKey(pair.src && pair.src.icao);
+    if (!region || !tierBoost[region]) return weight;
+    const dest = normalizeIcao(pair.dst && pair.dst.icao);
+    if (!isIcaoInActiveAirportDatabase(dest)) return weight;
+    const boost = tierBoost[region][dest];
+    if (boost > 0) weight += boost;
+    return 1 + Math.min(Math.max(0, weight - 1), LONG_HAUL_ROUTE_PICK_WEIGHT_CAP);
+}
+function pickWeightedLongHaulRoute(pool, tierMins, spec) {
+    if (!pool.length) return null;
+    if (pool.length === 1) return pool[0];
+    const destKey = (pair) => normalizeIcao(pair.dst && pair.dst.icao);
+    const weights = pool.map((pair) => getLongHaulRoutePickWeight(pair, tierMins));
+    const maxW = Math.max(...weights);
+    const narrowbody = spec && spec.class === "JET" && !specIsHeavyJet(spec);
+    const floorRatio = narrowbody ? 0.05 : LONG_HAUL_ROUTE_PICK_WEIGHT_FLOOR_RATIO;
+    const floor = maxW * floorRatio;
+    const eligible = [];
+    const eligibleWeights = [];
+    for (let i = 0; i < pool.length; i++) {
+        if (weights[i] < floor) continue;
+        eligible.push(pool[i]);
+        eligibleWeights.push(weights[i]);
+    }
+    let pickPool = eligible.length ? eligible : pool;
+    let pickWeights = eligible.length ? eligibleWeights : weights;
+    const poolDestCount = new Set(pool.map(destKey)).size;
+    const pickDestCount = new Set(pickPool.map(destKey)).size;
+    const minVariety = Math.min(LONG_HAUL_PICK_MIN_UNIQUE_DESTINATIONS, poolDestCount);
+    if (pickDestCount < minVariety && poolDestCount > pickDestCount) {
+        pickPool = pool;
+        pickWeights = weights;
+    }
+    const total = pickWeights.reduce((sum, w) => sum + w, 0);
+    let roll = Math.random() * total;
+    for (let i = 0; i < pickPool.length; i++) {
+        roll -= pickWeights[i];
+        if (roll <= 0) return pickPool[i];
+    }
+    return pickPool[pickPool.length - 1];
+}
+function getLongHaulHubMinRunwayFtForAirport(ap, spec) {
+    if (ap && isLongHaulScenicHubIcao(ap.icao)) {
+        const code = normalizeIcao(ap.icao);
+        const byIcao = typeof LONG_HAUL_SCENIC_HUB_MIN_RUNWAY_FT_BY_ICAO !== "undefined"
+            ? LONG_HAUL_SCENIC_HUB_MIN_RUNWAY_FT_BY_ICAO : null;
+        if (byIcao && byIcao[code] > 0) return byIcao[code];
+        return Number(LONG_HAUL_SCENIC_HUB_MIN_RUNWAY_FT) || 7000;
+    }
+    return getLongHaulHubMinRunwayFt(spec);
+}
+/** Major-hub proxy for long-haul routing (arrivals always; departures when not user-pinned). */
+function isLongHaulSuitableAirport(ap, spec) {
+    if (!ap || !spec) return false;
+    if (spec.class === "HELI" || isGliderAircraft(spec)) return true;
+    if (!getAllowedClassesForRunway(ap.rwy).includes(spec.class)) return false;
+    const minFt = getLongHaulHubMinRunwayFtForAirport(ap, spec);
+    return !!(ap.length && ap.length >= minFt);
+}
+function filterLongHaulHubAirports(airports, spec) {
+    return (airports || []).filter((ap) => isLongHaulSuitableAirport(ap, spec));
+}
 function isRouteWeightLimitedByRunway(origin, destination, spec) {
-    if (!spec || spec.class !== "JET") return false;
-    const minRw = Number(spec.minRunwayLength) || 0;
-    if (minRw <= 0) return false;
-    const origLen = origin && origin.length ? origin.length : Infinity;
-    const destLen = destination && destination.length ? destination.length : Infinity;
-    return Math.min(origLen, destLen) < minRw;
+    if (!spec || spec.class !== "JET" || !origin) return false;
+    return isJetWeightLimitedRunwayAirport(origin, spec)
+        || isJetDepartureRunwayPerformanceLimited(origin, spec);
 }
 function getRunwayOperationalMtowKg(runwayLengthFt, spec) {
     const minRw = Number(spec.minRunwayLength) || 0;
@@ -2028,33 +2566,217 @@ function getRunwayOperationalMtowKg(runwayLengthFt, spec) {
     const variableMass = Math.max(0, mtow - oew);
     return oew + variableMass * Math.pow(ratio, JET_WEIGHT_LIMITED_RUNWAY_EXPONENT);
 }
-function getRouteRunwayOperationalMtow(origin, destination, spec) {
+function getDepartureRunwayOperationalMtow(origin, spec) {
     const origLen = origin && origin.length ? origin.length : 99999;
-    const destLen = destination && destination.length ? destination.length : 99999;
-    return getRunwayOperationalMtowKg(Math.min(origLen, destLen), spec);
+    const structural = Number(spec.mtow) || 0;
+    const oew = Number(spec.oew) || 0;
+    const minRw = Number(spec.minRunwayLength) || 0;
+    if (minRw > 0 && origLen < minRw) {
+        return getRunwayOperationalMtowKg(origLen, spec);
+    }
+    if (specIsHeavyJet(spec) && origLen < JET_HEAVY_FULL_PERFORMANCE_RUNWAY_FT) {
+        const ratio = Math.max(0, origLen / JET_HEAVY_FULL_PERFORMANCE_RUNWAY_FT);
+        const variableMass = Math.max(0, structural - oew);
+        return oew + variableMass * Math.pow(ratio, JET_HEAVY_RUNWAY_MTOW_EXPONENT);
+    }
+    return structural;
+}
+function isJetDepartureRunwayPerformanceLimited(origin, spec) {
+    if (!origin || !spec || spec.class !== "JET") return false;
+    const structural = Number(spec.mtow) || 0;
+    if (structural <= 0) return false;
+    return getDepartureRunwayOperationalMtow(origin, spec) < structural * 0.995;
+}
+function getRouteRunwayOperationalMtow(origin, destination, spec) {
+    return getDepartureRunwayOperationalMtow(origin, spec);
 }
 function getWeightLimitedRunwayIcaos(origin, destination, spec) {
     const icaos = [];
-    [origin, destination].forEach(function (ap) {
-        if (ap && ap.icao && isJetWeightLimitedRunwayAirport(ap, spec)) {
-            const code = ap.icao.trim().toUpperCase();
-            if (!icaos.includes(code)) icaos.push(code);
-        }
-    });
+    if (origin && origin.icao && (
+        isJetWeightLimitedRunwayAirport(origin, spec)
+        || isJetDepartureRunwayPerformanceLimited(origin, spec)
+    )) {
+        icaos.push(origin.icao.trim().toUpperCase());
+    }
     return icaos;
 }
-function estimateJetBlockFuelBudgetKg(tripDistanceNm, spec) {
+function getJetMaxFuelKg(spec) {
+    const fromSpec = Number(spec && spec.maxFuelKg);
+    if (fromSpec > 0) return fromSpec;
+    const mtow = Number(spec && spec.mtow) || 0;
+    const oew = Number(spec && spec.oew) || 0;
+    return Math.max(0, mtow - oew) * 0.9;
+}
+function getJetAllowedMaxGcNm(spec) {
+    if (!spec || spec.class !== "JET") return Number(spec && spec.maxD) || Infinity;
+    const maxD = Number(spec.maxD) || 0;
+    if (maxD <= 0) return Infinity;
+    const isHeavy = !!(spec.tags && spec.tags.includes("HEAVY")) || (Number(spec.mtow) || 0) >= HEAVY_JET_MTOW_MIN;
+    const factor = isHeavy ? JET_HEAVY_ALLOWED_MAXD_FACTOR : JET_ALLOWED_MAXD_FACTOR;
+    return maxD * factor;
+}
+function getJetCatalogTripFuelPerNm(spec) {
+    const maxTank = getJetMaxFuelKg(spec);
+    const maxD = Number(spec && spec.maxD) || 0;
+    if (maxTank <= 0 || maxD <= 0) return 0;
+    return Math.max(0, maxTank - JET_BLOCK_TAXI_FUEL_KG) / maxD;
+}
+function getJetFuelPlanningDistanceNm(gcDistNm, spec) {
+    const nm = Math.max(0, Number(gcDistNm) || 0);
+    if (specIsHeavyJet(spec)) return nm;
+    const longHaul = typeof globalThis !== "undefined" && globalThis.___vectorMockLongHaul;
+    if (longHaul && nm >= LONG_HAUL_NARROWBODY_TRANSATLANTIC_MIN_NM) {
+        return Math.round(nm * JET_NARROWBODY_FUEL_DISTANCE_FACTOR);
+    }
+    if (nm < 2500) return nm;
+    return Math.round(nm * JET_NARROWBODY_FUEL_DISTANCE_FACTOR);
+}
+function getJetNarrowbodyMaxSafeFuelPlanningNm(spec) {
+    const maxTank = getJetMaxFuelKg(spec);
+    if (maxTank <= 0) return 0;
     const fuelPerNm = Number(spec.fuelPerNm) || 6;
+    const reserveFuel = fuelPerNm * JET_RESERVE_HOLD_MINUTES * JET_RESERVE_HOLD_NM_PER_MIN;
+    const maxTripFuel = maxTank * JET_NARROWBODY_TANK_RANGE_MARGIN - JET_BLOCK_TAXI_FUEL_KG - reserveFuel;
+    if (maxTripFuel <= 0) return 0;
+    return maxTripFuel / fuelPerNm;
+}
+function getJetNarrowbodyMaxSafeGcNm(spec) {
+    const fuelNm = getJetNarrowbodyMaxSafeFuelPlanningNm(spec);
+    if (fuelNm <= 0) return 0;
+    if (fuelNm < 2500) return fuelNm;
+    return fuelNm / JET_NARROWBODY_FUEL_DISTANCE_FACTOR;
+}
+function narrowbodyLongHaulTankCriticalRouteBlocked(gcDistNm, spec) {
+    if (!spec || spec.class !== "JET" || specIsHeavyJet(spec)) return false;
+    const longHaul = typeof globalThis !== "undefined" && globalThis.___vectorMockLongHaul;
+    if (!longHaul) return false;
+    const maxTank = getJetMaxFuelKg(spec);
+    if (maxTank <= 0) return false;
+    const fuelNm = getJetFuelPlanningDistanceNm(gcDistNm, spec);
+    const planFuel = getJetSimBriefPlanningBlockFuelKg(fuelNm, spec);
+    if (planFuel < maxTank * JET_SIMBRIEF_TANK_FILL_THRESHOLD) return false;
+    const maxD = Number(spec.maxD) || 0;
+    if (maxD <= 0) return false;
+    return gcDistNm > maxD * 0.9;
+}
+function narrowbodyFuelPlanningExceedsTankSafeEnvelope(gcDistNm, spec) {
+    if (!spec || spec.class !== "JET" || specIsHeavyJet(spec)) return false;
+    const safeGc = getJetNarrowbodyMaxSafeGcNm(spec);
+    if (safeGc <= 0) return true;
+    return gcDistNm > safeGc + 1e-6;
+}
+function getJetMaxLongHaulDispatchNm(spec) {
+    const allowedGc = getJetAllowedMaxGcNm(spec);
+    if (specIsHeavyJet(spec)) return allowedGc;
+    const maxTank = getJetMaxFuelKg(spec);
+    const catalogFpn = getJetCatalogTripFuelPerNm(spec);
+    if (maxTank <= 0 || catalogFpn <= 0) return allowedGc;
+    const maxTripNm = (maxTank * JET_NARROWBODY_TANK_RANGE_MARGIN) / catalogFpn;
+    const maxD = Number(spec.maxD) || 0;
+    const safeGc = getJetNarrowbodyMaxSafeGcNm(spec);
+    return Math.min(allowedGc, maxD > 0 ? maxD : allowedGc, maxTripNm, safeGc > 0 ? safeGc : allowedGc);
+}
+function estimateJetBlockFuelBudgetKg(tripDistanceNm, spec) {
     const tripNm = Math.max(0, Number(tripDistanceNm) || 0);
+    const fuelPerNm = Number(spec.fuelPerNm) || 6;
     const tripFuel = tripNm * fuelPerNm;
     const reserveFuel = fuelPerNm * JET_RESERVE_HOLD_MINUTES * JET_RESERVE_HOLD_NM_PER_MIN;
     return tripFuel + JET_BLOCK_TAXI_FUEL_KG + reserveFuel;
 }
+function getJetBlockFuelBudgetKg(tripDistanceNm, spec) {
+    const budget = estimateJetBlockFuelBudgetKg(tripDistanceNm, spec);
+    const maxTank = getJetMaxFuelKg(spec);
+    if (maxTank <= 0) return budget;
+    return Math.min(budget, maxTank);
+}
+/** Still-air trip fuel exceeds tank (or narrowbody range envelope) — SimBrief "exceeds aircraft range". */
+function jetTripFuelExceedsTankCapacity(tripDistanceNm, spec) {
+    const maxTank = getJetMaxFuelKg(spec);
+    if (maxTank <= 0) return false;
+    const gc = Math.max(0, Number(tripDistanceNm) || 0);
+    if (specIsHeavyJet(spec)) {
+        return estimateJetBlockFuelBudgetKg(gc, spec) > maxTank;
+    }
+    const catalogFpn = getJetCatalogTripFuelPerNm(spec);
+    if (catalogFpn <= 0) {
+        return estimateJetBlockFuelBudgetKg(gc, spec) > maxTank;
+    }
+    return gc * catalogFpn > maxTank * JET_NARROWBODY_TANK_RANGE_MARGIN;
+}
+function getJetScheduledCommercialMinPax(spec) {
+    if (!spec || !(spec.maxPax > 0)) return 0;
+    return Math.floor(spec.maxPax * SCHEDULED_COMMERCIAL_LOAD_MIN);
+}
+function getJetMaxFeasiblePax(gcDistNm, spec, origin, destination) {
+    const oew = Number(spec.oew) || 0;
+    let mtow = Number(spec.mtow) || 0;
+    if (origin) {
+        mtow = Math.min(mtow, getDepartureRunwayOperationalMtow(origin, spec));
+    }
+    const blockFuel = getJetSimBriefPlanningBlockFuelKg(getJetFuelPlanningDistanceNm(gcDistNm, spec), spec);
+    const maxPayload = mtow - oew - blockFuel;
+    if (maxPayload <= 0) return 0;
+    return Math.floor(maxPayload / getPaxAllInWeightKg(spec));
+}
+function isJetSimBriefRouteFeasible(gcDistNm, spec, origin, destination) {
+    if (!spec || spec.class !== "JET" || !gcDistNm || isNaN(gcDistNm)) return true;
+    const ctx = buildJetRouteFeasibilityContext(spec);
+    if (!isJetRouteDistanceFeasible(gcDistNm, ctx)) return false;
+    if (narrowbodyLongHaulTankCriticalRouteBlocked(gcDistNm, spec)) return false;
+    return isJetSimBriefDepartureFeasible(gcDistNm, spec, origin, ctx);
+}
+function buildJetRouteFeasibilityContext(spec) {
+    if (!spec || spec.class !== "JET") return null;
+    const isHeavy = specIsHeavyJet(spec);
+    const maxTank = getJetMaxFuelKg(spec);
+    const catalogFpn = getJetCatalogTripFuelPerNm(spec);
+    return {
+        allowedGc: getJetAllowedMaxGcNm(spec),
+        maxLhNm: isHeavy ? Infinity : getJetMaxLongHaulDispatchNm(spec),
+        narrowbodySafeGc: isHeavy ? Infinity : getJetNarrowbodyMaxSafeGcNm(spec),
+        isHeavy,
+        maxTank,
+        catalogFpn,
+        oew: Number(spec.oew) || 0,
+        minPayload: getPaxAllInWeightKg(spec),
+        fuelPerNm: Number(spec.fuelPerNm) || 6
+    };
+}
+function isJetRouteDistanceFeasible(gcDistNm, ctx) {
+    if (!ctx || !gcDistNm || isNaN(gcDistNm)) return true;
+    if (gcDistNm > ctx.allowedGc) return false;
+    if (!ctx.isHeavy && gcDistNm > ctx.maxLhNm) return false;
+    if (ctx.isHeavy) {
+        if (ctx.maxTank > 0 && estimateJetBlockFuelBudgetKg(gcDistNm, { fuelPerNm: ctx.fuelPerNm }) > ctx.maxTank) {
+            return false;
+        }
+    } else if (ctx.catalogFpn > 0) {
+        if (gcDistNm * ctx.catalogFpn > ctx.maxTank * JET_NARROWBODY_TANK_RANGE_MARGIN) return false;
+    } else if (ctx.maxTank > 0 && estimateJetBlockFuelBudgetKg(gcDistNm, { fuelPerNm: ctx.fuelPerNm }) > ctx.maxTank) {
+        return false;
+    }
+    if (!ctx.isHeavy && ctx.narrowbodySafeGc > 0 && gcDistNm > ctx.narrowbodySafeGc + 1e-6) return false;
+    return true;
+}
+function isJetSimBriefDepartureFeasible(gcDistNm, spec, origin, ctx) {
+    if (!ctx) return true;
+    const operationalTow = origin
+        ? getDepartureRunwayOperationalMtow(origin, spec)
+        : (Number(spec.mtow) || 0);
+    const fuelNm = getJetFuelPlanningDistanceNm(gcDistNm, spec);
+    const blockFuel = getJetSimBriefPlanningBlockFuelKg(fuelNm, spec);
+    return operationalTow - ctx.oew >= blockFuel + ctx.minPayload;
+}
 function allocateWeightLimitedJetPayload(spec, type, chosenMission, blockMinutes, operationalTow, tripDistanceNm) {
     const safeOew = Number(spec.oew) || 42000;
-    const blockFuel = estimateJetBlockFuelBudgetKg(tripDistanceNm, spec);
+    const blockFuel = getJetSimBriefPlanningBlockFuelKg(tripDistanceNm, spec);
     const maxPayloadAtTow = operationalTow - safeOew - blockFuel;
     if (maxPayloadAtTow <= 0) {
+        return { ok: false };
+    }
+    const paxAllInKg = getPaxAllInWeightKg(spec);
+    const maxPaxByWeight = Math.floor(maxPayloadAtTow / paxAllInKg);
+    if (maxPaxByWeight < 1 && missionRequiresPassengers(chosenMission, spec) && (spec.maxPax || 0) > 0) {
         return { ok: false };
     }
     const bizJetPassengerOnly = spec.class === "BIZ JET" && type !== "LJ35" && !isFreightMission(chosenMission);
@@ -2063,15 +2785,16 @@ function allocateWeightLimitedJetPayload(spec, type, chosenMission, blockMinutes
         const scaledMaxPax = Math.floor((spec.maxPax || 0) * loadFactor);
         const scaledMaxCargo = Math.floor((spec.maxCargo || 0) * loadFactor);
         if (missionRequiresPassengers(chosenMission, spec) && (spec.maxPax || 0) > 0) {
+            const paxCap = Math.min(scaledMaxPax, maxPaxByWeight);
             const { minPax, effectiveMax } = getPassengerLoadLimits(
-                chosenMission, spec, scaledMaxPax, blockMinutes
+                chosenMission, spec, paxCap, blockMinutes
             );
             if (effectiveMax <= 0) {
                 loadFactor -= WEIGHT_LIMITED_LOAD_FACTOR_STEP;
                 continue;
             }
             const pax = Math.floor(Math.random() * (effectiveMax - minPax + 1)) + minPax;
-            const paxWeight = pax * 104;
+            const paxWeight = getSimBriefPassengerPayloadKg(spec, pax);
             if (paxWeight > maxPayloadAtTow) {
                 loadFactor -= WEIGHT_LIMITED_LOAD_FACTOR_STEP;
                 continue;
@@ -2113,6 +2836,132 @@ function allocateWeightLimitedJetPayload(spec, type, chosenMission, blockMinutes
         loadFactor -= WEIGHT_LIMITED_LOAD_FACTOR_STEP;
     }
     return { ok: false };
+}
+function getSimBriefZfwTonnes(spec, pax, cargoKg) {
+    const oew = Number(spec.oew) || 0;
+    const zfwKg = oew + getSimBriefPassengerPayloadKg(spec, pax) + Math.max(0, cargoKg);
+    return (zfwKg / 1000).toFixed(3);
+}
+function getJetMaxPaxAtMtow(mtow, oew, blockFuelKg, cargoKg, spec) {
+    const cargo = Math.max(0, cargoKg);
+    const room = mtow - oew - blockFuelKg - cargo;
+    if (room <= 0) return 0;
+    let pax = Math.floor(room / getPaxAllInWeightKg(spec));
+    while (pax > 0 && oew + getSimBriefPassengerPayloadKg(spec, pax) + cargo + blockFuelKg > mtow) {
+        pax--;
+    }
+    return pax;
+}
+/** SimBrief often files max tank and exceeds still-air block fuel on long sectors (winds, profile). */
+function getJetSimBriefPlanningBlockFuelKg(tripDistanceNm, spec) {
+    const budget = getJetBlockFuelBudgetKg(tripDistanceNm, spec);
+    const nm = Number(tripDistanceNm) || 0;
+    const maxTank = getJetMaxFuelKg(spec);
+    let plan = budget;
+    if (nm >= 3500) plan = budget * 1.04;
+    if (maxTank > 0) {
+        const nearTankLimit = budget >= maxTank * JET_SIMBRIEF_TANK_FILL_THRESHOLD;
+        if (nearTankLimit) {
+            plan = Math.max(plan, maxTank);
+        }
+        plan = Math.min(maxTank, plan);
+    }
+    return plan;
+}
+function isJetFuelCriticalSector(fuelDistanceNm, longHaul) {
+    const nm = Number(fuelDistanceNm) || 0;
+    return !!longHaul || nm >= 3500;
+}
+function capJetPaxForMtow(pax, cargoKg, safeMtow, safeOew, fuelDistanceNm, spec) {
+    if (!spec || spec.class !== "JET" || !(spec.maxPax > 0)) return pax;
+    const planFuel = getJetSimBriefPlanningBlockFuelKg(fuelDistanceNm, spec);
+    const maxPax = getJetMaxPaxAtMtow(safeMtow, safeOew, planFuel, cargoKg, spec);
+    if (maxPax <= 0) return 0;
+    return Math.min(pax, maxPax);
+}
+function enforceJetTowPayloadCap(spec, pax, cargoKg, fuelDistanceNm, operationalMtow, chosenMission, blockMinutes) {
+    if (!spec || spec.class !== "JET") return { pax: pax, cargoKg: cargoKg };
+    const oew = Number(spec.oew) || 0;
+    const mtow = operationalMtow || Number(spec.mtow) || 0;
+    const blockFuel = getJetSimBriefPlanningBlockFuelKg(fuelDistanceNm, spec);
+    let outPax = pax;
+    let outCargo = cargoKg;
+    const maxPaxAtMtow = getJetMaxPaxAtMtow(mtow, oew, blockFuel, outCargo, spec);
+    if (missionRequiresPassengers(chosenMission, spec) && (spec.maxPax || 0) > 0 && maxPaxAtMtow < outPax) {
+        outPax = Math.max(0, maxPaxAtMtow);
+    }
+    function totalWeight() {
+        return oew + getSimBriefPassengerPayloadKg(spec, outPax) + outCargo + blockFuel;
+    }
+    while (totalWeight() > mtow && outCargo > 0) {
+        outCargo = Math.max(0, outCargo - 200);
+    }
+    const trimMinPax = missionRequiresPassengers(chosenMission, spec) && (spec.maxPax || 0) > 0 ? 1 : 0;
+    while (totalWeight() > mtow && outPax > trimMinPax) {
+        outPax--;
+    }
+    if (totalWeight() > mtow) return null;
+    return { pax: outPax, cargoKg: outCargo };
+}
+/**
+ * Dispatcher physics audit — every check SimBrief cares about (no weather).
+ * Returns violation strings; empty array means the plan is internally consistent.
+ */
+function validateJetDispatchPhysics(type, spec, origin, destination, gcDistNm, fuelDistNm, longHaul, pax, cargoKg, operationalMtow) {
+    if (!spec || spec.class !== "JET") return [];
+    const violations = [];
+    const gc = Number(gcDistNm) || 0;
+    const fuelNm = Number(fuelDistNm) || getJetFuelPlanningDistanceNm(gc, spec);
+    const oew = Number(spec.oew) || 0;
+    const mtow = operationalMtow || (origin ? getDepartureRunwayOperationalMtow(origin, spec) : Number(spec.mtow) || 0);
+    const maxTank = getJetMaxFuelKg(spec);
+    const planFuel = getJetSimBriefPlanningBlockFuelKg(fuelNm, spec);
+    const paxN = Math.max(0, Number(pax) || 0);
+    const cargoN = Math.max(0, Number(cargoKg) || 0);
+    const zfw = oew + getSimBriefPassengerPayloadKg(spec, paxN) + cargoN;
+    const tow = zfw + planFuel;
+
+    if (gc > getJetAllowedMaxGcNm(spec)) {
+        violations.push(`distance ${gc} nm exceeds GC envelope (${Math.round(getJetAllowedMaxGcNm(spec))} nm)`);
+    }
+    if (!isJetSimBriefRouteFeasible(gc, spec, origin, destination)) {
+        violations.push("route fails range/tank/runway feasibility gate");
+    }
+    if (jetTripFuelExceedsTankCapacity(gc, spec)) {
+        violations.push(`trip fuel exceeds tank capacity (max ${maxTank} kg)`);
+    }
+    if (maxTank > 0 && planFuel > maxTank + 1) {
+        violations.push(`planning fuel ${Math.round(planFuel)} kg exceeds tank ${maxTank} kg`);
+    }
+    if (specIsHeavyJet(spec) && maxTank > 0) {
+        const stillAir = estimateJetBlockFuelBudgetKg(fuelNm, spec);
+        if (stillAir > maxTank + 1) {
+            violations.push(`still-air fuel need ${Math.round(stillAir)} kg exceeds tank ${maxTank} kg`);
+        }
+    }
+    if (narrowbodyFuelPlanningExceedsTankSafeEnvelope(gc, spec)) {
+        violations.push(`distance ${gc} nm exceeds narrowbody tank-safe envelope (${Math.round(getJetNarrowbodyMaxSafeGcNm(spec))} nm)`);
+    }
+    if (longHaul && !specIsHeavyJet(spec) && gc > getJetMaxLongHaulDispatchNm(spec) + 1) {
+        violations.push(`long-haul ${gc} nm exceeds narrowbody cap (${Math.round(getJetMaxLongHaulDispatchNm(spec))} nm)`);
+    }
+    if (tow > mtow + 1) {
+        violations.push(
+            `TOW ${Math.round(tow)} kg > MTOW ${Math.round(mtow)} kg`
+            + ` (${paxN} pax, ${cargoN} kg cargo, ${Math.round(planFuel)} kg fuel)`
+        );
+    }
+    const maxPax = getJetMaxPaxAtMtow(mtow, oew, planFuel, cargoN, spec);
+    if (paxN > maxPax) {
+        violations.push(`${paxN} pax exceeds MTOW cap ${maxPax} at ${Math.round(planFuel)} kg fuel`);
+    }
+    if ((spec.maxPax || 0) > 0 && paxN > spec.maxPax) {
+        violations.push(`${paxN} pax exceeds seat capacity ${spec.maxPax}`);
+    }
+    if ((spec.maxCargo || 0) > 0 && cargoN > spec.maxCargo) {
+        violations.push(`${cargoN} kg cargo exceeds maxCargo ${spec.maxCargo} kg`);
+    }
+    return violations;
 }
 const LOWI_NARROWBODY_JETLINERS = ["B736", "B737", "B738", "B738_BDSF", "B738_BCF", "A319", "A320", "A321"];
 const LOWI_UNRESTRICTED_CLASSES = ["GA", "TURBO", "HELI", "WARBIRD", "BIZ JET"];
@@ -2241,7 +3090,36 @@ function checkAirportForAircraft(ap, spec, type, depOverride, forceMilitaryBases
     }
     if (!isAllowedType) return "runway_class";
     if (!meetsLength) return "runway_length";
+    if (!passesHeavyAirlifterAirport(ap, spec)) return "heavy_airlifter";
     return null;
+}
+function formatPinnedAirportUnsuitableNotam(icao, spec, type, depOverride, forceMilitaryBases, isContractorMode) {
+    const code = (icao || "").trim().toUpperCase();
+    if (!code) return null;
+    const ap = activeAirportDatabase.find(a => a.icao && a.icao.trim().toUpperCase() === code);
+    if (!ap) return null;
+    const blockReason = checkAirportForAircraft(ap, spec, type, depOverride || code, forceMilitaryBases, isContractorMode);
+    if (!blockReason) return null;
+    if (blockReason === "runway_length") {
+        const rwyFt = ap.length ? Math.round(ap.length).toLocaleString("en-GB") : "";
+        const needFt = spec.minRunwayLength ? Math.round(spec.minRunwayLength).toLocaleString("en-GB") : "";
+        const rwyNote = rwyFt && needFt
+            ? ` (${rwyFt} ft runway; this aircraft needs ${needFt} ft)`
+            : "";
+        return formatDispatchNotam(
+            "The runway at " + code + rwyNote + " is too short for your currently selected aircraft."
+        );
+    }
+    if (blockReason === "runway_class") {
+        return formatDispatchNotam("The runway category at " + code + " does not support your currently selected aircraft.");
+    }
+    if (blockReason === "military_access") {
+        return formatDispatchNotam(code + " is a military airbase. Enable contractor mode, select a military aircraft, tick Use Military airbases, or choose a different airport.");
+    }
+    if (blockReason === "military_only_mode") {
+        return formatDispatchNotam("Military airbases only is enabled, but " + code + " is not a military airbase.");
+    }
+    return formatDispatchNotam("This airport is unsuitable for your currently selected aircraft.");
 }
 function buildRouteFailureMessage(depOverride, type, spec, validAirports, departureAvailable, forceMilitaryBases, isContractorMode) {
     if (depOverride) {
@@ -2280,7 +3158,17 @@ function buildRouteFailureMessage(depOverride, type, spec, validAirports, depart
                 const longHaulHint = isLongHaulModeEnabled()
                     ? ""
                     : " enabling long-haul flights,";
+                if (isLongHaulModeEnabled() && LONG_HAUL_DURATION_SLIDER_ENABLED) {
+                    return `No destinations were found within range from ${depOverride} for your aircraft, route tier, and routing region. Try another tier (Transatlantic, Pacific, or Ultra), choosing Worldwide routing, or leave departure blank for a random route.`;
+                }
                 return `No destinations were found within range from ${depOverride} for your aircraft, flight time, and routing region. Try${longHaulHint} increasing flight time, choosing Worldwide routing, or leave departure blank for a random route.`;
+            }
+            if (isLongHaulModeEnabled() && LONG_HAUL_DURATION_SLIDER_ENABLED) {
+                if (!longHaulTierHasFeasibleRange(spec, getSavedLongHaulBlockMinutes())) {
+                    const tier = getLongHaulTierForMinutes(getSavedLongHaulBlockMinutes());
+                    return `Your aircraft cannot reach any ${tier.label} destinations (${tier.blurb}). Try Transatlantic or Pacific, choose a wide-body with more range, or leave departure blank for a random route.`;
+                }
+                return `No destinations were found within range from ${depOverride} for your aircraft and route tier. Try another tier (Transatlantic, Pacific, or Ultra), or leave departure blank for a random route.`;
             }
             return `No destinations were found within range from ${depOverride} for your aircraft and flight time. Try increasing flight time, or leave departure blank for a random route.`;
         }
@@ -2846,6 +3734,7 @@ function probeDispatchFlight(config) {
     const cfg = config || {};
     const callsignRaw = (cfg.callsign || "TEST").trim().toUpperCase();
     const depOverride = (cfg.depOverride || "").trim().toUpperCase();
+    const destOverride = (cfg.destOverride || "").trim().toUpperCase();
     const targetMins = parseInt(cfg.targetMins, 10) || 60;
     const isContractorMode = !!cfg.isContractorMode;
     const militaryBasesToggle = !!cfg.militaryBasesToggle;
@@ -2866,6 +3755,13 @@ function probeDispatchFlight(config) {
             return fail("invalid_dep", `Error: The airport ${searchIcao} was not found. Please check the ICAO code.`);
         }
     }
+    if (destOverride) {
+        const searchIcao = destOverride.trim().toUpperCase();
+        const destAp = activeAirportDatabase.find(ap => ap.icao && ap.icao.trim().toUpperCase() === searchIcao);
+        if (!destAp) {
+            return fail("invalid_dest", `Error: The airport ${searchIcao} was not found. Please check the ICAO code.`);
+        }
+    }
     if (!callsignRaw) {
         return fail("no_callsign", "Please supply a Callsign to proceed.");
     }
@@ -2881,20 +3777,41 @@ function probeDispatchFlight(config) {
         return fail("long_haul_unavailable", getLongHaulUnavailableReason(spec, type));
     }
     const longHaul = longHaulRequested && canAircraftUseLongHaulMode(spec, type);
-    const routingTargetMins = longHaul ? 0 : targetMins;
+    if (typeof globalThis !== "undefined") {
+        globalThis.___vectorMockLongHaul = longHaul;
+    }
+    const longHaulTierMins = (longHaul && LONG_HAUL_DURATION_SLIDER_ENABLED)
+        ? clampLongHaulBlockMinutes(targetMins)
+        : null;
+    const routingTargetMins = longHaul
+        ? getLongHaulTargetBlockMinutes(spec, type, targetMins)
+        : targetMins;
+    if (longHaulTierMins != null && !longHaulTierHasFeasibleRange(spec, longHaulTierMins)) {
+        const tier = getLongHaulTierForMinutes(longHaulTierMins);
+        const maxNm = Math.round(spec.class === "JET" ? getJetMaxLongHaulDispatchNm(spec) : (spec.maxD || 0));
+        return fail("long_haul_tier_unavailable",
+            `Your aircraft cannot reach any ${tier.label} destinations (${tier.blurb}) — practical range is about ${maxNm} nm. Try a shorter tier (Transatlantic or Pacific), or choose a wide-body with more range.`);
+    }
 
-    if (depOverride && spec.class === "GLIDER") {
-        const depAp = activeAirportDatabase.find(ap => ap.icao && ap.icao.trim().toUpperCase() === depOverride);
-        if (depAp) {
-            const reason = getGliderUnsuitabilityReason(depAp, spec);
-            if (reason) {
-                return fail("glider_unsuitable", formatGliderUnsuitabilityMessage(depOverride, reason));
-            }
+    if (depOverride) {
+        const depUnsuitable = formatPinnedAirportUnsuitableNotam(
+            depOverride, spec, type, depOverride, routingMilitaryOnly, isContractorMode
+        );
+        if (depUnsuitable) {
+            return fail("airport_unsuitable", depUnsuitable);
+        }
+    }
+    if (destOverride) {
+        const destUnsuitable = formatPinnedAirportUnsuitableNotam(
+            destOverride, spec, type, depOverride, routingMilitaryOnly, isContractorMode
+        );
+        if (destUnsuitable) {
+            return fail("airport_unsuitable", destUnsuitable);
         }
     }
     
     const { departureAirports, destinationAirports } = buildDispatchRoutingPools(
-        depOverride, routingScope, spec, type, routingMilitaryOnly, isContractorMode
+        depOverride, routingScope, spec, type, routingMilitaryOnly, isContractorMode, longHaul
     );
     const validAirports = depOverride
         ? departureAirports.concat(
@@ -2903,8 +3820,9 @@ function probeDispatchFlight(config) {
         : destinationAirports;
     const departureAvailable = departureAirports.length > 0;
 
+    const distanceTierMins = longHaulTierMins != null ? longHaulTierMins : routingTargetMins;
     const { minTarget, maxTarget, relaxedMin, relaxedMax, targetDist } = getRouteDistanceLimits(
-        routingTargetMins, spec, type, longHaul, depOverride
+        distanceTierMins, spec, type, longHaul, depOverride
     );
     const targetDistNm = targetDist;
     
@@ -2913,16 +3831,30 @@ function probeDispatchFlight(config) {
     if (routedAsGlider) {
         candidatePairs = buildGliderRoutePairs(validAirports, depOverride, spec);
     } else {
-        const routeSources = depOverride ? departureAirports : destinationAirports;
+        let routeSources = depOverride ? departureAirports : destinationAirports;
+        if (longHaul && !depOverride && routeSources.length > LONG_HAUL_UNPINNED_SOURCE_SAMPLE) {
+            routeSources = sampleAirportsForLongHaulSources(routeSources, LONG_HAUL_UNPINNED_SOURCE_SAMPLE);
+        }
         const routeResult = buildJetRoutePairs(
-            routeSources, destinationAirports, depOverride, spec,
+            routeSources, destinationAirports, depOverride, destOverride, spec,
             minTarget, maxTarget, relaxedMin, relaxedMax, longHaul,
-            routingTargetMins, type
+            distanceTierMins, type
         );
         candidatePairs = routeResult.candidatePairs;
     }
-    if (longHaul && candidatePairs.length) {
-        candidatePairs = candidatePairs.filter(p => passesLongHaulDurationBand(p.dist, spec, type));
+    if (spec.class === "JET" && !depOverride && candidatePairs.length) {
+        const fullRunwayPairs = candidatePairs.filter((p) => {
+            if (isJetWeightLimitedRunwayAirport(p.src, spec)) return false;
+            if (specIsHeavyJet(spec) && isJetDepartureRunwayPerformanceLimited(p.src, spec)) return false;
+            return true;
+        });
+        if (fullRunwayPairs.length) candidatePairs = fullRunwayPairs;
+    }
+    if (longHaul && candidatePairs.length && !(depOverride && destOverride)) {
+        const tierDurationCheck = LONG_HAUL_DURATION_SLIDER_ENABLED
+            ? (p) => passesLongHaulTierDurationBand(p.dist, spec, type, distanceTierMins)
+            : (p) => passesLongHaulDurationBand(p.dist, spec, type);
+        candidatePairs = candidatePairs.filter(tierDurationCheck);
     }
     if (candidatePairs.length === 0) {
         return fail("no_routes",
@@ -2959,7 +3891,7 @@ function probeDispatchFlight(config) {
     if (contractorMissionFirst) {
         const contractorPick = dispatchContractorMissionFirst(
             candidatePairs, spec, type, searchClass, isContractorMode, longHaul,
-            routingTargetMins, targetDistNm, longHaul, preferOwned
+            distanceTierMins, targetDistNm, longHaul, preferOwned
         );
         if (!contractorPick) {
             return fail("contractor_routing",
@@ -2968,17 +3900,37 @@ function probeDispatchFlight(config) {
         }
         preChosenMission = contractorPick.mission;
         selectedRoute = contractorPick.route;
+    } else if (depOverride && destOverride && candidatePairs.length === 1) {
+        selectedRoute = candidatePairs[0];
     } else {
         const weightedRoutePool = buildContractorRoutePool(candidatePairs, preferOwned);
-        selectedRoute = pickRouteByTimeFit(weightedRoutePool, routingTargetMins, targetDistNm, spec, type, longHaul);
+        selectedRoute = pickRouteByTimeFit(weightedRoutePool, distanceTierMins, targetDistNm, spec, type, longHaul);
+    }
+    if (!selectedRoute) {
+        return fail("no_routes",
+            buildRouteFailureMessage(depOverride, type, spec, validAirports, departureAvailable, routingMilitaryOnly, isContractorMode),
+            { candidatePairCount: candidatePairs.length, filteredMissionCount: 0 });
     }
 
     const origin = selectedRoute.src;
     const destination = selectedRoute.dst;
     const distanceNm = Math.round(selectedRoute.dist);
-    if (longHaul && !passesLongHaulDurationBand(distanceNm, spec, type)) {
-        return fail("no_long_haul_band", buildNoLongHaulMissionsMessage(spec, type, isContractorMode),
-            { candidatePairCount: candidatePairs.length, origin: origin.icao, destination: destination.icao, distanceNm });
+    const pinnedRoute = !!(depOverride && destOverride);
+    if (longHaul && !pinnedRoute) {
+        const targetBlock = routingTargetMins;
+        const blockOk = LONG_HAUL_DURATION_SLIDER_ENABLED
+            ? passesLongHaulTargetBlock(distanceNm, distanceTierMins, spec, type)
+            : passesLongHaulDurationBand(distanceNm, spec, type);
+        if (!blockOk) {
+            const est = estimateLongHaulBlockMinutes(distanceNm, spec, type);
+            const hrs = Math.round(est / 60);
+            const tier = getLongHaulTierForMinutes(distanceTierMins != null ? distanceTierMins : targetBlock);
+            const hint = LONG_HAUL_DURATION_SLIDER_ENABLED
+                ? ` No ${tier.label} route was found near your target (best match was about ${hrs} hours). Try another tier, departure, or routing region.`
+                : "";
+            return fail("no_long_haul_band", buildNoLongHaulMissionsMessage(spec, type, isContractorMode) + hint,
+                { candidatePairCount: candidatePairs.length, origin: origin.icao, destination: destination.icao, distanceNm });
+        }
     }
     const bearing = calculateBearing(origin.lat, origin.lon, destination.lat, destination.lon);
     const isEasterly = (bearing >= 0 && bearing < 180);
@@ -3079,11 +4031,20 @@ function probeDispatchFlight(config) {
         safeMtow = operationalMtowCap;
         mtowReducedForRestrictedAirport = true;
     }
+    if (spec.class === "JET" && origin) {
+        safeMtow = Math.min(safeMtow, getDepartureRunwayOperationalMtow(origin, spec));
+    }
     const safeOew = spec.oew || (spec.class === "JET" ? 42000 : 2000);
     const safeFuelPerNm = spec.fuelPerNm || (spec.class === "JET" ? 6 : 0.5);
     const weightLimitedRunway = spec.class === "JET" && isRouteWeightLimitedByRunway(origin, destination, spec);
     const weightLimitedRunwayIcaos = weightLimitedRunway ? getWeightLimitedRunwayIcaos(origin, destination, spec) : [];
     let fuelDistanceNm = distanceNm;
+    if (spec.class === "JET") {
+        fuelDistanceNm = getJetFuelPlanningDistanceNm(distanceNm, spec);
+    }
+    const jetPlanFuelKg = spec.class === "JET" ? getJetSimBriefPlanningBlockFuelKg(fuelDistanceNm, spec) : 0;
+    const jetMaxTankKg = spec.class === "JET" ? getJetMaxFuelKg(spec) : 0;
+    const jetTankCritical = jetMaxTankKg > 0 && jetPlanFuelKg >= jetMaxTankKg * JET_SIMBRIEF_TANK_FILL_THRESHOLD;
     if (origin.icao === "LOWI" && isLowiNarrowbodyJetliner(type, spec)) {
         fuelDistanceNm = Math.min(distanceNm, 900);
     }
@@ -3093,8 +4054,7 @@ function probeDispatchFlight(config) {
     let pax = 0;
     let cargoKg = 0;
     let hardCargoLimit = 0;
-    if (weightLimitedRunway) {
-        safeMtow = Math.min(safeMtow, getRouteRunwayOperationalMtow(origin, destination, spec));
+    if (weightLimitedRunway || jetTankCritical) {
         const weightLimitedAlloc = allocateWeightLimitedJetPayload(
             spec, type, chosenMission, blockMinutes, safeMtow, fuelDistanceNm
         );
@@ -3107,7 +4067,7 @@ function probeDispatchFlight(config) {
         cargoKg = weightLimitedAlloc.cargoKg;
         hardCargoLimit = weightLimitedAlloc.hardCargoLimit;
     } else {
-        let effectiveRunway = Math.min(origin.length || 99999, destination.length || 99999);
+        let effectiveRunway = origin.length || 99999;
         let runwayWeightPenalty = 0;
         const maxVariablePayload = safeMtow - safeOew;
         if (effectiveRunway < spec.minRunwayLength && spec.minRunwayLength > 0) {
@@ -3117,27 +4077,42 @@ function probeDispatchFlight(config) {
         }
         let minReservedPaxWeight = 0;
         if (missionRequiresPassengers(chosenMission, spec) && spec.maxPax > 0) {
-            const { minPax } = getPassengerLoadLimits(chosenMission, spec, spec.maxPax, blockMinutes);
-            minReservedPaxWeight = Math.max(1, minPax) * 104;
+            let reservePax = 1;
+            if (!isJetFuelCriticalSector(fuelDistanceNm, longHaul)) {
+                const { minPax } = getPassengerLoadLimits(chosenMission, spec, spec.maxPax, blockMinutes);
+                reservePax = Math.max(1, minPax);
+            }
+            minReservedPaxWeight = getSimBriefPassengerPayloadKg(spec, reservePax);
         }
-        const rawBlockFuel = fuelDistanceNm * safeFuelPerNm;
+        const rawBlockFuel = spec.class === "JET"
+            ? getJetSimBriefPlanningBlockFuelKg(fuelDistanceNm, spec)
+            : fuelDistanceNm * safeFuelPerNm;
         const availableForFuel = Math.max(0, safeMtow - safeOew - runwayWeightPenalty - minReservedPaxWeight);
         const estimatedBlockFuel = Math.min(rawBlockFuel, availableForFuel);
 
         const maxStructuralPayload = Math.max(0, safeMtow - safeOew - estimatedBlockFuel - runwayWeightPenalty);
+        const paxAllInKg = getPaxAllInWeightKg(spec);
         if (missionRequiresPassengers(chosenMission, spec) && spec.maxPax > 0) {
-            let maxSafePax = Math.max(0, Math.min(spec.maxPax, Math.floor(maxStructuralPayload / 104)));
+            let maxSafePax = Math.max(0, Math.min(spec.maxPax, Math.floor(maxStructuralPayload / paxAllInKg)));
+            if (spec.class === "JET") {
+                const mtowPaxCap = getJetMaxPaxAtMtow(
+                    safeMtow, safeOew, getJetSimBriefPlanningBlockFuelKg(fuelDistanceNm, spec), 0, spec
+                );
+                maxSafePax = Math.min(maxSafePax, mtowPaxCap);
+            }
             if (maxSafePax > 0) {
                 const { minPax, effectiveMax } = getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes);
                 if (effectiveMax > 0) {
                     pax = Math.floor(Math.random() * (effectiveMax - minPax + 1)) + minPax;
                 }
             }
-            if (pax === 0) {
-                pax = 1;
+            if (pax === 0 && spec.class === "JET") {
+                return fail("runway_performance",
+                    "Runway length and sector distance do not allow a feasible takeoff weight for this aircraft. Try a shorter sector, a different airport, or another airframe.",
+                    { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
             }
         }
-        const paxWeight = pax * 104;
+        const paxWeight = getSimBriefPassengerPayloadKg(spec, pax);
         const paxRatio = spec.maxPax > 0 ? (pax / spec.maxPax) : 0;
         const proportionalCargoLimit = spec.maxCargo * (1 - paxRatio);
         const remainingPayload = Math.max(0, maxStructuralPayload - paxWeight);
@@ -3150,6 +4125,14 @@ function probeDispatchFlight(config) {
             } else {
                 cargoKg = hardCargoLimit;
             }
+        }
+    }
+    if (spec.class === "JET" && missionRequiresPassengers(chosenMission, spec) && (spec.maxPax || 0) > 0) {
+        pax = capJetPaxForMtow(pax, cargoKg, safeMtow, safeOew, fuelDistanceNm, spec);
+        if (pax === 0) {
+            return fail("runway_performance",
+                "Runway length and sector distance do not allow a feasible takeoff weight for this aircraft. Try a shorter sector, a different airport, or another airframe.",
+                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
         }
     }
     const mtowReducedForAirport = mtowReducedForRestrictedAirport;
@@ -3208,11 +4191,58 @@ function probeDispatchFlight(config) {
     if (scenarioImgId === 156) cargoKg = Math.floor(hardCargoLimit * 0.70);
     cargoKg = finalizeAssignedPayloadKg(cargoKg, hardCargoLimit);
 
+    if (spec.class === "JET") {
+        const towCapped = enforceJetTowPayloadCap(
+            spec, pax, cargoKg, fuelDistanceNm, safeMtow, chosenMission, blockMinutes
+        );
+        if (!towCapped) {
+            return fail("runway_performance",
+                "Runway length and sector distance do not allow a feasible takeoff weight for this aircraft. Try a shorter sector, a different airport, or another airframe.",
+                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+        }
+        pax = towCapped.pax;
+        cargoKg = towCapped.cargoKg;
+    }
+
     if (weightLimitedRunwayIcaos.length) {
-        warnings.push("Takeoff weight reduced for runway length at " + weightLimitedRunwayIcaos.join(" / ") + ". Payload limited; plan fuel normally.");
+        const depNorm = normalizeIcao(depOverride);
+        if (depNorm && weightLimitedRunwayIcaos.includes(depNorm)) {
+            const rwyFt = origin && origin.length ? Math.round(origin.length).toLocaleString("en-GB") : "";
+            const rwyNote = rwyFt ? ` (${rwyFt} ft runway)` : "";
+            pushDispatchNotam(warnings,
+                "Takeoff from " + depNorm + rwyNote + " is weight-limited for this aircraft. " +
+                "The payload on your job ticket has been reduced to allow takeoff. Plan fuel in SimBrief as usual and check takeoff performance before departure."
+            );
+        }
     }
     if (mtowReducedForRestrictedAirport) {
-        warnings.push("MTOW has been reduced for this flight due to airport restrictions. You will need to check fuel before departing.");
+        pushDispatchNotam(warnings,
+            "MTOW has been reduced for this airport due to operational restrictions. Verify fuel load and takeoff performance in SimBrief before departure."
+        );
+    }
+    if (longHaul && depOverride && origin && !isLongHaulSuitableAirport(origin, spec)) {
+        pushDispatchNotam(warnings,
+            "You pinned a regional departure airport. Long-haul arrivals are still routed to major hubs for this aircraft. Confirm takeoff performance in SimBrief if needed."
+        );
+    }
+
+    if (spec.class === "JET") {
+        const physicsViolations = validateJetDispatchPhysics(
+            type, spec, origin, destination, distanceNm, fuelDistanceNm, longHaul, pax, cargoKg, safeMtow
+        );
+        if (physicsViolations.length) {
+            return fail("physics_validation",
+                "Dispatch plan failed weight and fuel checks: " + physicsViolations.join("; ") + ".",
+                {
+                    violations: physicsViolations,
+                    origin: origin.icao,
+                    destination: destination.icao,
+                    distanceNm,
+                    pax,
+                    cargoKg,
+                    candidatePairCount: candidatePairs.length
+                });
+        }
     }
 
     return {
@@ -3255,6 +4285,20 @@ function resetDispatchProbeHistory() {
 if (typeof globalThis !== "undefined") {
     globalThis.probeDispatchFlight = probeDispatchFlight;
     globalThis.resetDispatchProbeHistory = resetDispatchProbeHistory;
+    globalThis.validateJetDispatchPhysics = validateJetDispatchPhysics;
+    globalThis.isLongHaulSuitableAirport = isLongHaulSuitableAirport;
+}
+
+function formatDispatchNotam(text) {
+    const body = String(text || "").trim();
+    return body ? "NOTAM: " + body : "NOTAM:";
+}
+function pushDispatchNotam(warnings, text) {
+    warnings.push(formatDispatchNotam(text));
+}
+function showDispatchNotams(warnings) {
+    if (!warnings || !warnings.length) return;
+    alert(warnings.join("\n\n"));
 }
 
 // START OF DISPATCH FLIGHT FUNCTION
@@ -3277,7 +4321,7 @@ function dispatchFlight() {
         return;
     }
     if (result.warnings && result.warnings.length) {
-        result.warnings.forEach(msg => alert(msg));
+        showDispatchNotams(result.warnings);
     }
     let {
         spec, type, chosenMission, origin, destination, distanceNm, longHaul, targetMins,
@@ -3439,6 +4483,7 @@ function dispatchFlight() {
     }
     
     const cargoParam = (cargoKg / 1000).toFixed(3);
+    const manualZfw = getSimBriefZfwTonnes(spec, pax, cargoKg);
     const isGlider = spec.class === "GLIDER";
     const dispatchType = (spec.simbriefIcao || type || aircraftType || "").toUpperCase();
     
@@ -3453,7 +4498,7 @@ function dispatchFlight() {
     // Simbrief wants FL e.g. "080" for 8000ft, or "320" for FL320. 
     const simbriefAlt = (altFeet / 100).toString().padStart(3, '0');
     
-    const simbriefUrl = `https://www.simbrief.com/system/dispatch.php?share=1&type=${dispatchType}&orig=${origin.icao}&dest=${destination.icao}&airline=${dynamicAirline}&fltnum=${paddedFltNum}&callsign=${callsignRaw}&fl=${simbriefAlt}&pax=${pax}&cargo=${cargoParam}&units=KGS`;
+    const simbriefUrl = `https://www.simbrief.com/system/dispatch.php?share=1&type=${dispatchType}&orig=${origin.icao}&dest=${destination.icao}&airline=${dynamicAirline}&fltnum=${paddedFltNum}&callsign=${callsignRaw}&fl=${simbriefAlt}&pax=${pax}&cargo=${cargoParam}&manualzfw=${manualZfw}&units=KGS`;
     const linkEl = document.getElementById("outLink");
     linkEl.href = simbriefUrl;
     

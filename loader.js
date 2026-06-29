@@ -2,7 +2,7 @@
 
     // Bump this string on every deploy (keep version.json in sync).
 
-    var APP_VERSION = "2.2.4";
+    var APP_VERSION = "2.2.6";
 
     var useFileProtocol = window.location.protocol === "file:";
 
@@ -205,6 +205,10 @@
         "mission-assignment-core.js",
 
         "mission-assignments-data.js",
+
+        "long-haul-routes-db.js",
+
+        "short-haul-routes-db.js",
 
         "dispatch-engine.js",
 

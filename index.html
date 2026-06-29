@@ -490,10 +490,6 @@
         .checkbox-option--unavailable {
             display: none;
         }
-        #longHaulToggleLabel:has(#longHaulToggle:checked) {
-            font-weight: var(--font-weight-label);
-            color: var(--text-primary);
-        }
         .checkbox-option input[type="radio"] {
             width: 16px;
             height: 16px;
@@ -1275,6 +1271,55 @@
             color: var(--accent-color);
             font-weight: var(--font-weight-time-val);
         }
+        .long-haul-tier-hint {
+            color: var(--text-muted);
+            font-weight: var(--font-weight-body);
+            font-size: 0.92em;
+        }
+        .long-haul-tier-ticks {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 6px;
+            font-size: var(--font-size-small);
+            color: var(--text-muted);
+            user-select: none;
+        }
+        .long-haul-tier-tick {
+            flex: 1;
+            line-height: 1.35;
+        }
+        .long-haul-tier-tick:first-child {
+            text-align: left;
+        }
+        .long-haul-tier-tick:nth-child(2) {
+            text-align: center;
+        }
+        .long-haul-tier-tick:nth-child(3) {
+            text-align: right;
+        }
+        .long-haul-tier-tick-distance {
+            font-weight: var(--font-weight-body);
+        }
+        .long-haul-tier-tick--unavailable .long-haul-tier-tick-distance {
+            opacity: 0.85;
+        }
+        .long-haul-tier-tick--active {
+            color: var(--accent-color);
+            font-weight: var(--font-weight-time-val);
+        }
+        .long-haul-tier-tick--active .long-haul-tier-tick-distance {
+            font-weight: var(--font-weight-body);
+        }
+        .long-haul-tier-feasibility-note {
+            margin-top: 8px;
+            font-size: var(--font-size-small);
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .long-haul-tier-feasibility-note--warn {
+            color: #c45a5a;
+        }
         .custom-datalist {
             display: none;
             position: absolute;
@@ -1622,19 +1667,19 @@
                 A glider can dispatch from any departure airport with sufficient runway length (not a helipad) if you enter an ICAO. If the departure airport is left blank, the dispatcher considers all suitable airports but strongly prefers routes from and to glider strips.
             </div>
         </details>
-        <details id="longHaulUnavailableNotice" class="info-details" style="display: none;">
-            <summary>Long-haul flights</summary>
-            <div class="info-details-body" id="longHaulUnavailableNoticeText">
-                Long-haul mode is not available for this aircraft. Details update when you select an airframe.
-            </div>
-        </details>
 </div>
 <div class="slider-section">
     <label for="timeSlider" class="slider-header-row" id="timeSliderHeading">
         Target Block Time: <span id="timeVal">60</span> <span id="timeUnit">minutes</span>
     </label>
-    <div id="longHaulNote" class="slider-long-haul-note" role="note">⏳ <strong>NOTAM</strong>: Click below to generate a long-haul flight (between 6 and 16 hours) matched to your selected aircraft's specifications and operational limits. You can choose to fly from a specific airport, provided it is in either the core database or your custom database, or you can leave the field blank to generate a random flight. You can also choose to restrict long-haul flights to the Americas, Europe and the Rest of the World, or worldwide; the choice is yours.</div>
+    <div id="longHaulNote" class="slider-long-haul-note" role="note" style="display: none;">⏳ <strong>Long-haul</strong>: Select <strong>Transatlantic</strong>, <strong>Pacific</strong>, or <strong>Ultra</strong> and VECTOR will find iconic hub routes from the curated MSFS airport list. Select a custom departure to fly from a specific airport.</div>
     <input type="range" id="timeSlider" min="40" max="120" step="10" value="60" list="steplist" oninput="updateFlightTimeDisplay()" style="width: 100%; cursor: pointer;">
+    <div id="longHaulTierTicks" class="long-haul-tier-ticks" style="display: none;" aria-hidden="true">
+        <span class="long-haul-tier-tick" data-tier-mins="480">Transatlantic</span>
+        <span class="long-haul-tier-tick" data-tier-mins="720">Pacific</span>
+        <span class="long-haul-tier-tick" data-tier-mins="960">Ultra</span>
+    </div>
+    <div id="longHaulTierFeasibilityNote" class="long-haul-tier-feasibility-note" style="display: none;" role="note"></div>
 
     <datalist id="steplist">
         <option value="40"></option>
@@ -1647,10 +1692,18 @@
         <option value="110"></option>
         <option value="120"></option>
     </datalist>
+    <datalist id="longHaulSteplist">
+        <option value="480"></option>
+        <option value="720"></option>
+        <option value="960"></option>
+    </datalist>
     <div class="slider-footer-row">
-        <label class="checkbox-option" for="longHaulToggle" id="longHaulToggleLabel">
-            <input type="checkbox" id="longHaulToggle" onchange="toggleLongHaulMode()">⏳ Enable long-haul flights
-        </label>
+        <details class="info-details long-haul-notam">
+            <summary>Long-haul NOTAM</summary>
+            <div class="info-details-body">
+                VECTOR was initially conceived from a desire to create flightplans to and from the MSFS 2024 payware airports that I own in one click. No other software provides this functionality, that I know of. This grew rapidly into a feature-rich flight dispatch tool, implementing a curated Asobo and Third Party airport database, over 100 aircraft, a mission generator, military missions and airports, gliding missions and gliderports, the option to add custom airports and aircraft, the implementation of an editable logbook, as well as incorporating wishes from the community, and quickly growing beyond what I had initially envisioned. While community feedback has helped improve VECTOR, and for that I am very grateful, VECTOR was always designed to compliment SimBrief, never to replace it, and there are many good alternatives available for long-haul flight planning, such as APLv2, which I encourage you to explore if you enjoy flying long-haul sectors. VECTOR is designed for people who want to fly short-haul without time compression. Thank you for your understanding and for your support.
+            </div>
+        </details>
         <span class="note-text slider-rotor-glider-note">(N.B. Helicopter and Glider missions are unaffected by this slider.)</span>
     </div>
 </div>
@@ -1953,7 +2006,7 @@
                     <li>Saves a missing aircraft to your local fleet dropdown.</li>
                     <li>Mission tags are used to define how the dispatcher classifies aircraft. Gliders need class <strong>Glider / Sailplane</strong>, category <strong>Glider</strong>, and the appropriate glider options (self-launch, sailplane, etc.).</li>
                     <li>Enter maximum range (nm) from the aircraft manual — this controls short-haul and long-haul routing. Minimum sector distance is set automatically by class.</li>
-                    <li>Military airlifters (e.g. A400): class <strong>Turboprop</strong>, tick <strong>Military Aircraft</strong>, category <strong>Heavy Cargo / Airlifter</strong>, primary use <strong>Cargo / freight</strong>.</li>
+                    <li>Military airlifters: class <strong>Turboprop</strong>, tick <strong>Military Aircraft</strong>, category <strong>Heavy Cargo / Airlifter</strong>. C-130/C-160 use standard military transport; A400-class heavies get the <strong>HEAVY_AIRLIFTER</strong> tag (airliner/military strips only).</li>
                     <li>Custom glider strips: set largest permitted aircraft type to <strong>Glider strip / winch launch only</strong>.</li>
                 </ul>
             </div>
