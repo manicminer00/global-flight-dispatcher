@@ -2,7 +2,7 @@
 
     // Bump this string on every deploy (keep version.json in sync).
 
-    var APP_VERSION = "2.2.12";
+    var APP_VERSION = "2.2.13";
 
     var useFileProtocol = window.location.protocol === "file:";
 
