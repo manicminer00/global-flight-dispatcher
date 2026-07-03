@@ -404,7 +404,7 @@ var seedAsoboAirportDatabase = [
 { icao: "HEGH", name: "Giza Plateau Heliport", rwy: "HELI", length: 100, elev: 650, lat: 29.966, lon: 31.119, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "HUEN", name: "Entebbe International", rwy: "JET", length: 12000, elev: 3782, lat: 0.042, lon: 32.444, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "KASE", name: "Aspen-Pitkin County", rwy: "JET", length: 8006, elev: 7838, lat: 39.222, lon: -106.868, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
-{ icao: "KATL", name: "Hartsfield-Jackson Atlanta International", rwy: "JET", length: 12390, elev: 1026, lat: 33.637, lon: -84.428, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
+{ icao: "KATL", name: "Hartsfield-Jackson Atlanta International", rwy: "JET", length: 12390, elev: 1026, lat: 33.6407, lon: -84.4277, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "KAVX", name: "Catalina Airport", rwy: "TURBO", length: 3000, elev: 1602, lat: 33.405, lon: -118.416, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "KBID", name: "Block Island Airport", rwy: "GA", length: 2502, elev: 108, lat: 41.168, lon: -71.578, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
 { icao: "KCGX", name: "Meigs Field", rwy: "TURBO", length: 3900, elev: 593, lat: 41.858, lon: -87.608, source: "Core", tag: "Hand-Crafted", linkText: "Store", url: "" },
