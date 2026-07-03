@@ -522,6 +522,14 @@
         .dep-routing-labels {
             margin-bottom: 0;
         }
+        .dep-routing-labels label[for="routingScopeSelect"] {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+        .dep-routing-labels label[for="routingScopeSelect"] .field-hint {
+            margin-left: 0;
+        }
         .dep-routing-inputs {
             margin-top: 0;
             align-items: stretch;
@@ -1626,7 +1634,10 @@
         <div class="dispatch-form-field">
             <div class="form-grid-2 dep-routing-labels">
                 <label for="depOverrideInput" class="field-title">Departure Airport:</label>
-                <label for="routingScopeSelect" class="field-title">Routing Options:</label>
+                <label for="routingScopeSelect" class="field-title"><span>Routing Options:</span>
+                    <span class="field-hint">🧭 <a class="link-inline" href="https://www.google.com/maps/d/edit?mid=1m27z2BIBRWRM3MgD9UExPAOqxxRmntE&usp=sharing" target="_blank" rel="noopener noreferrer">Map of Airports in Database</a>
+                    </span>
+                </label>
             </div>
             <div class="form-grid-2 dep-routing-inputs">
                 <div class="dep-field-wrap">
