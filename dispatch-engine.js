@@ -710,8 +710,14 @@ function getRoutingMilitaryOnlyMode(isContractorMode, spec, forceMilitaryBases) 
     if (usesContractorMissionFirstRouting(isContractorMode, spec)) return false;
     return getEffectiveMilitaryBaseRouting(isContractorMode, forceMilitaryBases);
 }
+function passesAircraftGatedAirport(ap, type) {
+    if (!ap || !Array.isArray(ap.allowedAircraft) || ap.allowedAircraft.length === 0) return true;
+    const aircraftType = (type || "").trim().toUpperCase();
+    return ap.allowedAircraft.some(code => (code || "").trim().toUpperCase() === aircraftType);
+}
 function passesDispatchAirportFilters(ap, spec, type, overrideIcao, forceMilitaryBases, isContractorMode) {
     const apIcao = normalizeIcao(ap.icao);
+    if (!passesAircraftGatedAirport(ap, type)) return false;
     if (spec.class === "JET" && JET_SIMBRIEF_EXCLUDED_ICAOS.has(apIcao) && apIcao !== overrideIcao) {
         return false;
     }
@@ -3087,6 +3093,7 @@ function checkAirportForAircraft(ap, spec, type, depOverride, forceMilitaryBases
     if (spec.class === "GLIDER" && !isGliderSuitableAirport(ap, spec)) {
         return getGliderUnsuitabilityReason(ap, spec) || "runway_length";
     }
+    if (!passesAircraftGatedAirport(ap, type)) return "scenery_aircraft";
     const hasMilitaryAccess = hasMilitaryAirportAccess(spec, isContractorMode, forceMilitaryBases);
     if (ap.isMilitary && !hasMilitaryAccess && apIcao !== overrideIcao) return "military_access";
     if (forceMilitaryBases && !ap.isMilitary && apIcao !== overrideIcao) return "military_only_mode";
@@ -3140,6 +3147,9 @@ function formatPinnedAirportUnsuitableNotam(icao, spec, type, depOverride, force
     if (blockReason === "military_only_mode") {
         return formatDispatchNotam("Military airbases only is enabled, but " + code + " is not a military airbase.");
     }
+    if (blockReason === "scenery_aircraft") {
+        return formatDispatchNotam(code + " is only available with the Miltech Simulations MH-60. Select that aircraft to dispatch here.");
+    }
     return formatDispatchNotam("This airport is unsuitable for your currently selected aircraft.");
 }
 function buildRouteFailureMessage(depOverride, type, spec, validAirports, departureAvailable, forceMilitaryBases, isContractorMode) {
@@ -3170,6 +3180,9 @@ function buildRouteFailureMessage(depOverride, type, spec, validAirports, depart
             }
             if (blockReason === "military_only_mode") {
                 return `Military airbases only is enabled, but ${depOverride} is not a military airbase. Clear that option or choose a military departure airport.`;
+            }
+            if (blockReason === "scenery_aircraft") {
+                return `${depOverride} is only available with the Miltech Simulations MH-60. Select that aircraft to dispatch here.`;
             }
         }
         const scope = getRoutingScope();
