@@ -27,7 +27,7 @@
 <table>
   
 <tr><td width="180" valign="top"><strong>Aircraft</strong></td><td valign="top">112 aircraft (GA, turboprop, business jet, airliner, warbird, military jet, helicopter, glider).</td></tr>
-<tr><td valign="top"><strong>Airports</strong></td><td valign="top"><strong>Total: 1140 Asobo + 843 Third Party</strong> (MSFS Hand-Crafted · MSFS Glider airfields · MSFS Small Detailed Airfields · Contrail · iniBuilds · ORBX · UK2000 · Flightsim.to · Military airbases)<strong></td></tr>
+<tr><td valign="top"><strong>Airports</strong></td><td valign="top"><strong>Total: 1140 Asobo + 858 Third Party</strong> (MSFS Hand-Crafted · MSFS Glider airfields · MSFS Small Detailed Airfields · Contrail · iniBuilds · ORBX · UK2000 · Flightsim.to · Military airbases)<strong></td></tr>
 <tr><td valign="top"><strong>Missions</strong></td><td valign="top">250 missions - VIP charters, passenger, freight, medevac, survey, vintage, tactical, gliding operations, military operations and more.</td></tr>
 </table>
 
