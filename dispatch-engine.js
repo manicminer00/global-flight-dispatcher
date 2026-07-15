@@ -1532,6 +1532,53 @@ function loadSettings() {
     initRoutingScope();
     loadLongHaulPreference();
     syncContractorMilitaryOptions();
+    syncContractsBoardPreviewFromStorage();
+}
+
+/** Phase 0 visual mock only — does not alter dispatch or routing. Default OFF. */
+function isContractsBoardPreviewEnabled() {
+    try {
+        return localStorage.getItem("dispatcher_contracts_board") === "true";
+    } catch (e) {
+        return false;
+    }
+}
+
+function setContractsBoardPreview(enabled) {
+    const on = !!enabled;
+    try {
+        localStorage.setItem("dispatcher_contracts_board", on ? "true" : "false");
+    } catch (e) { /* ignore quota / private mode */ }
+    applyContractsBoardPreview(on);
+}
+
+function syncContractsBoardPreviewFromStorage() {
+    const on = isContractsBoardPreviewEnabled();
+    const toggle = document.getElementById("contractsBoardToggle");
+    if (toggle) toggle.checked = on;
+    applyContractsBoardPreview(on);
+}
+
+function applyContractsBoardPreview(on) {
+    document.documentElement.classList.toggle("contracts-board-on", !!on);
+    const panel = document.getElementById("contractsBoardPanel");
+    if (panel) {
+        if (on) {
+            panel.removeAttribute("hidden");
+            panel.style.display = "";
+        } else {
+            panel.setAttribute("hidden", "");
+            panel.style.display = "none";
+        }
+    }
+}
+
+function onContractTicketAcceptPreview(ticketIndex) {
+    alert(
+        "Contracts Board preview (Phase 0).\n\n"
+        + "Ticket " + ticketIndex + " is a visual placeholder only.\n"
+        + "Use GENERATE FLIGHT for a real dispatch — Accept will be wired in a later phase."
+    );
 }
 function toggleSettingsPanel() {
     const p = document.getElementById("settingsPanel");

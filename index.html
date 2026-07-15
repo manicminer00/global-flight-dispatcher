@@ -309,9 +309,15 @@
             background-color: var(--bg-page);
             color: var(--text-primary);
             padding: 20px;
-            max-width: 900px;
+            max-width: 900px; /* classic layout — unchanged when Contracts Board is off */
+            width: 100%;
             margin: 0 auto;
+            box-sizing: border-box;
             color-scheme: dark;
+        }
+        /* Hard cap: never wider than 1920px (1080p desktop target) */
+        html.contracts-board-on body {
+            max-width: min(1920px, 100%);
         }
         .container {
             background-color: var(--bg-container);
@@ -319,6 +325,8 @@
             border-radius: 8px;
             box-shadow: var(--shadow-container);
             margin-bottom: 20px;
+            max-width: 100%;
+            box-sizing: border-box;
         }
         .control-group, .settings-group {
             margin-bottom: 20px;
@@ -1469,6 +1477,130 @@
         .prefer-owned-row.military-airbase-row {
             margin-top: 10px;
         }
+        /* ---- Phase 0: Contracts Board visual mock (opt-in only) ---- */
+        #contractsBoardPanel {
+            display: none;
+            margin: 16px 0 8px;
+            padding: var(--spacing-inner);
+            background: var(--bg-section);
+            border: var(--border-width) solid var(--border-color);
+            border-radius: 4px;
+        }
+        html.contracts-board-on #contractsBoardPanel {
+            display: block;
+        }
+        .contracts-board-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 8px 16px;
+            margin-bottom: 12px;
+        }
+        .contracts-board-header h3 {
+            margin: 0;
+            font-size: var(--font-size-section-summary);
+            font-weight: var(--font-weight-section-summary);
+            color: var(--text-primary);
+        }
+        .contracts-board-note {
+            margin: 0 0 14px;
+            font-size: var(--font-size-nb);
+            color: var(--text-muted);
+            font-weight: var(--font-weight-body);
+        }
+        .contracts-ticket-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        @media (min-width: 900px) {
+            html.contracts-board-on .contracts-ticket-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+        .contract-ticket {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            background: var(--bg-container);
+            border: var(--border-width) solid var(--border-color);
+            border-left: 4px solid var(--border-ticket-note);
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: var(--shadow-ticket-note);
+        }
+        .contract-ticket-photo {
+            height: 96px;
+            background:
+                linear-gradient(135deg, var(--bg-section) 0%, var(--bg-panel) 55%, var(--bg-inset) 100%);
+            border-bottom: var(--border-width) solid var(--border-color);
+        }
+        .contract-ticket-photo--b { opacity: 0.92; }
+        .contract-ticket-photo--c { opacity: 0.84; }
+        .contract-ticket-body {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding: 12px;
+            flex: 1 1 auto;
+        }
+        .contract-ticket-kicker {
+            margin: 0;
+            font-size: var(--font-size-small);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .contract-ticket-title {
+            margin: 0;
+            font-size: 1.05em;
+            font-weight: var(--font-weight-section-summary);
+            color: var(--text-primary);
+            line-height: 1.25;
+        }
+        .contract-ticket-route {
+            margin: 0;
+            font-size: 1.35em;
+            font-weight: bold;
+            color: var(--text-primary);
+            letter-spacing: 0.02em;
+        }
+        .contract-ticket-meta {
+            margin: 0;
+            font-size: var(--font-size-ui);
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        .contract-ticket-value {
+            margin: 4px 0 0;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: var(--color-link-inline);
+        }
+        .contract-ticket-actions {
+            margin-top: auto;
+            padding-top: 8px;
+        }
+        .contract-ticket-accept {
+            width: 100%;
+            font-size: var(--font-size-btn) !important;
+            font-weight: var(--font-weight-btn) !important;
+            cursor: pointer;
+        }
+        html.contracts-board-on .logbook-table-wrap {
+            max-height: min(420px, 40vh);
+        }
+        html.contracts-board-on #logbookTable .lb-route {
+            width: 96px;
+            max-width: 120px;
+        }
+        html.contracts-board-on #logbookTable .lb-aircraft {
+            width: 22%;
+        }
+        .contracts-board-toggle-row {
+            margin: 10px 0 0;
+        }
         .form-grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1720,6 +1852,54 @@
 </div>
 
 <button id="generateFlightBtn" onclick="dispatchFlight()">🎲 GENERATE FLIGHT</button>
+<div id="contractsBoardPanel" class="contracts-board-panel" aria-label="Contracts Board preview" hidden>
+    <div class="contracts-board-header">
+        <h3>Contracts Board</h3>
+        <span class="note-text">Preview only — Phase 0</span>
+    </div>
+    <p class="contracts-board-note">Three ticket choices (visual mock). Accept is not wired yet — use GENERATE FLIGHT as normal. Toggle this view off in Settings to restore the classic narrow layout.</p>
+    <div class="contracts-ticket-grid">
+        <article class="contract-ticket" aria-label="Contract ticket 1">
+            <div class="contract-ticket-photo" aria-hidden="true"></div>
+            <div class="contract-ticket-body">
+                <p class="contract-ticket-kicker">Executive Shuttle</p>
+                <h4 class="contract-ticket-title">Regional Hopper</h4>
+                <p class="contract-ticket-route">EGLL → EGCC</p>
+                <p class="contract-ticket-meta">Sample short sector · ~55 min block<br>Placeholder route — not a live dispatch</p>
+                <p class="contract-ticket-value">Contract Value: $ 3,450</p>
+                <div class="contract-ticket-actions">
+                    <button type="button" class="contract-ticket-accept" onclick="onContractTicketAcceptPreview(1)">Accept Contract</button>
+                </div>
+            </div>
+        </article>
+        <article class="contract-ticket" aria-label="Contract ticket 2">
+            <div class="contract-ticket-photo contract-ticket-photo--b" aria-hidden="true"></div>
+            <div class="contract-ticket-body">
+                <p class="contract-ticket-kicker">VIP Charter</p>
+                <h4 class="contract-ticket-title">Quiet Cabin Priority</h4>
+                <p class="contract-ticket-route">LSGG → LIMC</p>
+                <p class="contract-ticket-meta">Sample executive sector · ~1h 20m block<br>Placeholder route — not a live dispatch</p>
+                <p class="contract-ticket-value">Contract Value: $ 6,820</p>
+                <div class="contract-ticket-actions">
+                    <button type="button" class="contract-ticket-accept" onclick="onContractTicketAcceptPreview(2)">Accept Contract</button>
+                </div>
+            </div>
+        </article>
+        <article class="contract-ticket" aria-label="Contract ticket 3">
+            <div class="contract-ticket-photo contract-ticket-photo--c" aria-hidden="true"></div>
+            <div class="contract-ticket-body">
+                <p class="contract-ticket-kicker">Efficiency Run</p>
+                <h4 class="contract-ticket-title">Overnight Freight Pulse</h4>
+                <p class="contract-ticket-route">EGNX → EHAM</p>
+                <p class="contract-ticket-meta">Sample freighter sector · ~1h 35m block<br>Placeholder route — not a live dispatch</p>
+                <p class="contract-ticket-value">Contract Value: $ 5,100</p>
+                <div class="contract-ticket-actions">
+                    <button type="button" class="contract-ticket-accept" onclick="onContractTicketAcceptPreview(3)">Accept Contract</button>
+                </div>
+            </div>
+        </article>
+    </div>
+</div>
 <div class="panel-btn-row">
     <button type="button" id="logbookToggleBtn" class="settings-toggle-btn" onclick="toggleLogbookPanel()">📋 View Pilot Logbook</button>
     <button type="button" class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Settings & Database Tools</button>
@@ -1771,6 +1951,11 @@
             <button type="button" class="theme-btn" onclick="setMode('dark')">🌙 Dark Mode</button>
             <button type="button" class="theme-btn" onclick="setMode('greyscale')">⬛ Greyscale Mode</button>
         </div>
+        <div class="prefer-owned-row contracts-board-toggle-row">
+            <input type="checkbox" id="contractsBoardToggle" onchange="setContractsBoardPreview(this.checked)">
+            <label for="contractsBoardToggle" class="accent-checkbox-label">Contracts Board preview (Phase 0 — visual only)</label>
+        </div>
+        <p class="note-text" style="margin-top: 6px;">When enabled, the page widens (max 1920px) and shows three sample flight tickets. Dispatch, routing, and Generate Flight are unchanged. Off = classic layout.</p>
         <hr class="config-separator">
         <details class="settings-section">
             <summary>⭐ Owned Airports Filter</summary>
