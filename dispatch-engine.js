@@ -1519,8 +1519,7 @@ function loadSettings() {
     if (savedCallsign) {
         document.getElementById("callsignInput").value = savedCallsign;
     }
-    const storedTheme = localStorage.getItem("dispatcher_theme");
-    if (storedTheme) setMode(storedTheme);
+    setMode("dark");
     // --- New Load Logic ---
     const ownedList = localStorage.getItem("dispatcher_owned_airports");
     if (ownedList) {
@@ -1532,64 +1531,313 @@ function loadSettings() {
     initRoutingScope();
     loadLongHaulPreference();
     syncContractorMilitaryOptions();
-    syncContractsBoardPreviewFromStorage();
 }
 
-/** Phase 0 visual mock only — does not alter dispatch or routing. Default OFF. */
-function isContractsBoardPreviewEnabled() {
-    try {
-        return localStorage.getItem("dispatcher_contracts_board") === "true";
-    } catch (e) {
-        return false;
+const BOARD_TICKET_KICKERS = [
+    "EXECUTIVE SHUTTLE",
+    "VIP CHARTER",
+    "NETWORK EFFICIENCY"
+];
+
+let boardContractResults = [];
+let boardSelectedIndex = -1;
+let boardPlnObjectUrls = [];
+
+function boardNavGo(target) {
+    document.querySelectorAll(".board-nav-btn").forEach((btn) => {
+        btn.classList.toggle("is-active", btn.getAttribute("data-nav") === target);
+    });
+    const settings = document.getElementById("settingsPanel");
+    const logbook = document.getElementById("logbookPanel");
+    if (target === "settings") {
+        if (settings) settings.style.display = "block";
+        if (logbook) logbook.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        if (settings) settings.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
     }
+    if (settings) settings.style.display = "none";
+    if (target === "logbook") {
+        updateLogbookUI();
+        if (logbook) logbook.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+    }
+    const form = document.querySelector(".dispatch-control-group");
+    if (form) form.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function setContractsBoardPreview(enabled) {
-    const on = !!enabled;
-    try {
-        localStorage.setItem("dispatcher_contracts_board", on ? "true" : "false");
-    } catch (e) { /* ignore quota / private mode */ }
-    applyContractsBoardPreview(on);
+function computePrestigePoints(distanceNm, spec, fromContractsBoard) {
+    const dist = Math.max(0, Number(distanceNm) || 0);
+    let mult = 1.0;
+    const cls = spec && spec.class;
+    if (cls === "JET") mult = 1.5;
+    else if (cls === "TURBO" || cls === "BIZ JET") mult = 1.2;
+    const contractBonus = fromContractsBoard ? 0.10 : 0;
+    return Math.max(1, Math.round(dist * mult * (1 + contractBonus)));
 }
 
-function syncContractsBoardPreviewFromStorage() {
-    const on = isContractsBoardPreviewEnabled();
-    const toggle = document.getElementById("contractsBoardToggle");
-    if (toggle) toggle.checked = on;
-    applyContractsBoardPreview(on);
+function formatBoardBlockDuration(result) {
+    const mins = (result.spec.class === "HELI" || result.spec.class === "GLIDER")
+        ? 20
+        : (result.longHaul
+            ? estimateLongHaulBlockMinutes(result.distanceNm, result.spec, result.type)
+            : result.targetMins);
+    if (mins >= 60) {
+        const h = Math.floor(mins / 60);
+        const m = mins % 60;
+        return m ? `${h}h ${m}m` : `${h}h`;
+    }
+    return `${mins} min`;
 }
 
-function applyContractsBoardPreview(on) {
-    document.documentElement.classList.toggle("contracts-board-on", !!on);
-    const panel = document.getElementById("contractsBoardPanel");
-    if (panel) {
-        if (on) {
-            panel.removeAttribute("hidden");
-            panel.style.display = "";
+function formatBoardPayloadLine(result) {
+    if (missionRequiresPassengers(result.chosenMission, result.spec)) {
+        const cargoBit = result.cargoKg > 0 ? ` · ${result.cargoKg} kg cargo` : "";
+        return `${formatPassengerManifest(result.pax)}${cargoBit}`;
+    }
+    return `${result.cargoKg} kg cargo`;
+}
+
+function revokeBoardPlnUrls() {
+    boardPlnObjectUrls.forEach((url) => {
+        try { URL.revokeObjectURL(url); } catch (e) { /* ignore */ }
+    });
+    boardPlnObjectUrls = [];
+}
+
+function buildDispatchExportBundle(result) {
+    const {
+        spec, type, chosenMission, origin, destination, distanceNm, longHaul, targetMins,
+        callsignRaw, isLocalFlight, altFeet, pax, cargoKg, imageId
+    } = result;
+    const depDisplayName = stripIrlNameSuffix(origin.name);
+    const destDisplayName = stripIrlNameSuffix(destination.name);
+    const cargoParam = (cargoKg / 1000).toFixed(3);
+    const manualZfw = getSimBriefZfwTonnes(spec, pax, cargoKg);
+    const isGlider = spec.class === "GLIDER";
+    const dispatchType = (spec.simbriefIcao || type || "").toUpperCase();
+
+    let flightCounter = parseInt(localStorage.getItem("dispatcher_flt_num"), 10) || 1;
+    const paddedFltNum = String(flightCounter).padStart(3, "0");
+    const nextFlightCounter = flightCounter >= 999 ? 1 : flightCounter + 1;
+    localStorage.setItem("dispatcher_flt_num", String(nextFlightCounter));
+
+    const airlineMatch = callsignRaw.match(/^[A-Z]+/);
+    const dynamicAirline = airlineMatch ? airlineMatch[0].substring(0, 3) : "VEC";
+    const simbriefAlt = (altFeet / 100).toString().padStart(3, "0");
+    const simbriefUrl = `https://www.simbrief.com/system/dispatch.php?share=1&type=${dispatchType}&orig=${origin.icao}&dest=${destination.icao}&airline=${dynamicAirline}&fltnum=${paddedFltNum}&callsign=${callsignRaw}&fl=${simbriefAlt}&pax=${pax}&cargo=${cargoParam}&manualzfw=${manualZfw}&units=KGS`;
+
+    const isWarbird = spec.class === "WARBIRD" || spec.name.toLowerCase().includes("flying iron") || spec.name.toLowerCase().includes("warbird");
+    const isSimbriefSupported = ["GA", "TURBO", "BIZ JET", "JET"].includes(spec.class) && !isWarbird;
+    let heliMessage = "";
+    if (!isSimbriefSupported) {
+        heliMessage = (isGlider || spec.class === "HELI")
+            ? "SimBrief is not available for this aircraft. Use the MSFS .pln download."
+            : "SimBrief is not available for this aircraft type.";
+    }
+
+    const depElevStr = origin.elev || 0;
+    const arrElevStr = destination.elev || 0;
+    const depLLA = getMSFSLLA(origin.lat, origin.lon, depElevStr);
+    const destLLA = getMSFSLLA(destination.lat, destination.lon, arrElevStr);
+    const isIfr = (chosenMission.type === 5 || altFeet >= 10000);
+    const localWptLLA = isLocalFlight ? getMSFSLLA(origin.lat + 0.2, origin.lon, altFeet) : "";
+    const xmlString = generatePlnXml({
+        originIcao: origin.icao,
+        destIcao: destination.icao,
+        originName: depDisplayName.replace(/&/g, "&amp;"),
+        destName: destDisplayName.replace(/&/g, "&amp;"),
+        depLLA,
+        destLLA,
+        localWptLLA,
+        isIfr,
+        altValue: altFeet.toString()
+    });
+    const blob = new Blob([xmlString], { type: "text/xml" });
+    const plnUrl = URL.createObjectURL(blob);
+    boardPlnObjectUrls.push(plnUrl);
+
+    const durationMins = (spec.class === "HELI" || spec.class === "GLIDER")
+        ? 20
+        : (longHaul ? estimateLongHaulBlockMinutes(distanceNm, spec, type) : targetMins);
+
+    const prestigePoints = computePrestigePoints(distanceNm, spec, true);
+
+    return {
+        simbriefUrl,
+        isSimbriefSupported,
+        heliMessage,
+        plnUrl,
+        plnFilename: `${origin.icao}_to_${destination.icao}.pln`,
+        prestigePoints,
+        pendingFlight: {
+            orig: origin.icao,
+            dest: destination.icao,
+            aircraft: spec.name,
+            mission: chosenMission.name,
+            durationMins,
+            payout: result.payout,
+            prestigePoints
+        },
+        imageUrl: imageId != null ? missionImageUrl(`mission${imageId}.jpg`) : ""
+    };
+}
+
+function getDispatchUiProbeConfig() {
+    return {
+        aircraftType: resolveAircraftTypeFromInput(document.getElementById("aircraftInput").value.trim()),
+        targetMins: parseInt(document.getElementById("timeSlider").value, 10),
+        callsign: document.getElementById("callsignInput").value,
+        depOverride: document.getElementById("depOverrideInput").value,
+        isContractorMode: document.getElementById("contractorToggle").checked,
+        militaryBasesToggle: document.getElementById("militaryBaseToggle").checked,
+        preferOwned: document.getElementById("preferOwnedToggle").checked,
+        longHaulRequested: isLongHaulModeEnabled(),
+        routingScope: getRoutingScope(),
+        mutateHistory: true
+    };
+}
+
+function fillContractTicketCard(card, result, index, bundle) {
+    const kicker = BOARD_TICKET_KICKERS[index] || "CONTRACT";
+    const photo = card.querySelector('[data-role="photo"]');
+    const setText = (role, text) => {
+        const el = card.querySelector(`[data-role="${role}"]`);
+        if (el) el.textContent = text;
+    };
+    setText("kicker", kicker);
+    setText("title", result.chosenMission.name || "Assignment");
+    setText("route", `${result.origin.icao} → ${result.destination.icao}`);
+    setText("airports", `${stripIrlNameSuffix(result.origin.name)} · ${stripIrlNameSuffix(result.destination.name)}`);
+    setText("meta",
+        `Aircraft: ${result.spec.name}\nDuration: ${formatBoardBlockDuration(result)}\nPayload: ${formatBoardPayloadLine(result)}`
+    );
+    const metaEl = card.querySelector('[data-role="meta"]');
+    if (metaEl) {
+        metaEl.innerHTML =
+            `<strong>Aircraft:</strong> ${result.spec.name}<br>`
+            + `<strong>Duration:</strong> ${formatBoardBlockDuration(result)}<br>`
+            + `<strong>Payload:</strong> ${formatBoardPayloadLine(result)}`;
+    }
+    setText("value", `Est. Value: ${result.payout} | +${bundle.prestigePoints} Prestige Points`);
+
+    if (photo) {
+        if (bundle.imageUrl) {
+            photo.style.backgroundImage = `url("${bundle.imageUrl}")`;
         } else {
-            panel.setAttribute("hidden", "");
-            panel.style.display = "none";
+            photo.style.backgroundImage = "";
+        }
+    }
+
+    const acceptBtn = card.querySelector('[data-role="accept"]');
+    if (acceptBtn) {
+        acceptBtn.disabled = false;
+        acceptBtn.textContent = "Accept Contract";
+    }
+    const detailsBtn = card.querySelector('[data-role="details"]');
+    if (detailsBtn) detailsBtn.disabled = false;
+
+    const simbrief = card.querySelector('[data-role="simbrief"]');
+    const pln = card.querySelector('[data-role="pln"]');
+    const heli = card.querySelector('[data-role="heli"]');
+    if (simbrief) {
+        simbrief.href = bundle.simbriefUrl;
+        simbrief.style.display = bundle.isSimbriefSupported ? "inline-flex" : "none";
+    }
+    if (pln) {
+        pln.href = bundle.plnUrl;
+        pln.download = bundle.plnFilename;
+        pln.style.display = "inline-flex";
+    }
+    if (heli) {
+        if (bundle.heliMessage) {
+            heli.style.display = "block";
+            heli.textContent = bundle.heliMessage;
+        } else {
+            heli.style.display = "none";
+            heli.textContent = "";
         }
     }
 }
 
-function onContractTicketAcceptPreview(ticketIndex) {
-    alert(
-        "Contracts Board preview (Phase 0).\n\n"
-        + "Ticket " + ticketIndex + " is a visual placeholder only.\n"
-        + "Use GENERATE FLIGHT for a real dispatch — Accept will be wired in a later phase."
-    );
+function renderContractsBoard(results) {
+    const cards = document.querySelectorAll("#contractsTicketGrid .contract-ticket");
+    const note = document.getElementById("contractsBoardNote");
+    boardSelectedIndex = -1;
+    cards.forEach((card, i) => {
+        card.classList.remove("is-selected", "is-dimmed");
+        const result = results[i];
+        if (!result) return;
+        const bundle = result._exportBundle;
+        fillContractTicketCard(card, result, i, bundle);
+    });
+    if (note) {
+        note.textContent = "Three contracts ready. View Details for a summary; Accept unlocks SimBrief / .pln on that ticket. Other tickets stay available at reduced opacity.";
+    }
 }
+
+function viewContractTicketDetails(index) {
+    const result = boardContractResults[index];
+    if (!result) {
+        alert("Generate three contracts first.");
+        return;
+    }
+    const pp = result._exportBundle ? result._exportBundle.prestigePoints : computePrestigePoints(result.distanceNm, result.spec, true);
+    const lines = [
+        (BOARD_TICKET_KICKERS[index] || "CONTRACT") + " — " + (result.chosenMission.name || "Assignment"),
+        "",
+        "Route: " + result.origin.icao + " → " + result.destination.icao,
+        stripIrlNameSuffix(result.origin.name) + " → " + stripIrlNameSuffix(result.destination.name),
+        "Aircraft: " + result.spec.name,
+        "Duration: " + formatBoardBlockDuration(result),
+        "Payload: " + formatBoardPayloadLine(result),
+        "Est. Value: " + result.payout + " | +" + pp + " Prestige Points",
+        "",
+        "Accept this ticket to unlock SimBrief / MSFS .pln on the card."
+    ];
+    alert(lines.join("\n"));
+}
+
+function acceptContractTicket(index) {
+    const result = boardContractResults[index];
+    if (!result || !result._exportBundle) {
+        alert("Generate three contracts first.");
+        return;
+    }
+    boardSelectedIndex = index;
+    const cards = document.querySelectorAll("#contractsTicketGrid .contract-ticket");
+    cards.forEach((card, i) => {
+        const selected = i === index;
+        card.classList.toggle("is-selected", selected);
+        card.classList.toggle("is-dimmed", !selected);
+        const acceptBtn = card.querySelector('[data-role="accept"]');
+        if (acceptBtn) acceptBtn.textContent = selected ? "Selected" : "Accept Contract";
+    });
+
+    const bundle = result._exportBundle;
+    currentPendingFlight = { ...bundle.pendingFlight };
+    persistLastDispatch(currentPendingFlight);
+
+    // Keep hidden classic targets in sync for restore / add-last-flight helpers
+    const linkEl = document.getElementById("outLink");
+    if (linkEl) {
+        linkEl.href = bundle.simbriefUrl;
+        linkEl.style.display = bundle.isSimbriefSupported ? "inline-flex" : "none";
+    }
+    const downloadBtn = document.getElementById("downloadPlnBtn");
+    if (downloadBtn) {
+        downloadBtn.href = bundle.plnUrl;
+        downloadBtn.download = bundle.plnFilename;
+        downloadBtn.style.display = "inline-flex";
+    }
+    const logBtn = document.getElementById("logFlightBtn");
+    if (logBtn) logBtn.style.display = "inline-flex";
+}
+
 function toggleSettingsPanel() {
-    const p = document.getElementById("settingsPanel");
-    p.style.display = (p.style.display === "block") ? "none" : "block";
-    document.getElementById("logbookPanel").style.display = "none";
+    boardNavGo("settings");
 }
 function toggleLogbookPanel() {
-    const lb = document.getElementById("logbookPanel");
-    lb.style.display = (lb.style.display === "block") ? "none" : "block";
-    document.getElementById("settingsPanel").style.display = "none";
-    if (lb.style.display === "block") updateLogbookUI();
+    boardNavGo("logbook");
 }
 function toggleDropdown(id) {
     const el = document.getElementById(id);
@@ -1748,16 +1996,10 @@ function updateThemeBanner() {
     if (img.getAttribute("src") !== url) img.src = url;
 }
 function setMode(mode) {
+    // v3 board layout is dark-only
     document.body.classList.remove('light-mode', 'greyscale-mode');
     document.documentElement.classList.remove('light-mode', 'greyscale-mode');
-    if (mode === 'light') {
-        document.body.classList.add('light-mode');
-        document.documentElement.classList.add('light-mode');
-    } else if (mode === 'greyscale') {
-        document.body.classList.add('greyscale-mode');
-        document.documentElement.classList.add('greyscale-mode');
-    }
-    localStorage.setItem("dispatcher_theme", mode === 'light' ? 'light' : mode === 'greyscale' ? 'greyscale' : 'dark');
+    localStorage.setItem("dispatcher_theme", "dark");
     updateThemeBanner();
 }
 function getMissionCatalogCounts() {
@@ -4386,261 +4628,43 @@ function showDispatchNotams(warnings) {
 
 // START OF DISPATCH FLIGHT FUNCTION
 function dispatchFlight() {
-    const aircraftType = resolveAircraftTypeFromInput(document.getElementById("aircraftInput").value.trim());
-    const result = probeDispatchFlight({
-        aircraftType,
-        targetMins: parseInt(document.getElementById("timeSlider").value, 10),
-        callsign: document.getElementById("callsignInput").value,
-        depOverride: document.getElementById("depOverrideInput").value,
-        isContractorMode: document.getElementById("contractorToggle").checked,
-        militaryBasesToggle: document.getElementById("militaryBaseToggle").checked,
-        preferOwned: document.getElementById("preferOwnedToggle").checked,
-        longHaulRequested: isLongHaulModeEnabled(),
-        routingScope: getRoutingScope(),
-        mutateHistory: true
-    });
-    if (!result.ok) {
-        if (result.message) alert(result.message);
+    const cfg = getDispatchUiProbeConfig();
+    if (!cfg.aircraftType) {
+        alert("Please select an aircraft type before generating contracts.");
         return;
     }
-    if (result.warnings && result.warnings.length) {
-        showDispatchNotams(result.warnings);
-    }
-    let {
-        spec, type, chosenMission, origin, destination, distanceNm, longHaul, targetMins,
-        callsignRaw, isLocalFlight, isEasterly, altFeet, pax, cargoKg, payout,
-        rPayload, rInstruction, scenarioImgId, imageId, mtowReducedForAirport, blockMinutes, hardCargoLimit
-    } = result;
-    const depDisplayName = stripIrlNameSuffix(origin.name);
-    const destDisplayName = stripIrlNameSuffix(destination.name);
-    let randomName = names[Math.floor(Math.random() * names.length)];
-    let randomAthlete = athletes[Math.floor(Math.random() * athletes.length)];
-    let randomTeam = teams[Math.floor(Math.random() * teams.length)];
-    let randomMusician = musician[Math.floor(Math.random() * musician.length)];
-    let randomMedCargo = typeof medCargo !== 'undefined' ? medCargo[Math.floor(Math.random() * medCargo.length)] : "medical supplies";
-    let randomIndustry = typeof industry !== 'undefined' ? industry[Math.floor(Math.random() * industry.length)] : "corporate";
-    let randomVip = typeof vipType !== 'undefined' ? vipType[Math.floor(Math.random() * vipType.length)] : "VIP";
-    let randomSciFi = typeof sciFi !== 'undefined' ? sciFi[Math.floor(Math.random() * sciFi.length)] : "surface anomaly";
-    let randomCargo = typeof cargoType !== 'undefined' ? cargoType[Math.floor(Math.random() * cargoType.length)] : "specialized cargo";
-
-    let rawDesc = chosenMission.desc ? chosenMission.desc : (chosenMission.pool ? rPayload : chosenMission.name);
-    let rawDetail = chosenMission.detail ? chosenMission.detail : rInstruction;
-
-    let processedDetail = rawDetail
-        .replace("{name}", randomName)
-        .replace("{athlete}", randomAthlete)
-        .replace("{team}", randomTeam)
-        .replace("{musician}", randomMusician)
-        .replace("{med_cargo}", randomMedCargo)
-        .replace("{industry}", randomIndustry)
-        .replace("{vip_type}", randomVip)
-        .replace("{sci_fi}", randomSciFi)
-        .replace("{cargo_type}", randomCargo)
-        .replace("{dep_field}", depDisplayName)
-        .replace("{dest_field}", destDisplayName);
-
-    let processedPayload = rawDesc
-        .replace("{name}", randomName)
-        .replace("{athlete}", randomAthlete)
-        .replace("{team}", randomTeam)
-        .replace("{musician}", randomMusician)
-        .replace("{med_cargo}", randomMedCargo)
-        .replace("{industry}", randomIndustry)
-        .replace("{vip_type}", randomVip)
-        .replace("{sci_fi}", randomSciFi)
-        .replace("{cargo_type}", randomCargo)
-        .replace("{dep_field}", depDisplayName)
-        .replace("{dest_field}", destDisplayName);
-
-    // --- PHASE 7: JOB TICKET GENERATION ---
-    let jobTicket = "";
-    const ticketRow = (html) => `<div class="ticket-row">${html}</div>`;
-    const ticketRoutingLine = chosenMission.militaryOnly
-        ? ticketRow(`<strong>ROUTING:</strong> <strong>${origin.icao}</strong> ➔ <strong>${destination.icao}</strong>`)
-        : ticketRow(`<strong>Routing:</strong> <strong>${origin.icao}</strong> ➔ <strong>${destination.icao}</strong>`);
-    const additionalPayloadKg = pax > 0 ? cargoKg : 0;
-    const cargoPayloadLine = additionalPayloadKg > 0
-        ? (chosenMission.militaryOnly
-            ? `<strong>ADDITIONAL PAYLOAD:</strong> ${additionalPayloadKg} KG`
-            : `<strong>Additional Payload:</strong> ${additionalPayloadKg} kg`)
-        : "";
-    const optionalCargoPayloadRow = cargoPayloadLine ? ticketRow(cargoPayloadLine) : "";
-    
-    if (chosenMission.militaryOnly) {
-        let manifestText = missionRequiresPassengers(chosenMission, spec) ? `${pax} PERS` : `${cargoKg} KG MATERIEL`;
-        let routingText = isLocalFlight 
-            ? `Execute local operations originating from ${origin.icao} and return to base.`
-            : `Execute routing from ${origin.icao} to ${destination.icao} strictly as filed.`;
-        const taskingLabel = (scenarioImgId && processedPayload && processedPayload !== chosenMission.name)
-            ? processedPayload
-            : chosenMission.name;
-        jobTicket = `
-            <div class="ticket-lined-rows">
-            ${ticketRow(`<strong>TASKING:</strong> ${taskingLabel.toUpperCase()}`)}
-            ${ticketRoutingLine}
-            ${ticketRow(`<strong>CLASSIFICATION:</strong> TACTICAL SORTIE (ATO# ${Math.floor(Math.random() * 9000) + 1000})`)}
-            ${ticketRow(`<strong>MANIFEST:</strong> ${manifestText}`)}
-            ${optionalCargoPayloadRow}
-            </div>
-            <div class="ticket-mission-text"><strong>SPECIAL INSTRUCTIONS:</strong> You are tasked with ${processedPayload}. ${processedDetail} Maintain sterile comms outside of ATC requirements. ${routingText} Check threat and weather scopes prior to engine start. Dismissed.</div>`;
-    } else {
-        let manifestText = missionRequiresPassengers(chosenMission, spec) ? formatPassengerManifest(pax) : `${cargoKg} kg Cargo`;
-        let payloadNote = `You are tasked with ${processedPayload}. `;
-        const lowiDepartureNote = (origin.icao === "LOWI" && isLowiNarrowbodyJetliner(type, spec))
-            ? " Innsbruck departure: payload and fuel are restricted for the 6,562 ft runway - plan for a short or medium-haul European sector."
-            : "";
-
-        const useVfrTicket = spec.class === "GLIDER" || spec.class === "HELI"
-            || (chosenMission.rules && chosenMission.rules.includes("VFR"))
-            || (altFeet < 10000 && !chosenMission.rules);
-
-        if (useVfrTicket) {
-            if (isLocalFlight) {
-                jobTicket = `
-                    <div class="ticket-lined-rows">
-                    ${ticketRow(`<strong>Assignment:</strong> <strong>${chosenMission.name}</strong>`)}
-                    ${ticketRoutingLine}
-                    ${ticketRow(`<strong>Manifest:</strong> ${manifestText}`)}
-                    ${optionalCargoPayloadRow}
-                    ${ticketRow(`<strong>Contract Value:</strong> ${payout}`)}
-                    </div>
-                    <div class="ticket-mission-text"><strong>Dispatcher Notes:</strong> Good day, Captain. This is a local operations flight operating out of ${depDisplayName}. ${payloadNote}${processedDetail}${lowiDepartureNote}<br><br>Conditions should be in your favor but always check the ATIS report before leaving. Keep your eyes outside the cockpit, maintain appropriate altitude over populated areas, and return to base when the block time is up.</div>`;
-            } else {
-                jobTicket = `
-                    <div class="ticket-lined-rows">
-                    ${ticketRow(`<strong>Assignment:</strong> <strong>${chosenMission.name}</strong>`)}
-                    ${ticketRoutingLine}
-                    ${ticketRow(`<strong>Manifest:</strong> ${manifestText}`)}
-                    ${optionalCargoPayloadRow}
-                    ${ticketRow(`<strong>Contract Value:</strong> ${payout}`)}
-                    </div>
-                    <div class="ticket-mission-text"><strong>Dispatcher Notes:</strong> Good day, Captain. You are cleared for transit from ${depDisplayName} toward ${destDisplayName}. ${payloadNote}${processedDetail}${lowiDepartureNote}<br><br>Conditions should be in your favor but always check the ATIS report before leaving. Maintain appropriate cruising altitudes and keep clear of weather decks.</div>`;
-            }
-        } else {
-            jobTicket = `
-                <div class="ticket-lined-rows">
-                ${ticketRow(`<strong>Assignment:</strong> <strong>${chosenMission.name}</strong>`)}
-                ${ticketRoutingLine}
-                ${ticketRow(`<strong>Manifest:</strong> ${manifestText}`)}
-                ${optionalCargoPayloadRow}
-                ${ticketRow(`<strong>Contract Value:</strong> ${payout}`)}
-                </div>
-                <div class="ticket-mission-text"><strong>Dispatcher Notes:</strong> Welcome to the flight deck, Captain. You are cleared for transit from ${depDisplayName} toward ${destDisplayName}. ${payloadNote}${processedDetail}${lowiDepartureNote} Maintain your assigned cruise altitude and keep clear of weather decks. Safe flight.</div>`;
+    revokeBoardPlnUrls();
+    boardContractResults = [];
+    boardSelectedIndex = -1;
+    const results = [];
+    const allWarnings = [];
+    let lastError = "";
+    // Up to 9 probe attempts to collect 3 successful contracts
+    for (let attempt = 0; attempt < 9 && results.length < 3; attempt++) {
+        const result = probeDispatchFlight(cfg);
+        if (!result.ok) {
+            lastError = result.message || "Dispatch failed.";
+            continue;
         }
+        if (result.warnings && result.warnings.length) {
+            result.warnings.forEach((w) => {
+                if (allWarnings.indexOf(w) === -1) allWarnings.push(w);
+            });
+        }
+        result._exportBundle = buildDispatchExportBundle(result);
+        results.push(result);
     }
-
-    // --- PHASE 8: OUTPUT FORMATTING ---
-    document.getElementById("outCallsign").innerText = callsignRaw;
-    document.getElementById("outAirframe").innerText = spec.name;
-    // outRules is safely ignored
-    const ownedSet = new Set(getOwnedAirportList());
-    document.getElementById("outOrig").innerHTML = formatRoutingAirportLabel(origin.icao, origin.name, ownedSet);
-    document.getElementById("outDest").innerHTML = formatRoutingAirportLabel(destination.icao, destination.name, ownedSet);
-    
-    // Clean, standard Altitude Formatting
-    let displayAlt = "";
-    if (altFeet >= 10000) {
-        displayAlt = "FL" + (altFeet / 100).toString();
-    } else {
-        displayAlt = altFeet.toLocaleString('en-US') + " ft";
+    if (results.length < 3) {
+        alert(lastError || "Could not generate three contracts with the current settings. Try adjusting aircraft, flight time, or departure.");
+        return;
     }
-    document.getElementById("outAlt").innerText = displayAlt;
-    
-    document.getElementById("outScenery").innerHTML = `<strong>DEP:</strong> ${formatScenery(origin)}<br><strong>ARR:</strong> ${formatScenery(destination)}`;
-    
-    const missionImgEl = document.getElementById("outMissionImage");
-    missionImgEl.onerror = function () {
-        missionImgEl.style.display = "none";
-    };
-    missionImgEl.src = missionImageUrl(`mission${imageId}.jpg`);
-    missionImgEl.style.display = "block";
-    
-    document.getElementById("outTicket").innerHTML = jobTicket;
-    const ticketWrapEl = document.getElementById("outTicketWrap");
-    if (chosenMission.militaryOnly) {
-        ticketWrapEl.classList.add("ticket-note-military");
-        ticketWrapEl.classList.remove("ticket-note");
-    } else {
-        ticketWrapEl.classList.add("ticket-note");
-        ticketWrapEl.classList.remove("ticket-note-military");
-    }
-    
-    const cargoParam = (cargoKg / 1000).toFixed(3);
-    const manualZfw = getSimBriefZfwTonnes(spec, pax, cargoKg);
-    const isGlider = spec.class === "GLIDER";
-    const dispatchType = (spec.simbriefIcao || type || aircraftType || "").toUpperCase();
-    
-    let flightCounter = parseInt(localStorage.getItem("dispatcher_flt_num")) || 1;
-    let paddedFltNum = String(flightCounter).padStart(3, '0');
-    let nextFlightCounter = flightCounter >= 999 ? 1 : flightCounter + 1;
-    localStorage.setItem("dispatcher_flt_num", nextFlightCounter.toString());
-    
-    const airlineMatch = callsignRaw.match(/^[A-Z]+/);
-    const dynamicAirline = airlineMatch ? airlineMatch[0].substring(0, 3) : "VEC"; 
-
-    // Simbrief wants FL e.g. "080" for 8000ft, or "320" for FL320. 
-    const simbriefAlt = (altFeet / 100).toString().padStart(3, '0');
-    
-    const simbriefUrl = `https://www.simbrief.com/system/dispatch.php?share=1&type=${dispatchType}&orig=${origin.icao}&dest=${destination.icao}&airline=${dynamicAirline}&fltnum=${paddedFltNum}&callsign=${callsignRaw}&fl=${simbriefAlt}&pax=${pax}&cargo=${cargoParam}&manualzfw=${manualZfw}&units=KGS`;
-    const linkEl = document.getElementById("outLink");
-    linkEl.href = simbriefUrl;
-    
-    const isWarbird = spec.class === "WARBIRD" || spec.name.toLowerCase().includes("flying iron") || spec.name.toLowerCase().includes("warbird");
-    const isSimbriefSupported = ["GA", "TURBO", "BIZ JET", "JET"].includes(spec.class) && !isWarbird;
-    const heliMessageEl = document.getElementById("heliMessage");
-    
-    if (!isSimbriefSupported) {
-        heliMessageEl.style.display = "block";
-        heliMessageEl.textContent = (isGlider || spec.class === "HELI")
-            ? "SimBrief dispatch is not available for this aircraft type. Click below to download an MSFS .pln file that you can use to follow your progress via the map on the EFB."
-            : "SimBrief dispatch is not available for this aircraft type.";
-        document.getElementById("outLink").style.display = "none";
-    } else {
-        heliMessageEl.style.display = "none";
-        document.getElementById("outLink").style.display = "inline-flex";
-    }
-    
-    const depElevStr = origin.elev || 0;
-    const arrElevStr = destination.elev || 0;
-    const depLLA = getMSFSLLA(origin.lat, origin.lon, depElevStr);
-    const destLLA = getMSFSLLA(destination.lat, destination.lon, arrElevStr);
-    
-    // Secretly enforce IFR for MSFS ATC logic if high-altitude
-    const isIfr = (chosenMission.type === 5 || altFeet >= 10000); 
-    const localWptLLA = isLocalFlight ? getMSFSLLA(origin.lat + 0.2, origin.lon, altFeet) : "";
-    
-    const xmlString = generatePlnXml({
-        originIcao: origin.icao,
-        destIcao: destination.icao,
-        originName: depDisplayName.replace(/&/g, '&amp;'), 
-        destName: destDisplayName.replace(/&/g, '&amp;'),
-        depLLA: depLLA,
-        destLLA: destLLA,
-        localWptLLA: localWptLLA,
-        isIfr: isIfr,
-        altValue: altFeet.toString() // MSFS requires raw feet 
-    });
-    
-    const blob = new Blob([xmlString], { type: "text/xml" });
-    const url = URL.createObjectURL(blob);
-    const downloadBtn = document.getElementById("downloadPlnBtn");
-    downloadBtn.href = url;
-    downloadBtn.download = `${origin.icao}_to_${destination.icao}.pln`;
-    downloadBtn.style.display = "inline-flex";
-    
-    currentPendingFlight = {
-        orig: origin.icao,
-        dest: destination.icao,
-        aircraft: spec.name,
-        mission: chosenMission.name,
-        durationMins: (spec.class === "HELI" || spec.class === "GLIDER") ? 20
-            : (longHaul ? estimateLongHaulBlockMinutes(distanceNm, spec, type) : targetMins)
-    };
-    persistLastDispatch(currentPendingFlight);
-    
-    document.getElementById("logFlightBtn").style.display = "inline-flex";
-    document.getElementById("dispatchRelease").style.display = "block";
+    if (allWarnings.length) showDispatchNotams(allWarnings.slice(0, 3));
+    boardContractResults = results;
+    renderContractsBoard(results);
+    const board = document.getElementById("contractsBoardPanel");
+    if (board) board.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
+
 // END OF DISPATCH FLIGHT FUNCTION
 
 function convertToDMS(deg, isLat) {

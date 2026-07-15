@@ -42,6 +42,20 @@
             --spacing-inner: 15px;                       /* panel padding; settings section gaps */
             --spacing-hint-bottom: 10px;           /* gap below hint-block / note blocks */
             --spacing-section-title-bottom: 6px;  /* gap below h3 / form section titles */
+
+            /* ---- v3 board tokens (Gemini + UI greyscale ticket look) ---- */
+            --board-bg-page: #0f1012;
+            --board-bg-sidebar: #15171a;
+            --board-bg-panel: #1b1d21;
+            --board-bg-ticket: #eceef1;
+            --board-ticket-text: #16181c;
+            --board-ticket-muted: #5c636a;
+            --board-text-primary: #e9ecef;
+            --board-text-muted: #868e96;
+            --board-border: #2d3139;
+            --board-accent: #ff9f00;
+            --board-btn-solid: #ff9f00;
+            --board-btn-ghost: transparent;
 			
            	/* ------------------------------- DARK MODE -------------------------------- */
             color-scheme: dark;
@@ -306,27 +320,98 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-page);
-            color: var(--text-primary);
-            padding: 20px;
-            max-width: 900px; /* classic layout — unchanged when Contracts Board is off */
+            background-color: var(--board-bg-page);
+            color: var(--board-text-primary);
+            padding: 0;
+            max-width: 1920px;
             width: 100%;
             margin: 0 auto;
             box-sizing: border-box;
             color-scheme: dark;
         }
-        /* Hard cap: never wider than 1920px (1080p desktop target) */
-        html.contracts-board-on body {
-            max-width: min(1920px, 100%);
+        .app-shell {
+            display: flex;
+            align-items: stretch;
+            min-height: 100vh;
+            max-width: 1920px;
+            margin: 0 auto;
+            background: var(--board-bg-page);
+        }
+        .board-nav {
+            width: 196px;
+            flex-shrink: 0;
+            background: var(--board-bg-sidebar);
+            border-right: 1px solid var(--board-border);
+            padding: 20px 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .board-nav-brand {
+            color: var(--board-text-primary);
+            font-weight: bold;
+            font-size: 13px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin: 0 0 18px;
+            padding: 0 18px;
+        }
+        .board-nav-btn {
+            width: 100%;
+            text-align: left;
+            background: transparent !important;
+            color: var(--board-text-muted) !important;
+            border: none !important;
+            border-radius: 0;
+            border-left: 3px solid transparent !important;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .board-nav-btn:hover {
+            background: rgba(255, 159, 0, 0.04) !important;
+            color: var(--board-text-primary) !important;
+        }
+        .board-nav-btn.is-active {
+            background: rgba(255, 159, 0, 0.04) !important;
+            color: var(--board-text-primary) !important;
+            border-left-color: var(--board-accent) !important;
+        }
+        .board-nav-spacer { flex: 1; }
+        .board-main {
+            flex: 1;
+            min-width: 0;
+            padding: 20px 24px 28px;
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
         .container {
-            background-color: var(--bg-container);
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: var(--shadow-container);
-            margin-bottom: 20px;
+            background-color: transparent;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            margin-bottom: 0;
             max-width: 100%;
             box-sizing: border-box;
+        }
+        @media (max-width: 900px) {
+            .app-shell { flex-direction: column; }
+            .board-nav {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 8px;
+                border-right: none;
+                border-bottom: 1px solid var(--board-border);
+                padding: 12px 14px;
+            }
+            .board-nav-brand { margin: 0 12px 0 0; padding: 0; }
+            .board-nav-spacer { display: none; }
+            .board-nav-btn { width: auto; border-left: none !important; border-bottom: 2px solid transparent !important; }
+            .board-nav-btn.is-active { border-bottom-color: var(--board-accent) !important; }
         }
         .control-group, .settings-group {
             margin-bottom: 20px;
@@ -1477,17 +1562,14 @@
         .prefer-owned-row.military-airbase-row {
             margin-top: 10px;
         }
-        /* ---- Phase 0: Contracts Board visual mock (opt-in only) ---- */
+        /* ---- Contracts Board (greyscale-paper tickets on dark chrome) ---- */
         #contractsBoardPanel {
-            display: none;
-            margin: 16px 0 8px;
-            padding: var(--spacing-inner);
-            background: var(--bg-section);
-            border: var(--border-width) solid var(--border-color);
-            border-radius: 4px;
-        }
-        html.contracts-board-on #contractsBoardPanel {
             display: block;
+            margin: 16px 0 20px;
+            padding: 16px;
+            background: var(--board-bg-panel);
+            border: 1px solid var(--board-border);
+            border-radius: 8px;
         }
         .contracts-board-header {
             display: flex;
@@ -1495,27 +1577,29 @@
             align-items: baseline;
             justify-content: space-between;
             gap: 8px 16px;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
         .contracts-board-header h3 {
             margin: 0;
-            font-size: var(--font-size-section-summary);
-            font-weight: var(--font-weight-section-summary);
-            color: var(--text-primary);
+            font-size: 1.05em;
+            font-weight: bold;
+            color: var(--board-text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
         }
         .contracts-board-note {
             margin: 0 0 14px;
             font-size: var(--font-size-nb);
-            color: var(--text-muted);
+            color: var(--board-text-muted);
             font-weight: var(--font-weight-body);
         }
         .contracts-ticket-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 12px;
+            gap: 14px;
         }
-        @media (min-width: 900px) {
-            html.contracts-board-on .contracts-ticket-grid {
+        @media (min-width: 960px) {
+            .contracts-ticket-grid {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
             }
         }
@@ -1523,83 +1607,190 @@
             display: flex;
             flex-direction: column;
             min-height: 0;
-            background: var(--bg-container);
-            border: var(--border-width) solid var(--border-color);
-            border-left: 4px solid var(--border-ticket-note);
-            border-radius: 6px;
+            background: var(--board-bg-ticket);
+            border: 1px solid #c5c9cf;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: var(--shadow-ticket-note);
+            transition: opacity 0.2s ease, box-shadow 0.2s ease;
+            opacity: 1;
+            color: var(--board-ticket-text);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+        }
+        .contract-ticket.is-dimmed {
+            opacity: 0.2;
+            pointer-events: auto;
+        }
+        .contract-ticket.is-selected {
+            opacity: 1;
+            box-shadow: 0 0 0 2px var(--board-accent), 0 10px 28px rgba(0, 0, 0, 0.35);
         }
         .contract-ticket-photo {
-            height: 96px;
-            background:
-                linear-gradient(135deg, var(--bg-section) 0%, var(--bg-panel) 55%, var(--bg-inset) 100%);
-            border-bottom: var(--border-width) solid var(--border-color);
+            position: relative;
+            height: 128px;
+            background: #2a2e34 center/cover no-repeat;
+            border-bottom: 1px solid #c5c9cf;
+            filter: grayscale(1);
+            opacity: 0.6;
+            transition: opacity 0.2s ease, outline 0.2s ease;
         }
-        .contract-ticket-photo--b { opacity: 0.92; }
-        .contract-ticket-photo--c { opacity: 0.84; }
+        .contract-ticket:hover .contract-ticket-photo {
+            opacity: 1;
+            outline: 1px solid var(--board-accent);
+            outline-offset: -1px;
+        }
         .contract-ticket-body {
             display: flex;
             flex-direction: column;
             gap: 8px;
-            padding: 12px;
+            padding: 16px;
             flex: 1 1 auto;
+            background: var(--board-bg-ticket);
         }
         .contract-ticket-kicker {
             margin: 0;
-            font-size: var(--font-size-small);
-            color: var(--text-muted);
+            font-size: 11px;
+            color: var(--board-ticket-muted);
             text-transform: uppercase;
-            letter-spacing: 0.04em;
+            letter-spacing: 0.06em;
+            font-weight: 700;
         }
         .contract-ticket-title {
             margin: 0;
-            font-size: 1.05em;
-            font-weight: var(--font-weight-section-summary);
-            color: var(--text-primary);
+            font-size: 1.02em;
+            font-weight: 800;
+            color: var(--board-ticket-text);
             line-height: 1.25;
-        }
-        .contract-ticket-route {
-            margin: 0;
-            font-size: 1.35em;
-            font-weight: bold;
-            color: var(--text-primary);
+            text-transform: uppercase;
             letter-spacing: 0.02em;
         }
-        .contract-ticket-meta {
+        .contract-ticket-route {
+            margin: 4px 0 0;
+            font-size: 1.55em;
+            font-weight: 800;
+            color: var(--board-ticket-text);
+            letter-spacing: 0.02em;
+        }
+        .contract-ticket-airports {
             margin: 0;
-            font-size: var(--font-size-ui);
-            color: var(--text-muted);
-            line-height: 1.4;
+            font-size: 12px;
+            color: var(--board-ticket-muted);
+        }
+        .contract-ticket-meta {
+            margin: 4px 0 0;
+            font-size: 12px;
+            color: var(--board-ticket-muted);
+            line-height: 1.45;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
         }
         .contract-ticket-value {
-            margin: 4px 0 0;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: var(--color-link-inline);
+            margin: 10px 0 0;
+            font-size: 1.35em;
+            font-weight: 800;
+            color: var(--board-ticket-text);
+            letter-spacing: 0.01em;
         }
         .contract-ticket-actions {
             margin-top: auto;
-            padding-top: 8px;
+            padding-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .contract-ticket-details {
+            width: 100%;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            cursor: pointer;
+            background: var(--board-btn-ghost) !important;
+            color: var(--board-ticket-text) !important;
+            border: 1px solid #9aa1a9 !important;
+            border-radius: 4px;
+            padding: 10px 12px;
+        }
+        .contract-ticket-details:hover {
+            border-color: var(--board-ticket-text) !important;
         }
         .contract-ticket-accept {
             width: 100%;
-            font-size: var(--font-size-btn) !important;
-            font-weight: var(--font-weight-btn) !important;
+            font-size: 14px !important;
+            font-weight: 800 !important;
             cursor: pointer;
+            background: var(--board-btn-solid) !important;
+            color: var(--board-bg-page) !important;
+            border: 1px solid var(--board-btn-solid) !important;
+            border-radius: 4px;
+            padding: 10px 12px;
         }
-        html.contracts-board-on .logbook-table-wrap {
-            max-height: min(420px, 40vh);
+        .contract-ticket-accept:hover:not(:disabled) {
+            filter: brightness(1.05);
         }
-        html.contracts-board-on #logbookTable .lb-route {
+        .contract-ticket-accept:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        .contract-ticket-export {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .contract-ticket.is-selected .contract-ticket-export {
+            display: flex;
+        }
+        .contract-ticket-export .dispatch-action-btn {
+            width: 100%;
+            justify-content: center;
+            box-sizing: border-box;
+            background: #2a2e36 !important;
+            color: #fff !important;
+        }
+        .contract-ticket-heli {
+            display: none;
+            margin: 0;
+            font-size: 11px;
+            color: #8a5a20;
+        }
+        #logbookPanel.board-logbook {
+            display: block !important;
+            margin-top: 0;
+            background: var(--board-bg-panel);
+            border: 1px solid var(--board-border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .board-logbook .logbook-table-wrap {
+            max-height: min(380px, 36vh);
+            background: #dfe2e6;
+            border-radius: 4px;
+        }
+        #logbookPanel.board-logbook h3 {
+            color: var(--board-text-primary);
+        }
+        .board-logbook #logbookTable th {
+            background: #cfd3d8;
+            color: #1a1d21;
+        }
+        .board-logbook #logbookTable td {
+            background: #e8eaed;
+            color: #1a1d21;
+        }
+        #logbookTable .lb-route {
             width: 96px;
-            max-width: 120px;
+            max-width: 140px;
         }
-        html.contracts-board-on #logbookTable .lb-aircraft {
-            width: 22%;
+        #dispatchRelease {
+            display: none !important;
         }
-        .contracts-board-toggle-row {
-            margin: 10px 0 0;
+        .dispatcher-banner-container.banner-med {
+            height: 160px;
+        }
+        .dispatcher-banner-container.banner-med .dispatcher-banner-img {
+            height: 160px;
+        }
+        #generateFlightBtn {
+            background: var(--board-btn-solid) !important;
+            color: var(--board-bg-page) !important;
+            border: 1px solid var(--board-btn-solid) !important;
         }
         .form-grid-2 {
             display: grid;
@@ -1713,29 +1904,28 @@
 })();
 </script>
 	<script>
-    // Apply theme immediately before the body renders
-    const preLoadTheme = localStorage.getItem("dispatcher_theme");
-    if (preLoadTheme === 'light') {
-        document.documentElement.classList.add('light-mode');
-    } else if (preLoadTheme === 'greyscale') {
-        document.documentElement.classList.add('greyscale-mode');
-    }
+    // v3 board layout is dark-only
+    document.documentElement.classList.remove('light-mode', 'greyscale-mode');
+    try { localStorage.setItem('dispatcher_theme', 'dark'); } catch (e) {}
 </script>
 </head>
 <body>
+<div class="app-shell">
+<nav class="board-nav" aria-label="VECTOR navigation">
+    <p class="board-nav-brand">VECTOR</p>
+    <button type="button" class="board-nav-btn is-active" data-nav="dispatch" onclick="boardNavGo('dispatch')">Dispatch</button>
+    <button type="button" class="board-nav-btn" data-nav="logbook" onclick="boardNavGo('logbook')">Logbook</button>
+    <div class="board-nav-spacer"></div>
+    <button type="button" class="board-nav-btn" data-nav="settings" onclick="boardNavGo('settings')">Settings</button>
+</nav>
+<div class="board-main">
 <div class="container">
     <div class="dispatcher-banner-container banner-med">
         <img id="dynamicWorkflowBanner" src="images/banner-dark.png" alt="Flight Dispatcher" class="dispatcher-banner-img">
     </div>
     <script>
     (function () {
-        var theme = localStorage.getItem("dispatcher_theme") || "dark";
-        var banners = {
-            dark: "images/banner-dark.png",
-            light: "images/banner-light.png",
-            greyscale: "images/banner-grey.png"
-        };
-        var path = banners[theme] || banners.dark;
+        var path = "images/banner-dark.png";
         var img = document.getElementById("dynamicWorkflowBanner");
         if (img) {
             img.src = window.dispatcherAssetUrl ? window.dispatcherAssetUrl(path) : path;
@@ -1852,61 +2042,84 @@
 </div>
 
 <button id="generateFlightBtn" onclick="dispatchFlight()">🎲 GENERATE FLIGHT</button>
-<div id="contractsBoardPanel" class="contracts-board-panel" aria-label="Contracts Board preview" hidden>
+<div id="contractsBoardPanel" class="contracts-board-panel" aria-label="Available contracts">
     <div class="contracts-board-header">
-        <h3>Contracts Board</h3>
-        <span class="note-text">Preview only — Phase 0</span>
+        <h3>Available Contracts</h3>
+        <span class="note-text">Pick one ticket · Generate refreshes all three</span>
     </div>
-    <p class="contracts-board-note">Three ticket choices (visual mock). Accept is not wired yet — use GENERATE FLIGHT as normal. Toggle this view off in Settings to restore the classic narrow layout.</p>
-    <div class="contracts-ticket-grid">
-        <article class="contract-ticket" aria-label="Contract ticket 1">
-            <div class="contract-ticket-photo" aria-hidden="true"></div>
+    <p class="contracts-board-note" id="contractsBoardNote">Click GENERATE FLIGHT to roll three job tickets for your current aircraft and settings.</p>
+    <div class="contracts-ticket-grid" id="contractsTicketGrid">
+        <article class="contract-ticket" data-ticket-index="0" aria-label="Contract ticket 1">
+            <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
             <div class="contract-ticket-body">
-                <p class="contract-ticket-kicker">Executive Shuttle</p>
-                <h4 class="contract-ticket-title">Regional Hopper</h4>
-                <p class="contract-ticket-route">EGLL → EGCC</p>
-                <p class="contract-ticket-meta">Sample short sector · ~55 min block<br>Placeholder route — not a live dispatch</p>
-                <p class="contract-ticket-value">Contract Value: $ 3,450</p>
+                <p class="contract-ticket-kicker" data-role="kicker">EXECUTIVE SHUTTLE</p>
+                <h4 class="contract-ticket-title" data-role="title">Corporate Fleet Overflow: Regional Operations</h4>
+                <p class="contract-ticket-route" data-role="route">— → —</p>
+                <p class="contract-ticket-airports" data-role="airports">Awaiting dispatch</p>
+                <p class="contract-ticket-meta" data-role="meta">Aircraft · Duration · Payload appear after Generate</p>
+                <p class="contract-ticket-value" data-role="value">Est. Value: — | +0 Prestige Points</p>
                 <div class="contract-ticket-actions">
-                    <button type="button" class="contract-ticket-accept" onclick="onContractTicketAcceptPreview(1)">Accept Contract</button>
+                    <button type="button" class="contract-ticket-details" data-role="details" onclick="viewContractTicketDetails(0)" disabled>View Details</button>
+                    <button type="button" class="contract-ticket-accept" data-role="accept" onclick="acceptContractTicket(0)" disabled>Accept Contract</button>
+                    <div class="contract-ticket-export" data-role="export">
+                        <a class="simbrief-btn dispatch-action-btn" data-role="simbrief" href="#" target="_blank" rel="noopener noreferrer"><img src="images/icon_navi_color.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Send Plan to SimBrief</a>
+                        <a class="simbrief-btn dispatch-action-btn" data-role="pln" href="#" style="cursor: pointer;"><img src="images/MSFS2024.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Download MSFS.PLN</a>
+                        <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">📋 Save Flight to Logbook</button>
+                        <p class="contract-ticket-heli" data-role="heli"></p>
+                    </div>
                 </div>
             </div>
         </article>
-        <article class="contract-ticket" aria-label="Contract ticket 2">
-            <div class="contract-ticket-photo contract-ticket-photo--b" aria-hidden="true"></div>
+        <article class="contract-ticket" data-ticket-index="1" aria-label="Contract ticket 2">
+            <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
             <div class="contract-ticket-body">
-                <p class="contract-ticket-kicker">VIP Charter</p>
-                <h4 class="contract-ticket-title">Quiet Cabin Priority</h4>
-                <p class="contract-ticket-route">LSGG → LIMC</p>
-                <p class="contract-ticket-meta">Sample executive sector · ~1h 20m block<br>Placeholder route — not a live dispatch</p>
-                <p class="contract-ticket-value">Contract Value: $ 6,820</p>
+                <p class="contract-ticket-kicker" data-role="kicker">VIP CHARTER</p>
+                <h4 class="contract-ticket-title" data-role="title">High-Net-Worth Individual: Intercity Transit</h4>
+                <p class="contract-ticket-route" data-role="route">— → —</p>
+                <p class="contract-ticket-airports" data-role="airports">Awaiting dispatch</p>
+                <p class="contract-ticket-meta" data-role="meta">Aircraft · Duration · Payload appear after Generate</p>
+                <p class="contract-ticket-value" data-role="value">Est. Value: — | +0 Prestige Points</p>
                 <div class="contract-ticket-actions">
-                    <button type="button" class="contract-ticket-accept" onclick="onContractTicketAcceptPreview(2)">Accept Contract</button>
+                    <button type="button" class="contract-ticket-details" data-role="details" onclick="viewContractTicketDetails(1)" disabled>View Details</button>
+                    <button type="button" class="contract-ticket-accept" data-role="accept" onclick="acceptContractTicket(1)" disabled>Accept Contract</button>
+                    <div class="contract-ticket-export" data-role="export">
+                        <a class="simbrief-btn dispatch-action-btn" data-role="simbrief" href="#" target="_blank" rel="noopener noreferrer"><img src="images/icon_navi_color.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Send Plan to SimBrief</a>
+                        <a class="simbrief-btn dispatch-action-btn" data-role="pln" href="#" style="cursor: pointer;"><img src="images/MSFS2024.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Download MSFS.PLN</a>
+                        <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">📋 Save Flight to Logbook</button>
+                        <p class="contract-ticket-heli" data-role="heli"></p>
+                    </div>
                 </div>
             </div>
         </article>
-        <article class="contract-ticket" aria-label="Contract ticket 3">
-            <div class="contract-ticket-photo contract-ticket-photo--c" aria-hidden="true"></div>
+        <article class="contract-ticket" data-ticket-index="2" aria-label="Contract ticket 3">
+            <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
             <div class="contract-ticket-body">
-                <p class="contract-ticket-kicker">Efficiency Run</p>
-                <h4 class="contract-ticket-title">Overnight Freight Pulse</h4>
-                <p class="contract-ticket-route">EGNX → EHAM</p>
-                <p class="contract-ticket-meta">Sample freighter sector · ~1h 35m block<br>Placeholder route — not a live dispatch</p>
-                <p class="contract-ticket-value">Contract Value: $ 5,100</p>
+                <p class="contract-ticket-kicker" data-role="kicker">NETWORK EFFICIENCY</p>
+                <h4 class="contract-ticket-title" data-role="title">Scheduled Express Feed: Time-Critical Logistics</h4>
+                <p class="contract-ticket-route" data-role="route">— → —</p>
+                <p class="contract-ticket-airports" data-role="airports">Awaiting dispatch</p>
+                <p class="contract-ticket-meta" data-role="meta">Aircraft · Duration · Payload appear after Generate</p>
+                <p class="contract-ticket-value" data-role="value">Est. Value: — | +0 Prestige Points</p>
                 <div class="contract-ticket-actions">
-                    <button type="button" class="contract-ticket-accept" onclick="onContractTicketAcceptPreview(3)">Accept Contract</button>
+                    <button type="button" class="contract-ticket-details" data-role="details" onclick="viewContractTicketDetails(2)" disabled>View Details</button>
+                    <button type="button" class="contract-ticket-accept" data-role="accept" onclick="acceptContractTicket(2)" disabled>Accept Contract</button>
+                    <div class="contract-ticket-export" data-role="export">
+                        <a class="simbrief-btn dispatch-action-btn" data-role="simbrief" href="#" target="_blank" rel="noopener noreferrer"><img src="images/icon_navi_color.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Send Plan to SimBrief</a>
+                        <a class="simbrief-btn dispatch-action-btn" data-role="pln" href="#" style="cursor: pointer;"><img src="images/MSFS2024.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Download MSFS.PLN</a>
+                        <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">📋 Save Flight to Logbook</button>
+                        <p class="contract-ticket-heli" data-role="heli"></p>
+                    </div>
                 </div>
             </div>
         </article>
     </div>
 </div>
 <div class="panel-btn-row">
-    <button type="button" id="logbookToggleBtn" class="settings-toggle-btn" onclick="toggleLogbookPanel()">📋 View Pilot Logbook</button>
-    <button type="button" class="settings-toggle-btn" onclick="toggleSettingsPanel()">⚙️ Settings & Database Tools</button>
+    <button type="button" id="logbookToggleBtn" class="settings-toggle-btn" onclick="boardNavGo('logbook')">📋 Pilot Logbook</button>
+    <button type="button" class="settings-toggle-btn" onclick="boardNavGo('settings')">⚙️ Settings &amp; Database Tools</button>
 </div>
-    <hr class="dispatch-hr" style="margin-top: 20px;">
-    <div id="logbookPanel" class="settings-panel settings-group" style="display: none;">
-        <h3 style="margin-top: 0;">📋 Pilot Logbook</h3>
+    <div id="logbookPanel" class="settings-panel settings-group board-logbook">
+        <h3 style="margin-top: 0;">PILOT LOGBOOK</h3>
         <div class="db-stats-container logbook-stats-grid">
             <div class="db-stat-item db-stat-item--static">
                 <span>Total Flights</span>
@@ -1944,18 +2157,10 @@
             <a href="#" id="clearLogbookLink" class="link-danger is-disabled" aria-disabled="true" onclick="event.preventDefault(); clearLogbook();">Clear entire logbook</a>
         </div>
     </div>
-    <div id="settingsPanel" class="settings-panel settings-group">
+    <div id="settingsPanel" class="settings-panel settings-group" style="display: none;">
         <h3>User Preferences</h3>
-        <div class="theme-controls">
-            <button type="button" class="theme-btn" onclick="setMode('light')">☀️ Light Mode</button>
-            <button type="button" class="theme-btn" onclick="setMode('dark')">🌙 Dark Mode</button>
-            <button type="button" class="theme-btn" onclick="setMode('greyscale')">⬛ Greyscale Mode</button>
-        </div>
-        <div class="prefer-owned-row contracts-board-toggle-row">
-            <input type="checkbox" id="contractsBoardToggle" onchange="setContractsBoardPreview(this.checked)">
-            <label for="contractsBoardToggle" class="accent-checkbox-label">Contracts Board preview (Phase 0 — visual only)</label>
-        </div>
-        <p class="note-text" style="margin-top: 6px;">When enabled, the page widens (max 1920px) and shows three sample flight tickets. Dispatch, routing, and Generate Flight are unchanged. Off = classic layout.</p>
+        <p class="note-text" style="margin-top: 0;">VECTOR v3 uses a single dark Contracts Board layout. Light and Greyscale modes have been removed.</p>
+        <p class="note-text"><strong>Q: Do different career paths alter point payouts?</strong><br>A: No. VECTOR balances progression equally across all paths; your career choice shifts operational style and routing flavour, not your progression velocity.</p>
         <hr class="config-separator">
         <details class="settings-section">
             <summary>⭐ Owned Airports Filter</summary>
@@ -2373,6 +2578,8 @@
             &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" class="footer-readme">READ ME</a> for details.
         </div>
     </div>
+</div>
+</div>
 </div>
 </body>
 </html>
