@@ -1543,6 +1543,22 @@ let boardContractResults = [];
 let boardSelectedIndex = -1;
 let boardPlnObjectUrls = [];
 
+function boardTabGo(tab) {
+    const contractsPanel = document.getElementById("contractsBoardPanel");
+    const logbookPanel = document.getElementById("logbookPanel");
+    const contractsTabBtn = document.getElementById("boardTabContracts");
+    const logbookTabBtn = document.getElementById("boardTabLogbook");
+
+    const showContracts = tab === "contracts";
+    if (contractsPanel) contractsPanel.style.display = showContracts ? "block" : "none";
+    if (logbookPanel) logbookPanel.style.display = showContracts ? "none" : "block";
+
+    if (contractsTabBtn) contractsTabBtn.classList.toggle("is-active", showContracts);
+    if (logbookTabBtn) logbookTabBtn.classList.toggle("is-active", !showContracts);
+
+    if (!showContracts) updateLogbookUI();
+}
+
 function boardNavGo(target) {
     document.querySelectorAll(".board-nav-btn").forEach((btn) => {
         btn.classList.toggle("is-active", btn.getAttribute("data-nav") === target);
@@ -1550,19 +1566,21 @@ function boardNavGo(target) {
     const settings = document.getElementById("settingsPanel");
     const logbook = document.getElementById("logbookPanel");
     if (target === "settings") {
-        if (settings) settings.style.display = "block";
-        if (logbook) logbook.scrollIntoView({ behavior: "smooth", block: "nearest" });
-        if (settings) settings.scrollIntoView({ behavior: "smooth", block: "start" });
+        if (settings) {
+            settings.style.display = "block";
+            settings.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
         return;
     }
     if (settings) settings.style.display = "none";
     if (target === "logbook") {
-        updateLogbookUI();
+        boardTabGo("logbook");
         if (logbook) logbook.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
     }
-    const form = document.querySelector(".dispatch-control-group");
-    if (form) form.scrollIntoView({ behavior: "smooth", block: "start" });
+    boardTabGo("contracts");
+    const board = document.getElementById("contractsBoardPanel");
+    if (board) board.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function computePrestigePoints(distanceNm, spec, fromContractsBoard) {
@@ -1587,6 +1605,26 @@ function formatBoardBlockDuration(result) {
         return m ? `${h}h ${m}m` : `${h}h`;
     }
     return `${mins} min`;
+}
+
+/** Strip leading "Developer - " from fleet display names for ticket UI. */
+function formatBoardAircraftDisplayName(name) {
+    const raw = String(name || "").trim();
+    const sep = raw.indexOf(" - ");
+    if (sep > 0) return raw.slice(sep + 3).trim() || raw;
+    return raw;
+}
+
+function formatBoardTicketMetaHtml(result) {
+    // Job-ticket meta is intentionally compact: aircraft, pax, and weight (no duration/time).
+    const aircraftLine = escapeHtml(formatBoardAircraftDisplayName(result.spec.name));
+    const pax = Number(result.pax) || 0;
+    const paxLine = missionRequiresPassengers(result.chosenMission, result.spec)
+        ? escapeHtml(pax === 1 ? "1 PAX" : `${pax} PAX`)
+        : escapeHtml("— PAX");
+    const weightKg = Number(result.cargoKg) || 0;
+    const weightLine = escapeHtml(`${weightKg} KG`);
+    return [aircraftLine, paxLine, weightLine].join("<br>");
 }
 
 function formatBoardPayloadLine(result) {
@@ -1698,28 +1736,22 @@ function getDispatchUiProbeConfig() {
 }
 
 function fillContractTicketCard(card, result, index, bundle) {
-    const kicker = BOARD_TICKET_KICKERS[index] || "CONTRACT";
-    const photo = card.querySelector('[data-role="photo"]');
     const setText = (role, text) => {
         const el = card.querySelector(`[data-role="${role}"]`);
         if (el) el.textContent = text;
     };
-    setText("kicker", kicker);
-    setText("title", result.chosenMission.name || "Assignment");
-    setText("route", `${result.origin.icao} → ${result.destination.icao}`);
-    setText("airports", `${stripIrlNameSuffix(result.origin.name)} · ${stripIrlNameSuffix(result.destination.name)}`);
-    setText("meta",
-        `Aircraft: ${result.spec.name}\nDuration: ${formatBoardBlockDuration(result)}\nPayload: ${formatBoardPayloadLine(result)}`
-    );
+    const missionName = (result.chosenMission && result.chosenMission.name)
+        ? result.chosenMission.name
+        : (BOARD_TICKET_KICKERS[index] || "CONTRACT");
+    setText("mission", missionName);
+    setText("dep", result.origin.icao);
+    setText("arr", result.destination.icao);
     const metaEl = card.querySelector('[data-role="meta"]');
-    if (metaEl) {
-        metaEl.innerHTML =
-            `<strong>Aircraft:</strong> ${result.spec.name}<br>`
-            + `<strong>Duration:</strong> ${formatBoardBlockDuration(result)}<br>`
-            + `<strong>Payload:</strong> ${formatBoardPayloadLine(result)}`;
-    }
-    setText("value", `Est. Value: ${result.payout} | +${bundle.prestigePoints} Prestige Points`);
+    if (metaEl) metaEl.innerHTML = formatBoardTicketMetaHtml(result);
+    setText("value", result.payout);
+    setText("pp", `+${bundle.prestigePoints} Prestige Points`);
 
+    const photo = card.querySelector('[data-role="photo"]');
     if (photo) {
         if (bundle.imageUrl) {
             photo.style.backgroundImage = `url("${bundle.imageUrl}")`;
@@ -1733,8 +1765,6 @@ function fillContractTicketCard(card, result, index, bundle) {
         acceptBtn.disabled = false;
         acceptBtn.textContent = "Accept Contract";
     }
-    const detailsBtn = card.querySelector('[data-role="details"]');
-    if (detailsBtn) detailsBtn.disabled = false;
 
     const simbrief = card.querySelector('[data-role="simbrief"]');
     const pln = card.querySelector('[data-role="pln"]');
@@ -1770,31 +1800,24 @@ function renderContractsBoard(results) {
         const bundle = result._exportBundle;
         fillContractTicketCard(card, result, i, bundle);
     });
-    if (note) {
-        note.textContent = "Three contracts ready. View Details for a summary; Accept unlocks SimBrief / .pln on that ticket. Other tickets stay available at reduced opacity.";
-    }
+    // Keep the UI clean: no extra status text.
+    if (note) note.textContent = "";
 }
 
-function viewContractTicketDetails(index) {
-    const result = boardContractResults[index];
-    if (!result) {
-        alert("Generate three contracts first.");
-        return;
-    }
-    const pp = result._exportBundle ? result._exportBundle.prestigePoints : computePrestigePoints(result.distanceNm, result.spec, true);
-    const lines = [
-        (BOARD_TICKET_KICKERS[index] || "CONTRACT") + " — " + (result.chosenMission.name || "Assignment"),
-        "",
-        "Route: " + result.origin.icao + " → " + result.destination.icao,
-        stripIrlNameSuffix(result.origin.name) + " → " + stripIrlNameSuffix(result.destination.name),
-        "Aircraft: " + result.spec.name,
-        "Duration: " + formatBoardBlockDuration(result),
-        "Payload: " + formatBoardPayloadLine(result),
-        "Est. Value: " + result.payout + " | +" + pp + " Prestige Points",
-        "",
-        "Accept this ticket to unlock SimBrief / MSFS .pln on the card."
-    ];
-    alert(lines.join("\n"));
+function clearContractTicketSelection() {
+    boardSelectedIndex = -1;
+    const cards = document.querySelectorAll("#contractsTicketGrid .contract-ticket");
+    cards.forEach((card) => {
+        card.classList.remove("is-selected", "is-dimmed");
+        const acceptBtn = card.querySelector('[data-role="accept"]');
+        if (acceptBtn) {
+            const hasJob = !!boardContractResults[Number(card.getAttribute("data-ticket-index"))];
+            acceptBtn.disabled = !hasJob;
+            acceptBtn.textContent = "Accept Contract";
+        }
+    });
+    const note = document.getElementById("contractsBoardNote");
+    if (note) note.textContent = "";
 }
 
 function acceptContractTicket(index) {
@@ -1810,7 +1833,10 @@ function acceptContractTicket(index) {
         card.classList.toggle("is-selected", selected);
         card.classList.toggle("is-dimmed", !selected);
         const acceptBtn = card.querySelector('[data-role="accept"]');
-        if (acceptBtn) acceptBtn.textContent = selected ? "Selected" : "Accept Contract";
+        if (acceptBtn) {
+            acceptBtn.textContent = selected ? "Selected" : "Accept Contract";
+            acceptBtn.disabled = true;
+        }
     });
 
     const bundle = result._exportBundle;
@@ -1831,6 +1857,11 @@ function acceptContractTicket(index) {
     }
     const logBtn = document.getElementById("logFlightBtn");
     if (logBtn) logBtn.style.display = "inline-flex";
+
+    const note = document.getElementById("contractsBoardNote");
+    if (note) {
+        note.textContent = "Job selected. Export below, or Select another job to pick a different ticket.";
+    }
 }
 
 function toggleSettingsPanel() {
@@ -5052,6 +5083,7 @@ window.onload = function() {
     rebuildAirportDropdown(); // Initializes the new airport search
     updateDatabaseStats();
     updateLogbookUI();
+    boardTabGo("contracts");
     updateManageCustomDbUI();
     bindManageCustomDbActions();
     updateAppVersionLabel();
@@ -5061,7 +5093,19 @@ window.onload = function() {
     syncLastArrivalFromLogbook();
     refreshLastArrivalDepField();
     updateFlightTimeSliderState();
+    moveLongHaulNotamUnderGenerate();
 };
+function moveLongHaulNotamUnderGenerate() {
+    // Visually move the long-haul NOTAM block below the Generate Flight button.
+    const generateBtn = document.getElementById("generateFlightBtn");
+    const wrapper = document.querySelector(".slider-footer-row .long-haul-notam")?.closest(".slider-footer-row");
+    if (!generateBtn || !wrapper) return;
+    try {
+        generateBtn.insertAdjacentElement("afterend", wrapper);
+    } catch (e) {
+        // Ignore; layout will fall back to the original DOM position.
+    }
+}
 function updateAppVersionLabel() {
     const el = document.getElementById("appVersionLabel");
     if (!el) return;

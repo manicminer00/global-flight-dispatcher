@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
     <title>VECTOR - FLIGHT DISPATCH</title>
 	<link rel="icon" href="favicon/favicon.ico" sizes="any">
 	<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
@@ -24,7 +27,7 @@
             --font-size-section-summary: 1.17em;    /* settings section titles (Owned Airports, etc.) */
 
             --font-weight-label: bold;                     /* form labels, accent checkbox labels */
-            --font-weight-body: normal;                 /* notes, hints, checkboxes, muted body text */
+            --font-weight-body: 600;                   /* notes, hints, checkboxes, muted body text */
             --font-weight-btn: bold;                        /* standard action buttons, backup buttons, SimBrief row */
             --font-weight-generate-btn: bold;        /* GENERATE FLIGHT button */
             --font-weight-theme-btn: normal;        /* Light / Dark / Greyscale mode buttons */
@@ -47,15 +50,30 @@
             --board-bg-page: #0f1012;
             --board-bg-sidebar: #15171a;
             --board-bg-panel: #1b1d21;
-            --board-bg-ticket: #eceef1;
+            --board-bg-ticket: #e8eaed;
             --board-ticket-text: #16181c;
-            --board-ticket-muted: #5c636a;
+            --board-ticket-muted: #6b7280;
             --board-text-primary: #e9ecef;
             --board-text-muted: #868e96;
             --board-border: #2d3139;
             --board-accent: #ff9f00;
             --board-btn-solid: #ff9f00;
             --board-btn-ghost: transparent;
+            /* Layout: sidebar + contracts column capped to 3 tickets */
+            --board-sidebar-width: 408px; /* was 340px (+20%) */
+            --board-ticket-width: 288px; /* was 320px (−10%) */
+            --board-ticket-gap: 22px;
+            --board-ticket-radius: 16px;
+            --board-ticket-stack-peek: 14px;
+            --board-ticket-font: "Roboto", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            --board-panel-pad: 18px;
+            --board-main-pad-x: 16px;
+            --board-main-content-width: calc(
+                (3 * var(--board-ticket-width))
+                + (2 * var(--board-ticket-gap))
+                + (2 * var(--board-panel-pad))
+                + (2 * var(--board-main-pad-x))
+            );
 			
            	/* ------------------------------- DARK MODE -------------------------------- */
             color-scheme: dark;
@@ -319,13 +337,13 @@
             color-scheme: dark;
         }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--board-bg-page);
             color: var(--board-text-primary);
             padding: 0;
-            max-width: 1920px;
+            max-width: none;
             width: 100%;
-            margin: 0 auto;
+            margin: 0;
             box-sizing: border-box;
             color-scheme: dark;
         }
@@ -333,29 +351,188 @@
             display: flex;
             align-items: stretch;
             min-height: 100vh;
-            max-width: 1920px;
-            margin: 0 auto;
+            width: fit-content;
+            max-width: 100%;
+            margin: 0;
             background: var(--board-bg-page);
         }
-        .board-nav {
-            width: 196px;
+        .board-sidebar {
+            width: var(--board-sidebar-width);
+            max-width: 45vw;
             flex-shrink: 0;
             background: var(--board-bg-sidebar);
             border-right: 1px solid var(--board-border);
-            padding: 20px 0;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            min-height: 100vh;
+            max-height: 100vh;
+        }
+        .board-sidebar-top {
+            padding: 14px 12px 12px;
+            border-bottom: 1px solid var(--board-border);
+            flex-shrink: 0;
+        }
+        .board-sidebar-header-img {
+            display: block;
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            object-position: center top;
+            border-radius: 6px;
         }
         .board-nav-brand {
             color: var(--board-text-primary);
             font-weight: bold;
-            font-size: 13px;
-            letter-spacing: 0.06em;
+            font-size: 14px;
+            letter-spacing: 0.08em;
             text-transform: uppercase;
-            margin: 0 0 18px;
+            margin: 0;
+            padding: 0;
+        }
+        .board-sidebar-sub {
+            margin: 4px 0 0;
+            font-size: 12px;
+            color: var(--board-text-muted);
+        }
+        .board-sidebar-scroll {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 12px 14px 16px;
+            min-height: 0;
+        }
+        .board-sidebar-form {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
+        }
+        .board-sidebar-form .dispatch-form-field {
+            margin-bottom: 12px;
+        }
+        .board-sidebar-form label,
+        .board-sidebar-form .field-title {
+            font-size: 12px;
+            color: var(--board-text-primary);
+        }
+        .board-sidebar-form .field-hint,
+        .board-sidebar-form .field-hint a {
+            font-size: 11px;
+        }
+        .board-sidebar-form input[type="text"],
+        .board-sidebar-form select {
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--board-bg-page);
+            color: var(--board-text-primary);
+            border: 1px solid var(--board-border);
+            border-radius: 4px;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+        .board-sidebar-checks {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .board-sidebar-checks .checkbox-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--board-text-muted);
+            line-height: 1.35;
+            font-weight: 500;
+        }
+        .board-sidebar-checks .checkbox-option input {
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+        .board-sidebar-slider {
+            margin-top: 8px;
+            padding-top: 10px;
+            border-top: 1px solid var(--board-border);
+        }
+        .board-sidebar-slider-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        .board-sidebar-form #generateFlightBtn {
+            margin-top: 14px;
+            width: 100%;
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            padding: 12px 10px;
+            background: linear-gradient(180deg, #c8ccd2 0%, #9aa1a9 100%) !important;
+            color: #1a1c20 !important;
+            border: 1px solid #7a828c !important;
+            border-radius: 13px !important;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        #generateFlightBtn:hover {
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
+            border-color: #348538 !important;
+            color: #ffffff !important;
+        }
+        .board-sidebar-footer {
+            flex-shrink: 0;
+            border-top: 1px solid var(--board-border);
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .board-sidebar-bmc {
+            display: flex;
+            flex-shrink: 0;
+            line-height: 0;
+            text-decoration: none;
+        }
+        .board-sidebar-bmc-img {
+            display: block;
+            height: 40px !important;
+            width: auto !important;
+            max-width: 174px;
+        }
+        .board-sidebar-settings-btn.board-nav-btn {
+            flex: 1 1 auto;
+            width: auto;
+            min-width: 0;
+            height: 40px;
+            margin: 0;
             padding: 0 18px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #c8ccd2 0%, #9aa1a9 100%) !important;
+            color: #1a1c20 !important;
+            border: 1px solid #7a828c !important;
+            border-left: none !important;
+            border-radius: 13px !important;
+            cursor: pointer;
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        .board-sidebar-settings-btn.board-nav-btn:hover {
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
+            border-color: #348538 !important;
+            color: #ffffff !important;
+        }
+        .board-sidebar-settings-btn.board-nav-btn.is-active {
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
+            border-color: #348538 !important;
+            color: #ffffff !important;
+            border-left-color: transparent !important;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         .board-nav-btn {
             width: 100%;
@@ -365,27 +542,31 @@
             border: none !important;
             border-radius: 0;
             border-left: 3px solid transparent !important;
-            padding: 10px 18px;
+            padding: 10px 16px;
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
         }
         .board-nav-btn:hover {
-            background: rgba(255, 159, 0, 0.04) !important;
+            background: rgba(76, 175, 80, 0.12) !important;
             color: var(--board-text-primary) !important;
         }
         .board-nav-btn.is-active {
-            background: rgba(255, 159, 0, 0.04) !important;
+            background: rgba(76, 175, 80, 0.12) !important;
             color: var(--board-text-primary) !important;
-            border-left-color: var(--board-accent) !important;
+            border-left-color: #3f9e44 !important;
         }
-        .board-nav-spacer { flex: 1; }
         .board-main {
-            flex: 1;
+            flex: 0 0 auto;
+            width: var(--board-main-content-width);
+            max-width: calc(100vw - var(--board-sidebar-width));
             min-width: 0;
-            padding: 20px 24px 28px;
+            padding: 20px var(--board-main-pad-x) 28px;
             box-sizing: border-box;
             overflow-x: hidden;
+            overflow-y: auto;
+            max-height: 100vh;
+            background: var(--board-bg-page);
         }
         .container {
             background-color: transparent;
@@ -396,22 +577,31 @@
             max-width: 100%;
             box-sizing: border-box;
         }
+        .dispatcher-banner-container {
+            display: none !important;
+        }
+        @media (max-width: 1100px) {
+            .board-sidebar {
+                width: 360px;
+                max-width: 42vw;
+            }
+        }
         @media (max-width: 900px) {
-            .app-shell { flex-direction: column; }
-            .board-nav {
+            .app-shell { flex-direction: column; width: 100%; }
+            .board-sidebar {
                 width: 100%;
-                flex-direction: row;
-                flex-wrap: wrap;
-                align-items: center;
-                gap: 8px;
+                max-width: none;
+                max-height: none;
+                min-height: 0;
                 border-right: none;
                 border-bottom: 1px solid var(--board-border);
-                padding: 12px 14px;
             }
-            .board-nav-brand { margin: 0 12px 0 0; padding: 0; }
-            .board-nav-spacer { display: none; }
-            .board-nav-btn { width: auto; border-left: none !important; border-bottom: 2px solid transparent !important; }
-            .board-nav-btn.is-active { border-bottom-color: var(--board-accent) !important; }
+            .board-sidebar-scroll { max-height: 55vh; }
+            .board-main {
+                width: 100%;
+                max-width: 100%;
+                max-height: none;
+            }
         }
         .control-group, .settings-group {
             margin-bottom: 20px;
@@ -1430,6 +1620,7 @@
             max-height: 250px;
             overflow-y: auto;
             background-color: var(--dropdown-bg);
+            z-index: 40;
             border: var(--border-width) solid var(--border-color);
             border-radius: 4px;
             z-index: 1000;
@@ -1562,14 +1753,47 @@
         .prefer-owned-row.military-airbase-row {
             margin-top: 10px;
         }
-        /* ---- Contracts Board (greyscale-paper tickets on dark chrome) ---- */
+        .board-tabs {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            margin: 0 0 0;
+            padding: 0;
+        }
+        .board-tab {
+            border: 1px solid var(--board-border);
+            border-bottom: none;
+            background: var(--board-bg-panel);
+            color: var(--board-text-muted);
+            border-radius: 13px 13px 0 0;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        .board-tab:hover {
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%);
+            color: #ffffff;
+            border-color: #348538;
+        }
+        .board-tab.is-active {
+            background: #cfd3d8;
+            color: #16181c;
+            border-color: #cfd3d8;
+        }
+        /* ---- Contracts Board (paper tickets on dark chrome) ---- */
         #contractsBoardPanel {
             display: block;
-            margin: 16px 0 20px;
-            padding: 16px;
+            margin: 0 0 20px;
+            padding: var(--board-panel-pad);
             background: var(--board-bg-panel);
             border: 1px solid var(--board-border);
             border-radius: 8px;
+            box-sizing: border-box;
+            width: 100%;
         }
         .contracts-board-header {
             display: flex;
@@ -1581,153 +1805,322 @@
         }
         .contracts-board-header h3 {
             margin: 0;
-            font-size: 1.05em;
-            font-weight: bold;
+            font-size: 48pt;
+            font-weight: 800;
             color: var(--board-text-primary);
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
         .contracts-board-note {
-            margin: 0 0 14px;
-            font-size: var(--font-size-nb);
+            margin: 0 0 16px;
+            font-size: 13px;
             color: var(--board-text-muted);
             font-weight: var(--font-weight-body);
+            line-height: 1.4;
+        }
+        .contracts-board-note:empty {
+            display: none;
         }
         .contracts-ticket-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 14px;
+            display: flex;
+            flex-wrap: nowrap;
+            align-items: flex-start;
+            gap: var(--board-ticket-gap);
+            padding-bottom: calc(var(--board-ticket-stack-peek) + 6px);
         }
-        @media (min-width: 960px) {
-            .contracts-ticket-grid {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-            }
+        /* Slot = front ticket + 2 stacked layers behind (RHS reference) */
+        .contract-ticket-slot {
+            position: relative;
+            width: var(--board-ticket-width);
+            max-width: var(--board-ticket-width);
+            flex: 0 0 var(--board-ticket-width);
+            padding-bottom: var(--board-ticket-stack-peek);
+        }
+        .contract-ticket-slot::before,
+        .contract-ticket-slot::after {
+            content: "";
+            position: absolute;
+            left: 2.5%;
+            right: 2.5%;
+            top: 8px;
+            bottom: 0;
+            background: #d0d4d9;
+            border: 1px solid #9aa1a9;
+            border-radius: var(--board-ticket-radius);
+            z-index: 0;
+            pointer-events: none;
+            transition: transform 0.22s ease, opacity 0.22s ease;
+        }
+        .contract-ticket-slot::before {
+            transform: translateY(7px);
+            opacity: 0.95;
+        }
+        .contract-ticket-slot::after {
+            left: 5%;
+            right: 5%;
+            transform: translateY(14px);
+            background: #c4c9cf;
+            opacity: 0.9;
         }
         .contract-ticket {
+            position: relative;
+            z-index: 1;
             display: flex;
             flex-direction: column;
-            min-height: 0;
+            width: 100%;
+            min-height: calc(580px * 1.15);
             background: var(--board-bg-ticket);
-            border: 1px solid #c5c9cf;
-            border-radius: 10px;
+            border: 1px solid #8b929a;
+            border-radius: var(--board-ticket-radius);
             overflow: hidden;
-            transition: opacity 0.2s ease, box-shadow 0.2s ease;
-            opacity: 1;
+            font-family: var(--board-ticket-font);
             color: var(--board-ticket-text);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+            opacity: 1;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+            transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.2s ease;
+            will-change: transform;
+        }
+        /* Hover: lift front ticket; stack stays put — simple “pick up a card” feel */
+        .contract-ticket-slot:hover .contract-ticket:not(.is-dimmed) {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.38);
+        }
+        .contract-ticket-slot:hover:has(.contract-ticket:not(.is-dimmed))::before {
+            transform: translateY(9px);
+        }
+        .contract-ticket-slot:hover:has(.contract-ticket:not(.is-dimmed))::after {
+            transform: translateY(16px);
         }
         .contract-ticket.is-dimmed {
-            opacity: 0.2;
+            opacity: 0.22;
             pointer-events: auto;
+            box-shadow: none;
+        }
+        .contract-ticket-slot:has(.contract-ticket.is-dimmed)::before,
+        .contract-ticket-slot:has(.contract-ticket.is-dimmed)::after {
+            opacity: 0.18;
         }
         .contract-ticket.is-selected {
             opacity: 1;
-            box-shadow: 0 0 0 2px var(--board-accent), 0 10px 28px rgba(0, 0, 0, 0.35);
+            box-shadow: 0 0 0 3px #4caf50, 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        .contract-ticket-photo-wrap {
+            position: relative;
+            border-bottom: 1px solid #c5c9cf;
+        }
+        /* Grey top stripe (1/8 of mission image height) */
+        .contract-ticket-photo-wrap::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 12.5%;
+            background: #cfd3d8;
+            z-index: 1;
+            pointer-events: none;
+        }
+        .contract-ticket-photo-label {
+            position: absolute;
+            top: 10px;
+            left: 12px;
+            z-index: 2;
+            margin: 0;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #16181c;
+            text-shadow: none;
+            pointer-events: none;
         }
         .contract-ticket-photo {
-            position: relative;
-            height: 128px;
-            background: #2a2e34 center/cover no-repeat;
-            border-bottom: 1px solid #c5c9cf;
+            height: 210px;
+            background: #3a3f45 center/cover no-repeat;
             filter: grayscale(1);
-            opacity: 0.6;
-            transition: opacity 0.2s ease, outline 0.2s ease;
+            transition: filter 0.28s ease;
         }
-        .contract-ticket:hover .contract-ticket-photo {
-            opacity: 1;
-            outline: 1px solid var(--board-accent);
-            outline-offset: -1px;
+        .contract-ticket-slot:hover .contract-ticket:not(.is-dimmed) .contract-ticket-photo,
+        .contract-ticket.is-selected .contract-ticket-photo {
+            filter: none;
         }
         .contract-ticket-body {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            padding: 16px;
+            gap: 0;
+            padding: 14px 16px 16px;
             flex: 1 1 auto;
             background: var(--board-bg-ticket);
         }
-        .contract-ticket-kicker {
-            margin: 0;
-            font-size: 11px;
-            color: var(--board-ticket-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            font-weight: 700;
+        .contract-ticket-title-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin: 0 0 2px;
         }
-        .contract-ticket-title {
+        .contract-ticket-title,
+        .contract-ticket-mission {
             margin: 0;
-            font-size: 1.02em;
-            font-weight: 800;
+            flex: 1 1 auto;
+            min-width: 0;
+            font-size: 20px;
+            font-weight: 700;
             color: var(--board-ticket-text);
-            line-height: 1.25;
+            line-height: 1.15;
             text-transform: uppercase;
             letter-spacing: 0.02em;
+        }
+        .contract-ticket-mission {
+            font-size: 48pt;
+            font-weight: 800;
+            line-height: 1.02;
+            letter-spacing: 0.01em;
+        }
+        .contract-ticket-lock {
+            display: none;
+        }
+        .contract-ticket-kicker,
+        .contract-ticket-airports,
+        .contract-ticket-photo-stripe {
+            display: none;
+        }
+        .contract-ticket-label {
+            margin: 12px 0 0;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--board-ticket-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
         }
         .contract-ticket-route {
             margin: 4px 0 0;
-            font-size: 1.55em;
-            font-weight: 800;
-            color: var(--board-ticket-text);
-            letter-spacing: 0.02em;
-        }
-        .contract-ticket-airports {
-            margin: 0;
-            font-size: 12px;
-            color: var(--board-ticket-muted);
-        }
-        .contract-ticket-meta {
-            margin: 4px 0 0;
-            font-size: 12px;
-            color: var(--board-ticket-muted);
-            line-height: 1.45;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
-        }
-        .contract-ticket-value {
-            margin: 10px 0 0;
-            font-size: 1.35em;
-            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 10px;
+            font-size: 36pt;
+            font-weight: 700;
             color: var(--board-ticket-text);
             letter-spacing: 0.01em;
+            line-height: 1.1;
+        }
+        .contract-ticket-route-leg {
+            min-width: 0;
+        }
+        .contract-ticket-route-arrow {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #5c636a;
+            font-size: 18px;
+            font-weight: 400;
+            line-height: 1;
+            transform: translateY(1px);
+        }
+        .contract-ticket-route-arrow::before {
+            content: "→";
+        }
+        .contract-ticket-value {
+            margin: 4px 0 0;
+            font-size: 36pt;
+            font-weight: 700;
+            color: var(--board-ticket-text);
+            letter-spacing: 0.01em;
+            line-height: 1.1;
+        }
+        .contract-ticket-pp {
+            margin: 6px 0 0;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--board-ticket-muted);
+            letter-spacing: 0.01em;
+        }
+        .contract-ticket-rule {
+            display: block;
+            width: 90%;
+            max-width: none;
+            height: 0;
+            margin: 12px auto 0;
+            border: 0;
+            border-top: 1px solid #9aa0a8;
+        }
+        .contract-ticket-meta {
+            margin: 12px 0 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #2a2e34;
+            line-height: 1.45;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .contract-ticket-meta strong {
+            color: var(--board-ticket-text);
+            font-weight: 700;
         }
         .contract-ticket-actions {
             margin-top: auto;
-            padding-top: 12px;
+            padding-top: 14px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
-        .contract-ticket-details {
-            width: 100%;
-            font-size: 13px !important;
-            font-weight: 700 !important;
-            cursor: pointer;
-            background: var(--board-btn-ghost) !important;
-            color: var(--board-ticket-text) !important;
-            border: 1px solid #9aa1a9 !important;
-            border-radius: 4px;
-            padding: 10px 12px;
-        }
-        .contract-ticket-details:hover {
-            border-color: var(--board-ticket-text) !important;
+        .contract-ticket-accept,
+        .contract-ticket-reselect,
+        .contract-ticket-export .dispatch-action-btn {
+            font-family: "Roboto", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
         }
         .contract-ticket-accept {
             width: 100%;
-            font-size: 14px !important;
-            font-weight: 800 !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
             cursor: pointer;
-            background: var(--board-btn-solid) !important;
-            color: var(--board-bg-page) !important;
-            border: 1px solid var(--board-btn-solid) !important;
-            border-radius: 4px;
-            padding: 10px 12px;
+            background: linear-gradient(180deg, #c8ccd2 0%, #9aa1a9 100%) !important;
+            color: #1a1c20 !important;
+            border: 1px solid #7a828c !important;
+            border-radius: 13px;
+            padding: 11px 12px;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, filter 0.15s ease;
         }
         .contract-ticket-accept:hover:not(:disabled) {
-            filter: brightness(1.05);
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
+            border-color: #348538 !important;
+            color: #fff !important;
         }
         .contract-ticket-accept:disabled {
             opacity: 0.45;
             cursor: not-allowed;
+        }
+        .contract-ticket.is-selected .contract-ticket-accept {
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
+            border-color: #348538 !important;
+            color: #fff !important;
+            opacity: 1;
+            cursor: default;
+        }
+        .contract-ticket-reselect {
+            display: none;
+            width: 100%;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            background: linear-gradient(180deg, #dde1e6 0%, #c5c9cf 100%) !important;
+            color: #1a1c20 !important;
+            border: 1px solid #9198a1 !important;
+            border-radius: 13px;
+            padding: 10px 12px;
+        }
+        .contract-ticket.is-selected .contract-ticket-reselect {
+            display: block;
+        }
+        .contract-ticket-reselect:hover {
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
+            border-color: #348538 !important;
+            color: #ffffff !important;
         }
         .contract-ticket-export {
             display: none;
@@ -1743,36 +2136,95 @@
             box-sizing: border-box;
             background: #2a2e36 !important;
             color: #fff !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.01em;
+            border-radius: 13px !important;
+            transition: background 0.15s ease, filter 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        .contract-ticket-export .dispatch-action-btn:hover {
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
+            color: #ffffff !important;
         }
         .contract-ticket-heli {
             display: none;
             margin: 0;
-            font-size: 11px;
+            font-size: 12px;
             color: #8a5a20;
+            text-transform: none;
+            letter-spacing: 0;
         }
+        @media (prefers-reduced-motion: reduce) {
+            .contract-ticket,
+            .contract-ticket-photo,
+            .contract-ticket-slot::before,
+            .contract-ticket-slot::after {
+                transition: none;
+            }
+            .contract-ticket-slot:hover .contract-ticket:not(.is-dimmed) {
+                transform: none;
+            }
+        }
+        /* Logbook: match Available Contracts panel (no classic blue) */
         #logbookPanel.board-logbook {
-            display: block !important;
+            display: none;
             margin-top: 0;
-            background: var(--board-bg-panel);
-            border: 1px solid var(--board-border);
+            background: var(--board-bg-panel) !important;
+            border: 1px solid var(--board-border) !important;
             border-radius: 8px;
-            padding: 16px;
-        }
-        .board-logbook .logbook-table-wrap {
-            max-height: min(380px, 36vh);
-            background: #dfe2e6;
-            border-radius: 4px;
+            border-top: 1px solid var(--board-border) !important;
+            padding: var(--board-panel-pad);
+            color: var(--board-text-primary);
         }
         #logbookPanel.board-logbook h3 {
             color: var(--board-text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            font-weight: 800;
+        }
+        .board-logbook .logbook-table-wrap {
+            max-height: min(380px, 36vh);
+            background: var(--board-bg-page);
+            border: 1px solid var(--board-border);
+            border-radius: 4px;
+        }
+        .board-logbook .db-stat-item,
+        .board-logbook .db-stat-item--static,
+        .board-logbook .db-stat-item.db-stat-item--static {
+            background-color: var(--board-bg-page) !important;
+            color: var(--board-text-primary) !important;
+            border-color: var(--board-border) !important;
+        }
+        .board-logbook .db-stat-item:hover,
+        .board-logbook .db-stat-item--static:hover {
+            background-color: #22252b !important;
+            color: var(--board-text-primary) !important;
         }
         .board-logbook #logbookTable th {
-            background: #cfd3d8;
-            color: #1a1d21;
+            background: #15171a !important;
+            color: var(--board-text-primary) !important;
+            border-color: var(--board-border) !important;
         }
         .board-logbook #logbookTable td {
-            background: #e8eaed;
-            color: #1a1d21;
+            background: var(--board-bg-panel) !important;
+            color: var(--board-text-primary) !important;
+            border-color: var(--board-border) !important;
+        }
+        .board-logbook .logbook-actions a {
+            color: var(--board-accent);
+        }
+        .board-logbook .logbook-actions a.link-danger:not(.is-disabled) {
+            color: var(--color-link-danger);
+        }
+        .board-logbook .logbook-actions a.is-disabled,
+        .board-logbook .logbook-actions a.link-danger.is-disabled {
+            color: var(--board-text-muted);
+        }
+        .board-logbook .pagination-controls a {
+            color: var(--board-accent);
+        }
+        .board-logbook .pagination-indicator {
+            color: var(--board-text-muted);
         }
         #logbookTable .lb-route {
             width: 96px;
@@ -1788,9 +2240,9 @@
             height: 160px;
         }
         #generateFlightBtn {
-            background: var(--board-btn-solid) !important;
-            color: var(--board-bg-page) !important;
-            border: 1px solid var(--board-btn-solid) !important;
+            background: linear-gradient(180deg, #c8ccd2 0%, #9aa1a9 100%) !important;
+            color: #1a1c20 !important;
+            border: 1px solid #7a828c !important;
         }
         .form-grid-2 {
             display: grid;
@@ -1911,214 +2363,233 @@
 </head>
 <body>
 <div class="app-shell">
-<nav class="board-nav" aria-label="VECTOR navigation">
-    <p class="board-nav-brand">VECTOR</p>
-    <button type="button" class="board-nav-btn is-active" data-nav="dispatch" onclick="boardNavGo('dispatch')">Dispatch</button>
-    <button type="button" class="board-nav-btn" data-nav="logbook" onclick="boardNavGo('logbook')">Logbook</button>
-    <div class="board-nav-spacer"></div>
-    <button type="button" class="board-nav-btn" data-nav="settings" onclick="boardNavGo('settings')">Settings</button>
-</nav>
-<div class="board-main">
-<div class="container">
-    <div class="dispatcher-banner-container banner-med">
-        <img id="dynamicWorkflowBanner" src="images/banner-dark.png" alt="Flight Dispatcher" class="dispatcher-banner-img">
+<aside class="board-sidebar" aria-label="VECTOR dispatch controls">
+    <div class="board-sidebar-top">
+        <img src="images/header.png" alt="VECTOR Flight Dispatch" class="board-sidebar-header-img">
     </div>
-    <script>
-    (function () {
-        var path = "images/banner-dark.png";
-        var img = document.getElementById("dynamicWorkflowBanner");
-        if (img) {
-            img.src = window.dispatcherAssetUrl ? window.dispatcherAssetUrl(path) : path;
-        }
-    })();
-    </script>
-    <div class="control-group dispatch-control-group">
-        <div class="dispatch-form-fields">
-        <div class="dispatch-form-field">
-        <label for="callsignInput">ATC Callsign:
-            <span class="field-hint">
-                <a class="link-inline" onclick="event.preventDefault(); saveCallsign();">Save Callsign</a>
-                <span class="field-hint-sep">/</span>
-                <a class="link-inline" href="https://123atc.com/call-signs" target="_blank" rel="noopener noreferrer">Lookup Callsign</a>
-                <span class="field-hint-sep">/</span>
-                <a class="link-inline" onclick="event.preventDefault(); generateRandomCallsign();">Generate Callsign</a>
-            </span>
-        </label>
-        <input type="text" id="callsignInput" placeholder="e.g. MRD275" maxlength="7" required>
-        </div>
-        <div class="dispatch-form-field">
-        <label for="aircraftInput" class="flex-label">Aircraft Type:</label>
-		<div class="input-relative-wrap">
-			<input type="text" id="aircraftInput" placeholder="Search by name or ICAO code" autocomplete="off">
-			<div id="customAircraftList" class="custom-datalist"></div>
-		</div>
-        </div>
-        <div class="dispatch-form-field">
-            <div class="form-grid-2 dep-routing-labels">
-                <label for="depOverrideInput" class="field-title">Departure Airport:</label>
-                <label for="routingScopeSelect" class="field-title"><span>Routing Options:</span>
-                    <span class="field-hint">🧭 <a class="link-inline" href="https://www.google.com/maps/d/edit?mid=1m27z2BIBRWRM3MgD9UExPAOqxxRmntE&usp=sharing" target="_blank" rel="noopener noreferrer">Map of Airports in Database</a>
-                    </span>
+    <div class="board-sidebar-scroll">
+        <div class="dispatch-control-group board-sidebar-form">
+            <div class="dispatch-form-field">
+                <label for="callsignInput">ATC Callsign:</label>
+                <input type="text" id="callsignInput" placeholder="e.g. MRD275" maxlength="7" required>
+                <span class="field-hint" style="display:block; margin-left:0; margin-top:6px;">
+                    <a class="link-inline" onclick="event.preventDefault(); saveCallsign();">Save Callsign</a>
+                    <span class="field-hint-sep">/</span>
+                    <a class="link-inline" href="https://123atc.com/call-signs" target="_blank" rel="noopener noreferrer">Lookup Callsign</a>
+                    <span class="field-hint-sep">/</span>
+                    <a class="link-inline" onclick="event.preventDefault(); generateRandomCallsign();">Generate Callsign</a>
+                </span>
+            </div>
+            <div class="dispatch-form-field">
+                <label for="aircraftInput" class="flex-label">Aircraft Type:</label>
+                <div class="input-relative-wrap">
+                    <input type="text" id="aircraftInput" placeholder="Search by name or ICAO code" autocomplete="off">
+                    <div id="customAircraftList" class="custom-datalist"></div>
+                </div>
+            </div>
+            <div class="dispatch-form-field board-sidebar-checks">
+                <label class="checkbox-option" for="contractorToggle">
+                    <input type="checkbox" id="contractorToggle" onchange="syncContractorMilitaryOptions()">Contractor Mode (civilian aircraft fly military missions)
                 </label>
             </div>
-            <div class="form-grid-2 dep-routing-inputs">
+            <div class="dispatch-form-field">
+                <label for="depOverrideInput" class="field-title">Departure Airport:</label>
                 <div class="dep-field-wrap">
-                    <input type="text" id="depOverrideInput" placeholder="Enter Airport Name or ICAO (Optional)" autocomplete="off">
+                    <input type="text" id="depOverrideInput" placeholder="Airport Name or ICAO (Optional)" autocomplete="off">
                     <div id="customAirportList" class="custom-datalist"></div>
                 </div>
+            </div>
+            <div class="dispatch-form-field board-sidebar-checks">
+                <label class="checkbox-option" for="useLastArrivalToggle">
+                    <input type="checkbox" id="useLastArrivalToggle" onchange="toggleLastArrival()">Continue from last airport?
+                </label>
+                <label class="checkbox-option" for="militaryBaseToggle">
+                    <input type="checkbox" id="militaryBaseToggle">Use Military Airbases
+                </label>
+            </div>
+            <div class="dispatch-form-field">
+                <label for="routingScopeSelect" class="field-title"><span>Routing Options:</span>
+                    <span class="field-hint">🧭 <a class="link-inline" href="https://www.google.com/maps/d/edit?mid=1m27z2BIBRWRM3MgD9UExPAOqxxRmntE&usp=sharing" target="_blank" rel="noopener noreferrer">Map of Airports in Database</a></span>
+                </label>
                 <select id="routingScopeSelect">
                     <option value="worldwide">🌐 Worldwide</option>
                     <option value="americas">Americas Only</option>
                     <option value="row">Europe &amp; Rest of World</option>
                 </select>
+                <script>
+                (function () {
+                    var valid = { worldwide: true, americas: true, row: true };
+                    try {
+                        var saved = localStorage.getItem("dispatcher_routing_scope");
+                        var sel = document.getElementById("routingScopeSelect");
+                        if (saved && valid[saved] && sel) sel.value = saved;
+                    } catch (e) {}
+                })();
+                </script>
             </div>
-            <script>
-            (function () {
-                var valid = { worldwide: true, americas: true, row: true };
-                try {
-                    var saved = localStorage.getItem("dispatcher_routing_scope");
-                    var sel = document.getElementById("routingScopeSelect");
-                    if (saved && valid[saved] && sel) sel.value = saved;
-                } catch (e) {}
-            })();
-            </script>
-        </div>
-        <div class="dispatch-form-field">
-            <div class="additional-options-row">
-                <label class="checkbox-option" for="useLastArrivalToggle">
-                    <input type="checkbox" id="useLastArrivalToggle" onchange="toggleLastArrival()"><strong>Continue from last airport?</strong></label>
-                <label class="checkbox-option" for="contractorToggle">
-                    <input type="checkbox" id="contractorToggle" onchange="syncContractorMilitaryOptions()">Contractor Mode (civilian aircraft fly military missions)</label>
-                <label class="checkbox-option" for="militaryBaseToggle">
-                    <input type="checkbox" id="militaryBaseToggle">Use Military airbases</label>
+            <details id="gliderAircraftNotice" class="info-details" style="display: none;">
+                <summary>Glider Aircraft Notice</summary>
+                <div class="info-details-body">
+                    A glider can dispatch from any departure airport with sufficient runway length (not a helipad) if you enter an ICAO. If the departure airport is left blank, the dispatcher considers all suitable airports but strongly prefers routes from and to glider strips.
+                </div>
+            </details>
+            <div class="slider-section board-sidebar-slider">
+                <label for="timeSlider" class="slider-header-row" id="timeSliderHeading">
+                    Target Block Time: <span id="timeVal">60</span> <span id="timeUnit">minutes</span>
+                </label>
+                <div id="longHaulNote" class="slider-long-haul-note" role="note" style="display: none;">⏳ <strong>Long-haul</strong>: Select <strong>Transatlantic</strong>, <strong>Pacific</strong>, or <strong>Ultra</strong> and VECTOR will find iconic hub routes from the curated MSFS airport list. Select a custom departure to fly from a specific airport.</div>
+                <input type="range" id="timeSlider" min="40" max="120" step="10" value="60" list="steplist" oninput="updateFlightTimeDisplay()" style="width: 100%; cursor: pointer;">
+                <div id="longHaulTierTicks" class="long-haul-tier-ticks" style="display: none;" aria-hidden="true">
+                    <span class="long-haul-tier-tick" data-tier-mins="480">Transatlantic</span>
+                    <span class="long-haul-tier-tick" data-tier-mins="720">Pacific</span>
+                    <span class="long-haul-tier-tick" data-tier-mins="960">Ultra</span>
+                </div>
+                <div id="longHaulTierFeasibilityNote" class="long-haul-tier-feasibility-note" style="display: none;" role="note"></div>
+                <datalist id="steplist">
+                    <option value="40"></option><option value="50"></option><option value="60"></option><option value="70"></option>
+                    <option value="80"></option><option value="90"></option><option value="100"></option><option value="110"></option><option value="120"></option>
+                </datalist>
+                <datalist id="longHaulSteplist">
+                    <option value="480"></option><option value="720"></option><option value="960"></option>
+                </datalist>
+                <div class="slider-footer-row board-sidebar-slider-footer">
+                    <details class="info-details long-haul-notam">
+                        <summary>Long-haul NOTAM</summary>
+                        <div class="info-details-body">
+                            VECTOR was initially conceived from a desire to create flightplans to and from the MSFS 2024 payware airports that I own in one click. No other software provides this functionality, that I know of. This grew rapidly into a feature-rich flight dispatch tool, implementing a curated Asobo and Third Party airport database, over 100 aircraft, a mission generator, military missions and airports, gliding missions and gliderports, the option to add custom airports and aircraft, the implementation of an editable logbook, as well as incorporating wishes from the community, and quickly growing beyond what I had initially envisioned. While community feedback has helped improve VECTOR, and for that I am very grateful, VECTOR was always designed to compliment SimBrief, never to replace it, and there are many good alternatives available for long-haul flight planning, such as APLv2, which I encourage you to explore if you enjoy flying long-haul sectors. VECTOR is designed for people who want to fly short-haul without time compression. Thank you for your understanding and for your support.
+                        </div>
+                    </details>
+                    <span class="note-text slider-rotor-glider-note">(N.B. Helicopter and Glider missions are unaffected by this slider.)</span>
+                </div>
             </div>
+            <button id="generateFlightBtn" type="button" onclick="dispatchFlight()">GENERATE FLIGHT</button>
         </div>
-        </div>
-        <details id="gliderAircraftNotice" class="info-details" style="display: none;">
-            <summary>Glider Aircraft Notice</summary>
-            <div class="info-details-body">
-                A glider can dispatch from any departure airport with sufficient runway length (not a helipad) if you enter an ICAO. If the departure airport is left blank, the dispatcher considers all suitable airports but strongly prefers routes from and to glider strips.
-            </div>
-        </details>
-</div>
-<div class="slider-section">
-    <label for="timeSlider" class="slider-header-row" id="timeSliderHeading">
-        Target Block Time: <span id="timeVal">60</span> <span id="timeUnit">minutes</span>
-    </label>
-    <div id="longHaulNote" class="slider-long-haul-note" role="note" style="display: none;">⏳ <strong>Long-haul</strong>: Select <strong>Transatlantic</strong>, <strong>Pacific</strong>, or <strong>Ultra</strong> and VECTOR will find iconic hub routes from the curated MSFS airport list. Select a custom departure to fly from a specific airport.</div>
-    <input type="range" id="timeSlider" min="40" max="120" step="10" value="60" list="steplist" oninput="updateFlightTimeDisplay()" style="width: 100%; cursor: pointer;">
-    <div id="longHaulTierTicks" class="long-haul-tier-ticks" style="display: none;" aria-hidden="true">
-        <span class="long-haul-tier-tick" data-tier-mins="480">Transatlantic</span>
-        <span class="long-haul-tier-tick" data-tier-mins="720">Pacific</span>
-        <span class="long-haul-tier-tick" data-tier-mins="960">Ultra</span>
     </div>
-    <div id="longHaulTierFeasibilityNote" class="long-haul-tier-feasibility-note" style="display: none;" role="note"></div>
-
-    <datalist id="steplist">
-        <option value="40"></option>
-        <option value="50"></option>
-        <option value="60"></option>
-        <option value="70"></option>
-        <option value="80"></option>
-        <option value="90"></option>
-        <option value="100"></option>
-        <option value="110"></option>
-        <option value="120"></option>
-    </datalist>
-    <datalist id="longHaulSteplist">
-        <option value="480"></option>
-        <option value="720"></option>
-        <option value="960"></option>
-    </datalist>
-    <div class="slider-footer-row">
-        <details class="info-details long-haul-notam">
-            <summary>Long-haul NOTAM</summary>
-            <div class="info-details-body">
-                VECTOR was initially conceived from a desire to create flightplans to and from the MSFS 2024 payware airports that I own in one click. No other software provides this functionality, that I know of. This grew rapidly into a feature-rich flight dispatch tool, implementing a curated Asobo and Third Party airport database, over 100 aircraft, a mission generator, military missions and airports, gliding missions and gliderports, the option to add custom airports and aircraft, the implementation of an editable logbook, as well as incorporating wishes from the community, and quickly growing beyond what I had initially envisioned. While community feedback has helped improve VECTOR, and for that I am very grateful, VECTOR was always designed to compliment SimBrief, never to replace it, and there are many good alternatives available for long-haul flight planning, such as APLv2, which I encourage you to explore if you enjoy flying long-haul sectors. VECTOR is designed for people who want to fly short-haul without time compression. Thank you for your understanding and for your support.
-            </div>
-        </details>
-        <span class="note-text slider-rotor-glider-note">(N.B. Helicopter and Glider missions are unaffected by this slider.)</span>
+    <div class="board-sidebar-footer">
+        <a href="https://www.buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" class="board-sidebar-bmc footer-bmc" aria-label="Buy Me a Coffee">
+            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" class="board-sidebar-bmc-img">
+        </a>
+        <button type="button" class="board-nav-btn board-sidebar-settings-btn" data-nav="settings" onclick="boardNavGo('settings')">Settings</button>
     </div>
+</aside>
+<div class="board-main">
+<div class="container">
+<div class="board-tabs" role="tablist" aria-label="Contracts and Logbook tabs">
+    <button type="button" id="boardTabContracts" class="board-tab is-active" role="tab" aria-selected="true" onclick="boardTabGo('contracts')">CONTRACTS BOARD</button>
+    <button type="button" id="boardTabLogbook" class="board-tab" role="tab" aria-selected="false" onclick="boardTabGo('logbook')">LOGBOOK</button>
 </div>
-
-<button id="generateFlightBtn" onclick="dispatchFlight()">🎲 GENERATE FLIGHT</button>
 <div id="contractsBoardPanel" class="contracts-board-panel" aria-label="Available contracts">
     <div class="contracts-board-header">
-        <h3>Available Contracts</h3>
-        <span class="note-text">Pick one ticket · Generate refreshes all three</span>
+        <h3>Contracts Board</h3>
     </div>
-    <p class="contracts-board-note" id="contractsBoardNote">Click GENERATE FLIGHT to roll three job tickets for your current aircraft and settings.</p>
+    <p class="contracts-board-note" id="contractsBoardNote"></p>
     <div class="contracts-ticket-grid" id="contractsTicketGrid">
+        <div class="contract-ticket-slot">
         <article class="contract-ticket" data-ticket-index="0" aria-label="Contract ticket 1">
-            <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
+            <div class="contract-ticket-photo-wrap">
+                <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
+                <p class="contract-ticket-photo-label">MISSION PHOTO</p>
+            </div>
             <div class="contract-ticket-body">
-                <p class="contract-ticket-kicker" data-role="kicker">EXECUTIVE SHUTTLE</p>
-                <h4 class="contract-ticket-title" data-role="title">Corporate Fleet Overflow: Regional Operations</h4>
-                <p class="contract-ticket-route" data-role="route">— → —</p>
-                <p class="contract-ticket-airports" data-role="airports">Awaiting dispatch</p>
-                <p class="contract-ticket-meta" data-role="meta">Aircraft · Duration · Payload appear after Generate</p>
-                <p class="contract-ticket-value" data-role="value">Est. Value: — | +0 Prestige Points</p>
+                <div class="contract-ticket-title-row">
+                    <h4 class="contract-ticket-mission" data-role="mission">Awaiting dispatch</h4>
+                </div>
+                <p class="contract-ticket-label">ROUTE ICAOs</p>
+                <p class="contract-ticket-route" data-role="route">
+                    <span class="contract-ticket-route-leg" data-role="dep">—</span>
+                    <span class="contract-ticket-route-arrow" aria-hidden="true"></span>
+                    <span class="contract-ticket-route-leg" data-role="arr">—</span>
+                </p>
+                <p class="contract-ticket-label">CONTRACT VALUE</p>
+                <p class="contract-ticket-value" data-role="value">$ —</p>
+                <p class="contract-ticket-pp" data-role="pp">+0 Prestige Points</p>
+                <hr class="contract-ticket-rule" aria-hidden="true">
+                <p class="contract-ticket-meta" data-role="meta">Awaiting dispatch</p>
                 <div class="contract-ticket-actions">
-                    <button type="button" class="contract-ticket-details" data-role="details" onclick="viewContractTicketDetails(0)" disabled>View Details</button>
                     <button type="button" class="contract-ticket-accept" data-role="accept" onclick="acceptContractTicket(0)" disabled>Accept Contract</button>
                     <div class="contract-ticket-export" data-role="export">
                         <a class="simbrief-btn dispatch-action-btn" data-role="simbrief" href="#" target="_blank" rel="noopener noreferrer"><img src="images/icon_navi_color.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Send Plan to SimBrief</a>
                         <a class="simbrief-btn dispatch-action-btn" data-role="pln" href="#" style="cursor: pointer;"><img src="images/MSFS2024.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Download MSFS.PLN</a>
-                        <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">📋 Save Flight to Logbook</button>
+                        <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">Save Flight to Logbook</button>
                         <p class="contract-ticket-heli" data-role="heli"></p>
                     </div>
+                    <button type="button" class="contract-ticket-reselect" data-role="reselect" onclick="clearContractTicketSelection()">Select another job</button>
                 </div>
             </div>
         </article>
+        </div>
+        <div class="contract-ticket-slot">
         <article class="contract-ticket" data-ticket-index="1" aria-label="Contract ticket 2">
-            <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
+            <div class="contract-ticket-photo-wrap">
+                <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
+                <p class="contract-ticket-photo-label">MISSION PHOTO</p>
+            </div>
             <div class="contract-ticket-body">
-                <p class="contract-ticket-kicker" data-role="kicker">VIP CHARTER</p>
-                <h4 class="contract-ticket-title" data-role="title">High-Net-Worth Individual: Intercity Transit</h4>
-                <p class="contract-ticket-route" data-role="route">— → —</p>
-                <p class="contract-ticket-airports" data-role="airports">Awaiting dispatch</p>
-                <p class="contract-ticket-meta" data-role="meta">Aircraft · Duration · Payload appear after Generate</p>
-                <p class="contract-ticket-value" data-role="value">Est. Value: — | +0 Prestige Points</p>
+                <div class="contract-ticket-title-row">
+                    <h4 class="contract-ticket-mission" data-role="mission">Awaiting dispatch</h4>
+                </div>
+                <p class="contract-ticket-label">ROUTE ICAOs</p>
+                <p class="contract-ticket-route" data-role="route">
+                    <span class="contract-ticket-route-leg" data-role="dep">—</span>
+                    <span class="contract-ticket-route-arrow" aria-hidden="true"></span>
+                    <span class="contract-ticket-route-leg" data-role="arr">—</span>
+                </p>
+                <p class="contract-ticket-label">CONTRACT VALUE</p>
+                <p class="contract-ticket-value" data-role="value">$ —</p>
+                <p class="contract-ticket-pp" data-role="pp">+0 Prestige Points</p>
+                <hr class="contract-ticket-rule" aria-hidden="true">
+                <p class="contract-ticket-meta" data-role="meta">Awaiting dispatch</p>
                 <div class="contract-ticket-actions">
-                    <button type="button" class="contract-ticket-details" data-role="details" onclick="viewContractTicketDetails(1)" disabled>View Details</button>
                     <button type="button" class="contract-ticket-accept" data-role="accept" onclick="acceptContractTicket(1)" disabled>Accept Contract</button>
                     <div class="contract-ticket-export" data-role="export">
                         <a class="simbrief-btn dispatch-action-btn" data-role="simbrief" href="#" target="_blank" rel="noopener noreferrer"><img src="images/icon_navi_color.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Send Plan to SimBrief</a>
                         <a class="simbrief-btn dispatch-action-btn" data-role="pln" href="#" style="cursor: pointer;"><img src="images/MSFS2024.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Download MSFS.PLN</a>
-                        <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">📋 Save Flight to Logbook</button>
+                        <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">Save Flight to Logbook</button>
                         <p class="contract-ticket-heli" data-role="heli"></p>
                     </div>
+                    <button type="button" class="contract-ticket-reselect" data-role="reselect" onclick="clearContractTicketSelection()">Select another job</button>
                 </div>
             </div>
         </article>
+        </div>
+        <div class="contract-ticket-slot">
         <article class="contract-ticket" data-ticket-index="2" aria-label="Contract ticket 3">
-            <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
+            <div class="contract-ticket-photo-wrap">
+                <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
+                <p class="contract-ticket-photo-label">MISSION PHOTO</p>
+            </div>
             <div class="contract-ticket-body">
-                <p class="contract-ticket-kicker" data-role="kicker">NETWORK EFFICIENCY</p>
-                <h4 class="contract-ticket-title" data-role="title">Scheduled Express Feed: Time-Critical Logistics</h4>
-                <p class="contract-ticket-route" data-role="route">— → —</p>
-                <p class="contract-ticket-airports" data-role="airports">Awaiting dispatch</p>
-                <p class="contract-ticket-meta" data-role="meta">Aircraft · Duration · Payload appear after Generate</p>
-                <p class="contract-ticket-value" data-role="value">Est. Value: — | +0 Prestige Points</p>
+                <div class="contract-ticket-title-row">
+                    <h4 class="contract-ticket-mission" data-role="mission">Awaiting dispatch</h4>
+                </div>
+                <p class="contract-ticket-label">ROUTE ICAOs</p>
+                <p class="contract-ticket-route" data-role="route">
+                    <span class="contract-ticket-route-leg" data-role="dep">—</span>
+                    <span class="contract-ticket-route-arrow" aria-hidden="true"></span>
+                    <span class="contract-ticket-route-leg" data-role="arr">—</span>
+                </p>
+                <p class="contract-ticket-label">CONTRACT VALUE</p>
+                <p class="contract-ticket-value" data-role="value">$ —</p>
+                <p class="contract-ticket-pp" data-role="pp">+0 Prestige Points</p>
+                <hr class="contract-ticket-rule" aria-hidden="true">
+                <p class="contract-ticket-meta" data-role="meta">Awaiting dispatch</p>
                 <div class="contract-ticket-actions">
-                    <button type="button" class="contract-ticket-details" data-role="details" onclick="viewContractTicketDetails(2)" disabled>View Details</button>
                     <button type="button" class="contract-ticket-accept" data-role="accept" onclick="acceptContractTicket(2)" disabled>Accept Contract</button>
                     <div class="contract-ticket-export" data-role="export">
                         <a class="simbrief-btn dispatch-action-btn" data-role="simbrief" href="#" target="_blank" rel="noopener noreferrer"><img src="images/icon_navi_color.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Send Plan to SimBrief</a>
                         <a class="simbrief-btn dispatch-action-btn" data-role="pln" href="#" style="cursor: pointer;"><img src="images/MSFS2024.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Download MSFS.PLN</a>
-                        <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">📋 Save Flight to Logbook</button>
+                        <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">Save Flight to Logbook</button>
                         <p class="contract-ticket-heli" data-role="heli"></p>
                     </div>
+                    <button type="button" class="contract-ticket-reselect" data-role="reselect" onclick="clearContractTicketSelection()">Select another job</button>
                 </div>
             </div>
         </article>
+        </div>
     </div>
 </div>
-<div class="panel-btn-row">
-    <button type="button" id="logbookToggleBtn" class="settings-toggle-btn" onclick="boardNavGo('logbook')">📋 Pilot Logbook</button>
-    <button type="button" class="settings-toggle-btn" onclick="boardNavGo('settings')">⚙️ Settings &amp; Database Tools</button>
-</div>
-    <div id="logbookPanel" class="settings-panel settings-group board-logbook">
+
+<div id="logbookPanel" class="settings-panel settings-group board-logbook">
         <h3 style="margin-top: 0;">PILOT LOGBOOK</h3>
         <div class="db-stats-container logbook-stats-grid">
             <div class="db-stat-item db-stat-item--static">
@@ -2569,12 +3040,7 @@
         <strong>Disclaimer:</strong> For flight simulation use only. Do not use for real-world aviation or dispatch. Third-party names and links belong to their respective owners.
     </div>
     <div class="footer-bar">
-        <div style="text-align: left;">
-           <a href="https://www.buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" class="footer-bmc">
-                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" style="height: 48px !important;width: 174px !important;">
-            </a>
-        </div>
-        <div style="text-align: right;">
+        <div style="text-align: right; width: 100%;">
             &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" class="footer-readme">READ ME</a> for details.
         </div>
     </div>
