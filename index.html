@@ -63,7 +63,7 @@
             --board-sidebar-width: 408px; /* was 340px (+20%) */
             --board-ticket-width: 288px; /* was 320px (−10%) */
             --board-ticket-gap: 22px;
-            --board-ticket-radius: 16px;
+            --board-ticket-radius: 12px;
             --board-ticket-stack-peek: 14px;
             --board-ticket-font: "Roboto", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             --board-panel-pad: 18px;
@@ -1852,15 +1852,15 @@
             transition: transform 0.22s ease, opacity 0.22s ease;
         }
         .contract-ticket-slot::before {
-            transform: translateY(7px);
-            opacity: 0.95;
+            transform: translateY(8px);
+            opacity: 0.92;
         }
         .contract-ticket-slot::after {
-            left: 5%;
-            right: 5%;
-            transform: translateY(14px);
-            background: #c4c9cf;
-            opacity: 0.9;
+            left: 4.875%;
+            right: 4.875%;
+            transform: translateY(16px);
+            background: #bcc1c8;
+            opacity: 0.88;
         }
         .contract-ticket {
             position: relative;
@@ -1885,11 +1885,11 @@
             transform: translateY(-8px);
             box-shadow: 0 16px 32px rgba(0, 0, 0, 0.38);
         }
-        .contract-ticket-slot:hover:has(.contract-ticket:not(.is-dimmed))::before {
-            transform: translateY(9px);
+        .contract-ticket-slot:hover::before {
+            transform: translateY(10px);
         }
-        .contract-ticket-slot:hover:has(.contract-ticket:not(.is-dimmed))::after {
-            transform: translateY(16px);
+        .contract-ticket-slot:hover::after {
+            transform: translateY(18px);
         }
         .contract-ticket.is-dimmed {
             opacity: 0.22;
@@ -1915,7 +1915,7 @@
             left: 0;
             right: 0;
             top: 0;
-            height: 12.5%;
+            height: 25%;
             background: #cfd3d8;
             z-index: 1;
             pointer-events: none;
@@ -1972,7 +1972,7 @@
             letter-spacing: 0.02em;
         }
         .contract-ticket-mission {
-            font-size: 48pt;
+            font-size: 36pt;
             font-weight: 800;
             line-height: 1.02;
             letter-spacing: 0.01em;
@@ -1999,7 +1999,7 @@
             align-items: center;
             justify-content: flex-start;
             gap: 10px;
-            font-size: 36pt;
+            font-size: 27pt;
             font-weight: 700;
             color: var(--board-ticket-text);
             letter-spacing: 0.01em;
@@ -2024,7 +2024,7 @@
         }
         .contract-ticket-value {
             margin: 4px 0 0;
-            font-size: 36pt;
+            font-size: 27pt;
             font-weight: 700;
             color: var(--board-ticket-text);
             letter-spacing: 0.01em;
@@ -2039,7 +2039,7 @@
         }
         .contract-ticket-rule {
             display: block;
-            width: 90%;
+            width: 80%;
             max-width: none;
             height: 0;
             margin: 12px auto 0;
