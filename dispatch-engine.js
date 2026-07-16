@@ -2007,7 +2007,6 @@ function showContractRollover(index) {
     `;
 
     const panel = document.getElementById("contractsBoardPanel");
-    const grid = document.getElementById("contractsTicketGrid");
     if (panel && grid) {
         win.classList.add("is-visible");
         win.setAttribute("aria-hidden", "false");
