@@ -2363,6 +2363,84 @@
             letter-spacing: 0.04em;
             font-weight: 800;
         }
+        /* Settings: match board greyscale (no classic blue accents) */
+        #settingsPanel.board-settings label,
+        #settingsPanel.board-settings .accent-checkbox-label,
+        #settingsPanel.board-settings .field-title,
+        #settingsPanel.board-settings .form-section-title,
+        #settingsPanel.board-settings .text-accent {
+            color: var(--board-text-primary) !important;
+        }
+        #settingsPanel.board-settings .note-text,
+        #settingsPanel.board-settings .hint-block,
+        #settingsPanel.board-settings .accent-checkbox-label .note-text,
+        #settingsPanel.board-settings .settings-section-note {
+            color: var(--board-text-muted) !important;
+        }
+        #settingsPanel.board-settings .field-hint,
+        #settingsPanel.board-settings .field-hint a,
+        #settingsPanel.board-settings .link-inline,
+        #settingsPanel.board-settings a:not(.link-danger):not(.footer-readme) {
+            color: var(--board-text-muted) !important;
+        }
+        #settingsPanel.board-settings .field-hint a:hover,
+        #settingsPanel.board-settings .link-inline:hover {
+            color: var(--board-text-primary) !important;
+        }
+        #settingsPanel.board-settings .settings-section > summary,
+        #settingsPanel.board-settings .info-details > summary {
+            color: var(--board-text-primary) !important;
+        }
+        #settingsPanel.board-settings input[type="text"],
+        #settingsPanel.board-settings input[type="number"],
+        #settingsPanel.board-settings textarea,
+        #settingsPanel.board-settings select {
+            background: var(--board-bg-page) !important;
+            color: var(--board-text-primary) !important;
+            border: 1px solid var(--board-border) !important;
+        }
+        #settingsPanel.board-settings button:not(.board-topbar-link) {
+            background: linear-gradient(180deg, #c8ccd2 0%, #9aa1a9 100%) !important;
+            color: #1a1c20 !important;
+            border: 1px solid #7a828c !important;
+            border-radius: var(--board-ui-radius) !important;
+        }
+        #settingsPanel.board-settings button:not(.board-topbar-link):hover {
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
+            border-color: #348538 !important;
+            color: #ffffff !important;
+        }
+        #settingsPanel.board-settings .backup-btn--reset:hover {
+            background: linear-gradient(180deg, #c75c5c 0%, #a84848 100%) !important;
+            border-color: #8f3d3d !important;
+            color: #ffffff !important;
+        }
+        #settingsPanel.board-settings .backup-btn--backup:hover,
+        #settingsPanel.board-settings .backup-btn:hover {
+            background: linear-gradient(180deg, #e3ae36 0%, #c99420 100%) !important;
+            border-color: #b8871c !important;
+            color: #1a1c20 !important;
+        }
+        #settingsPanel.board-settings .db-stat-item,
+        #settingsPanel.board-settings .db-stat-item--static,
+        #settingsPanel.board-settings .db-stat-item.db-stat-item--static {
+            background-color: var(--board-bg-page) !important;
+            color: var(--board-text-primary) !important;
+            border-color: var(--board-border) !important;
+        }
+        #settingsPanel.board-settings .db-stat-item:hover,
+        #settingsPanel.board-settings .db-stat-item--static:hover {
+            background-color: #22252b !important;
+            color: var(--board-text-primary) !important;
+        }
+        #settingsPanel.board-settings .config-separator {
+            border-color: var(--board-border) !important;
+        }
+        #settingsPanel.board-settings .info-details-body {
+            background: var(--board-bg-page) !important;
+            border-color: var(--board-border) !important;
+            color: var(--board-text-muted) !important;
+        }
         .board-logbook .logbook-table-wrap {
             max-height: min(380px, 36vh);
             background: var(--board-bg-page);
@@ -2820,7 +2898,6 @@
     </div>
     <div id="settingsPanel" class="settings-panel settings-group board-settings">
         <h3>User Preferences</h3>
-        <p class="note-text" style="margin-top: 0;">VECTOR v3 uses a single dark Contracts Board layout. Light and Greyscale modes have been removed.</p>
         <p class="note-text"><strong>Q: Do different career paths alter point payouts?</strong><br>A: No. VECTOR balances progression equally across all paths; your career choice shifts operational style and routing flavour, not your progression velocity.</p>
         <hr class="config-separator">
         <details class="settings-section">
