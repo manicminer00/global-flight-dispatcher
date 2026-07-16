@@ -414,7 +414,7 @@
         }
         .board-sidebar-form label,
         .board-sidebar-form .field-title {
-            font-size: 12px;
+            font-size: 14px;
             color: var(--board-text-primary);
         }
         .board-sidebar-form .field-hint,
@@ -449,6 +449,11 @@
         .board-sidebar-checks .checkbox-option input {
             margin-top: 2px;
             flex-shrink: 0;
+        }
+        .sidebar-section-divider {
+            border: 0;
+            border-top: 1px solid var(--board-border);
+            margin: 14px 0;
         }
         .board-sidebar-slider {
             margin-top: 8px;
@@ -488,6 +493,19 @@
             align-items: center;
             justify-content: space-between;
             gap: 10px;
+        }
+        .board-sidebar-footer-left {
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            gap: 6px;
+            align-items: flex-start;
+        }
+        .board-sidebar-copyright {
+            font-size: var(--font-size-small);
+            color: var(--text-muted);
+            line-height: 1.25;
+            text-align: left;
         }
         .board-sidebar-bmc {
             display: flex;
@@ -1772,6 +1790,7 @@
             font-weight: 800;
             letter-spacing: 0.06em;
             text-transform: uppercase;
+            text-align: left;
             transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
         }
         .board-tab:hover {
@@ -1794,6 +1813,114 @@
             border-radius: 8px;
             box-sizing: border-box;
             width: 100%;
+            position: relative;
+            overflow: visible;
+        }
+        .contract-rollover-window {
+            display: none;
+            position: absolute;
+            z-index: 60;
+            width: 560px;
+            max-width: calc(100% - 30px);
+            background: #f2f3f5;
+            border: 1px solid #8b929a;
+            border-radius: var(--board-ticket-radius);
+            box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
+            pointer-events: none; /* keep hover behavior clean */
+            overflow: hidden;
+        }
+        .contract-rollover-window.is-visible {
+            display: block;
+        }
+        .contract-rollover-photo-wrap {
+            position: relative;
+            height: 240px;
+            background: #3a3f45;
+        }
+        .contract-rollover-photo-wrap::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 25%;
+            background: #cfd3d8;
+            z-index: 1;
+        }
+        .contract-rollover-photo {
+            position: absolute;
+            inset: 0;
+            background: #3a3f45 center/cover no-repeat;
+            filter: none;
+        }
+        .contract-rollover-photo-label {
+            position: absolute;
+            top: 16px;
+            left: 18px;
+            margin: 0;
+            z-index: 2;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #16181c;
+            pointer-events: none;
+        }
+        .contract-rollover-body {
+            padding: 14px 18px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .contract-rollover-mission {
+            margin: 0;
+            font-size: 34pt;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            line-height: 1.05;
+            text-transform: uppercase;
+            color: #16181c;
+        }
+        .contract-rollover-label {
+            margin: 0;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #6b7280;
+        }
+        .contract-rollover-route {
+            font-size: 26pt;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: 0.01em;
+            color: #16181c;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .contract-rollover-value {
+            margin: 0;
+            font-size: 30pt;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: 0.01em;
+            color: #16181c;
+        }
+        .contract-rollover-divider {
+            border: 0;
+            border-top: 1px solid #9aa0a8;
+            width: 92%;
+            margin: 8px 0 0;
+        }
+        .contract-rollover-desc {
+            font-size: 14px;
+            color: #2a2e34;
+            line-height: 1.4;
+            white-space: pre-wrap;
+        }
+        .contract-rollover-strong {
+            font-weight: 800;
         }
         .contracts-board-header {
             display: flex;
@@ -2370,7 +2497,7 @@
     <div class="board-sidebar-scroll">
         <div class="dispatch-control-group board-sidebar-form">
             <div class="dispatch-form-field">
-                <label for="callsignInput">ATC Callsign:</label>
+                <label for="callsignInput">ATC CALLSIGN</label>
                 <input type="text" id="callsignInput" placeholder="e.g. MRD275" maxlength="7" required>
                 <span class="field-hint" style="display:block; margin-left:0; margin-top:6px;">
                     <a class="link-inline" onclick="event.preventDefault(); saveCallsign();">Save Callsign</a>
@@ -2380,20 +2507,22 @@
                     <a class="link-inline" onclick="event.preventDefault(); generateRandomCallsign();">Generate Callsign</a>
                 </span>
             </div>
+            <hr class="sidebar-section-divider" aria-hidden="true">
             <div class="dispatch-form-field">
-                <label for="aircraftInput" class="flex-label">Aircraft Type:</label>
+                <label for="aircraftInput" class="flex-label">AIRCRAFT TYPE</label>
                 <div class="input-relative-wrap">
-                    <input type="text" id="aircraftInput" placeholder="Search by name or ICAO code" autocomplete="off">
+                    <input type="text" id="aircraftInput" placeholder="Seach by name or Aircraft type designator" autocomplete="off">
                     <div id="customAircraftList" class="custom-datalist"></div>
                 </div>
             </div>
             <div class="dispatch-form-field board-sidebar-checks">
                 <label class="checkbox-option" for="contractorToggle">
-                    <input type="checkbox" id="contractorToggle" onchange="syncContractorMilitaryOptions()">Contractor Mode (civilian aircraft fly military missions)
+                    <input type="checkbox" id="contractorToggle" onchange="syncContractorMilitaryOptions()">CONTRACTOR MODE (civilian aircraft fly military missions)
                 </label>
             </div>
+            <hr class="sidebar-section-divider" aria-hidden="true">
             <div class="dispatch-form-field">
-                <label for="depOverrideInput" class="field-title">Departure Airport:</label>
+                <label for="depOverrideInput" class="field-title">DEPARTURE AIRPORT</label>
                 <div class="dep-field-wrap">
                     <input type="text" id="depOverrideInput" placeholder="Airport Name or ICAO (Optional)" autocomplete="off">
                     <div id="customAirportList" class="custom-datalist"></div>
@@ -2401,14 +2530,15 @@
             </div>
             <div class="dispatch-form-field board-sidebar-checks">
                 <label class="checkbox-option" for="useLastArrivalToggle">
-                    <input type="checkbox" id="useLastArrivalToggle" onchange="toggleLastArrival()">Continue from last airport?
+                    <input type="checkbox" id="useLastArrivalToggle" onchange="toggleLastArrival()">CONTINUE FROM LAST AIRPORT?
                 </label>
                 <label class="checkbox-option" for="militaryBaseToggle">
-                    <input type="checkbox" id="militaryBaseToggle">Use Military Airbases
+                    <input type="checkbox" id="militaryBaseToggle">USE MILITARY AIRBASES
                 </label>
             </div>
+            <hr class="sidebar-section-divider" aria-hidden="true">
             <div class="dispatch-form-field">
-                <label for="routingScopeSelect" class="field-title"><span>Routing Options:</span>
+                <label for="routingScopeSelect" class="field-title"><span>ROUTING OPTIONS:</span>
                     <span class="field-hint">🧭 <a class="link-inline" href="https://www.google.com/maps/d/edit?mid=1m27z2BIBRWRM3MgD9UExPAOqxxRmntE&usp=sharing" target="_blank" rel="noopener noreferrer">Map of Airports in Database</a></span>
                 </label>
                 <select id="routingScopeSelect">
@@ -2466,16 +2596,21 @@
         </div>
     </div>
     <div class="board-sidebar-footer">
-        <a href="https://www.buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" class="board-sidebar-bmc footer-bmc" aria-label="Buy Me a Coffee">
-            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" class="board-sidebar-bmc-img">
-        </a>
+        <div class="board-sidebar-footer-left">
+            <a href="https://www.buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" class="board-sidebar-bmc footer-bmc" aria-label="Buy Me a Coffee">
+                <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" class="board-sidebar-bmc-img">
+            </a>
+            <div class="board-sidebar-copyright">
+                &copy; 2026. See <a class="footer-readme" href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer">READ ME</a> for details.
+            </div>
+        </div>
         <button type="button" class="board-nav-btn board-sidebar-settings-btn" data-nav="settings" onclick="boardNavGo('settings')">Settings</button>
     </div>
 </aside>
 <div class="board-main">
 <div class="container">
 <div class="board-tabs" role="tablist" aria-label="Contracts and Logbook tabs">
-    <button type="button" id="boardTabContracts" class="board-tab is-active" role="tab" aria-selected="true" onclick="boardTabGo('contracts')">CONTRACTS BOARD</button>
+    <button type="button" id="boardTabContracts" class="board-tab is-active" role="tab" aria-selected="true" onclick="boardTabGo('contracts')">CONTRACTS</button>
     <button type="button" id="boardTabLogbook" class="board-tab" role="tab" aria-selected="false" onclick="boardTabGo('logbook')">LOGBOOK</button>
 </div>
 <div id="contractsBoardPanel" class="contracts-board-panel" aria-label="Available contracts">
@@ -2485,7 +2620,7 @@
     <p class="contracts-board-note" id="contractsBoardNote"></p>
     <div class="contracts-ticket-grid" id="contractsTicketGrid">
         <div class="contract-ticket-slot">
-        <article class="contract-ticket" data-ticket-index="0" aria-label="Contract ticket 1">
+        <article class="contract-ticket" data-ticket-index="0" aria-label="Contract ticket 1" onmouseenter="showContractRollover(0)" onmouseleave="hideContractRollover()">
             <div class="contract-ticket-photo-wrap">
                 <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
                 <p class="contract-ticket-photo-label">MISSION PHOTO</p>
@@ -2519,7 +2654,7 @@
         </article>
         </div>
         <div class="contract-ticket-slot">
-        <article class="contract-ticket" data-ticket-index="1" aria-label="Contract ticket 2">
+        <article class="contract-ticket" data-ticket-index="1" aria-label="Contract ticket 2" onmouseenter="showContractRollover(1)" onmouseleave="hideContractRollover()">
             <div class="contract-ticket-photo-wrap">
                 <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
                 <p class="contract-ticket-photo-label">MISSION PHOTO</p>
@@ -2553,7 +2688,7 @@
         </article>
         </div>
         <div class="contract-ticket-slot">
-        <article class="contract-ticket" data-ticket-index="2" aria-label="Contract ticket 3">
+        <article class="contract-ticket" data-ticket-index="2" aria-label="Contract ticket 3" onmouseenter="showContractRollover(2)" onmouseleave="hideContractRollover()">
             <div class="contract-ticket-photo-wrap">
                 <div class="contract-ticket-photo" data-role="photo" aria-hidden="true"></div>
                 <p class="contract-ticket-photo-label">MISSION PHOTO</p>
@@ -2587,6 +2722,7 @@
         </article>
         </div>
     </div>
+    <div id="contractRolloverWindow" class="contract-rollover-window" aria-hidden="true"></div>
 </div>
 
 <div id="logbookPanel" class="settings-panel settings-group board-logbook">
@@ -3040,9 +3176,7 @@
         <strong>Disclaimer:</strong> For flight simulation use only. Do not use for real-world aviation or dispatch. Third-party names and links belong to their respective owners.
     </div>
     <div class="footer-bar">
-        <div style="text-align: right; width: 100%;">
-            &copy; 2026. See  <a href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer" class="footer-readme">READ ME</a> for details.
-        </div>
+        
     </div>
 </div>
 </div>

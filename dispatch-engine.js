@@ -1820,6 +1820,97 @@ function clearContractTicketSelection() {
     if (note) note.textContent = "";
 }
 
+let contractRolloverHideTimer = null;
+function hideContractRollover() {
+    const win = document.getElementById("contractRolloverWindow");
+    if (!win) return;
+    if (contractRolloverHideTimer) clearTimeout(contractRolloverHideTimer);
+    contractRolloverHideTimer = setTimeout(() => {
+        win.classList.remove("is-visible");
+        win.setAttribute("aria-hidden", "true");
+    }, 80);
+}
+
+function showContractRollover(index) {
+    const result = boardContractResults[index];
+    const win = document.getElementById("contractRolloverWindow");
+    if (!result || !win) return;
+
+    if (contractRolloverHideTimer) clearTimeout(contractRolloverHideTimer);
+
+    const bundle = result._exportBundle || {};
+    const pax = Number(result.pax) || 0;
+    const cargoKg = Number(result.cargoKg) || 0;
+    const aircraftName = formatBoardAircraftDisplayName(result.spec && result.spec.name ? result.spec.name : "");
+
+    const missionName = (result.chosenMission && result.chosenMission.name)
+        ? result.chosenMission.name
+        : (BOARD_TICKET_KICKERS[index] || "CONTRACT");
+
+    const paxLine = missionRequiresPassengers(result.chosenMission, result.spec)
+        ? (pax === 1 ? "1 PAX" : `${pax} PAX`)
+        : `${pax} PAX`;
+
+    const instruction = String(result.rInstruction || "").trim();
+    const payload = String(result.rPayload || "").trim();
+
+    const descLines = [
+        `AIRCRAFT: ${aircraftName}`,
+        `DURATION: ${formatBoardBlockDuration(result)}`,
+        `PASSENGERS: ${paxLine}`,
+        `CARGO: ${cargoKg} KG`,
+        payload ? `PAYLOAD: ${payload}` : "",
+        instruction ? `${instruction}` : ""
+    ].filter(Boolean);
+
+    const descHtml = escapeHtml(descLines.join("\n")).replace(/\n/g, "<br>");
+    const imgUrl = bundle.imageUrl || "";
+
+    win.innerHTML = `
+        <div class="contract-rollover-photo-wrap">
+            <div class="contract-rollover-photo" style="${imgUrl ? `background-image: url(\"${imgUrl}\")` : ""}"></div>
+            <p class="contract-rollover-photo-label">MISSION PHOTO</p>
+        </div>
+        <div class="contract-rollover-body">
+            <h4 class="contract-rollover-mission">${escapeHtml(missionName)}</h4>
+            <p class="contract-rollover-label">ROUTE ICAOs</p>
+            <div class="contract-rollover-route">
+                <span>${escapeHtml(result.origin.icao)}</span>
+                <span aria-hidden="true">→</span>
+                <span>${escapeHtml(result.destination.icao)}</span>
+            </div>
+            <div class="contract-rollover-divider"></div>
+            <p class="contract-rollover-label">CONTRACT VALUE</p>
+            <p class="contract-rollover-value">${escapeHtml(result.payout || "")}</p>
+            <div class="contract-rollover-divider"></div>
+            <div class="contract-rollover-desc">${descHtml}</div>
+        </div>
+    `;
+
+    // Position overlay near hovered card (inside contracts board panel).
+    const panel = document.getElementById("contractsBoardPanel");
+    const card = document.querySelector(`#contractsTicketGrid .contract-ticket[data-ticket-index="${index}"]`);
+    if (panel && card) {
+        win.classList.add("is-visible");
+        win.setAttribute("aria-hidden", "false");
+        const panelRect = panel.getBoundingClientRect();
+        const cardRect = card.getBoundingClientRect();
+        const leftCandidate = cardRect.right - panelRect.left + 12;
+        const topCandidate = cardRect.top - panelRect.top - 6;
+        const maxLeft = panelRect.width - win.offsetWidth - 10;
+        const left = Math.max(10, Math.min(maxLeft, leftCandidate));
+        const top = Math.max(10, topCandidate);
+        win.style.left = `${left}px`;
+        win.style.top = `${top}px`;
+        return;
+    }
+
+    win.classList.add("is-visible");
+    win.setAttribute("aria-hidden", "false");
+    win.style.left = "10px";
+    win.style.top = "10px";
+}
+
 function acceptContractTicket(index) {
     const result = boardContractResults[index];
     if (!result || !result._exportBundle) {
