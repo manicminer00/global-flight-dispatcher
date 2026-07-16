@@ -351,12 +351,70 @@
         }
         .app-shell {
             display: flex;
+            flex-direction: column;
             align-items: stretch;
             min-height: 100vh;
             width: fit-content;
             max-width: 100%;
             margin: 0;
             background: var(--board-bg-page);
+        }
+        .board-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px 16px;
+            flex-shrink: 0;
+            background: var(--board-bg-page);
+        }
+        .board-topbar-logo {
+            display: block;
+            height: 40px;
+            width: auto;
+            flex-shrink: 0;
+        }
+        .board-topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .board-topbar-link {
+            background: transparent;
+            border: none;
+            color: var(--board-text-muted);
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 8px 14px;
+            cursor: pointer;
+            text-align: left;
+        }
+        .board-topbar-link:hover {
+            color: var(--board-text-primary);
+        }
+        .board-topbar-link.is-active {
+            color: var(--board-text-primary);
+            box-shadow: inset 0 -2px 0 #ffffff;
+        }
+        .board-topbar-rule {
+            height: 0;
+            border: 0;
+            border-top: 1px solid var(--board-border);
+            margin: 0;
+            flex-shrink: 0;
+            width: 100%;
+        }
+        .app-body {
+            display: flex;
+            align-items: stretch;
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
         }
         .board-sidebar {
             width: var(--board-sidebar-width);
@@ -367,41 +425,16 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            max-height: 100vh;
-        }
-        .board-sidebar-top {
-            padding: 14px 12px 12px;
-            border-bottom: 1px solid var(--board-border);
-            flex-shrink: 0;
-        }
-        .board-sidebar-header-img {
-            display: block;
-            width: 100%;
-            height: 110px;
-            object-fit: cover;
-            object-position: center top;
-            border-radius: 6px;
-        }
-        .board-nav-brand {
-            color: var(--board-text-primary);
-            font-weight: bold;
-            font-size: 14px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            margin: 0;
-            padding: 0;
-        }
-        .board-sidebar-sub {
-            margin: 4px 0 0;
-            font-size: 12px;
-            color: var(--board-text-muted);
+            min-height: 0;
+            max-height: none;
+            height: auto;
         }
         .board-sidebar-scroll {
             flex: 1 1 auto;
             overflow-y: auto;
             overflow-x: hidden;
-            padding: 12px 14px 16px;
+            /* Match main content top so ATC CALLSIGN lines up with CONTRACTS BOARD */
+            padding: 16px 14px 16px;
             min-height: 0;
         }
         .board-sidebar-form {
@@ -609,12 +642,11 @@
             width: var(--board-main-content-width);
             max-width: calc(100vw - var(--board-sidebar-width));
             min-width: 0;
-            min-height: 100vh;
-            padding: 0 var(--board-main-pad-x) 28px;
+            min-height: 0;
+            padding: 16px var(--board-main-pad-x) 28px;
             box-sizing: border-box;
             overflow-x: hidden;
             overflow-y: auto;
-            max-height: 100vh;
             background: var(--board-bg-page);
             display: flex;
             flex-direction: column;
@@ -632,52 +664,6 @@
             flex-direction: column;
             min-height: 0;
         }
-        .board-topbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 24px;
-            padding: 14px 0 12px;
-            flex-shrink: 0;
-        }
-        .board-topbar-logo {
-            display: block;
-            height: 36px;
-            width: auto;
-            flex-shrink: 0;
-        }
-        .board-topbar-nav {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-left: auto;
-        }
-        .board-topbar-link {
-            background: transparent;
-            border: none;
-            color: var(--board-text-muted);
-            font-size: 13px;
-            font-weight: 800;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            padding: 8px 14px;
-            cursor: pointer;
-            text-align: left;
-        }
-        .board-topbar-link:hover {
-            color: var(--board-text-primary);
-        }
-        .board-topbar-link.is-active {
-            color: var(--board-text-primary);
-            box-shadow: inset 0 -2px 0 #ffffff;
-        }
-        .board-topbar-rule {
-            height: 0;
-            border: 0;
-            border-top: 1px solid var(--board-border);
-            margin: 0 0 16px;
-            flex-shrink: 0;
-        }
         .dispatcher-banner-container {
             display: none !important;
         }
@@ -688,7 +674,8 @@
             }
         }
         @media (max-width: 900px) {
-            .app-shell { flex-direction: column; width: 100%; }
+            .app-shell { width: 100%; }
+            .app-body { flex-direction: column; }
             .board-sidebar {
                 width: 100%;
                 max-width: none;
@@ -1986,6 +1973,11 @@
             color: var(--board-text-primary);
             text-transform: uppercase;
             letter-spacing: 0.04em;
+            line-height: 1;
+        }
+        .board-sidebar-form > .dispatch-form-field:first-child > label {
+            margin-top: 0;
+            line-height: 1;
         }
         .contracts-board-note {
             margin: 0 0 16px;
@@ -2552,10 +2544,17 @@
 </head>
 <body>
 <div class="app-shell">
+<header class="board-topbar" aria-label="VECTOR main navigation">
+    <img src="images/logowhite.png" alt="VECTOR" class="board-topbar-logo">
+    <nav class="board-topbar-nav" role="tablist" aria-label="Contracts, Logbook and Settings">
+        <button type="button" id="boardTabContracts" class="board-topbar-link is-active" role="tab" aria-selected="true" onclick="boardTabGo('contracts')">CONTRACTS</button>
+        <button type="button" id="boardTabLogbook" class="board-topbar-link" role="tab" aria-selected="false" onclick="boardTabGo('logbook')">LOGBOOK</button>
+        <button type="button" id="boardTabSettings" class="board-topbar-link" role="tab" aria-selected="false" onclick="boardTabGo('settings')">SETTINGS</button>
+    </nav>
+</header>
+<hr class="board-topbar-rule" aria-hidden="true">
+<div class="app-body">
 <aside class="board-sidebar" aria-label="VECTOR dispatch controls">
-    <div class="board-sidebar-top">
-        <img src="images/header.png" alt="VECTOR Flight Dispatch" class="board-sidebar-header-img">
-    </div>
     <div class="board-sidebar-scroll">
         <div class="dispatch-control-group board-sidebar-form">
             <div class="dispatch-form-field">
@@ -2666,15 +2665,6 @@
 </aside>
 <div class="board-main">
 <div class="container">
-<header class="board-topbar" aria-label="VECTOR main navigation">
-    <img src="images/logowhite.png" alt="VECTOR" class="board-topbar-logo">
-    <nav class="board-topbar-nav" role="tablist" aria-label="Contracts, Logbook and Settings">
-        <button type="button" id="boardTabContracts" class="board-topbar-link is-active" role="tab" aria-selected="true" onclick="boardTabGo('contracts')">CONTRACTS</button>
-        <button type="button" id="boardTabLogbook" class="board-topbar-link" role="tab" aria-selected="false" onclick="boardTabGo('logbook')">LOGBOOK</button>
-        <button type="button" id="boardTabSettings" class="board-topbar-link" role="tab" aria-selected="false" onclick="boardTabGo('settings')">SETTINGS</button>
-    </nav>
-</header>
-<hr class="board-topbar-rule" aria-hidden="true">
 <div id="contractsBoardPanel" class="contracts-board-panel is-active" aria-label="Available contracts">
     <div class="contracts-board-header">
         <h3>Contracts Board</h3>
@@ -3242,6 +3232,7 @@
     <div class="footer-bar">
         
     </div>
+</div>
 </div>
 </div>
 </div>
