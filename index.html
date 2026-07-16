@@ -520,7 +520,7 @@
             display: flex;
             flex-direction: row;
             align-items: flex-start;
-            justify-content: space-between;
+            justify-content: flex-start;
             gap: 10px;
         }
         .board-sidebar-footer-left {
@@ -605,16 +605,19 @@
             border-left-color: #3f9e44 !important;
         }
         .board-main {
-            flex: 0 0 auto;
+            flex: 1 1 auto;
             width: var(--board-main-content-width);
             max-width: calc(100vw - var(--board-sidebar-width));
             min-width: 0;
-            padding: 20px var(--board-main-pad-x) 28px;
+            min-height: 100vh;
+            padding: 0 var(--board-main-pad-x) 28px;
             box-sizing: border-box;
             overflow-x: hidden;
             overflow-y: auto;
             max-height: 100vh;
             background: var(--board-bg-page);
+            display: flex;
+            flex-direction: column;
         }
         .container {
             background-color: transparent;
@@ -624,6 +627,56 @@
             margin-bottom: 0;
             max-width: 100%;
             box-sizing: border-box;
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .board-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 14px 0 12px;
+            flex-shrink: 0;
+        }
+        .board-topbar-logo {
+            display: block;
+            height: 36px;
+            width: auto;
+            flex-shrink: 0;
+        }
+        .board-topbar-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .board-topbar-link {
+            background: transparent;
+            border: none;
+            color: var(--board-text-muted);
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 8px 14px;
+            cursor: pointer;
+            text-align: left;
+        }
+        .board-topbar-link:hover {
+            color: var(--board-text-primary);
+        }
+        .board-topbar-link.is-active {
+            color: var(--board-text-primary);
+            box-shadow: inset 0 -2px 0 #ffffff;
+        }
+        .board-topbar-rule {
+            height: 0;
+            border: 0;
+            border-top: 1px solid var(--board-border);
+            margin: 0 0 16px;
+            flex-shrink: 0;
         }
         .dispatcher-banner-container {
             display: none !important;
@@ -1801,51 +1854,27 @@
         .prefer-owned-row.military-airbase-row {
             margin-top: 10px;
         }
-        .board-tabs {
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
-            justify-content: flex-start;
-            width: 100%;
-            margin: 0 0 0;
-            padding: 0;
-        }
-        .board-tab {
-            flex: 0 0 auto;
-            border: 1px solid var(--board-border);
-            border-bottom: none;
-            background: var(--board-bg-sidebar);
-            color: var(--board-text-muted);
-            border-radius: var(--board-ui-radius) var(--board-ui-radius) 0 0;
-            padding: 10px 16px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 800;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            text-align: left;
-        }
-        .board-tab.is-active {
-            position: relative;
-            z-index: 2;
-            margin-bottom: -1px;
-            background: var(--board-bg-panel);
-            color: var(--board-text-primary);
-            border-color: var(--board-border);
-        }
-        /* ---- Contracts Board (paper tickets on dark chrome) ---- */
-        #contractsBoardPanel {
-            display: block;
-            margin: 0 0 20px;
-            padding: var(--board-panel-pad);
-            background: var(--board-bg-panel);
-            border: 1px solid var(--board-border);
-            border-top: none;
-            border-radius: 0 var(--board-ui-radius) var(--board-ui-radius) var(--board-ui-radius);
+        /* ---- Main body panels (flat, page background) ---- */
+        #contractsBoardPanel,
+        #logbookPanel.board-logbook,
+        #settingsPanel.board-settings {
+            display: none;
+            margin: 0 !important;
+            padding: 0 0 24px !important;
+            background: transparent !important;
+            border: none !important;
+            border-radius: 0 !important;
             box-sizing: border-box;
             width: 100%;
             position: relative;
             overflow: visible;
+            flex: 1 1 auto;
+            color: var(--board-text-primary);
+        }
+        #contractsBoardPanel.is-active,
+        #logbookPanel.board-logbook.is-active,
+        #settingsPanel.board-settings.is-active {
+            display: block !important;
         }
         .contract-rollover-window {
             display: none;
@@ -1863,6 +1892,39 @@
         .contract-rollover-window.is-visible {
             display: block;
             opacity: 1;
+        }
+        .contract-rollover-photo-wrap {
+            position: relative;
+            height: 200px;
+            background: #3a3f45;
+        }
+        .contract-rollover-photo-wrap::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 25%;
+            background: #cfd3d8;
+            z-index: 1;
+        }
+        .contract-rollover-photo {
+            position: absolute;
+            inset: 0;
+            background: #3a3f45 center/cover no-repeat;
+        }
+        .contract-rollover-photo-label {
+            position: absolute;
+            top: 14px;
+            left: 16px;
+            margin: 0;
+            z-index: 2;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: #16181c;
+            pointer-events: none;
         }
         .contract-rollover-body {
             padding: 14px 18px 18px;
@@ -1896,20 +1958,6 @@
             display: flex;
             gap: 10px;
             align-items: center;
-        }
-        .contract-rollover-value {
-            margin: 0;
-            font-size: 30pt;
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: 0.01em;
-            color: #16181c;
-        }
-        .contract-rollover-pp {
-            margin: 0;
-            font-size: 13px;
-            font-weight: 600;
-            color: #6b7280;
         }
         .contract-rollover-divider {
             border: 0;
@@ -1953,34 +2001,12 @@
             position: relative;
             width: 100%;
         }
-        .contracts-board-placeholder {
-            width: calc((3 * var(--board-ticket-width)) + (2 * var(--board-ticket-gap)));
-            max-width: 100%;
-            min-height: calc((580px * 1.15) + var(--board-ticket-stack-peek) + 6px);
-            margin-bottom: 0;
-            background-color: var(--board-bg-page);
-            background-image:
-                linear-gradient(var(--board-border) 1px, transparent 1px),
-                linear-gradient(90deg, var(--board-border) 1px, transparent 1px);
-            background-size: 100px 100px;
-            border: 1px solid var(--board-border);
-            border-radius: var(--board-ui-radius);
-            box-sizing: border-box;
-        }
-        .contracts-ticket-stage:has(.contracts-ticket-grid:not(.is-waiting)) .contracts-board-placeholder {
-            width: 100%;
-            min-height: 120px;
-            margin-top: 16px;
-        }
         .contracts-ticket-grid {
             display: flex;
             flex-wrap: nowrap;
             align-items: flex-start;
             gap: var(--board-ticket-gap);
-            padding-bottom: calc(var(--board-ticket-stack-peek) + 6px);
-        }
-        .contracts-ticket-grid.is-waiting {
-            display: none;
+            padding-bottom: calc(var(--board-ticket-stack-peek) + 18px);
         }
         .contracts-ticket-grid.is-dealing .contract-ticket-slot {
             opacity: 0;
@@ -2000,19 +2026,19 @@
             opacity: 0.1;
             pointer-events: none;
         }
-        .contracts-ticket-stage:has(.contracts-ticket-grid.is-waiting) .contracts-board-placeholder {
-            display: block;
+        .contracts-ticket-grid.is-inactive .contract-ticket-slot {
+            opacity: 0.22;
+            pointer-events: none;
+            filter: grayscale(0.15);
         }
-        .contracts-ticket-stage:has(.contracts-ticket-grid:not(.is-waiting)) .contracts-board-placeholder {
-            display: block;
-        }
-        /* Slot = front ticket + 2 stacked layers behind (RHS reference) */
+        /* Slot = front ticket + 2 stacked layers (3 deep) */
         .contract-ticket-slot {
             position: relative;
             width: var(--board-ticket-width);
             max-width: var(--board-ticket-width);
             flex: 0 0 var(--board-ticket-width);
-            padding-bottom: var(--board-ticket-stack-peek);
+            padding-bottom: calc(var(--board-ticket-stack-peek) + 14px);
+            isolation: isolate;
         }
         .contract-ticket-slot::before,
         .contract-ticket-slot::after {
@@ -2022,24 +2048,24 @@
             right: 2.5%;
             top: 0;
             bottom: 0;
-            border: 1px solid #9aa1a9;
+            border: 1px solid #8b929a;
             border-radius: var(--board-ticket-radius);
             pointer-events: none;
             transition: transform 0.22s ease, opacity 0.22s ease;
         }
         .contract-ticket-slot::before {
-            z-index: 0;
+            z-index: 1;
             transform: translateY(10px);
-            background: #c5c9cf;
-            opacity: 0.95;
+            background: #b8bec6;
+            opacity: 1;
         }
         .contract-ticket-slot::after {
-            left: 5%;
-            right: 5%;
-            z-index: -1;
-            transform: translateY(20px);
-            background: #9aa1a9;
-            opacity: 0.92;
+            left: 5.5%;
+            right: 5.5%;
+            z-index: 0;
+            transform: translateY(22px);
+            background: #6f7680;
+            opacity: 1;
         }
         .contract-ticket {
             position: relative;
@@ -2059,16 +2085,15 @@
             transition: transform 0.22s ease, box-shadow 0.22s ease, opacity 0.2s ease;
             will-change: transform;
         }
-        /* Hover: lift front ticket; stack stays put — simple “pick up a card” feel */
         .contract-ticket-slot:hover .contract-ticket:not(.is-dimmed) {
             transform: translateY(-8px);
             box-shadow: 0 16px 32px rgba(0, 0, 0, 0.38);
         }
         .contract-ticket-slot:hover::before {
-            transform: translateY(10px);
+            transform: translateY(12px);
         }
         .contract-ticket-slot:hover::after {
-            transform: translateY(22px);
+            transform: translateY(24px);
         }
         .contract-ticket.is-dimmed {
             opacity: 0.22;
@@ -2087,7 +2112,6 @@
             position: relative;
             border-bottom: 1px solid #c5c9cf;
         }
-        /* Grey top stripe (1/8 of mission image height) */
         .contract-ticket-photo-wrap::before {
             content: "";
             position: absolute;
@@ -2116,11 +2140,6 @@
         .contract-ticket-photo {
             height: 210px;
             background: #3a3f45 center/cover no-repeat;
-            filter: grayscale(1);
-            transition: filter 0.28s ease;
-        }
-        .contract-ticket-slot:hover .contract-ticket:not(.is-dimmed) .contract-ticket-photo,
-        .contract-ticket.is-selected .contract-ticket-photo {
             filter: none;
         }
         .contract-ticket-body {
@@ -2344,18 +2363,9 @@
                 transform: none;
             }
         }
-        /* Logbook: match Available Contracts panel (no classic blue) */
-        #logbookPanel.board-logbook {
-            display: none;
-            margin-top: 0;
-            background: var(--board-bg-panel) !important;
-            border: 1px solid var(--board-border) !important;
-            border-top: none !important;
-            border-radius: 0 var(--board-ui-radius) var(--board-ui-radius) var(--board-ui-radius);
-            padding: var(--board-panel-pad);
-            color: var(--board-text-primary);
-        }
-        #logbookPanel.board-logbook h3 {
+        /* Logbook / settings share flat main-body look */
+        #logbookPanel.board-logbook h3,
+        #settingsPanel.board-settings h3 {
             color: var(--board-text-primary);
             text-transform: uppercase;
             letter-spacing: 0.04em;
@@ -2586,10 +2596,10 @@
                     <input type="checkbox" id="contractorToggle" onchange="syncContractorMilitaryOptions()">CONTRACTOR MODE (civilian aircraft fly military missions)
                 </label>
             </div>
-            <div class="dispatch-form-field">
+            <div class="dispatch-form-field" style="margin-top: 15px;">
                 <label for="routingScopeSelect" class="field-title">ROUTING OPTIONS:</label>
                 <select id="routingScopeSelect">
-                    <option value="worldwide">🌐 Worldwide</option>
+                    <option value="worldwide">Worldwide</option>
                     <option value="americas">Americas Only</option>
                     <option value="row">Europe &amp; Rest of World</option>
                 </select>
@@ -2652,22 +2662,26 @@
                 &copy; 2026. See <a class="footer-readme" href="https://github.com/manicminer00/global-flight-dispatcher/blob/main/README.md" target="_blank" rel="noopener noreferrer">READ ME</a> for details.
             </div>
         </div>
-        <button type="button" class="board-nav-btn board-sidebar-settings-btn" data-nav="settings" onclick="boardNavGo('settings')">Settings</button>
     </div>
 </aside>
 <div class="board-main">
 <div class="container">
-<div class="board-tabs" role="tablist" aria-label="Contracts and Logbook tabs">
-    <button type="button" id="boardTabContracts" class="board-tab is-active" role="tab" aria-selected="true" onclick="boardTabGo('contracts')">CONTRACTS</button>
-    <button type="button" id="boardTabLogbook" class="board-tab" role="tab" aria-selected="false" onclick="boardTabGo('logbook')">LOGBOOK</button>
-</div>
-<div id="contractsBoardPanel" class="contracts-board-panel" aria-label="Available contracts">
+<header class="board-topbar" aria-label="VECTOR main navigation">
+    <img src="images/logowhite.png" alt="VECTOR" class="board-topbar-logo">
+    <nav class="board-topbar-nav" role="tablist" aria-label="Contracts, Logbook and Settings">
+        <button type="button" id="boardTabContracts" class="board-topbar-link is-active" role="tab" aria-selected="true" onclick="boardTabGo('contracts')">CONTRACTS</button>
+        <button type="button" id="boardTabLogbook" class="board-topbar-link" role="tab" aria-selected="false" onclick="boardTabGo('logbook')">LOGBOOK</button>
+        <button type="button" id="boardTabSettings" class="board-topbar-link" role="tab" aria-selected="false" onclick="boardTabGo('settings')">SETTINGS</button>
+    </nav>
+</header>
+<hr class="board-topbar-rule" aria-hidden="true">
+<div id="contractsBoardPanel" class="contracts-board-panel is-active" aria-label="Available contracts">
     <div class="contracts-board-header">
         <h3>Contracts Board</h3>
     </div>
     <p class="contracts-board-note" id="contractsBoardNote"></p>
     <div class="contracts-ticket-stage">
-        <div class="contracts-ticket-grid is-waiting" id="contractsTicketGrid">
+        <div class="contracts-ticket-grid is-inactive" id="contractsTicketGrid">
         <div class="contract-ticket-slot">
         <article class="contract-ticket" data-ticket-index="0" aria-label="Contract ticket 1" onmouseenter="showContractRollover(0)" onmouseleave="hideContractRollover()">
             <div class="contract-ticket-photo-wrap">
@@ -2770,7 +2784,7 @@
             </div>
         </article>
         </div>
-        <div id="contractsTicketPlaceholder" class="contracts-board-placeholder" aria-hidden="false"></div>
+    </div>
     </div>
     <div id="contractRolloverWindow" class="contract-rollover-window" aria-hidden="true"></div>
 </div>
@@ -2814,7 +2828,7 @@
             <a href="#" id="clearLogbookLink" class="link-danger is-disabled" aria-disabled="true" onclick="event.preventDefault(); clearLogbook();">Clear entire logbook</a>
         </div>
     </div>
-    <div id="settingsPanel" class="settings-panel settings-group" style="display: none;">
+    <div id="settingsPanel" class="settings-panel settings-group board-settings">
         <h3>User Preferences</h3>
         <p class="note-text" style="margin-top: 0;">VECTOR v3 uses a single dark Contracts Board layout. Light and Greyscale modes have been removed.</p>
         <p class="note-text"><strong>Q: Do different career paths alter point payouts?</strong><br>A: No. VECTOR balances progression equally across all paths; your career choice shifts operational style and routing flavour, not your progression velocity.</p>

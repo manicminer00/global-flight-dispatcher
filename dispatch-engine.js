@@ -1599,41 +1599,41 @@ let boardPlnObjectUrls = [];
 function boardTabGo(tab) {
     const contractsPanel = document.getElementById("contractsBoardPanel");
     const logbookPanel = document.getElementById("logbookPanel");
+    const settingsPanel = document.getElementById("settingsPanel");
     const contractsTabBtn = document.getElementById("boardTabContracts");
     const logbookTabBtn = document.getElementById("boardTabLogbook");
+    const settingsTabBtn = document.getElementById("boardTabSettings");
 
     const showContracts = tab === "contracts";
-    if (contractsPanel) contractsPanel.style.display = showContracts ? "block" : "none";
-    if (logbookPanel) logbookPanel.style.display = showContracts ? "none" : "block";
+    const showLogbook = tab === "logbook";
+    const showSettings = tab === "settings";
 
-    if (contractsTabBtn) contractsTabBtn.classList.toggle("is-active", showContracts);
-    if (logbookTabBtn) logbookTabBtn.classList.toggle("is-active", !showContracts);
+    if (contractsPanel) contractsPanel.classList.toggle("is-active", showContracts);
+    if (logbookPanel) logbookPanel.classList.toggle("is-active", showLogbook);
+    if (settingsPanel) settingsPanel.classList.toggle("is-active", showSettings);
 
-    if (!showContracts) updateLogbookUI();
+    if (contractsTabBtn) {
+        contractsTabBtn.classList.toggle("is-active", showContracts);
+        contractsTabBtn.setAttribute("aria-selected", showContracts ? "true" : "false");
+    }
+    if (logbookTabBtn) {
+        logbookTabBtn.classList.toggle("is-active", showLogbook);
+        logbookTabBtn.setAttribute("aria-selected", showLogbook ? "true" : "false");
+    }
+    if (settingsTabBtn) {
+        settingsTabBtn.classList.toggle("is-active", showSettings);
+        settingsTabBtn.setAttribute("aria-selected", showSettings ? "true" : "false");
+    }
+
+    if (showLogbook) updateLogbookUI();
 }
 
 function boardNavGo(target) {
-    document.querySelectorAll(".board-nav-btn").forEach((btn) => {
-        btn.classList.toggle("is-active", btn.getAttribute("data-nav") === target);
-    });
-    const settings = document.getElementById("settingsPanel");
-    const logbook = document.getElementById("logbookPanel");
-    if (target === "settings") {
-        if (settings) {
-            settings.style.display = "block";
-            settings.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-        return;
-    }
-    if (settings) settings.style.display = "none";
-    if (target === "logbook") {
-        boardTabGo("logbook");
-        if (logbook) logbook.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (target === "settings" || target === "logbook" || target === "contracts") {
+        boardTabGo(target);
         return;
     }
     boardTabGo("contracts");
-    const board = document.getElementById("contractsBoardPanel");
-    if (board) board.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 function computePrestigePoints(distanceNm, spec, fromContractsBoard) {
@@ -1842,12 +1842,68 @@ function fillContractTicketCard(card, result, index, bundle) {
     }
 }
 
+const BOARD_SESSION_KEY = "dispatcher_board_session_v1";
+
+function persistBoardSession(results, inactive) {
+    try {
+        const slim = (results || []).slice(0, 3).map((r) => ({
+            ok: true,
+            type: r.type,
+            aircraftType: r.aircraftType || r.type,
+            spec: r.spec,
+            chosenMission: r.chosenMission,
+            origin: r.origin,
+            destination: r.destination,
+            distanceNm: r.distanceNm,
+            longHaul: !!r.longHaul,
+            targetMins: r.targetMins,
+            pax: r.pax,
+            cargoKg: r.cargoKg,
+            payout: r.payout,
+            rPayload: r.rPayload,
+            rInstruction: r.rInstruction,
+            scenarioImgId: r.scenarioImgId,
+            imageId: r.imageId,
+            blockMinutes: r.blockMinutes,
+            _duplicateUnavailable: !!r._duplicateUnavailable,
+            _exportBundle: r._exportBundle ? {
+                prestigePoints: r._exportBundle.prestigePoints,
+                imageUrl: r._exportBundle.imageUrl,
+                simbriefUrl: r._exportBundle.simbriefUrl,
+                isSimbriefSupported: r._exportBundle.isSimbriefSupported,
+                heliMessage: r._exportBundle.heliMessage,
+                plnUrl: r._exportBundle.plnUrl,
+                plnFilename: r._exportBundle.plnFilename,
+                pendingFlight: r._exportBundle.pendingFlight
+            } : null
+        }));
+        localStorage.setItem(BOARD_SESSION_KEY, JSON.stringify({
+            inactive: !!inactive,
+            results: slim,
+            savedAt: Date.now()
+        }));
+    } catch (e) { /* private browsing / quota */ }
+}
+
+function loadBoardSession() {
+    try {
+        const raw = localStorage.getItem(BOARD_SESSION_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (!parsed || !Array.isArray(parsed.results) || !parsed.results.length) return null;
+        return parsed;
+    } catch (e) {
+        return null;
+    }
+}
+
 function renderContractsBoard(results, options) {
     const cards = document.querySelectorAll("#contractsTicketGrid .contract-ticket");
     const slots = document.querySelectorAll("#contractsTicketGrid .contract-ticket-slot");
     const note = document.getElementById("contractsBoardNote");
     const grid = document.getElementById("contractsTicketGrid");
     const animateDeal = !!(options && options.animateDeal);
+    const inactive = !!(options && options.inactive);
     boardSelectedIndex = -1;
 
     slots.forEach((slot, i) => {
@@ -1864,17 +1920,17 @@ function renderContractsBoard(results, options) {
             if (acceptBtn) acceptBtn.disabled = true;
             return;
         }
-        const bundle = result._exportBundle;
+        const bundle = result._exportBundle || {};
         fillContractTicketCard(card, result, i, bundle);
-        if (result._duplicateUnavailable) {
-            const acceptBtn = card.querySelector('[data-role="accept"]');
-            if (acceptBtn) acceptBtn.disabled = true;
+        const acceptBtn = card.querySelector('[data-role="accept"]');
+        if (acceptBtn) {
+            acceptBtn.disabled = inactive || !!result._duplicateUnavailable;
         }
     });
     if (note) note.textContent = "";
 
     if (grid) {
-        grid.classList.remove("is-waiting");
+        grid.classList.toggle("is-inactive", inactive);
         if (animateDeal) {
             grid.classList.remove("is-dealing");
             void grid.offsetWidth;
@@ -1914,7 +1970,9 @@ function hideContractRollover() {
 function showContractRollover(index) {
     const result = boardContractResults[index];
     const win = document.getElementById("contractRolloverWindow");
+    const grid = document.getElementById("contractsTicketGrid");
     if (!result || !win || result._duplicateUnavailable) return;
+    if (grid && grid.classList.contains("is-inactive")) return;
 
     if (contractRolloverHideTimer) clearTimeout(contractRolloverHideTimer);
 
@@ -1928,7 +1986,12 @@ function showContractRollover(index) {
     const jobDescription = [payload, instruction].filter(Boolean).join("\n\n");
     const descHtml = escapeHtml(jobDescription).replace(/\n/g, "<br>");
 
+    const imgUrl = bundle.imageUrl || "";
     win.innerHTML = `
+        <div class="contract-rollover-photo-wrap">
+            <div class="contract-rollover-photo" style="${imgUrl ? `background-image: url(\"${imgUrl}\")` : ""}"></div>
+            <p class="contract-rollover-photo-label">MISSION PHOTO</p>
+        </div>
         <div class="contract-rollover-body">
             <h4 class="contract-rollover-mission">${escapeHtml(missionName)}</h4>
             <p class="contract-rollover-label">ROUTE ICAOs</p>
@@ -1937,10 +2000,6 @@ function showContractRollover(index) {
                 <span aria-hidden="true">→</span>
                 <span>${escapeHtml(result.destination.icao)}</span>
             </div>
-            <div class="contract-rollover-divider"></div>
-            <p class="contract-rollover-label">CONTRACT VALUE</p>
-            <p class="contract-rollover-value">${escapeHtml(result.payout || "")}</p>
-            <p class="contract-rollover-pp">+${bundle.prestigePoints || 0} Prestige Points</p>
             <div class="contract-rollover-divider"></div>
             <p class="contract-rollover-label">Job Description</p>
             <div class="contract-rollover-desc">${descHtml}</div>
@@ -1954,9 +2013,9 @@ function showContractRollover(index) {
         win.setAttribute("aria-hidden", "false");
         const panelRect = panel.getBoundingClientRect();
         const gridRect = grid.getBoundingClientRect();
-        const targetWidth = gridRect.width * 0.8;
+        const targetWidth = gridRect.width * 0.7;
         const left = gridRect.left - panelRect.left + ((gridRect.width - targetWidth) / 2);
-        const top = gridRect.top - panelRect.top + 24;
+        const top = gridRect.top - panelRect.top + 124;
         win.style.width = `${targetWidth}px`;
         win.style.left = `${Math.max(10, left)}px`;
         win.style.top = `${Math.max(10, top)}px`;
@@ -1969,7 +2028,12 @@ function showContractRollover(index) {
 
 function acceptContractTicket(index) {
     const result = boardContractResults[index];
-    if (!result || !result._exportBundle) {
+    const grid = document.getElementById("contractsTicketGrid");
+    if (grid && grid.classList.contains("is-inactive")) {
+        alert("Generate a flight to activate contracts.");
+        return;
+    }
+    if (!result || !result._exportBundle || result._duplicateUnavailable) {
         alert("Generate three contracts first.");
         return;
     }
@@ -4849,7 +4913,8 @@ function dispatchFlight() {
     if (allWarnings.length) showDispatchNotams(allWarnings.slice(0, 3));
     boardContractResults = boardResults;
     boardTicketsDealt = true;
-    renderContractsBoard(boardResults, { animateDeal });
+    renderContractsBoard(boardResults, { animateDeal, inactive: false });
+    persistBoardSession(boardResults, false);
     const board = document.getElementById("contractsBoardPanel");
     if (board) board.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
@@ -5232,6 +5297,42 @@ function clearLogbook() {
         updateDatabaseStats();
     }
 }
+function initBoardPreviewTickets() {
+    const session = loadBoardSession();
+    if (session && session.results && session.results.length) {
+        // Always start faded/inactive; Generate Flight clears them.
+        boardContractResults = session.results;
+        boardTicketsDealt = false;
+        renderContractsBoard(session.results, { inactive: true });
+        return;
+    }
+
+    // No saved session: generate up to 3 random preview contracts (inactive).
+    const cfg = getDispatchUiProbeConfig();
+    if (!cfg.aircraftType) {
+        // Fall back to first fleet aircraft so the board is never empty on load.
+        const fleetKeys = Object.keys(activeFleetSpecs || {});
+        if (fleetKeys.length) cfg.aircraftType = fleetKeys[0];
+        else return;
+    }
+    cfg.mutateHistory = false;
+    const results = [];
+    for (let attempt = 0; attempt < 15 && results.length < 3; attempt++) {
+        const result = probeDispatchFlight(cfg);
+        if (!result.ok) continue;
+        const sig = getContractResultSignature(result);
+        if (results.some((r) => getContractResultSignature(r) === sig)) continue;
+        result._exportBundle = buildDispatchExportBundle(result);
+        results.push(result);
+    }
+    if (!results.length) return;
+    const boardResults = finalizeBoardContractResults(results);
+    boardContractResults = boardResults;
+    boardTicketsDealt = false;
+    renderContractsBoard(boardResults, { inactive: true });
+    persistBoardSession(boardResults, true);
+}
+
 window.onload = function() {
     loadSettings();
     updateThemeBanner();
@@ -5252,6 +5353,7 @@ window.onload = function() {
     refreshLastArrivalDepField();
     updateFlightTimeSliderState();
     moveLongHaulNotamUnderGenerate();
+    initBoardPreviewTickets();
 };
 function moveLongHaulNotamUnderGenerate() {
     // Visually move the long-haul NOTAM block below the Generate Flight button.
