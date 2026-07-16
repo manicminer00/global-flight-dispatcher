@@ -63,8 +63,10 @@
             --board-sidebar-width: 408px; /* was 340px (+20%) */
             --board-ticket-width: 288px; /* was 320px (−10%) */
             --board-ticket-gap: 22px;
-            --board-ticket-radius: 12px;
+            --board-ticket-radius: 10px;
             --board-ticket-stack-peek: 14px;
+            --board-ticket-rule-width: 98%;
+            --board-ui-radius: 10px;
             --board-ticket-font: "Roboto", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
             --board-panel-pad: 18px;
             --board-main-pad-x: 16px;
@@ -439,7 +441,7 @@
         }
         .board-sidebar-checks .checkbox-option {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 8px;
             font-size: 12px;
             color: var(--board-text-muted);
@@ -447,8 +449,35 @@
             font-weight: 500;
         }
         .board-sidebar-checks .checkbox-option input {
-            margin-top: 2px;
+            margin-top: 0;
             flex-shrink: 0;
+        }
+        .board-sidebar-form .custom-datalist {
+            background-color: var(--board-bg-page);
+            border-color: var(--board-border);
+        }
+        .board-sidebar-form .custom-datalist div:hover {
+            background-color: var(--board-bg-panel);
+            color: var(--board-text-primary);
+        }
+        .board-sidebar-form .routing-map-hint {
+            display: block;
+            margin-top: 8px;
+            font-size: 11px;
+        }
+        .board-sidebar-form .slider-footer-row.board-sidebar-slider-footer {
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: flex-start;
+            gap: 8px;
+        }
+        .board-sidebar-form .long-haul-notam {
+            width: 100%;
+            text-align: left;
+        }
+        .board-sidebar-form .slider-rotor-glider-note {
+            text-align: left;
+            font-weight: var(--font-weight-input);
         }
         .sidebar-section-divider {
             border: 0;
@@ -476,7 +505,7 @@
             background: linear-gradient(180deg, #c8ccd2 0%, #9aa1a9 100%) !important;
             color: #1a1c20 !important;
             border: 1px solid #7a828c !important;
-            border-radius: 13px !important;
+            border-radius: var(--board-ui-radius) !important;
             transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
         #generateFlightBtn:hover {
@@ -490,7 +519,7 @@
             padding: 12px 14px;
             display: flex;
             flex-direction: row;
-            align-items: center;
+            align-items: flex-start;
             justify-content: space-between;
             gap: 10px;
         }
@@ -506,6 +535,7 @@
             color: var(--text-muted);
             line-height: 1.25;
             text-align: left;
+            margin-top: 10px;
         }
         .board-sidebar-bmc {
             display: flex;
@@ -535,7 +565,7 @@
             color: #1a1c20 !important;
             border: 1px solid #7a828c !important;
             border-left: none !important;
-            border-radius: 13px !important;
+            border-radius: var(--board-ui-radius) !important;
             cursor: pointer;
             box-shadow: 0 2px 0 rgba(0, 0, 0, 0.25);
             transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
@@ -1775,15 +1805,18 @@
             display: flex;
             gap: 12px;
             align-items: flex-end;
+            justify-content: flex-start;
+            width: 100%;
             margin: 0 0 0;
             padding: 0;
         }
         .board-tab {
+            flex: 0 0 auto;
             border: 1px solid var(--board-border);
             border-bottom: none;
-            background: var(--board-bg-panel);
+            background: var(--board-bg-sidebar);
             color: var(--board-text-muted);
-            border-radius: 13px 13px 0 0;
+            border-radius: var(--board-ui-radius) var(--board-ui-radius) 0 0;
             padding: 10px 16px;
             cursor: pointer;
             font-size: 14px;
@@ -1791,17 +1824,14 @@
             letter-spacing: 0.06em;
             text-transform: uppercase;
             text-align: left;
-            transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-        }
-        .board-tab:hover {
-            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%);
-            color: #ffffff;
-            border-color: #348538;
         }
         .board-tab.is-active {
-            background: #cfd3d8;
-            color: #16181c;
-            border-color: #cfd3d8;
+            position: relative;
+            z-index: 2;
+            margin-bottom: -1px;
+            background: var(--board-bg-panel);
+            color: var(--board-text-primary);
+            border-color: var(--board-border);
         }
         /* ---- Contracts Board (paper tickets on dark chrome) ---- */
         #contractsBoardPanel {
@@ -1810,7 +1840,8 @@
             padding: var(--board-panel-pad);
             background: var(--board-bg-panel);
             border: 1px solid var(--board-border);
-            border-radius: 8px;
+            border-top: none;
+            border-radius: 0 var(--board-ui-radius) var(--board-ui-radius) var(--board-ui-radius);
             box-sizing: border-box;
             width: 100%;
             position: relative;
@@ -1820,51 +1851,18 @@
             display: none;
             position: absolute;
             z-index: 60;
-            width: 560px;
-            max-width: calc(100% - 30px);
             background: #f2f3f5;
             border: 1px solid #8b929a;
             border-radius: var(--board-ticket-radius);
             box-shadow: 0 22px 60px rgba(0, 0, 0, 0.45);
-            pointer-events: none; /* keep hover behavior clean */
+            pointer-events: none;
             overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.12s ease;
         }
         .contract-rollover-window.is-visible {
             display: block;
-        }
-        .contract-rollover-photo-wrap {
-            position: relative;
-            height: 240px;
-            background: #3a3f45;
-        }
-        .contract-rollover-photo-wrap::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            top: 0;
-            height: 25%;
-            background: #cfd3d8;
-            z-index: 1;
-        }
-        .contract-rollover-photo {
-            position: absolute;
-            inset: 0;
-            background: #3a3f45 center/cover no-repeat;
-            filter: none;
-        }
-        .contract-rollover-photo-label {
-            position: absolute;
-            top: 16px;
-            left: 18px;
-            margin: 0;
-            z-index: 2;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: #16181c;
-            pointer-events: none;
+            opacity: 1;
         }
         .contract-rollover-body {
             padding: 14px 18px 18px;
@@ -1874,7 +1872,7 @@
         }
         .contract-rollover-mission {
             margin: 0;
-            font-size: 34pt;
+            font-size: 27pt;
             font-weight: 800;
             letter-spacing: 0.01em;
             line-height: 1.05;
@@ -1907,6 +1905,12 @@
             letter-spacing: 0.01em;
             color: #16181c;
         }
+        .contract-rollover-pp {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+        }
         .contract-rollover-divider {
             border: 0;
             border-top: 1px solid #9aa0a8;
@@ -1916,11 +1920,8 @@
         .contract-rollover-desc {
             font-size: 14px;
             color: #2a2e34;
-            line-height: 1.4;
+            line-height: 1.45;
             white-space: pre-wrap;
-        }
-        .contract-rollover-strong {
-            font-weight: 800;
         }
         .contracts-board-header {
             display: flex;
@@ -1948,12 +1949,62 @@
         .contracts-board-note:empty {
             display: none;
         }
+        .contracts-ticket-stage {
+            position: relative;
+            width: 100%;
+        }
+        .contracts-board-placeholder {
+            width: calc((3 * var(--board-ticket-width)) + (2 * var(--board-ticket-gap)));
+            max-width: 100%;
+            min-height: calc((580px * 1.15) + var(--board-ticket-stack-peek) + 6px);
+            margin-bottom: 0;
+            background-color: var(--board-bg-page);
+            background-image:
+                linear-gradient(var(--board-border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--board-border) 1px, transparent 1px);
+            background-size: 100px 100px;
+            border: 1px solid var(--board-border);
+            border-radius: var(--board-ui-radius);
+            box-sizing: border-box;
+        }
+        .contracts-ticket-stage:has(.contracts-ticket-grid:not(.is-waiting)) .contracts-board-placeholder {
+            width: 100%;
+            min-height: 120px;
+            margin-top: 16px;
+        }
         .contracts-ticket-grid {
             display: flex;
             flex-wrap: nowrap;
             align-items: flex-start;
             gap: var(--board-ticket-gap);
             padding-bottom: calc(var(--board-ticket-stack-peek) + 6px);
+        }
+        .contracts-ticket-grid.is-waiting {
+            display: none;
+        }
+        .contracts-ticket-grid.is-dealing .contract-ticket-slot {
+            opacity: 0;
+            transform: translateY(72px);
+            animation: dealTicketUp 0.42s ease-out forwards;
+        }
+        .contracts-ticket-grid.is-dealing .contract-ticket-slot:nth-child(1) { animation-delay: 0ms; }
+        .contracts-ticket-grid.is-dealing .contract-ticket-slot:nth-child(2) { animation-delay: 90ms; }
+        .contracts-ticket-grid.is-dealing .contract-ticket-slot:nth-child(3) { animation-delay: 180ms; }
+        @keyframes dealTicketUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .contract-ticket-slot.is-unavailable-duplicate {
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        .contracts-ticket-stage:has(.contracts-ticket-grid.is-waiting) .contracts-board-placeholder {
+            display: block;
+        }
+        .contracts-ticket-stage:has(.contracts-ticket-grid:not(.is-waiting)) .contracts-board-placeholder {
+            display: block;
         }
         /* Slot = front ticket + 2 stacked layers behind (RHS reference) */
         .contract-ticket-slot {
@@ -1969,29 +2020,30 @@
             position: absolute;
             left: 2.5%;
             right: 2.5%;
-            top: 8px;
+            top: 0;
             bottom: 0;
-            background: #d0d4d9;
             border: 1px solid #9aa1a9;
             border-radius: var(--board-ticket-radius);
-            z-index: 0;
             pointer-events: none;
             transition: transform 0.22s ease, opacity 0.22s ease;
         }
         .contract-ticket-slot::before {
-            transform: translateY(8px);
-            opacity: 0.92;
+            z-index: 0;
+            transform: translateY(10px);
+            background: #c5c9cf;
+            opacity: 0.95;
         }
         .contract-ticket-slot::after {
-            left: 4.875%;
-            right: 4.875%;
-            transform: translateY(16px);
-            background: #bcc1c8;
-            opacity: 0.88;
+            left: 5%;
+            right: 5%;
+            z-index: -1;
+            transform: translateY(20px);
+            background: #9aa1a9;
+            opacity: 0.92;
         }
         .contract-ticket {
             position: relative;
-            z-index: 1;
+            z-index: 2;
             display: flex;
             flex-direction: column;
             width: 100%;
@@ -2016,7 +2068,7 @@
             transform: translateY(10px);
         }
         .contract-ticket-slot:hover::after {
-            transform: translateY(18px);
+            transform: translateY(22px);
         }
         .contract-ticket.is-dimmed {
             opacity: 0.22;
@@ -2099,7 +2151,7 @@
             letter-spacing: 0.02em;
         }
         .contract-ticket-mission {
-            font-size: 36pt;
+            font-size: 27pt;
             font-weight: 800;
             line-height: 1.02;
             letter-spacing: 0.01em;
@@ -2166,7 +2218,7 @@
         }
         .contract-ticket-rule {
             display: block;
-            width: 95%;
+            width: var(--board-ticket-rule-width);
             max-width: none;
             height: 0;
             margin: 12px auto 0;
@@ -2208,7 +2260,7 @@
             background: linear-gradient(180deg, #c8ccd2 0%, #9aa1a9 100%) !important;
             color: #1a1c20 !important;
             border: 1px solid #7a828c !important;
-            border-radius: 13px;
+            border-radius: var(--board-ui-radius);
             padding: 11px 12px;
             transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, filter 0.15s ease;
         }
@@ -2238,7 +2290,7 @@
             background: linear-gradient(180deg, #dde1e6 0%, #c5c9cf 100%) !important;
             color: #1a1c20 !important;
             border: 1px solid #9198a1 !important;
-            border-radius: 13px;
+            border-radius: var(--board-ui-radius);
             padding: 10px 12px;
         }
         .contract-ticket.is-selected .contract-ticket-reselect {
@@ -2266,7 +2318,7 @@
             font-size: 13px !important;
             font-weight: 600 !important;
             letter-spacing: 0.01em;
-            border-radius: 13px !important;
+            border-radius: var(--board-ui-radius) !important;
             transition: background 0.15s ease, filter 0.15s ease, color 0.15s ease, border-color 0.15s ease;
         }
         .contract-ticket-export .dispatch-action-btn:hover {
@@ -2298,8 +2350,8 @@
             margin-top: 0;
             background: var(--board-bg-panel) !important;
             border: 1px solid var(--board-border) !important;
-            border-radius: 8px;
-            border-top: 1px solid var(--board-border) !important;
+            border-top: none !important;
+            border-radius: 0 var(--board-ui-radius) var(--board-ui-radius) var(--board-ui-radius);
             padding: var(--board-panel-pad);
             color: var(--board-text-primary);
         }
@@ -2515,11 +2567,6 @@
                     <div id="customAircraftList" class="custom-datalist"></div>
                 </div>
             </div>
-            <div class="dispatch-form-field board-sidebar-checks">
-                <label class="checkbox-option" for="contractorToggle">
-                    <input type="checkbox" id="contractorToggle" onchange="syncContractorMilitaryOptions()">CONTRACTOR MODE (civilian aircraft fly military missions)
-                </label>
-            </div>
             <hr class="sidebar-section-divider" aria-hidden="true">
             <div class="dispatch-form-field">
                 <label for="depOverrideInput" class="field-title">DEPARTURE AIRPORT</label>
@@ -2535,17 +2582,18 @@
                 <label class="checkbox-option" for="militaryBaseToggle">
                     <input type="checkbox" id="militaryBaseToggle">USE MILITARY AIRBASES
                 </label>
-            </div>
-            <hr class="sidebar-section-divider" aria-hidden="true">
-            <div class="dispatch-form-field">
-                <label for="routingScopeSelect" class="field-title"><span>ROUTING OPTIONS:</span>
-                    <span class="field-hint">🧭 <a class="link-inline" href="https://www.google.com/maps/d/edit?mid=1m27z2BIBRWRM3MgD9UExPAOqxxRmntE&usp=sharing" target="_blank" rel="noopener noreferrer">Map of Airports in Database</a></span>
+                <label class="checkbox-option" for="contractorToggle">
+                    <input type="checkbox" id="contractorToggle" onchange="syncContractorMilitaryOptions()">CONTRACTOR MODE (civilian aircraft fly military missions)
                 </label>
+            </div>
+            <div class="dispatch-form-field">
+                <label for="routingScopeSelect" class="field-title">ROUTING OPTIONS:</label>
                 <select id="routingScopeSelect">
                     <option value="worldwide">🌐 Worldwide</option>
                     <option value="americas">Americas Only</option>
                     <option value="row">Europe &amp; Rest of World</option>
                 </select>
+                <span class="field-hint routing-map-hint">🧭 <a class="link-inline" href="https://www.google.com/maps/d/edit?mid=1m27z2BIBRWRM3MgD9UExPAOqxxRmntE&usp=sharing" target="_blank" rel="noopener noreferrer">Map of Airports in Database</a></span>
                 <script>
                 (function () {
                     var valid = { worldwide: true, americas: true, row: true };
@@ -2618,7 +2666,8 @@
         <h3>Contracts Board</h3>
     </div>
     <p class="contracts-board-note" id="contractsBoardNote"></p>
-    <div class="contracts-ticket-grid" id="contractsTicketGrid">
+    <div class="contracts-ticket-stage">
+        <div class="contracts-ticket-grid is-waiting" id="contractsTicketGrid">
         <div class="contract-ticket-slot">
         <article class="contract-ticket" data-ticket-index="0" aria-label="Contract ticket 1" onmouseenter="showContractRollover(0)" onmouseleave="hideContractRollover()">
             <div class="contract-ticket-photo-wrap">
@@ -2721,6 +2770,7 @@
             </div>
         </article>
         </div>
+        <div id="contractsTicketPlaceholder" class="contracts-board-placeholder" aria-hidden="false"></div>
     </div>
     <div id="contractRolloverWindow" class="contract-rollover-window" aria-hidden="true"></div>
 </div>
