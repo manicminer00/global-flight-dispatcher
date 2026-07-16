@@ -2534,8 +2534,11 @@ function updateCustomAircraftForm() {
     const cargoRole = document.getElementById("newAcRoleCargo");
     toggleWrap("acCargoTierWrap", !!(cargoRole && cargoRole.checked), false);
     const lengthEl = document.getElementById("newAcLength");
-    if (lengthEl && rawClass === "HELI" && lengthEl.value === "") lengthEl.value = "0";
-    if (lengthEl && rawClass === "GLIDER" && lengthEl.value === "") lengthEl.value = "1300";
+    if (lengthEl) {
+        if (rawClass === "HELI") lengthEl.placeholder = "e.g. 0";
+        else if (rawClass === "GLIDER") lengthEl.placeholder = "e.g. 1300";
+        else lengthEl.placeholder = "e.g. 1000";
+    }
     applyCustomAircraftRangeDefaults();
     const fighterEl = document.getElementById("newAcFighter");
     if (fighterEl) fighterEl.checked = rawClass === "MIL_JET" ? true : (rawClass === "WARBIRD" ? fighterEl.checked : false);
@@ -2563,8 +2566,8 @@ function applyCustomAircraftRangeDefaults() {
     const defs = rawClass === "MIL_JET"
         ? { minD: 150, maxD: 320 }
         : getDefaultAircraftRange(acClass);
+    // Placeholder only — never inject a real value (that renders as white filled text).
     maxEl.placeholder = `e.g. ${defs.maxD}`;
-    if (!maxEl.dataset.touched) maxEl.value = defs.maxD;
 }
 function clearCustomAircraftForm() {
     ["newAcName", "newAcIcao", "newAcLength", "newAcMaxPax", "newAcMaxCargo", "newAcMtow", "newAcOew", "newAcFuel", "newAcMaxD"].forEach(id => {

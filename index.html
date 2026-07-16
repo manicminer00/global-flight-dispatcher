@@ -2368,6 +2368,10 @@
         #settingsPanel.board-settings .accent-checkbox-label,
         #settingsPanel.board-settings .field-title,
         #settingsPanel.board-settings .form-section-title,
+        #settingsPanel.board-settings .additional-options-title,
+        #settingsPanel.board-settings .manage-custom-db-heading,
+        #settingsPanel.board-settings #manageCustomDbPanel .manage-custom-db-heading,
+        #settingsPanel.board-settings h4,
         #settingsPanel.board-settings .text-accent {
             color: var(--board-text-primary) !important;
         }
@@ -2398,6 +2402,15 @@
             background: var(--board-bg-page) !important;
             color: var(--board-text-primary) !important;
             border: 1px solid var(--board-border) !important;
+        }
+        #settingsPanel.board-settings input::placeholder,
+        #settingsPanel.board-settings textarea::placeholder {
+            color: var(--board-text-muted) !important;
+            opacity: 1;
+        }
+        #settingsPanel.board-settings select option {
+            background: var(--board-bg-page);
+            color: var(--board-text-primary);
         }
         #settingsPanel.board-settings button:not(.board-topbar-link) {
             background: linear-gradient(180deg, #c8ccd2 0%, #9aa1a9 100%) !important;
@@ -2432,6 +2445,34 @@
         #settingsPanel.board-settings .db-stat-item--static:hover {
             background-color: #22252b !important;
             color: var(--board-text-primary) !important;
+        }
+        #settingsPanel.board-settings .db-dropdown {
+            background-color: var(--board-bg-page) !important;
+            border-color: var(--board-border) !important;
+            color: var(--board-text-primary) !important;
+        }
+        #settingsPanel.board-settings .db-dropdown ul,
+        #settingsPanel.board-settings .db-dropdown li {
+            color: var(--board-text-muted) !important;
+        }
+        #settingsPanel.board-settings .custom-db-table-wrap,
+        #settingsPanel.board-settings #manageCustomDbPanel .custom-db-table-wrap {
+            background: var(--board-bg-page) !important;
+            border: 1px solid var(--board-border) !important;
+            border-radius: 4px;
+        }
+        #settingsPanel.board-settings #manageCustomDbPanel table,
+        #settingsPanel.board-settings #manageCustomDbPanel th,
+        #settingsPanel.board-settings #manageCustomDbPanel td {
+            background: var(--board-bg-page) !important;
+            color: var(--board-text-primary) !important;
+            border-color: var(--board-border) !important;
+        }
+        #settingsPanel.board-settings #manageCustomDbPanel .cdb-empty {
+            color: var(--board-text-muted) !important;
+        }
+        #settingsPanel.board-settings #manageCustomDbPanel {
+            border-top-color: var(--board-border) !important;
         }
         #settingsPanel.board-settings .config-separator {
             border-color: var(--board-border) !important;
@@ -3012,7 +3053,7 @@
         <div class="form-grid-2">
             <div>
                 <label for="newAcLength">Min Takeoff Distance (ft):</label>
-                <input type="number" id="newAcLength" placeholder="Refer to Aircraft Manual / 0ft for Helicopters">
+                <input type="number" id="newAcLength" placeholder="e.g. 1000">
             </div>
             <div>
                 <label for="newAcClass">Aircraft Type:</label>
