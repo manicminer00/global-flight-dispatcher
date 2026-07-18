@@ -202,11 +202,15 @@
 
         "airports-thirdparty-db.js",
 
+        "data/ils-strict-icaos.js",
+
+        "data/navigraph-airport-icaos.js",
+
+        "data/dest-approach-types.js",
+
         "mission-assignment-core.js",
 
         "mission-assignments-data.js",
-
-        "long-haul-routes-db.js",
 
         "short-haul-routes-db.js",
 
@@ -233,7 +237,7 @@
                 + "<pre style=\"white-space:pre-wrap;background:#f5f5f5;padding:12px;border-radius:6px;\">"
                 + String(assignmentError.message).replace(/</g, "&lt;")
                 + "</pre>"
-                + "<p>Export from the mission editor, regenerate <code>mission-assignments-data.js</code>, hard-refresh (Ctrl+F5), then run <code>node scripts/validate-assignments.mjs</code>.</p>"
+                + "<p>Export from the mission editor, regenerate <code>mission-assignments-data.js</code>, hard-refresh (Ctrl+F5), then run <code>node dev/scripts/validate-assignments.mjs</code>.</p>"
                 + "</div>";
             throw assignmentError;
         }

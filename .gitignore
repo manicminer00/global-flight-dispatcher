@@ -4,8 +4,9 @@
 # ── Root config files ─────────────────────────────────────────────────────────
 !.gitignore
 !README.md
+!WEB.md
 
-# ── Core app files ────────────────────────────────────────────────────────────
+# ── Core app files (WEB deploy) ───────────────────────────────────────────────
 !index.html
 !loader.js
 !dispatch-engine.js
@@ -16,6 +17,17 @@
 !airports-asobo-db.js
 !airports-thirdparty-db.js
 !version.json
+!short-haul-routes-db.js
+!long-haul-routes-db.js
+!data/
+!data/**
+
+# ── Dev tooling (local — optional in git) ───────────────────────────────────────
+!dev/
+!dev/**
+!master-verify.bat
+!verify-vfd.bat
+!dispatch-fleet-smoke.bat
 
 # ── Favicon ───────────────────────────────────────────────────────────────────
 !favicon/

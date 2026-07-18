@@ -10,14 +10,11 @@ var MISSION_POOL_ORDER = [
     "uniqueMissions",
     "commercial",
     "commercial-regional",
-    "longHaulOps",
     "executive",
-    "longHaulExecutive",
     "lightPax",
     "lightFreight",
     "regionalFreight",
     "heavyFreight",
-    "longHaulFreight",
     "vintageOps",
     "vintageAirliner",
     "vintageProplinerFreight",
@@ -27,7 +24,6 @@ var MISSION_POOL_ORDER = [
     "helicopterOps-CIV",
     "gliderOps",
     "heavyFreight-MIL",
-    "longHaulFreight-MIL",
     "militaryTransit-MIL",
     "helicopterOps-MIL",
     "tacticalJet-MIL",
@@ -36,30 +32,26 @@ var MISSION_POOL_ORDER = [
 
 var MISSION_POOL_LABELS = {
     uniqueMissions: "Unique / one-off missions",
-    commercial: "Scheduled commercial (mainline)",
-    "commercial-regional": "Regional commuter (pax)",
-    longHaulOps: "Intercontinental scheduled (pax)",
-    executive: "Executive VIP charter",
-    longHaulExecutive: "Intercontinental executive",
-    lightPax: "Light passenger / air taxi",
-    lightFreight: "Light freight",
+    commercial: "Commercial service (mainline)",
+    "commercial-regional": "Regional commuter",
+    executive: "Executive charter",
+    lightPax: "Air taxi",
+    lightFreight: "Light freight ops",
     regionalFreight: "Regional freight",
     heavyFreight: "Heavy cargo (civil)",
-    longHaulFreight: "Intercontinental heavy freight",
-    vintageOps: "Vintage & heritage",
+    vintageOps: "Heritage flight",
     vintageAirliner: "Classic airliner charter",
     vintageProplinerFreight: "Vintage propliner freight",
-    medical: "Medevac / lifeguard",
+    medical: "Medical relay",
     surveyServices: "Aerial survey",
-    highAltServices: "High-altitude research",
+    highAltServices: "Weather ops",
     "helicopterOps-CIV": "Civil helicopter ops",
     gliderOps: "Gliding",
-    "heavyFreight-MIL": "Military cargo",
-    "longHaulFreight-MIL": "Intercontinental military cargo",
-    "militaryTransit-MIL": "Military logistics transit",
+    "heavyFreight-MIL": "Mil-cargo ops",
+    "militaryTransit-MIL": "Military logistics",
     "helicopterOps-MIL": "Military helicopter ops",
     "tacticalJet-MIL": "Tactical sortie",
-    "reconnaissance-MIL": "Strategic reconnaissance"
+    "reconnaissance-MIL": "Strategic recon."
 };
 
 /**
@@ -72,7 +64,7 @@ var AIRCRAFT_MISSION_PRESETS = [
         id: "commercial-jets",
         label: "Commercial passenger jets",
         description: "Mainline jetliners (A320, B737, B777, etc.)",
-        pools: ["commercial", "longHaulOps"],
+        pools: ["commercial"],
         match: function (type, spec) {
             return spec.class === "JET"
                 && hasTag(spec, "JETLINER")
@@ -109,7 +101,7 @@ var AIRCRAFT_MISSION_PRESETS = [
         id: "biz-jets",
         label: "Business jets",
         description: "Citations, Phenom, Learjet, HondaJet, etc.",
-        pools: ["executive", "longHaulExecutive", "lightPax"],
+        pools: ["executive", "lightPax"],
         match: function (type, spec) {
             return spec.class === "BIZ JET" && hasTag(spec, "PAX");
         }
@@ -139,7 +131,7 @@ var AIRCRAFT_MISSION_PRESETS = [
         id: "heavy-freight",
         label: "Heavy freighters (civil)",
         description: "B737BCF, MD-11F, B727F, DC-6A, etc.",
-        pools: ["heavyFreight", "longHaulFreight", "vintageProplinerFreight"],
+        pools: ["heavyFreight", "vintageProplinerFreight"],
         match: function (type, spec) {
             return hasTag(spec, "FREIGHTER")
                 && !spec.isMilitary
@@ -169,7 +161,7 @@ var AIRCRAFT_MISSION_PRESETS = [
         id: "military-transport",
         label: "Military transport",
         description: "A400, C-130, C-160, CH-47, etc.",
-        pools: ["heavyFreight-MIL", "longHaulFreight-MIL", "militaryTransit-MIL", "helicopterOps-MIL"],
+        pools: ["heavyFreight-MIL", "militaryTransit-MIL", "helicopterOps-MIL"],
         match: function (type, spec) {
             return spec.isMilitary && (hasTag(spec, "MILITARY_TRANSPORT") || type === "H47D");
         }
@@ -561,7 +553,7 @@ function resolvePoolKeysForCustomRoles(spec, roles) {
             if (specHasTag(spec, "REGIONAL") || (spec.mtow || 0) < 50000) {
                 pools.push("commercial-regional");
             } else {
-                pools.push("commercial", "longHaulOps");
+                pools.push("commercial");
             }
         } else if (cls === "TURBO") {
             pools.push("commercial-regional", "lightPax");
@@ -575,15 +567,15 @@ function resolvePoolKeysForCustomRoles(spec, roles) {
     }
 
     if (roles.executive || cls === "BIZ JET") {
-        pools.push("executive", "longHaulExecutive");
+        pools.push("executive");
     }
 
     if (roles.cargo) {
         var tier = roles.cargoTier || inferCargoTierFromSpec(spec);
         if (tier === "military" || (spec.isMilitary && tier !== "light")) {
-            pools.push("heavyFreight-MIL", "longHaulFreight-MIL", "militaryTransit-MIL");
+            pools.push("heavyFreight-MIL", "militaryTransit-MIL");
         } else if (tier === "heavy") {
-            pools.push("heavyFreight", "longHaulFreight", "vintageProplinerFreight");
+            pools.push("heavyFreight", "vintageProplinerFreight");
         } else if (tier === "regional") {
             pools.push("regionalFreight", "lightFreight");
         } else {
