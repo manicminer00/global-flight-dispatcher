@@ -22,13 +22,6 @@
 !data/
 !data/**
 
-# ── Dev tooling (local — optional in git) ───────────────────────────────────────
-!dev/
-!dev/**
-!master-verify.bat
-!verify-vfd.bat
-!dispatch-fleet-smoke.bat
-
 # ── Favicon ───────────────────────────────────────────────────────────────────
 !favicon/
 !favicon/**
