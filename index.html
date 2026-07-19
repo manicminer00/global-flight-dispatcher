@@ -900,6 +900,9 @@
         .board-sidebar-optional-details .dispatch-form-field.board-sidebar-checks:has(#militaryBaseToggle) {
             margin-bottom: 4px;
         }
+        .board-sidebar-optional-details .dispatch-form-field.board-sidebar-checks:has(#militaryBaseToggle) .checkbox-option + .checkbox-option {
+            margin-top: 5px;
+        }
         .routing-options-header {
             display: flex;
             align-items: baseline;
@@ -1228,10 +1231,6 @@
         }
         .dispatch-control-group {
             display: flow-root;
-        }
-        .dispatch-control-group #gliderAircraftNotice {
-            margin-top: 10px;
-            margin-bottom: 0;
         }
         .dispatch-control-group .additional-options-row {
             min-height: 42px;
@@ -2915,18 +2914,7 @@
             border-top-color: color-mix(in srgb, var(--military-ticket-text, var(--text-ticket-military)) 28%, transparent);
         }
         .contract-ticket-photo-label {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            z-index: 2;
-            margin: 0;
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: #16181c;
-            text-shadow: none;
-            pointer-events: none;
+            display: none;
         }
         .contract-ticket-photo {
             height: 220px;
@@ -3018,12 +3006,232 @@
             color: #6dff96;
             text-shadow: 0 0 8px rgba(109, 255, 150, 0.55);
         }
+        .ticket-photo-fx-crt .contract-ticket .contract-ticket-photo-brief {
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        /* Vintage phosphor CRT — heritage airframes; military tickets keep green above */
+        .ticket-photo-fx-crt .contract-ticket.is-vintage-crt:not(.is-military) .contract-ticket-photo {
+            filter: contrast(1.05) sepia(0.08) saturate(1) brightness(0.92);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-vintage-crt:not(.is-military) .contract-ticket-photo-overlay {
+            background: rgba(20, 14, 8, 0.92);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-vintage-crt:not(.is-military) .contract-ticket-photo-brief {
+            font-family: "Courier New", Courier, monospace;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            color: #c9bc7a;
+            text-shadow: 0 0 7px rgba(201, 188, 122, 0.5), 0 0 2px rgba(255, 236, 170, 0.35);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-vintage-crt:not(.is-military) .contract-ticket-photo-brief.is-visible {
+            scrollbar-color: rgba(201, 188, 122, 0.4) transparent;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-vintage-crt:not(.is-military) .contract-ticket-photo-brief.is-visible.is-scrollable {
+            scrollbar-color: rgba(201, 188, 122, 0.55) rgba(0, 0, 0, 0.25);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-vintage-crt:not(.is-military) .contract-ticket-photo-brief.is-visible::-webkit-scrollbar-thumb {
+            background: rgba(201, 188, 122, 0.45);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-vintage-crt:not(.is-military) .contract-ticket-photo-wrap::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 42px;
+            bottom: 0;
+            z-index: 6;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.04) 0,
+                rgba(0, 0, 0, 0.04) 1px,
+                transparent 1px,
+                transparent 4px
+            );
+            opacity: 0.1;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-vintage-crt:not(.is-military) .contract-ticket-photo-matrix {
+            background: #100c06;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-vintage-crt:not(.is-military) .contract-ticket-matrix-col {
+            color: #6b5f2a;
+            text-shadow: 0 0 4px rgba(180, 160, 80, 0.35);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-vintage-crt:not(.is-military) .contract-ticket-matrix-col span:last-child {
+            color: #e8dcb0;
+            text-shadow: 0 0 10px rgba(232, 220, 176, 0.85), 0 0 4px rgba(201, 188, 122, 0.5);
+        }
+        /* LED avionics (Garmin G5000-style) — modern business jets; FA50 stays vintage above */
+        .ticket-photo-fx-crt .contract-ticket.is-led-crt:not(.is-military) .contract-ticket-photo {
+            filter: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-led-crt:not(.is-military) .contract-ticket-photo-overlay {
+            background: rgba(0, 0, 0, 0.93);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-led-crt:not(.is-military) .contract-ticket-photo-brief {
+            font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: 400;
+            letter-spacing: 0;
+            color: #ffffff;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-led-crt:not(.is-military) .contract-ticket-photo-brief.is-visible {
+            scrollbar-color: rgba(100, 110, 120, 0.55) transparent;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-led-crt:not(.is-military) .contract-ticket-photo-brief.is-visible.is-scrollable {
+            scrollbar-color: rgba(100, 110, 120, 0.7) rgba(0, 0, 0, 0.35);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-led-crt:not(.is-military) .contract-ticket-photo-brief.is-visible::-webkit-scrollbar-thumb {
+            background: rgba(100, 110, 120, 0.65);
+            border-radius: 0;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-led-crt:not(.is-military) .contract-ticket-photo-brief.is-visible.is-typing:not(.is-complete)::after {
+            color: #00ff00;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-led-crt:not(.is-military) .contract-ticket-photo-matrix {
+            background: #000000;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-led-crt:not(.is-military) .contract-ticket-matrix-col {
+            font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: 400;
+            color: #00ffff;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-led-crt:not(.is-military) .contract-ticket-matrix-col span:last-child {
+            color: #00ff00;
+            text-shadow: none;
+        }
+        /* Airliner MCDU — A320 / 737-style mainline jets */
+        .ticket-photo-fx-crt .contract-ticket.is-mcdu-crt:not(.is-military) .contract-ticket-photo {
+            filter: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-mcdu-crt:not(.is-military) .contract-ticket-photo-overlay {
+            background: rgba(0, 0, 0, 0.96);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-mcdu-crt:not(.is-military) .contract-ticket-photo-brief {
+            font-family: "Courier New", Courier, monospace;
+            font-weight: 400;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #ececec;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-mcdu-crt:not(.is-military) .contract-ticket-photo-brief.is-visible {
+            scrollbar-color: rgba(0, 255, 65, 0.45) transparent;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-mcdu-crt:not(.is-military) .contract-ticket-photo-brief.is-visible.is-scrollable {
+            scrollbar-color: rgba(0, 255, 65, 0.55) rgba(0, 0, 0, 0.35);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-mcdu-crt:not(.is-military) .contract-ticket-photo-brief.is-visible::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 65, 0.5);
+            border-radius: 0;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-mcdu-crt:not(.is-military) .contract-ticket-photo-brief.is-visible.is-typing:not(.is-complete)::after {
+            color: #00ff41;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-mcdu-crt:not(.is-military) .contract-ticket-photo-matrix {
+            background: #000000;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-mcdu-crt:not(.is-military) .contract-ticket-matrix-col {
+            font-family: "Courier New", Courier, monospace;
+            font-weight: 400;
+            color: #00ff41;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-mcdu-crt:not(.is-military) .contract-ticket-matrix-col span:last-child {
+            color: #f0f0f0;
+            text-shadow: none;
+        }
+        /* Regional jet MCDU — Collins CRJ-style */
+        .ticket-photo-fx-crt .contract-ticket.is-regional-mcdu-crt:not(.is-military) .contract-ticket-photo {
+            filter: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-regional-mcdu-crt:not(.is-military) .contract-ticket-photo-overlay {
+            background: rgba(3, 8, 18, 0.95);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-regional-mcdu-crt:not(.is-military) .contract-ticket-photo-brief {
+            font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            color: #8ecae6;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-regional-mcdu-crt:not(.is-military) .contract-ticket-photo-brief.is-visible {
+            scrollbar-color: rgba(142, 202, 230, 0.45) transparent;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-regional-mcdu-crt:not(.is-military) .contract-ticket-photo-brief.is-visible.is-scrollable {
+            scrollbar-color: rgba(142, 202, 230, 0.55) rgba(0, 0, 0, 0.35);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-regional-mcdu-crt:not(.is-military) .contract-ticket-photo-brief.is-visible::-webkit-scrollbar-thumb {
+            background: rgba(142, 202, 230, 0.5);
+            border-radius: 0;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-regional-mcdu-crt:not(.is-military) .contract-ticket-photo-brief.is-visible.is-typing:not(.is-complete)::after {
+            color: #ffffff;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-regional-mcdu-crt:not(.is-military) .contract-ticket-photo-matrix {
+            background: #030812;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-regional-mcdu-crt:not(.is-military) .contract-ticket-matrix-col {
+            font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+            font-weight: 400;
+            color: #5eb8d9;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-regional-mcdu-crt:not(.is-military) .contract-ticket-matrix-col span:last-child {
+            color: #ffe566;
+            text-shadow: none;
+        }
+        /* Starship Collins CRT — cyan headers / green data */
+        .ticket-photo-fx-crt .contract-ticket.is-starship-crt:not(.is-military) .contract-ticket-photo {
+            filter: contrast(1.08) brightness(0.88);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-starship-crt:not(.is-military) .contract-ticket-photo-overlay {
+            background: rgba(4, 10, 14, 0.94);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-starship-crt:not(.is-military) .contract-ticket-photo-brief {
+            font-family: "Courier New", Courier, monospace;
+            font-weight: 400;
+            letter-spacing: 0.03em;
+            color: #4ade80;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-starship-crt:not(.is-military) .contract-ticket-photo-brief.is-visible {
+            scrollbar-color: rgba(92, 225, 230, 0.45) transparent;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-starship-crt:not(.is-military) .contract-ticket-photo-brief.is-visible.is-scrollable {
+            scrollbar-color: rgba(92, 225, 230, 0.55) rgba(0, 0, 0, 0.35);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-starship-crt:not(.is-military) .contract-ticket-photo-brief.is-visible::-webkit-scrollbar-thumb {
+            background: rgba(92, 225, 230, 0.5);
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-starship-crt:not(.is-military) .contract-ticket-photo-brief.is-visible.is-typing:not(.is-complete)::after {
+            color: #5ce1e6;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-starship-crt:not(.is-military) .contract-ticket-photo-matrix {
+            background: #040a0e;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-starship-crt:not(.is-military) .contract-ticket-matrix-col {
+            font-family: "Courier New", Courier, monospace;
+            font-weight: 400;
+            color: #5ce1e6;
+            text-shadow: none;
+        }
+        .ticket-photo-fx-crt .contract-ticket.is-starship-crt:not(.is-military) .contract-ticket-matrix-col span:last-child {
+            color: #4ade80;
+            text-shadow: none;
+        }
         .contract-ticket-photo-brief.is-matrix-mode {
             top: auto;
             bottom: 10px;
             max-height: 42%;
-            font-size: 12px;
-            line-height: 1.35;
+            font-size: 14px;
+            line-height: 1.4;
             z-index: 5;
         }
         .contract-ticket-photo-matrix {
@@ -3063,12 +3271,12 @@
             text-shadow: 0 0 12px rgba(255, 255, 255, 0.92), 0 0 6px rgba(109, 255, 150, 0.75);
         }
         .contract-ticket-photo-matrix.is-monolith .contract-ticket-matrix-col {
-            color: #3a7a9e;
-            text-shadow: 0 0 4px rgba(126, 200, 255, 0.35);
+            color: #2fa85a;
+            text-shadow: 0 0 4px rgba(93, 255, 138, 0.35);
         }
         .contract-ticket-photo-matrix.is-monolith .contract-ticket-matrix-col span:last-child {
-            color: #f4fcff;
-            text-shadow: 0 0 12px rgba(255, 255, 255, 0.92), 0 0 6px rgba(160, 220, 255, 0.75);
+            color: #f2fff6;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.92), 0 0 6px rgba(109, 255, 150, 0.75);
         }
         .contract-ticket-photo-matrix.is-fading {
             opacity: 0;
@@ -3143,7 +3351,7 @@
             letter-spacing: 0.02em;
         }
         .contract-ticket-mission {
-            font-size: 30px;
+            font-size: 33px;
             font-weight: 800;
             line-height: 1.1;
             letter-spacing: 0;
@@ -3183,22 +3391,26 @@
             align-items: center;
             justify-content: flex-start;
             gap: 14px;
-            font-size: 30px;
+            width: 100%;
+            font-size: 33px;
             font-weight: 700;
             color: var(--board-ticket-text);
             letter-spacing: 0;
             line-height: 1.1;
         }
-        .contract-ticket-route-leg {
-            min-width: 0;
+        .contract-ticket-route-icao {
+            font-size: inherit;
+            font-weight: inherit;
+            color: inherit;
+            letter-spacing: inherit;
+            line-height: inherit;
         }
         .contract-ticket-route-arrow {
             flex-shrink: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            align-self: center;
-            color: var(--board-ticket-text);
+            color: inherit;
             width: auto;
             height: auto;
             margin: 0;
@@ -3209,7 +3421,7 @@
             content: "→";
             display: block;
             font-family: "Roboto", "Segoe UI", sans-serif;
-            font-size: 27px;
+            font-size: 30px;
             font-weight: 900;
             line-height: 1;
             -webkit-text-stroke: 2.2px currentColor;
@@ -3217,7 +3429,7 @@
         }
         .contract-ticket-value {
             margin: 0;
-            font-size: 30px;
+            font-size: 33px;
             font-weight: 700;
             color: var(--board-ticket-text);
             letter-spacing: 0;
@@ -4036,7 +4248,7 @@
         }
         .vector-dialog {
             position: relative;
-            width: min(520px, 100%);
+            width: min(390px, 100%);
             max-height: min(80vh, 640px);
             overflow: auto;
             background: var(--board-bg-panel);
@@ -4051,23 +4263,27 @@
         }
         .vector-dialog-close {
             position: absolute;
-            top: 8px;
+            top: 10px;
             right: 10px;
-            width: 40px;
-            height: 40px;
+            width: 24px;
+            height: 24px;
             border: none;
-            border-radius: 6px;
+            border-radius: 4px;
             background: transparent;
             color: #e85d5d;
-            font-size: 30px;
+            font-size: 42px;
             font-weight: 700;
-            line-height: 1;
+            line-height: 0;
             cursor: pointer;
             padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
         }
         .vector-dialog-close:hover {
             color: #ff4444;
-            background: color-mix(in srgb, #e85d5d 18%, transparent);
+            background: color-mix(in srgb, #e85d5d 14%, transparent);
         }
         .vector-dialog-badge {
             margin: 0 0 10px;
@@ -4199,7 +4415,7 @@
                 <label class="board-sidebar-navigraph-option" for="navigraphOnlyToggle">
                     <input type="checkbox" id="navigraphOnlyToggle">
                     <img src="images/icon_navi_color.png" alt="" class="board-sidebar-navigraph-icon" aria-hidden="true">
-                    <span class="board-sidebar-navigraph-text">NAVIGRAPH DESTINATIONS ONLY</span>
+                    <span class="board-sidebar-navigraph-text">USE ONLY NAVIGRAPH AIRPORTS</span>
                 </label>
                 <script>
                 (function () {
@@ -4219,7 +4435,7 @@
             <button id="generateFlightBtn" type="button" onclick="dispatchFlight()">GENERATE FLIGHT</button>
         </div>
         </div>
-        <details class="board-sidebar-optional-details">
+        <details class="board-sidebar-optional-details" open>
             <summary class="board-sidebar-subheading">Options</summary>
             <div class="board-sidebar-optional-body">
             <div class="dispatch-form-field">
@@ -4266,12 +4482,6 @@
             <div class="board-sidebar-flourish" aria-hidden="true">
                 <img src="images/flourish.png" alt="">
             </div>
-            <details id="gliderAircraftNotice" class="info-details" style="display: none;">
-                <summary>Glider Aircraft Notice</summary>
-                <div class="info-details-body">
-                    A glider can dispatch from any departure airport with sufficient runway length (not a helipad) if you enter an ICAO. If the departure airport is left blank, the dispatcher considers all suitable airports but strongly prefers routes from and to glider strips.
-                </div>
-            </details>
             </div>
             <p id="appVersionLabel" class="board-sidebar-app-version" aria-label="Application version"></p>
         </details>
@@ -4305,9 +4515,9 @@
             <div class="contract-ticket-body">
                 <p class="contract-ticket-label">ROUTE</p>
                 <p class="contract-ticket-route" data-role="route">
-                    <span class="contract-ticket-route-leg" data-role="dep">—</span>
+                    <span class="contract-ticket-route-icao" data-role="dep-icao">—</span>
                     <span class="contract-ticket-route-arrow" aria-hidden="true"></span>
-                    <span class="contract-ticket-route-leg" data-role="arr">—</span>
+                    <span class="contract-ticket-route-icao" data-role="arr-icao">—</span>
                 </p>
                 <p class="contract-ticket-label">CONTRACT VALUE</p>
                 <p class="contract-ticket-value" data-role="value">$ —</p>
@@ -4351,9 +4561,9 @@
             <div class="contract-ticket-body">
                 <p class="contract-ticket-label">ROUTE</p>
                 <p class="contract-ticket-route" data-role="route">
-                    <span class="contract-ticket-route-leg" data-role="dep">—</span>
+                    <span class="contract-ticket-route-icao" data-role="dep-icao">—</span>
                     <span class="contract-ticket-route-arrow" aria-hidden="true"></span>
-                    <span class="contract-ticket-route-leg" data-role="arr">—</span>
+                    <span class="contract-ticket-route-icao" data-role="arr-icao">—</span>
                 </p>
                 <p class="contract-ticket-label">CONTRACT VALUE</p>
                 <p class="contract-ticket-value" data-role="value">$ —</p>
@@ -4397,9 +4607,9 @@
             <div class="contract-ticket-body">
                 <p class="contract-ticket-label">ROUTE</p>
                 <p class="contract-ticket-route" data-role="route">
-                    <span class="contract-ticket-route-leg" data-role="dep">—</span>
+                    <span class="contract-ticket-route-icao" data-role="dep-icao">—</span>
                     <span class="contract-ticket-route-arrow" aria-hidden="true"></span>
-                    <span class="contract-ticket-route-leg" data-role="arr">—</span>
+                    <span class="contract-ticket-route-icao" data-role="arr-icao">—</span>
                 </p>
                 <p class="contract-ticket-label">CONTRACT VALUE</p>
                 <p class="contract-ticket-value" data-role="value">$ —</p>
@@ -4595,7 +4805,7 @@
                 <label class="checkbox-option" for="newApMilitary">
                     <input type="checkbox" id="newApMilitary">Military airbase</label>
                 <label class="checkbox-option" for="newApHasIls">
-                    <input type="checkbox" id="newApHasIls">Has ILS approach (strict)</label>
+                    <input type="checkbox" id="newApHasIls">Has ILS approach</label>
             </div>
         </div>
         <div class="btn-row">

@@ -374,6 +374,15 @@ const SCHEDULED_COMMERCIAL_LOAD_MAX = 0.80;
 const DEFAULT_SIMBRIEF_PAX_WEIGHT_KG = 79;
 const DEFAULT_SIMBRIEF_BAGGAGE_PER_PAX_KG = 25;
 const VINTAGE_PROPLINER_TYPES = new Set(["DC6A", "DC6B"]);
+const VINTAGE_AIRFRAME_TYPES = new Set(["U16", "PA24", "FA50"]);
+const STARSHIP_CRT_TYPES = new Set(["STAR"]);
+const REGIONAL_JET_CRT_TYPES = new Set([
+    "CRJ7", "E190", "E195", "F70", "F100", "F28",
+    "B461", "B462", "B463", "RJ70", "RJ85", "RJ1H",
+    "B462_QT", "B463_QT", "RJ1F"
+]);
+const TICKET_PHOTO_VINTAGE_TYPEWRITER_CPS = 28;
+const TICKET_PHOTO_LED_TYPEWRITER_CPS = 44;
 const HEAVY_JET_MTOW_MIN = 136000;
 const FREIGHT_MISSION_TYPES = new Set([17, 18, 29, 33, 39]);
 const PASSENGER_MISSION_TYPES = new Set([14, 15, 16, 19, 20, 21, 22, 25, 26, 27, 28, 30, 31, 34]);
@@ -1357,6 +1366,15 @@ function formatBoardAircraftDisplayName(name) {
     return label;
 }
 
+function fillBoardRouteCells(card, origin, destination) {
+    const setText = (role, text) => {
+        const el = card.querySelector(`[data-role="${role}"]`);
+        if (el) el.textContent = text;
+    };
+    setText("dep-icao", origin && origin.icao ? String(origin.icao).toUpperCase() : "—");
+    setText("arr-icao", destination && destination.icao ? String(destination.icao).toUpperCase() : "—");
+}
+
 function formatBoardTicketMetaHtml(result) {
     // Job-ticket meta is intentionally compact: aircraft, pax/cargo, then destination aids.
     const aircraftLine = `<span class="contract-ticket-meta-key">ACFT:</span> ${escapeHtml(formatBoardAircraftDisplayName(result.spec.name))}`;
@@ -1415,7 +1433,8 @@ function buildDispatchExportBundle(result) {
 
     const navDep = airportIsInNavigraph(origin);
     const navDest = airportIsInNavigraph(destination);
-    const isSimbriefSupported = navDep && navDest;
+    const simbriefClassOk = spec.class !== "GLIDER" && spec.class !== "HELI" && spec.class !== "WARBIRD";
+    const isSimbriefSupported = simbriefClassOk && navDep && navDest;
     const simbriefNote = formatSimbriefUnavailableNote(origin, destination);
     let heliMessage = "";
 
@@ -1546,6 +1565,7 @@ const CRT_BRIEF_MAX_LINES = CRT_BRIEF_VISIBLE_LINES * 2;
 const CRT_BRIEF_CHARS_PER_LINE = 28;
 const TICKET_PHOTO_MATRIX_CHARS = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ0123456789ZYXWVUTSRQPONMLK";
 const CRT_MATRIX_SCENARIOS = {
+    132: { variant: "alien" },
     204: { variant: "alien" },
     183: { variant: "monolith" }
 };
@@ -1559,7 +1579,9 @@ const photoFilterPreviewCrtState = { timer: null, briefEl: null };
 const ticketPhotoCrtState = { timer: null, columnTimers: [], resolveTimer: null, slot: null, matrixFinishing: false };
 
 function formatDispatchPayout(amount) {
-    return "$ " + Math.floor(amount).toLocaleString("en-GB");
+    const n = Math.floor(amount);
+    const formatted = n > 9999 ? n.toLocaleString("en-GB") : String(n);
+    return "$ " + formatted;
 }
 function applyScenarioPayoutBonus(baseAmount, scenarioImgId) {
     if (scenarioImgId != null && HUSH_MONEY_SCENARIO_IMG_IDS.has(scenarioImgId)) {
@@ -1621,6 +1643,114 @@ function trimCrtBriefBody(body, bodyLineBudget) {
     return `${trimmed}…`;
 }
 
+function isVintageAirframeSpec(spec, aircraftType) {
+    if (!spec) return false;
+    const type = (aircraftType || "").toUpperCase();
+    if (VINTAGE_PROPLINER_TYPES.has(type) || VINTAGE_AIRFRAME_TYPES.has(type)) return true;
+    if (spec.class === "WARBIRD") return true;
+    const tags = spec.tags || [];
+    return tags.includes("VINTAGE");
+}
+
+function isStarshipCrtSpec(spec, aircraftType) {
+    const type = (aircraftType || "").toUpperCase();
+    return STARSHIP_CRT_TYPES.has(type);
+}
+
+function isMilitaryJetSpec(spec) {
+    if (!spec || spec.class !== "JET") return false;
+    if (spec.isMilitary) return true;
+    const tags = spec.tags || [];
+    return tags.includes("FIGHTER") || tags.includes("FAST_JET") || tags.includes("BOMBER");
+}
+
+function isRegionalJetMcduSpec(spec, aircraftType) {
+    if (!spec || spec.class !== "JET" || isMilitaryJetSpec(spec)) return false;
+    const type = (aircraftType || "").toUpperCase();
+    if (REGIONAL_JET_CRT_TYPES.has(type)) return true;
+    const tags = spec.tags || [];
+    return tags.includes("REGIONAL");
+}
+
+function isAirlinerMcduSpec(spec, aircraftType) {
+    if (!spec || spec.class !== "JET" || isMilitaryJetSpec(spec)) return false;
+    return !isRegionalJetMcduSpec(spec, aircraftType);
+}
+
+function isLedAvionicsAirframeSpec(spec, aircraftType) {
+    if (!spec || isVintageAirframeSpec(spec, aircraftType)) return false;
+    if (isStarshipCrtSpec(spec, aircraftType)) return false;
+    return spec.class === "BIZ JET";
+}
+
+function shouldUseVintageCrtForResult(result) {
+    if (!result || !result.spec) return false;
+    if (result.chosenMission && result.chosenMission.militaryOnly) return false;
+    const type = result.aircraftType || result.type;
+    return isVintageAirframeSpec(result.spec, type);
+}
+
+function shouldUseLedAvionicsCrtForResult(result) {
+    if (!result || !result.spec) return false;
+    if (result.chosenMission && result.chosenMission.militaryOnly) return false;
+    const type = result.aircraftType || result.type;
+    return isLedAvionicsAirframeSpec(result.spec, type);
+}
+
+function shouldUseStarshipCrtForResult(result) {
+    if (!result || !result.spec) return false;
+    if (result.chosenMission && result.chosenMission.militaryOnly) return false;
+    const type = result.aircraftType || result.type;
+    return isStarshipCrtSpec(result.spec, type);
+}
+
+function shouldUseRegionalMcduCrtForResult(result) {
+    if (!result || !result.spec) return false;
+    if (result.chosenMission && result.chosenMission.militaryOnly) return false;
+    const type = result.aircraftType || result.type;
+    return isRegionalJetMcduSpec(result.spec, type);
+}
+
+function shouldUseAirlinerMcduCrtForResult(result) {
+    if (!result || !result.spec) return false;
+    if (result.chosenMission && result.chosenMission.militaryOnly) return false;
+    const type = result.aircraftType || result.type;
+    return isAirlinerMcduSpec(result.spec, type);
+}
+
+function refreshBoardCrtSkinFromSelection() {
+    const type = getSelectedAircraftType();
+    const spec = type ? activeFleetSpecs[type] : null;
+    const vintageAirframe = isVintageAirframeSpec(spec, type);
+    const ledAirframe = isLedAvionicsAirframeSpec(spec, type);
+    const starshipAirframe = isStarshipCrtSpec(spec, type);
+    const regionalMcdu = isRegionalJetMcduSpec(spec, type);
+    const airlinerMcdu = isAirlinerMcduSpec(spec, type);
+    document.querySelectorAll("#contractsTicketGrid .contract-ticket").forEach((card, i) => {
+        const result = boardContractResults[i];
+        const isMilitary = !!(result && result.chosenMission && result.chosenMission.militaryOnly);
+        card.classList.toggle("is-vintage-crt", vintageAirframe && !isMilitary);
+        card.classList.toggle("is-led-crt", ledAirframe && !isMilitary);
+        card.classList.toggle("is-starship-crt", starshipAirframe && !isMilitary);
+        card.classList.toggle("is-regional-mcdu-crt", regionalMcdu && !isMilitary);
+        card.classList.toggle("is-mcdu-crt", airlinerMcdu && !isMilitary);
+    });
+}
+
+function getTicketCrtTypewriterCps(briefEl) {
+    const card = briefEl && briefEl.closest(".contract-ticket");
+    if (!card || card.classList.contains("is-military")) {
+        return TICKET_PHOTO_TYPEWRITER_CPS;
+    }
+    if (card.classList.contains("is-vintage-crt")) {
+        return TICKET_PHOTO_VINTAGE_TYPEWRITER_CPS;
+    }
+    if (card.classList.contains("is-led-crt")) {
+        return TICKET_PHOTO_LED_TYPEWRITER_CPS;
+    }
+    return TICKET_PHOTO_TYPEWRITER_CPS;
+}
+
 function formatContractTicketBrief(missionName, body) {
     if (!missionName && !body) return "";
     if (!body) return missionName || "";
@@ -1638,7 +1768,6 @@ function formatContractTicketBrief(missionName, body) {
 
 function resolveContractTicketBrief(result, ticketIndex) {
     const scenario = result && result.scenario;
-    const missionName = resolveContractJobTitle(result, ticketIndex);
     let body = "";
     if (result && result.rInstruction) {
         body = String(result.rInstruction);
@@ -1646,7 +1775,8 @@ function resolveContractTicketBrief(result, ticketIndex) {
         if (scenario.instruction) body = String(scenario.instruction);
         else if (scenario.payload) body = String(scenario.payload);
     }
-    return formatContractTicketBrief(missionName, body);
+    if (!body) return "";
+    return trimCrtBriefBody(body, CRT_BRIEF_MAX_LINES);
 }
 
 function syncCrtBriefScroll(briefEl) {
@@ -1745,7 +1875,7 @@ function runTicketPhotoTypewriter(briefEl, full) {
     }
 
     let i = 0;
-    const delayMs = Math.round(1000 / TICKET_PHOTO_TYPEWRITER_CPS);
+    const delayMs = Math.round(1000 / getTicketCrtTypewriterCps(briefEl));
     ticketPhotoCrtState.timer = setInterval(() => {
         if (i >= full.length) {
             clearInterval(ticketPhotoCrtState.timer);
@@ -2064,12 +2194,16 @@ function fillContractTicketCard(card, result, index, bundle) {
     };
     const isMilitary = !!(result.chosenMission && result.chosenMission.militaryOnly);
     card.classList.toggle("is-military", isMilitary);
+    card.classList.toggle("is-vintage-crt", shouldUseVintageCrtForResult(result));
+    card.classList.toggle("is-led-crt", shouldUseLedAvionicsCrtForResult(result));
+    card.classList.toggle("is-starship-crt", shouldUseStarshipCrtForResult(result));
+    card.classList.toggle("is-regional-mcdu-crt", shouldUseRegionalMcduCrtForResult(result));
+    card.classList.toggle("is-mcdu-crt", shouldUseAirlinerMcduCrtForResult(result));
     const slot = card.closest(".contract-ticket-slot");
     if (slot) slot.classList.toggle("is-military", isMilitary);
     const missionName = resolveContractJobTitle(result, index);
     setText("mission", missionName);
-    setText("dep", result.origin.icao);
-    setText("arr", result.destination.icao);
+    fillBoardRouteCells(card, result.origin, result.destination);
     setText("photo-label", formatBoardFlightLabel(index));
     const metaEl = card.querySelector('[data-role="meta"]');
     if (metaEl) metaEl.innerHTML = formatBoardTicketMetaHtml(result);
@@ -3070,8 +3204,7 @@ function updateFlightTimeSliderState() {
     const sliderIgnored = spec && isSliderIgnoredAircraft(spec);
     slider.disabled = false;
     if (section) section.classList.toggle("slider-section--rotor-glider", !!sliderIgnored);
-    const gliderNotice = document.getElementById("gliderAircraftNotice");
-    if (gliderNotice) gliderNotice.style.display = spec && spec.class === "GLIDER" ? "block" : "none";
+    refreshBoardCrtSkinFromSelection();
 }
 function rebuildFleetDropdown() {
     migrateCustomMissionAssignmentsOnLoad();
@@ -4003,9 +4136,6 @@ function passesMissionContextFilter(m, spec, origin, isContractorMode, aircraftT
     if (origin && origin.isMilitary && !m.militaryOnly && !isFreight) {
         if (!(spec.class === "WARBIRD" && isWarbirdHeritageMission(m))) return false;
     }
-    if (isContractorMode && !spec.isMilitary && origin) {
-        if (m.militaryOnly && !origin.isMilitary) return false;
-    }
     return true;
 }
 function scenarioAllowsAircraft(s, type, spec) {
@@ -4335,9 +4465,15 @@ function filterRoutesForContractorMission(candidatePairs, mission, spec) {
     if (!mission) return candidatePairs;
     let matched;
     if (mission.militaryOnly) {
-        matched = candidatePairs.filter(pair => pair.src.isMilitary);
-        if (matched.length) {
-            const bothMilitary = matched.filter(pair => pair.dst.isMilitary);
+        if (spec && spec.isMilitary) {
+            matched = candidatePairs.filter(pair => pair.src.isMilitary);
+            if (matched.length) {
+                const bothMilitary = matched.filter(pair => pair.dst.isMilitary);
+                if (bothMilitary.length) matched = bothMilitary;
+            }
+        } else {
+            matched = candidatePairs.filter(pair => pair.dst.isMilitary);
+            const bothMilitary = matched.filter(pair => pair.src.isMilitary && pair.dst.isMilitary);
             if (bothMilitary.length) matched = bothMilitary;
         }
     } else {
