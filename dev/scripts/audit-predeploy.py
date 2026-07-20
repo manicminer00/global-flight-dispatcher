@@ -80,26 +80,6 @@ else:
 if unused:
     warnings.append(f"Unused images on disk: {','.join(map(str, unused))}")
 
-# --- 3. Long-haul scenario consistency ---
-lh_block = re.search(r"const LONG_HAUL_SCENARIOS_BY_MISSION = \{(.*?)\};", text, re.S).group(1)
-lh_map = {}
-for m in re.finditer(r"(\d+):\s*\[([^\]]+)\]", lh_block):
-    lh_map[int(m.group(1))] = [int(x.strip()) for x in m.group(2).split(",") if x.strip()]
-
-type_pool = {m["type"]: m["pool"] for m in missions if "pool" in m}
-for mtype, ids in sorted(lh_map.items()):
-    pool = type_pool.get(mtype)
-    if not pool:
-        issues.append(f"Long-haul type {mtype} has no pool in missionMatrix")
-        continue
-    pool_ids = set(pools.get(pool, []))
-    for img in ids:
-        if img not in pool_ids:
-            issues.append(f"Long-haul type {mtype} ({pool}): imgId {img} not in pool")
-
-if not any("Long-haul" in i for i in issues):
-    print("OK long-haul scenario lists match pools")
-
 # --- 4. Duplicate imgIds ---
 dups = {k: v for k, v in uses.items() if len(v) > 1}
 print(f"Duplicate imgIds across pools: {len(dups)}")
@@ -109,8 +89,6 @@ known_pairs = {
     frozenset({"commercial", "commercial-regional"}),
     frozenset({"lightFreight", "regionalFreight"}),
     frozenset({"regionalFreight", "heavyFreight"}),
-    frozenset({"heavyFreight-MIL", "longHaulFreight-MIL"}),
-    frozenset({"executive", "longHaulExecutive"}),
     frozenset({"tacticalJet-MIL", "reconnaissance-MIL"}),
     frozenset({"uniqueMissions", "surveyServices"}),
     frozenset({"uniqueMissions", "vintageOps"}),
@@ -122,7 +100,7 @@ for img_id, entries in sorted(dups.items()):
     payloads = {e[1] for e in entries}
     if len(payloads) > 1:
         if not any(pools_set <= kp or pools_set == kp for kp in known_pairs):
-            if not (pools_set <= {"executive", "lightPax", "longHaulExecutive"}):
+            if not (pools_set <= {"executive", "lightPax"}):
                 cross.append((img_id, entries))
 
 if cross:

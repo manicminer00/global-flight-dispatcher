@@ -54,7 +54,6 @@ export function createVectorSandbox(rootDir = process.cwd()) {
     loadScript(sandbox, "missions-db.js");
     loadScript(sandbox, "mission-assignment-core.js");
     loadScript(sandbox, "mission-assignments-data.js");
-    loadScript(sandbox, "long-haul-routes-db.js");
     loadScript(sandbox, "short-haul-routes-db.js");
     loadScript(sandbox, "dispatch-engine.js");
     vm.runInNewContext("if (typeof initMissionAssignments === 'function') initMissionAssignments();", sandbox);

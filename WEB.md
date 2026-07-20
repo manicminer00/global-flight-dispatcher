@@ -12,7 +12,7 @@ GitHub Pages serves **from this repository root**. Do not move these into a subf
 | `fleet-db.js`, `missions-db.js` | Fleet + missions |
 | `airports-asobo-db.js`, `airports-thirdparty-db.js` | Airports |
 | `mission-assignment-core.js`, `mission-assignments-data.js` | Assignments |
-| `short-haul-routes-db.js`, `long-haul-routes-db.js` | Route pools |
+| `short-haul-routes-db.js` | Route pools |
 | `data/*.js` | Generated Navigraph navdata |
 | `version.json` | Release version |
 | `images/`, `images-missions/`, `favicon/` | Assets |

@@ -96,7 +96,6 @@ DEPLOY_FILES = [
     "airports-asobo-db.js",
     "airports-thirdparty-db.js",
     "short-haul-routes-db.js",
-    "long-haul-routes-db.js",
     "data/ils-strict-icaos.js",
     "data/navigraph-airport-icaos.js",
     "data/dest-approach-types.js",

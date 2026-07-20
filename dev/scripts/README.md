@@ -58,7 +58,7 @@ When editing airport data or fixing audit findings, **never** “correct” a si
 | `verification-manifest.json` | Local record of verified DBs (not uploaded to the site) |
 | `CURSOR-PREDEPLOY-PROMPT.md` | Prompt for Cursor before a release |
 | `audit-fleet-missions.py` | Fleet ↔ mission eligibility (called automatically by vfd-verify) |
-| `audit-predeploy.py` | Images, imgIds, version sync, long-haul pools (called automatically) |
+| `audit-predeploy.py` | Images, imgIds, version sync (called automatically) |
 | `audit-longhaul-math.py` | Long-haul range/block math spot-check (called automatically) |
 | `fleet-reference.json` | Optional POH / developer specs for fleet verification |
 | `dispatch-fleet-smoke.mjs` | **Headless QA** — runs `probeDispatchFlight()` 20× per aircraft (see root `dispatch-fleet-smoke.bat`) |

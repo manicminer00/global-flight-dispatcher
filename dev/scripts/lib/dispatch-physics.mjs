@@ -21,7 +21,7 @@ export function getPhysicsHelpers(sbx) {
                 validateJetDispatchPhysics,
                 isJetSimBriefRouteFeasible,
                 jetTripFuelExceedsTankCapacity,
-                getJetMaxLongHaulDispatchNm,
+                getJetMaxDispatchRangeNm,
                 getJetAllowedMaxGcNm,
                 getJetFuelPlanningDistanceNm,
                 calculateDistance

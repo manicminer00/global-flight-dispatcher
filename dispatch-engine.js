@@ -563,13 +563,13 @@ function formatPassengerManifest(count) {
 function normalizeIcao(icao) {
     return (icao || "").trim().toUpperCase();
 }
-function estimateLongHaulBlockMinutes(distNm, spec, aircraftType) {
+function estimateBaseBlockMinutes(distNm, spec, aircraftType) {
     const speed = getBlockSpeedForSpec(spec, aircraftType);
     if (!speed || !distNm) return 0;
     return Math.round((distNm / speed) * 60) + SHORT_HAUL_BLOCK_TIME_PAD_MINS;
 }
-function estimateLongHaulBlockMinutesForRoute(dist, spec, aircraftType) {
-    return estimateLongHaulBlockMinutes(Math.round(dist), spec, aircraftType);
+function estimateBaseBlockMinutesForRoute(dist, spec, aircraftType) {
+    return estimateBaseBlockMinutes(Math.round(dist), spec, aircraftType);
 }
 function getEffectiveBlockMinutes(targetMins, spec, aircraftType) {
     if (isSliderIgnoredAircraft(spec)) return 20;
@@ -618,7 +618,7 @@ const SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS = 8;
 const FIXED_DEPARTURE_BLOCK_TOLERANCE_MINS = 15;
 const FIXED_DEPARTURE_BLOCK_RELAXED_MINS = 20;
 function estimateShortHaulBlockMinutesForRoute(dist, spec, aircraftType) {
-    return estimateLongHaulBlockMinutesForRoute(dist, spec, aircraftType);
+    return estimateBaseBlockMinutesForRoute(dist, spec, aircraftType);
 }
 function getShortHaulSimbriefProxyBlockMinutes(dist, spec, aircraftType) {
     return estimateShortHaulBlockMinutesForRoute(dist, spec, aircraftType) + SHORT_HAUL_SIMBRIEF_OVERHEAD_MINS;
@@ -3615,7 +3615,7 @@ function narrowbodyFuelPlanningExceedsTankSafeEnvelope(gcDistNm, spec) {
     if (safeGc <= 0) return true;
     return gcDistNm > safeGc + 1e-6;
 }
-function getJetMaxLongHaulDispatchNm(spec) {
+function getJetMaxDispatchRangeNm(spec) {
     const allowedGc = getJetAllowedMaxGcNm(spec);
     if (specIsHeavyJet(spec)) return allowedGc;
     const maxTank = getJetMaxFuelKg(spec);
@@ -3666,7 +3666,7 @@ function buildJetRouteFeasibilityContext(spec) {
     const catalogFpn = getJetCatalogTripFuelPerNm(spec);
     return {
         allowedGc: getJetAllowedMaxGcNm(spec),
-        maxLhNm: isHeavy ? Infinity : getJetMaxLongHaulDispatchNm(spec),
+        maxLhNm: isHeavy ? Infinity : getJetMaxDispatchRangeNm(spec),
         narrowbodySafeGc: isHeavy ? Infinity : getJetNarrowbodyMaxSafeGcNm(spec),
         isHeavy,
         maxTank,
@@ -3839,6 +3839,47 @@ function enforceJetTowPayloadCap(spec, pax, cargoKg, fuelDistanceNm, operational
     if (totalWeight() > mtow) return null;
     return { pax: outPax, cargoKg: outCargo };
 }
+function enforceMzfwCap(spec, pax, cargoKg, chosenMission, scenario) {
+    if (!spec || !(spec.mzfw > 0)) return { pax: pax, cargoKg: cargoKg };
+    const oew = Number(spec.oew) || 0;
+    const mzfw = Number(spec.mzfw);
+    let outPax = pax;
+    let outCargo = cargoKg;
+    function zfw() {
+        return oew + getSimBriefPassengerPayloadKg(spec, outPax) + outCargo;
+    }
+    while (zfw() > mzfw && outCargo > 0) {
+        outCargo = Math.max(0, outCargo - 200);
+    }
+    const trimMinPax = missionRequiresPassengers(chosenMission, spec, scenario) && (spec.maxPax || 0) > 0 ? 1 : 0;
+    while (zfw() > mzfw && outPax > trimMinPax) {
+        outPax--;
+    }
+    if (zfw() > mzfw) return null;
+    return { pax: outPax, cargoKg: outCargo };
+}
+function enforceMlwCap(spec, pax, cargoKg, fuelDistanceNm, chosenMission, scenario) {
+    if (!spec || !(spec.mlw > 0)) return { pax: pax, cargoKg: cargoKg };
+    const oew = Number(spec.oew) || 0;
+    const mlw = Number(spec.mlw);
+    const blockFuel = spec.class === "JET"
+        ? getJetSimBriefPlanningBlockFuelKg(fuelDistanceNm, spec)
+        : Math.max(0, Number(fuelDistanceNm) || 0) * (Number(spec.fuelPerNm) || 0.5);
+    let outPax = pax;
+    let outCargo = cargoKg;
+    function totalWeight() {
+        return oew + getSimBriefPassengerPayloadKg(spec, outPax) + outCargo + blockFuel;
+    }
+    while (totalWeight() > mlw && outCargo > 0) {
+        outCargo = Math.max(0, outCargo - 200);
+    }
+    const trimMinPax = missionRequiresPassengers(chosenMission, spec, scenario) && (spec.maxPax || 0) > 0 ? 1 : 0;
+    while (totalWeight() > mlw && outPax > trimMinPax) {
+        outPax--;
+    }
+    if (totalWeight() > mlw) return null;
+    return { pax: outPax, cargoKg: outCargo };
+}
 /**
  * Dispatcher physics audit — every check SimBrief cares about (no weather).
  * Returns violation strings; empty array means the plan is internally consistent.
@@ -3893,6 +3934,12 @@ function validateJetDispatchPhysics(type, spec, origin, destination, gcDistNm, f
     }
     if ((spec.maxCargo || 0) > 0 && cargoN > spec.maxCargo) {
         violations.push(`${cargoN} kg cargo exceeds maxCargo ${spec.maxCargo} kg`);
+    }
+    if ((spec.mzfw || 0) > 0 && zfw > spec.mzfw + 1) {
+        violations.push(`ZFW ${Math.round(zfw)} kg > MZFW ${Math.round(spec.mzfw)} kg`);
+    }
+    if ((spec.mlw || 0) > 0 && tow > spec.mlw + 1) {
+        violations.push(`landing weight ${Math.round(tow)} kg > MLW ${Math.round(spec.mlw)} kg`);
     }
     return violations;
 }
@@ -5102,6 +5149,28 @@ function probeDispatchFlight(config) {
         }
         pax = towCapped.pax;
         cargoKg = towCapped.cargoKg;
+    }
+
+    if (spec.mzfw > 0) {
+        const zfwCapped = enforceMzfwCap(spec, pax, cargoKg, chosenMission, chosenScenario);
+        if (!zfwCapped) {
+            return fail("runway_performance",
+                "Payload exceeds this aircraft's maximum zero fuel weight. Try a lighter load or another airframe.",
+                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+        }
+        pax = zfwCapped.pax;
+        cargoKg = zfwCapped.cargoKg;
+    }
+
+    if (spec.mlw > 0) {
+        const mlwCapped = enforceMlwCap(spec, pax, cargoKg, fuelDistanceNm, chosenMission, chosenScenario);
+        if (!mlwCapped) {
+            return fail("runway_performance",
+                "Payload and fuel combination exceeds this aircraft's maximum landing weight. Try a lighter load or another airframe.",
+                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+        }
+        pax = mlwCapped.pax;
+        cargoKg = mlwCapped.cargoKg;
     }
 
     if (mtowReducedForRestrictedAirport) {
