@@ -224,6 +224,17 @@
 
     ].forEach(loadScriptSync);
 
+    function renderFatalErrorPage(html) {
+        var write = function () {
+            document.body.innerHTML = html;
+        };
+        if (document.body) {
+            write();
+        } else {
+            document.addEventListener("DOMContentLoaded", write);
+        }
+    }
+
     if (typeof initMissionAssignments === "function") {
         initMissionAssignments();
     }
@@ -233,20 +244,20 @@
             console.info("VECTOR: mission assignments active (" + Object.keys(getMissionAssignmentData().assignments).length + " aircraft).");
         } catch (assignmentError) {
             console.error(assignmentError.message);
-            document.body.innerHTML = "<div style=\"max-width:720px;margin:40px auto;padding:24px;font-family:Segoe UI,sans-serif;line-height:1.5;\">"
+            renderFatalErrorPage("<div style=\"max-width:720px;margin:40px auto;padding:24px;font-family:Segoe UI,sans-serif;line-height:1.5;\">"
                 + "<h1 style=\"color:#c00;\">VECTOR cannot start</h1>"
                 + "<p>Mission assignments failed to load or are incomplete. Dispatch requires mission-assignments-data.js with every core fleet type configured.</p>"
                 + "<pre style=\"white-space:pre-wrap;background:#f5f5f5;padding:12px;border-radius:6px;\">"
                 + String(assignmentError.message).replace(/</g, "&lt;")
                 + "</pre>"
                 + "<p>Export from the mission editor, regenerate <code>mission-assignments-data.js</code>, hard-refresh (Ctrl+F5), then run <code>node dev/scripts/validate-assignments.mjs</code>.</p>"
-                + "</div>";
+                + "</div>");
             throw assignmentError;
         }
     } else if (typeof usesMissionAssignments === "function" && !usesMissionAssignments()) {
-        document.body.innerHTML = "<div style=\"max-width:720px;margin:40px auto;padding:24px;font-family:Segoe UI,sans-serif;\">"
+        renderFatalErrorPage("<div style=\"max-width:720px;margin:40px auto;padding:24px;font-family:Segoe UI,sans-serif;\">"
             + "<h1 style=\"color:#c00;\">VECTOR cannot start</h1>"
-            + "<p>Mission assignment data is missing. Reload the app from a complete install.</p></div>";
+            + "<p>Mission assignment data is missing. Reload the app from a complete install.</p></div>");
         throw new Error("VECTOR: mission assignments are required but not loaded.");
     }
 
