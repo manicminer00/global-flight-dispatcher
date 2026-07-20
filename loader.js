@@ -214,6 +214,8 @@
 
         "short-haul-routes-db.js",
 
+        "settings.js",
+
         "dispatch-engine.js",
 
         "fleet-db.js",

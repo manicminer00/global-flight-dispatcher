@@ -1383,14 +1383,16 @@ function formatBoardTicketMetaHtml(result) {
     const payloadLine = `<span class="contract-ticket-meta-key">PAX</span> ${escapeHtml(String(pax))} <span class="contract-ticket-meta-key">/</span> <span class="contract-ticket-meta-key">CARGO</span> ${escapeHtml(`${weightKg.toLocaleString("en-GB")} KG`)}`;
     const destDivider = `<span class="contract-ticket-meta-divider" aria-hidden="true"></span>`;
     const destIlsLine = `<span class="contract-ticket-meta-key">DESTINATION HAS ILS:</span> ${escapeHtml(formatDestinationIlsTicketLabel(result.destination))}`;
-    const destApprLine = `<span class="contract-ticket-meta-key">AVAIL. APPR.:</span> ${escapeHtml(formatDestinationApproachTicketLabel(result.destination))}`;
+    const destApprLine = `<span class="contract-ticket-meta-key">OTHER:</span> ${escapeHtml(formatDestinationApproachTicketLabel(result.destination))}`;
+    const navigraphLine = `<span class="contract-ticket-meta-key">NAVIGRAPH:</span> ${airportIsInNavigraph(result.destination) ? "YES" : "NO"}`;
     const wrapMetaLine = (line) => `<span class="contract-ticket-meta-line">${line}</span>`;
     return [
         wrapMetaLine(aircraftLine),
         wrapMetaLine(payloadLine),
         destDivider,
         wrapMetaLine(destIlsLine),
-        wrapMetaLine(destApprLine)
+        wrapMetaLine(destApprLine),
+        wrapMetaLine(navigraphLine)
     ].join("");
 }
 
@@ -1528,20 +1530,13 @@ function formatBoardFlightLabel(ticketIndex) {
     return `FLIGHT# ${getBoardCallsignPrefix()}${formatBoardFlightSeq(ticketIndex)}`;
 }
 
-/** Stable faux job-desk reference, e.g. #REF-VEC-23/FHL */
+/** Stable faux job-desk reference, ending with the three-digit mission image ID. */
 function formatBoardJobRef(result, ticketIndex) {
     const prefix = getBoardCallsignPrefix();
     const num = String(getBoardFlightNumber(ticketIndex) % 100).padStart(2, "0");
-    const dep = String((result && result.origin && result.origin.icao) || "XXX").toUpperCase();
-    const arr = String((result && result.destination && result.destination.icao) || "XXX").toUpperCase();
-    const seed = `${dep}${arr}${prefix}${ticketIndex}`;
-    let suffix = "";
-    for (let i = 0; i < 3; i++) {
-        const a = seed.charCodeAt(i % seed.length);
-        const b = seed.charCodeAt((i * 5 + 2) % seed.length);
-        suffix += String.fromCharCode(65 + ((a + b + i * 7) % 26));
-    }
-    return `#REF-${prefix}-${num}/${suffix}`;
+    const imageId = getContractScenarioImgId(result);
+    const missionRef = imageId != null ? String(imageId).padStart(3, "0").slice(-3) : "---";
+    return `#REF-${prefix}-${num}/${missionRef}`;
 }
 
 function refreshBoardFlightLabels() {
@@ -1558,17 +1553,14 @@ function refreshBoardFlightLabels() {
 }
 
 const TICKET_PHOTO_FX_STORAGE_KEY = "vector_ticket_photo_fx_v1";
+const TICKET_FX_USER_SETTINGS_KEY = "vector_ticket_fx_user_settings_v1";
 const TICKET_PHOTO_FX_MODES = ["static", "zoom", "crt"];
+const TICKET_FX_PROFILE_MODES = ["crt-standard", "crt-military", "crt-vintage", "crt-business", "crt-commercial", "crt-regional", "crt-starship", "crt-helicopter"];
 const TICKET_PHOTO_TYPEWRITER_CPS = 40;
-const CRT_BRIEF_VISIBLE_LINES = 7;
+const CRT_BRIEF_VISIBLE_LINES = 9;
 const CRT_BRIEF_MAX_LINES = CRT_BRIEF_VISIBLE_LINES * 2;
 const CRT_BRIEF_CHARS_PER_LINE = 28;
 const TICKET_PHOTO_MATRIX_CHARS = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ0123456789ZYXWVUTSRQPONMLK";
-const CRT_MATRIX_SCENARIOS = {
-    132: { variant: "alien" },
-    204: { variant: "alien" },
-    183: { variant: "monolith" }
-};
 const HUSH_MONEY_SCENARIO_BONUS = 25000;
 const HUSH_MONEY_SCENARIO_IMG_IDS = new Set([183, 204]);
 const TICKET_PHOTO_MATRIX_INTRO_MS = 4500;
@@ -1577,6 +1569,128 @@ const PHOTO_FILTER_PREVIEW_CRT_FILE = "images/photo-filter-crt.png";
 const PHOTO_FILTER_PREVIEW_BRIEF = "Priority cargo lift — maintain assigned corridor, report position at waypoint BRAVO, and confirm cargo secure before final approach.";
 const photoFilterPreviewCrtState = { timer: null, briefEl: null };
 const ticketPhotoCrtState = { timer: null, columnTimers: [], resolveTimer: null, slot: null, matrixFinishing: false };
+let ticketFxProfilesCache = { groupDefaults: {}, aircraftOverrides: {}, matrixMissionRules: {} };
+
+function isTicketFxProfileMode(value) {
+    return TICKET_FX_PROFILE_MODES.includes(value);
+}
+
+function getTicketFxProfiles() {
+    const clean = { groupDefaults: {}, aircraftOverrides: {}, matrixMissionRules: {} };
+    ["groupDefaults", "aircraftOverrides"].forEach((key) => {
+        Object.entries(ticketFxProfilesCache[key] || {}).forEach(([id, fx]) => {
+            if (isTicketFxProfileMode(fx)) clean[key][String(id).toUpperCase()] = fx;
+        });
+    });
+    Object.entries(ticketFxProfilesCache.matrixMissionRules || {}).forEach(([imgId, rule]) => {
+        if (/^\d+$/.test(imgId) && rule && rule.enabled === true) {
+            clean.matrixMissionRules[imgId] = { enabled: true, variant: rule.variant === "monolith" ? "monolith" : "alien" };
+        }
+    });
+    return clean;
+}
+
+function readTicketFxUserSettings() {
+    try { return JSON.parse(localStorage.getItem(TICKET_FX_USER_SETTINGS_KEY) || "{}") || {}; }
+    catch (e) { return {}; }
+}
+
+function reloadTicketFxProfiles() {
+    const defaults = (window.VECTOR_DEFAULT_SETTINGS && window.VECTOR_DEFAULT_SETTINGS.ticketFx) || {};
+    const personal = readTicketFxUserSettings();
+    ticketFxProfilesCache = {
+        groupDefaults: Object.assign({}, defaults.groupDefaults || {}, personal.groupDefaults || {}),
+        aircraftOverrides: Object.assign({}, defaults.aircraftOverrides || {}, personal.aircraftOverrides || {}),
+        matrixMissionRules: Object.assign({}, defaults.matrixMissionRules || {}, personal.matrixMissionRules || {})
+    };
+    applyTicketFxToRenderedCards();
+    return getTicketFxProfiles();
+}
+
+function saveTicketFxUserSettings(settings) {
+    localStorage.setItem(TICKET_FX_USER_SETTINGS_KEY, JSON.stringify(settings || {}));
+    reloadTicketFxProfiles();
+}
+
+function isMatrixMissionEnabled(scenarioImgId) {
+    if (scenarioImgId == null) return false;
+    const rule = getTicketFxProfiles().matrixMissionRules[String(scenarioImgId)];
+    return !!(rule && rule.enabled);
+}
+
+function getMatrixMissionConfig(scenarioImgId) {
+    const rule = getTicketFxProfiles().matrixMissionRules[String(scenarioImgId)];
+    return rule && rule.enabled ? { variant: rule.variant === "monolith" ? "monolith" : "alien" } : null;
+}
+
+function getGlobalTicketFxFallback() {
+    try {
+        const stored = localStorage.getItem(TICKET_PHOTO_FX_STORAGE_KEY);
+        const defaultMode = (window.VECTOR_DEFAULT_SETTINGS || {}).ticketPhotoFilterFx;
+        return TICKET_PHOTO_FX_MODES.includes(stored) ? stored : (TICKET_PHOTO_FX_MODES.includes(defaultMode) ? defaultMode : "zoom");
+    } catch (e) {
+        const defaultMode = (window.VECTOR_DEFAULT_SETTINGS || {}).ticketPhotoFilterFx;
+        return TICKET_PHOTO_FX_MODES.includes(defaultMode) ? defaultMode : "zoom";
+    }
+}
+
+function resolveTicketFxForResult(result) {
+    const spec = (result && result.spec) || {};
+    let type = String((result && (result.aircraftType || result.type)) || "").toUpperCase();
+    const matchingFleetType = typeof activeFleetSpecs !== "undefined"
+        ? Object.keys(activeFleetSpecs).find((key) => {
+            const fleetSpec = activeFleetSpecs[key];
+            return fleetSpec === spec || (fleetSpec && spec && fleetSpec.name === spec.name);
+        }) || ""
+        : "";
+    if (!type) type = matchingFleetType;
+    if (!type && typeof getSelectedAircraftType === "function") type = String(getSelectedAircraftType() || "").toUpperCase();
+    const profiles = getTicketFxProfiles();
+    const scenarioImgId = getContractScenarioImgId(result);
+    if (isMatrixMissionEnabled(scenarioImgId)) return "matrix";
+    const explicit = profiles.aircraftOverrides[type]
+        || profiles.aircraftOverrides[String(matchingFleetType).toUpperCase()]
+        || (isTicketFxProfileMode(spec.ticketFx) ? spec.ticketFx : "");
+    if (explicit) return explicit;
+    const groupFx = profiles.groupDefaults[String(spec.class || "").toUpperCase()];
+    return groupFx || "legacy";
+}
+
+function applyTicketFxToCard(card, result) {
+    if (!card) return;
+    const globalPhotoMode = getGlobalTicketFxFallback();
+    const fx = resolveTicketFxForResult(result);
+    ["static", "zoom", "crt", "legacy", "matrix", ...TICKET_FX_PROFILE_MODES].forEach((mode) => card.classList.remove("ticket-photo-fx-" + mode));
+    card.classList.remove("is-force-military-crt");
+    ["is-vintage-crt", "is-led-crt", "is-starship-crt", "is-regional-mcdu-crt", "is-mcdu-crt", "is-helicopter-crt"].forEach((name) => card.classList.remove(name));
+    if (globalPhotoMode !== "crt") {
+        card.classList.remove("is-crt-pinned");
+        resetTicketPhotoCrtDisplay(card);
+        if (globalPhotoMode === "zoom") card.classList.add("ticket-photo-fx-zoom");
+        card.dataset.ticketFx = globalPhotoMode;
+        return;
+    }
+    if (fx === "legacy") {
+        card.classList.add("ticket-photo-fx-crt");
+    } else {
+        card.classList.add("ticket-photo-fx-" + fx, "ticket-photo-fx-crt");
+        card.classList.toggle("is-vintage-crt", fx === "crt-vintage");
+        card.classList.toggle("is-led-crt", fx === "crt-business");
+        card.classList.toggle("is-mcdu-crt", fx === "crt-commercial");
+        card.classList.toggle("is-regional-mcdu-crt", fx === "crt-regional");
+        card.classList.toggle("is-starship-crt", fx === "crt-starship");
+        card.classList.toggle("is-helicopter-crt", fx === "crt-helicopter");
+        card.classList.toggle("is-force-military-crt", fx === "crt-military");
+    }
+    card.dataset.ticketFx = fx;
+}
+
+function applyTicketFxToRenderedCards() {
+    document.querySelectorAll("#contractsTicketGrid .contract-ticket").forEach((card, index) => {
+        const result = boardContractResults && boardContractResults[index];
+        if (result) applyTicketFxToCard(card, result);
+    });
+}
 
 function formatDispatchPayout(amount) {
     const n = Math.floor(amount);
@@ -1735,6 +1849,7 @@ function refreshBoardCrtSkinFromSelection() {
         card.classList.toggle("is-regional-mcdu-crt", regionalMcdu && !isMilitary);
         card.classList.toggle("is-mcdu-crt", airlinerMcdu && !isMilitary);
     });
+    applyTicketFxToRenderedCards();
 }
 
 function getTicketCrtTypewriterCps(briefEl) {
@@ -1938,7 +2053,7 @@ function startTicketPhotoMatrixEffect(slot, card, briefEl, matrixConfig, fullBri
         if (photoWrap && photoWrap.clientHeight) matrixHeight = photoWrap.clientHeight - 42;
         else if (photo && photo.clientHeight) matrixHeight = Math.max(0, photo.clientHeight - 42);
     }
-    matrixHeight = matrixHeight || 178;
+    matrixHeight = matrixHeight || 220;
     const rowsInView = Math.max(8, Math.ceil(matrixHeight / lineHeight));
     const trailLen = rowsInView;
     const dropsPerColumn = rowsInView + trailLen;
@@ -1988,16 +2103,13 @@ function startTicketPhotoMatrixEffect(slot, card, briefEl, matrixConfig, fullBri
 }
 
 function startTicketPhotoTypewriter(slot) {
-    const grid = document.getElementById("contractsTicketGrid");
-    if (!grid || !grid.classList.contains("ticket-photo-fx-crt")) return;
     const card = slot.querySelector(".contract-ticket:not(.is-dimmed):not(.is-selected)");
-    if (!card) return;
+    if (!card || !card.classList.contains("ticket-photo-fx-crt")) return;
     showTicketPhotoCrtForCard(card, slot, false);
 }
 
 function showTicketPhotoCrtForCard(card, slotOverride, pinAfter) {
-    const grid = document.getElementById("contractsTicketGrid");
-    if (!grid || !grid.classList.contains("ticket-photo-fx-crt") || !card) return;
+    if (!card || !card.classList.contains("ticket-photo-fx-crt")) return;
     const slot = slotOverride || card.closest(".contract-ticket-slot");
     if (!slot) return;
     const briefEl = card.querySelector('[data-role="photo-brief"]');
@@ -2010,7 +2122,9 @@ function showTicketPhotoCrtForCard(card, slotOverride, pinAfter) {
     if (!full) return;
 
     const matrixKey = briefEl.getAttribute("data-crt-matrix");
-    const matrixConfig = matrixKey ? CRT_MATRIX_SCENARIOS[matrixKey] : null;
+    const matrixConfig = card.dataset.ticketFx === "matrix"
+        ? (matrixKey ? getMatrixMissionConfig(matrixKey) : { variant: "alien" })
+        : null;
     if (matrixConfig) {
         startTicketPhotoMatrixEffect(slot, card, briefEl, matrixConfig, full);
     } else {
@@ -2025,14 +2139,14 @@ function activateTicketPhotoCrtForCard(card, slotOverride) {
     showTicketPhotoCrtForCard(card, slotOverride, true);
 }
 
-function applyTicketPhotoFxMode(mode) {
+function applyTicketPhotoFxMode(mode, persist = true) {
     const grid = document.getElementById("contractsTicketGrid");
     if (!grid || TICKET_PHOTO_FX_MODES.indexOf(mode) === -1) return;
     TICKET_PHOTO_FX_MODES.forEach((m) => grid.classList.remove("ticket-photo-fx-" + m));
-    grid.classList.add("ticket-photo-fx-" + mode);
-    try {
-        localStorage.setItem(TICKET_PHOTO_FX_STORAGE_KEY, mode);
-    } catch (e) { /* ignore */ }
+    if (persist) {
+        try { localStorage.setItem(TICKET_PHOTO_FX_STORAGE_KEY, mode); }
+        catch (e) { /* ignore */ }
+    }
     const toggle = document.getElementById("contractsPhotoFxToggle");
     if (toggle) {
         toggle.querySelectorAll("[data-fx]").forEach((btn) => {
@@ -2042,6 +2156,7 @@ function applyTicketPhotoFxMode(mode) {
             btn.setAttribute("aria-pressed", active ? "true" : "false");
         });
     }
+    applyTicketFxToRenderedCards();
     cancelTicketPhotoTypewriter();
 }
 
@@ -2067,11 +2182,10 @@ function bindTicketPhotoFxInteractions() {
         if (ticketPhotoCrtState.slot === slot) cancelTicketPhotoTypewriter();
     });
     grid.addEventListener("wheel", (e) => {
-        if (!grid.classList.contains("ticket-photo-fx-crt")) return;
         const slot = e.target.closest(".contract-ticket-slot");
         if (!slot) return;
         const card = slot.querySelector(".contract-ticket:not(.is-dimmed)");
-        if (!card) return;
+        if (!card || !card.classList.contains("ticket-photo-fx-crt")) return;
         const briefEl = card.querySelector('[data-role="photo-brief"]');
         if (!briefEl || !briefEl.classList.contains("is-visible")) return;
         if (!briefEl.classList.contains("is-scrollable")) return;
@@ -2161,12 +2275,12 @@ function initTicketPhotoFxToggle() {
 
     initPhotoFilterPreviews();
 
-    let initial = "zoom";
+    let initial = getGlobalTicketFxFallback();
     try {
         const stored = localStorage.getItem(TICKET_PHOTO_FX_STORAGE_KEY);
         if (TICKET_PHOTO_FX_MODES.indexOf(stored) !== -1) initial = stored;
     } catch (e) { /* ignore */ }
-    applyTicketPhotoFxMode(initial);
+    applyTicketPhotoFxMode(initial, false);
 
     const toggle = document.getElementById("contractsPhotoFxToggle");
     if (toggle) {
@@ -2185,6 +2299,24 @@ function initTicketPhotoFxToggle() {
         });
     }
     bindTicketPhotoFxInteractions();
+    reloadTicketFxProfiles();
+}
+
+function getTicketPhotoCrop(imageKey) {
+    const cropMap = window.MISSION_IMAGE_CROPS || {};
+    const crop = cropMap[imageKey] || {};
+    return {
+        x: Number.isFinite(crop.x) ? crop.x : 50,
+        y: Number.isFinite(crop.y) ? crop.y : 50,
+        zoom: Number.isFinite(crop.zoom) ? Math.max(100, Math.min(115, crop.zoom)) : 100
+    };
+}
+
+function applyTicketPhotoCrop(photo, imageKey) {
+    if (!photo || !imageKey) return;
+    const crop = getTicketPhotoCrop(imageKey);
+    photo.style.backgroundPosition = `${crop.x}% ${crop.y}%`;
+    photo.style.backgroundSize = crop.zoom === 100 ? "cover" : `auto ${crop.zoom}%`;
 }
 
 function fillContractTicketCard(card, result, index, bundle) {
@@ -2199,6 +2331,7 @@ function fillContractTicketCard(card, result, index, bundle) {
     card.classList.toggle("is-starship-crt", shouldUseStarshipCrtForResult(result));
     card.classList.toggle("is-regional-mcdu-crt", shouldUseRegionalMcduCrtForResult(result));
     card.classList.toggle("is-mcdu-crt", shouldUseAirlinerMcduCrtForResult(result));
+    applyTicketFxToCard(card, result);
     const slot = card.closest(".contract-ticket-slot");
     if (slot) slot.classList.toggle("is-military", isMilitary);
     const missionName = resolveContractJobTitle(result, index);
@@ -2212,8 +2345,12 @@ function fillContractTicketCard(card, result, index, bundle) {
 
     const photo = card.querySelector('[data-role="photo"]');
     if (photo) {
+        const scenarioImgId = getContractScenarioImgId(result);
+        const imageKey = scenarioImgId != null ? `mission${scenarioImgId}.jpg` : "";
+        photo.dataset.imageKey = imageKey;
         if (bundle.imageUrl) {
             photo.style.backgroundImage = `url("${bundle.imageUrl}")`;
+            applyTicketPhotoCrop(photo, imageKey);
         } else {
             photo.style.backgroundImage = "";
         }
@@ -2223,7 +2360,7 @@ function fillContractTicketCard(card, result, index, bundle) {
     if (briefEl) {
         const scenarioImgId = getContractScenarioImgId(result);
         briefEl.setAttribute("data-brief", resolveContractTicketBrief(result, index));
-        if (CRT_MATRIX_SCENARIOS[scenarioImgId]) {
+        if (isMatrixMissionEnabled(scenarioImgId)) {
             briefEl.setAttribute("data-crt-matrix", String(scenarioImgId));
         } else {
             briefEl.removeAttribute("data-crt-matrix");
@@ -2452,7 +2589,7 @@ function acceptContractTicket(index) {
         }
     });
 
-    if (grid && grid.classList.contains("ticket-photo-fx-crt") && selectedCard) {
+    if (selectedCard && selectedCard.classList.contains("ticket-photo-fx-crt")) {
         activateTicketPhotoCrtForCard(selectedCard);
     } else {
         cancelTicketPhotoTypewriter();
@@ -3007,6 +3144,9 @@ function clearCustomAircraftForm() {
     });
     const classEl = document.getElementById("newAcClass");
     if (classEl) classEl.value = "JET";
+    const ticketFxEl = document.getElementById("newAcTicketFx");
+    if (ticketFxEl) ticketFxEl.value = "";
+    document.querySelectorAll("[data-ticket-fx-option]").forEach((option) => { option.checked = false; });
     const paxRole = document.getElementById("newAcRolePassenger");
     if (paxRole) paxRole.checked = true;
     ["newAcRoleCargo", "newAcRoleExecutive", "newAcRoleMilitary", "newAcRoleMedevac"].forEach(id => {
@@ -3020,6 +3160,43 @@ function clearCustomAircraftForm() {
         if (el) el.checked = false;
     });
     updateCustomAircraftForm();
+    updateCustomAircraftFxPreview();
+}
+function selectCustomAircraftTicketFx(selectedOption) {
+    const ticketFxEl = document.getElementById("newAcTicketFx");
+    if (!ticketFxEl || !selectedOption) return;
+    document.querySelectorAll("[data-ticket-fx-option]").forEach((option) => {
+        if (option !== selectedOption) option.checked = false;
+    });
+    ticketFxEl.value = selectedOption.checked && isTicketFxProfileMode(selectedOption.value) ? selectedOption.value : "";
+    updateCustomAircraftFxPreview();
+}
+function updateCustomAircraftFxPreview() {
+    const select = document.getElementById("newAcTicketFx");
+    const preview = document.getElementById("newAcTicketFxPreview");
+    if (!preview) return;
+    const selectedFx = select && isTicketFxProfileMode(select.value) ? select.value : "";
+    const fx = selectedFx || "static";
+    const samples = {
+        "crt-standard": { copy: "ROUTE CLEAR\nALT 28000 FT", label: "STANDARD CRT" },
+        "crt-military": { copy: "MISSION ACTIVE\nSECTOR BRAVO", label: "MILITARY GREEN" },
+        "crt-vintage": { copy: "FLIGHT BRIEF\nHOLDING SHORT", label: "VINTAGE / SEPIA" },
+        "crt-business": { copy: "FMS READY\nROUTE CONFIRMED", label: "BUSINESS JET LED" },
+        "crt-commercial": { copy: "INIT A\nCI 24 / FL350", label: "COMMERCIAL MCDU" },
+        "crt-regional": { copy: "FPLN ACTIVE\nVNAV READY", label: "REGIONAL BLUE" },
+        "crt-starship": { copy: "NAV DATA\nCORRIDOR SET", label: "STARSHIP COLLINS" },
+        "crt-helicopter": { copy: "HDG 270\nTORQUE 82%", label: "HELICOPTER AVIONICS ’90S" }
+    };
+    const sample = samples[selectedFx] || { copy: "SELECT A PROFILE", label: "INHERIT CATEGORY DEFAULT" };
+    preview.className = `ticket-fx-custom-preview ticket-fx-preview-${fx}`;
+    preview.replaceChildren();
+    const copy = document.createElement("span");
+    copy.className = "ticket-fx-custom-preview-copy";
+    copy.textContent = sample.copy;
+    const label = document.createElement("span");
+    label.className = "ticket-fx-custom-preview-label";
+    label.textContent = sample.label;
+    preview.append(copy, label);
 }
 function saveCustomAircraft() {
     const name = document.getElementById("newAcName").value.trim();
@@ -3036,6 +3213,8 @@ function saveCustomAircraft() {
     const fuelPerNm = parseFloat(document.getElementById("newAcFuel").value);
     const minD = getDefaultMinDistanceNm(rawClass);
     const maxD = parseInt(document.getElementById("newAcMaxD").value, 10);
+    const ticketFxEl = document.getElementById("newAcTicketFx");
+    const ticketFx = ticketFxEl && isTicketFxProfileMode(ticketFxEl.value) ? ticketFxEl.value : "";
     if (!name || icao.length < 2 || icao.length > 4) {
         vectorAlert("Please enter an aircraft name and a valid 2-4 character ICAO type code.");
         return;
@@ -3119,6 +3298,11 @@ function saveCustomAircraft() {
         missionRoles: missionRoles
     });
     localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(customFleet));
+    const ticketFxUserSettings = readTicketFxUserSettings();
+    ticketFxUserSettings.aircraftOverrides = ticketFxUserSettings.aircraftOverrides || {};
+    if (ticketFx) ticketFxUserSettings.aircraftOverrides[icao] = ticketFx;
+    else delete ticketFxUserSettings.aircraftOverrides[icao];
+    saveTicketFxUserSettings(ticketFxUserSettings);
     const assignmentCount = saveCustomMissionAssignmentsForSpec(icao, customFleet[icao], missionRoles);
     if (!assignmentCount) {
         vectorAlert(`${icao} saved, but no missions could be generated for the selected roles. Adjust roles or airframe class.`);
@@ -3306,6 +3490,7 @@ function exportDatabaseBackup() {
         airports: JSON.parse(localStorage.getItem("dispatcher_custom_user_airports") || "[]"),
         fleet: JSON.parse(localStorage.getItem("dispatcher_custom_fleet") || "{}"),
         custom_assignments: JSON.parse(localStorage.getItem("dispatcher_custom_assignments") || "{}"),
+        ticket_fx_user_settings: readTicketFxUserSettings(),
         logbook: JSON.parse(localStorage.getItem("dispatcher_logbook") || "[]")
     };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObject, null, 2));
@@ -3318,12 +3503,13 @@ function importDatabaseBackup(inputElement) {
     const file = inputElement.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = async function(e) {
         try {
             const d = JSON.parse(e.target.result);
             if (d.airports) localStorage.setItem("dispatcher_custom_user_airports", JSON.stringify(d.airports));
             if (d.fleet) localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(d.fleet));
             if (d.custom_assignments) localStorage.setItem("dispatcher_custom_assignments", JSON.stringify(d.custom_assignments));
+            if (d.ticket_fx_user_settings) saveTicketFxUserSettings(d.ticket_fx_user_settings);
             if (d.logbook) localStorage.setItem("dispatcher_logbook", JSON.stringify(d.logbook));
             syncLastArrivalFromLogbook();
             refreshLastArrivalDepField();
@@ -3345,6 +3531,8 @@ async function resetCustomDatabase() {
         localStorage.removeItem("dispatcher_custom_airports");
         localStorage.removeItem("dispatcher_custom_fleet");
         localStorage.removeItem("dispatcher_custom_assignments");
+        localStorage.removeItem(TICKET_FX_USER_SETTINGS_KEY);
+        reloadTicketFxProfiles();
         rebuildActiveDatabase();
         rebuildFleetDropdown();
         updateDatabaseStats();
@@ -3666,8 +3854,9 @@ function allocateWeightLimitedJetPayload(spec, type, chosenMission, blockMinutes
             const hardCargoLimit = Math.floor(Math.min(proportionalCargoLimit, remainingPayload, scaledMaxCargo));
             let cargoKg = 0;
             if (!bizJetPassengerOnly && hardCargoLimit > 0) {
-                if (hardCargoLimit >= MIN_ASSIGNED_PAYLOAD_KG) {
-                    cargoKg = Math.floor(Math.random() * (hardCargoLimit - MIN_ASSIGNED_PAYLOAD_KG + 1)) + MIN_ASSIGNED_PAYLOAD_KG;
+                const cargoFloorKg = getCargoAssignmentFloorKg(scenario, hardCargoLimit);
+                if (hardCargoLimit >= cargoFloorKg) {
+                    cargoKg = Math.floor(Math.random() * (hardCargoLimit - cargoFloorKg + 1)) + cargoFloorKg;
                 } else {
                     cargoKg = hardCargoLimit;
                 }
@@ -3684,8 +3873,9 @@ function allocateWeightLimitedJetPayload(spec, type, chosenMission, blockMinutes
                 continue;
             }
             let cargoKg = 0;
-            if (hardCargoLimit >= MIN_ASSIGNED_PAYLOAD_KG) {
-                cargoKg = Math.floor(Math.random() * (hardCargoLimit - MIN_ASSIGNED_PAYLOAD_KG + 1)) + MIN_ASSIGNED_PAYLOAD_KG;
+            const cargoFloorKg = getCargoAssignmentFloorKg(scenario, hardCargoLimit);
+            if (hardCargoLimit >= cargoFloorKg) {
+                cargoKg = Math.floor(Math.random() * (hardCargoLimit - cargoFloorKg + 1)) + cargoFloorKg;
             } else {
                 cargoKg = hardCargoLimit;
             }
@@ -3825,6 +4015,12 @@ const LOWI_NARROWBODY_JETLINERS = ["B736", "B737", "B738", "B738_BDSF", "B738_BC
 const LOWI_UNRESTRICTED_CLASSES = ["GA", "TURBO", "HELI", "WARBIRD", "BIZ JET"];
 const LOWI_LARGE_PROPLINER_MTOW = 40000;
 const MIN_ASSIGNED_PAYLOAD_KG = 25;
+
+function getCargoAssignmentFloorKg(scenario, hardLimit) {
+    const loadFactor = Number(scenario && scenario.minCargoLoadFactor);
+    if (!(hardLimit > 0) || !(loadFactor > 0)) return MIN_ASSIGNED_PAYLOAD_KG;
+    return Math.min(hardLimit, Math.max(MIN_ASSIGNED_PAYLOAD_KG, Math.ceil(hardLimit * Math.min(1, loadFactor))));
+}
 
 function finalizeAssignedPayloadKg(kg, hardLimit) {
     if (hardLimit <= 0) return 0;
@@ -4956,9 +5152,10 @@ function probeDispatchFlight(config) {
         hardCargoLimit = Math.floor(Math.min(proportionalCargoLimit, remainingPayload));
         const bizJetPassengerOnly = spec.class === "BIZ JET" && type !== "LJ35" && !isFreightMission(chosenMission);
         if (!bizJetPassengerOnly && hardCargoLimit > 0) {
-            if (hardCargoLimit >= MIN_ASSIGNED_PAYLOAD_KG) {
-                const cargoSpan = hardCargoLimit - MIN_ASSIGNED_PAYLOAD_KG + 1;
-                cargoKg = Math.floor(Math.random() * cargoSpan) + MIN_ASSIGNED_PAYLOAD_KG;
+            const cargoFloorKg = getCargoAssignmentFloorKg(chosenScenario, hardCargoLimit);
+            if (hardCargoLimit >= cargoFloorKg) {
+                const cargoSpan = hardCargoLimit - cargoFloorKg + 1;
+                cargoKg = Math.floor(Math.random() * cargoSpan) + cargoFloorKg;
             } else {
                 cargoKg = hardCargoLimit;
             }
@@ -5037,7 +5234,6 @@ function probeDispatchFlight(config) {
     );
     const payout = formatDispatchPayout(payoutAmount);
 
-    if (scenarioImgId === 156) cargoKg = Math.floor(hardCargoLimit * 0.70);
     cargoKg = finalizeAssignedPayloadKg(cargoKg, hardCargoLimit);
 
     if (spec.class === "JET") {

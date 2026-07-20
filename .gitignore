@@ -1,10 +1,17 @@
 # ── Ignore everything by default (whitelist approach) ─────────────────────────
 *
+!ticket-fx-profiles.html
+!ticket-fx-profiles.js
+!settings.js
+!start-ticket-fx-profiles.bat
 
 # ── Root config files ─────────────────────────────────────────────────────────
 !.gitignore
 !README.md
 !WEB.md
+!tools/
+tools/*
+!tools/mission-crop-editor.js
 
 # ── Core app files (WEB deploy) ───────────────────────────────────────────────
 !index.html
@@ -34,6 +41,8 @@ images/header0bak.png
 # ── Mission card images ───────────────────────────────────────────────────────
 !images-missions/
 !images-missions/**
+!images-missions-unused/
+!images-missions-unused/**
 
 # ── GitHub metadata (sponsor button) ─────────────────────────────────────────
 !.github/
