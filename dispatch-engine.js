@@ -681,11 +681,6 @@ function getDefaultMinDistanceNm(rawClass) {
     if (rawClass === "MIL_JET") return 150;
     return getDefaultAircraftRange(rawClass).minD;
 }
-function estimateBlockMinutesFromDistance(distNm, spec, aircraftType) {
-    const speed = getBlockSpeedForSpec(spec, aircraftType);
-    if (!speed || !distNm) return 0;
-    return Math.round((distNm / speed) * 60);
-}
 function hasMilitaryAirportAccess(spec, isContractorMode, forceMilitaryBases) {
     return !!(spec.isMilitary || isContractorMode || forceMilitaryBases);
 }
@@ -1110,15 +1105,6 @@ function escapeHtml(str) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
 }
-function formatRoutingAirportLabel(icao, name, ownedSet) {
-    const displayName = stripIrlNameSuffix(name);
-    const safeIcao = escapeHtml(icao);
-    const safeName = escapeHtml(displayName);
-    if (ownedSet.has(String(icao).toUpperCase())) {
-        return `<span class="owned-airport-icao">${safeIcao}</span> (${safeName})`;
-    }
-    return `${safeIcao} (${safeName})`;
-}
 function stripIrlNameSuffix(name) {
     if (!name) return name;
     return String(name).replace(/\s*\(IRL:\s*[^)]+\)/gi, "").trim();
@@ -1319,14 +1305,6 @@ function boardTabGo(tab) {
     if (showLogbook) updateLogbookUI();
 }
 
-function boardNavGo(target) {
-    if (target === "settings" || target === "logbook" || target === "contracts") {
-        boardTabGo(target);
-        return;
-    }
-    boardTabGo("contracts");
-}
-
 function computePrestigePoints(distanceNm, spec, fromContractsBoard) {
     const dist = Math.max(0, Number(distanceNm) || 0);
     let mult = 1.0;
@@ -1335,18 +1313,6 @@ function computePrestigePoints(distanceNm, spec, fromContractsBoard) {
     else if (cls === "TURBO" || cls === "BIZ JET") mult = 1.2;
     const contractBonus = fromContractsBoard ? 0.10 : 0;
     return Math.max(1, Math.round(dist * mult * (1 + contractBonus)));
-}
-
-function formatBoardBlockDuration(result) {
-    const mins = (result.spec.class === "HELI" || result.spec.class === "GLIDER")
-        ? 20
-        : result.targetMins;
-    if (mins >= 60) {
-        const h = Math.floor(mins / 60);
-        const m = mins % 60;
-        return m ? `${h}h ${m}m` : `${h}h`;
-    }
-    return `${mins} min`;
 }
 
 /** Strip developer prefix and redundant type suffixes from fleet display names for ticket UI. */
@@ -1386,14 +1352,6 @@ function formatBoardTicketMetaHtml(result) {
         wrapMetaLine(destApprLine),
         wrapMetaLine(navigraphLine)
     ].join("");
-}
-
-function formatBoardPayloadLine(result) {
-    if (missionRequiresPassengers(result.chosenMission, result.spec, result.scenario)) {
-        const cargoBit = result.cargoKg > 0 ? ` · ${result.cargoKg} kg cargo` : "";
-        return `${formatPassengerManifest(result.pax)}${cargoBit}`;
-    }
-    return `${result.cargoKg} kg cargo`;
 }
 
 function revokeBoardPlnUrls() {
@@ -1854,21 +1812,6 @@ function getTicketCrtTypewriterCps(briefEl) {
         return TICKET_PHOTO_LED_TYPEWRITER_CPS;
     }
     return TICKET_PHOTO_TYPEWRITER_CPS;
-}
-
-function formatContractTicketBrief(missionName, body) {
-    if (!missionName && !body) return "";
-    if (!body) return missionName || "";
-    if (!missionName) return body;
-
-    const title = missionName;
-    const prefix = `${title} - `;
-    let text = `${prefix}${body}`;
-    if (estimateCrtBriefLines(text) > CRT_BRIEF_MAX_LINES) {
-        const bodyLineBudget = CRT_BRIEF_MAX_LINES - (estimateCrtBriefLines(text) - estimateCrtBriefLines(body));
-        text = `${prefix}${trimCrtBriefBody(body, bodyLineBudget)}`;
-    }
-    return text;
 }
 
 function resolveContractTicketBrief(result, ticketIndex) {
@@ -2615,12 +2558,6 @@ function acceptContractTicket(index) {
     }
 }
 
-function toggleSettingsPanel() {
-    boardNavGo("settings");
-}
-function toggleLogbookPanel() {
-    boardNavGo("logbook");
-}
 function toggleDropdown(id) {
     const el = document.getElementById(id);
     el.style.display = el.style.display === 'none' ? 'block' : 'none';
@@ -3620,9 +3557,6 @@ function isJetDepartureRunwayPerformanceLimited(origin, spec) {
     if (structural <= 0) return false;
     return getDepartureRunwayOperationalMtow(origin, spec) < structural * 0.995;
 }
-function getRouteRunwayOperationalMtow(origin, destination, spec) {
-    return getDepartureRunwayOperationalMtow(origin, spec);
-}
 function getWeightLimitedRunwayIcaos(origin, destination, spec) {
     const icaos = [];
     if (origin && origin.icao && (
@@ -3718,21 +3652,6 @@ function jetTripFuelExceedsTankCapacity(tripDistanceNm, spec) {
         return estimateJetBlockFuelBudgetKg(gc, spec) > maxTank;
     }
     return gc * catalogFpn > maxTank * JET_NARROWBODY_TANK_RANGE_MARGIN;
-}
-function getJetScheduledCommercialMinPax(spec) {
-    if (!spec || !(spec.maxPax > 0)) return 0;
-    return Math.floor(spec.maxPax * SCHEDULED_COMMERCIAL_LOAD_MIN);
-}
-function getJetMaxFeasiblePax(gcDistNm, spec, origin, destination) {
-    const oew = Number(spec.oew) || 0;
-    let mtow = Number(spec.mtow) || 0;
-    if (origin) {
-        mtow = Math.min(mtow, getDepartureRunwayOperationalMtow(origin, spec));
-    }
-    const blockFuel = getJetSimBriefPlanningBlockFuelKg(getJetFuelPlanningDistanceNm(gcDistNm, spec), spec);
-    const maxPayload = mtow - oew - blockFuel;
-    if (maxPayload <= 0) return 0;
-    return Math.floor(maxPayload / getPaxAllInWeightKg(spec));
 }
 function isJetSimBriefRouteFeasible(gcDistNm, spec, origin, destination) {
     if (!spec || spec.class !== "JET" || !gcDistNm || isNaN(gcDistNm)) return true;
@@ -4218,15 +4137,6 @@ function buildRouteFailureMessage(depOverride, type, spec, validAirports, depart
     }
     return "No valid routes were found for your aircraft and current settings. Try adjusting flight time, military options, or choosing a different airframe.";
 }
-function passesMissionAircraftRole(m, spec) {
-    if (isFreightMission(m)) {
-        if ((spec.maxCargo || 0) <= 0) return false;
-    }
-    if (isPassengerMission(m) && (spec.maxPax || 0) <= 0) {
-        return false;
-    }
-    return true;
-}
 function passesTemplateMtowCap(m, searchClass, spec) {
     if (!m.maxMTOW) return true;
     if (m.maxMTOWAppliesTo && !m.maxMTOWAppliesTo.includes(searchClass)) return true;
@@ -4299,15 +4209,6 @@ function passesMissionContextFilter(m, spec, origin, isContractorMode, aircraftT
         if (!(spec.class === "WARBIRD" && isWarbirdHeritageMission(m))) return false;
     }
     return true;
-}
-function scenarioAllowsAircraft(s, type, spec) {
-    if (s.allowedAircraft && s.allowedAircraft.includes(type)) return true;
-    if (s.allowedClasses && spec.class && s.allowedClasses.includes(spec.class)) return true;
-    if (!s.allowedAircraft && !s.allowedClasses) return true;
-    return false;
-}
-function scenarioEligibleForAircraft(s, type, spec) {
-    return passesScenarioPhysicalHardLocks(s, type, spec);
 }
 function passesScenarioPhysicalHardLocks(s, type, spec) {
     if (s.minCargo && spec.maxCargo < s.minCargo) return false;
@@ -4458,10 +4359,6 @@ function buildActiveScenarioPoolForMission(mission, type, spec, isLocalFlight) {
     }
     return applyAssignedOnlyScenarioFilter(activePool, type);
 }
-function missionHasPlayableScenario(mission, type, spec, isLocalFlight) {
-    if (!mission.pool) return true;
-    return buildActiveScenarioPoolForMission(mission, type, spec, isLocalFlight).length > 0;
-}
 function filterScenarioPool(pool, type, spec, excludedImgIds) {
     return pool.filter(s => scenarioPassesHardLocks(s, type, spec, excludedImgIds));
 }
@@ -4476,14 +4373,6 @@ function pickWeightedRandom(items, defaultWeight = 10, getWeight) {
         randomNum -= w;
     }
     return items[0];
-}
-function filterWithRecentGuard(items, recentIds, getId) {
-    if (!items.length) return items;
-    const lastId = recentIds.length ? recentIds[recentIds.length - 1] : null;
-    if (lastId == null) return items;
-    const withoutLast = items.filter(item => getId(item) !== lastId);
-    // Never block the whole pool — skip only the immediate last pick; repeat is allowed when it is the sole option.
-    return withoutLast.length > 0 ? withoutLast : items;
 }
 function isMedevacMission(m) {
     return !!(m && (m.type === 19 || m.pool === "medical"));
