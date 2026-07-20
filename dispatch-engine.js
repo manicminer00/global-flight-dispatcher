@@ -2887,13 +2887,6 @@ function updateDatabaseStats() {
             ? `<ul>${formatAirportListItems(coreSmallDetailed)}</ul>`
             : `<ul><li>Loading permanent database array records...</li></ul>`;
     }
-    const legacySmallAirportsEl = document.getElementById('coreSmallAirportsCount');
-    if (legacySmallAirportsEl) {
-        legacySmallAirportsEl.innerText = coreSmallDetailed.length;
-        document.getElementById('coreSmallAirportsList').innerHTML = coreSmallDetailed.length > 0
-            ? `<ul>${formatAirportListItems(coreSmallDetailed)}</ul>`
-            : `<ul><li>Loading permanent database array records...</li></ul>`;
-    }
 	const coreMilitary = liveAirportsDB.filter(a => a.isMilitary === true);
 		document.getElementById('coreMilitaryCount').innerText = coreMilitary.length;
 		document.getElementById('coreMilitaryList').innerHTML = coreMilitary.length > 0
