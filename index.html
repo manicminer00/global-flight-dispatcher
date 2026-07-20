@@ -1022,9 +1022,6 @@
         #settingsPanel.board-settings > h3 {
             flex-shrink: 0;
         }
-        .dispatcher-banner-container {
-            display: none !important;
-        }
         .control-group, .settings-group {
             margin-bottom: 20px;
             background: var(--bg-section);
@@ -1037,29 +1034,6 @@
         }
         .dispatch-control-group .additional-options-row {
             min-height: 42px;
-        }
-        .dispatcher-banner-container {
-            width: 100%;
-            height: 180px; 
-            overflow: hidden;
-            border-radius: 6px;
-            margin-bottom: 25px;
-            box-shadow: var(--shadow-banner);
-        }
-        .dispatcher-banner-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; 
-            object-position: center;
-            display: block;
-        }
-        .dispatcher-banner-container.banner-med {
-            height: 300px;
-            margin-bottom: 25px;
-        }
-        .dispatcher-banner-container.banner-med .dispatcher-banner-img {
-            height: 300px;
-            object-fit: cover;
         }
         .owned-airport-icao {
             color: var(--color-link-readme);
@@ -3823,12 +3797,6 @@
         }
         #dispatchRelease {
             display: none !important;
-        }
-        .dispatcher-banner-container.banner-med {
-            height: 160px;
-        }
-        .dispatcher-banner-container.banner-med .dispatcher-banner-img {
-            height: 160px;
         }
         /* TODO(cleanup): duplicate #generateFlightBtn idle rule — consolidate with .board-sidebar-form block above */
         #generateFlightBtn {

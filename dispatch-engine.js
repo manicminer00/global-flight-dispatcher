@@ -2762,11 +2762,6 @@ async function removeCustomAircraft(icao) {
     updateDatabaseStats();
     updateManageCustomDbUI();
 }
-const THEME_BANNERS = {
-    dark: "images/banner-dark.png",
-    light: "images/banner-light.png",
-    greyscale: "images/banner-grey.png"
-};
 function getCurrentThemeMode() {
     if (document.documentElement.classList.contains("light-mode")) return "light";
     if (document.documentElement.classList.contains("greyscale-mode")) return "greyscale";
@@ -2778,22 +2773,11 @@ function missionImageUrl(fileName) {
         ? window.dispatcherAssetUrl(path)
         : path;
 }
-function updateThemeBanner() {
-    const img = document.getElementById("dynamicWorkflowBanner");
-    if (!img) return;
-    const mode = getCurrentThemeMode();
-    const path = THEME_BANNERS[mode] || THEME_BANNERS.dark;
-    const url = typeof window.dispatcherAssetUrl === "function"
-        ? window.dispatcherAssetUrl(path)
-        : path;
-    if (img.getAttribute("src") !== url) img.src = url;
-}
 function setMode(mode) {
     // v3 board layout is dark-only
     document.body.classList.remove('light-mode', 'greyscale-mode');
     document.documentElement.classList.remove('light-mode', 'greyscale-mode');
     localStorage.setItem("dispatcher_theme", "dark");
-    updateThemeBanner();
 }
 function getMissionCatalogCounts() {
     const imgIds = new Set();
@@ -5791,7 +5775,6 @@ function initBoardPreviewTickets() {
 
 window.onload = function() {
     loadSettings();
-    updateThemeBanner();
     updateCustomAircraftForm();
     rebuildActiveDatabase();
     rebuildFleetDropdown();
