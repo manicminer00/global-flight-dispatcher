@@ -214,14 +214,6 @@ function airportIsInNavigraph(ap) {
     const set = getNavigraphAirportIcaoSet();
     return !!(set && set.has(normalizeIcao(ap.icao)));
 }
-function formatSimbriefUnavailableNote(origin, destination) {
-    const missing = [];
-    if (!airportIsInNavigraph(origin)) missing.push((origin && origin.icao) || "departure");
-    if (!airportIsInNavigraph(destination)) missing.push((destination && destination.icao) || "arrival");
-    if (!missing.length) return "";
-    const codes = missing.map((c) => String(c).toUpperCase()).join(" and ");
-    return `SimBrief unavailable — ${codes} not in Navigraph. Use Download MSFS.PLN for Little NavMap or VFR.`;
-}
 function getDestApproachTypesByIcaoMap() {
     if (typeof DEST_APPROACH_TYPES_BY_ICAO !== "undefined" && DEST_APPROACH_TYPES_BY_ICAO) {
         return DEST_APPROACH_TYPES_BY_ICAO;
@@ -1437,7 +1429,6 @@ function buildDispatchExportBundle(result) {
     const navDest = airportIsInNavigraph(destination);
     const simbriefClassOk = spec.class !== "GLIDER" && spec.class !== "HELI" && spec.class !== "WARBIRD";
     const isSimbriefSupported = simbriefClassOk && navDep && navDest;
-    const simbriefNote = formatSimbriefUnavailableNote(origin, destination);
     let heliMessage = "";
 
     const depElevStr = origin.elev || 0;
@@ -1470,7 +1461,6 @@ function buildDispatchExportBundle(result) {
     return {
         simbriefUrl,
         isSimbriefSupported,
-        simbriefNote,
         heliMessage,
         plnUrl,
         plnFilename: `${origin.icao}_to_${destination.icao}.pln`,
@@ -2393,7 +2383,7 @@ function fillContractTicketCard(card, result, index, bundle) {
         pln.onclick = () => promptSaveFlightToLogbook(card);
     }
     if (heli) {
-        const exportNote = bundle.simbriefNote || bundle.heliMessage || "";
+        const exportNote = bundle.heliMessage || "";
         if (exportNote) {
             heli.style.display = "block";
             heli.textContent = exportNote;
@@ -2445,7 +2435,6 @@ function persistBoardSession(results, inactive) {
                 imageUrl: r._exportBundle.imageUrl,
                 simbriefUrl: r._exportBundle.simbriefUrl,
                 isSimbriefSupported: r._exportBundle.isSimbriefSupported,
-                simbriefNote: r._exportBundle.simbriefNote,
                 heliMessage: r._exportBundle.heliMessage,
                 plnUrl: r._exportBundle.plnUrl,
                 plnFilename: r._exportBundle.plnFilename,
@@ -2615,7 +2604,7 @@ function acceptContractTicket(index) {
     if (logBtn) logBtn.style.display = "inline-flex";
     const heliMsgEl = document.getElementById("heliMessage");
     if (heliMsgEl) {
-        const exportNote = bundle.simbriefNote || bundle.heliMessage || "";
+        const exportNote = bundle.heliMessage || "";
         if (exportNote) {
             heliMsgEl.textContent = exportNote;
             heliMsgEl.style.display = "block";
