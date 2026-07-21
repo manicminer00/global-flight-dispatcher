@@ -145,6 +145,26 @@ MTOW cap enforced at all. Logged as its own defect, found while
 investigating the SimBrief cargo-clipping regression below — not caused by
 Tier 1 item 6.
 
+RESOLVED (commit a59077c, 2026-07-21, local only, not yet pushed) — not a
+simple one-line class-gate widening. The three functions above all called
+getJetSimBriefPlanningBlockFuelKg unconditionally for their fuel-budget
+figure — a JET-specific SimBrief tank/wind model. Widening just the class
+check would have fed BIZ JET/TURBO aircraft that airliner fuel model instead
+of the fuelPerNm-based calc their payload was already allocated with
+elsewhere in the file, producing mismatched TOW figures. Fix: added a shared
+getMtowPlanningBlockFuelKg() helper that branches per class (JET keeps the
+SimBrief model, BIZ JET/TURBO use fuelPerNm * distance), mirroring the
+pattern enforceMlwCap already used. Class gates on all three functions and
+their three call sites were then widened to MTOW_ENFORCED_CLASSES = ["JET",
+"BIZ JET", "TURBO"]. jetTripFuelExceedsTankCapacity and the planFuel >
+maxTank check were deliberately left JET-only (explicit guard added) since
+they depend on getJetMaxFuelKg, which fabricates a synthetic tank size for
+aircraft without maxFuelKg sourced — most BIZ JET/TURBO right now — and
+would have produced false violations. Verified via
+dispatch-fleet-smoke.mjs (112/112), dispatch-physics-verify.mjs --quick, and
+manual dispatch tests on C700 (BIZ JET), A400 and BE20 (TURBO); BE20 cleared
+MTOW by only 13 kg, correctly passed rather than silently allowed over.
+
 B. No MLW or MZFW modeling anywhere — root cause of SimBrief clipping
 Confirmed via grep across dispatch-engine.js and fleet-db.js: neither
 Max Landing Weight nor Max Zero-Fuel Weight exists as a field or a check.
