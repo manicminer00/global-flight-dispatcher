@@ -37,6 +37,9 @@ mid-word (no CSS fix in scope for this pass, per Toby's call).
 to, please note, at this time, you're tasked with, "safe travels," or any
 line that could be pasted into a corporate memo unchanged.
 
+**No em-dashes, ever.** Use a period, comma, or restructure the sentence
+instead.
+
 **Every brief needs a story beat**, not just a task description. Concretely,
 that means at least one of:
 - A specific, small human detail (why *this* mission, why *now*)

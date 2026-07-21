@@ -10,6 +10,8 @@ Vector-Dev-Tools/*
 !Vector-Dev-Tools/ticket-fx-profiles.html
 !Vector-Dev-Tools/ticket-fx-profiles.js
 !Vector-Dev-Tools/start-ticket-fx-profiles.bat
+!Vector-Dev-Tools/mission-review-tool.html
+!Vector-Dev-Tools/mission-rewrites-staging.json
 
 # ── Root config files ─────────────────────────────────────────────────────────
 !.gitignore

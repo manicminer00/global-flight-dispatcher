@@ -1,0 +1,92 @@
+[
+  {
+    "imgId": 33,
+    "oldTitle": "Regional Hop",
+    "newTitle": "Morning Meetings Run",
+    "oldBrief": "This is a short regional sector. The cabin is full of young professionals on their way to meetings. The wheels of commerce keep turning thanks to your skills as a pilot.",
+    "newBrief": "Coffee in hand and half-awake, the regional crowd's stacked up for the morning meetings run. Keep the short hop easy and get them there while the caffeine's still working.",
+    "imagePath": "../images-missions/mission33.jpg",
+    "reviewed": false
+  },
+  {
+    "imgId": 36,
+    "oldTitle": "Late-Evening Commuter",
+    "newTitle": "Quiet Late Commuter",
+    "oldBrief": "Tonight's late commuter sector should be a quiet one. The sky is empty tonight. Climb efficiently and do not waste fuel. The company is clamping down hard and wants to save money.",
+    "newBrief": "Tonight's board has gone quiet and the sky's empty. Climb clean and don't burn a drop you don't need. Ops upstairs is watching the fuel bill hard tonight.",
+    "imagePath": "../images-missions/mission36.jpg",
+    "reviewed": false
+  },
+  {
+    "imgId": 24,
+    "oldTitle": "Scheduled Sector",
+    "newTitle": "Tight Turn Sector",
+    "oldBrief": "The clock is against you on this scheduled sector. Ask for priority on the approach, aim for vectors to finals, and get the passengers offloaded as soon as you block in.",
+    "newBrief": "ATC expects you on the money today. Push for priority on the approach, line up for vectors to finals, and have the doors open the second you block in.",
+    "imagePath": "../images-missions/mission24.jpg",
+    "reviewed": false
+  },
+  {
+    "imgId": 119,
+    "oldTitle": "Formula One Chassis",
+    "newTitle": "Podium Bound Freight",
+    "oldBrief": "High-value, time-critical Formula One chassis needs transporting for a race. You cannot afford to make a mistake with this one. These cars cost upwards of $15 million, so take it easy.",
+    "newBrief": "The team needs this chassis trackside for the weekend, and it's worth more than most people's houses. These cars run $15 million a piece, so one rough patch of air could end a season early. Fly it like it matters.",
+    "imagePath": "../images-missions/mission119.jpg",
+    "reviewed": false
+  },
+  {
+    "imgId": 69,
+    "oldTitle": "Patient Airlift",
+    "newTitle": "Smooth Air Priority",
+    "oldBrief": "The patient is stable, but rough air will not help their condition. Watch the weather radar and keep the ride smooth all the way in. The medical team are already on board and expecting the patient soon.",
+    "newBrief": "Turbulence won't do this patient any favors, so watch the radar and keep it smooth all the way down. The medical team's already strapped in beside you, counting on a gentle ride.",
+    "imagePath": "../images-missions/mission69.jpg",
+    "reviewed": false
+  },
+  {
+    "imgId": 171,
+    "oldTitle": "Highway Extraction",
+    "newTitle": "Roadside Trauma Run",
+    "oldBrief": "First responders have a landing zone ready on the roadway. Get in, get the patient aboard and go — the clock is running.",
+    "newBrief": "First responders already have the LZ marked on the roadway. Get in, get the patient aboard, go. Every second counts now.",
+    "imagePath": "../images-missions/mission171.jpg",
+    "reviewed": false
+  },
+  {
+    "imgId": 218,
+    "oldTitle": "Red Air Support",
+    "newTitle": "Red Air Exercise",
+    "oldBrief": "You are Red Air today. Fly the briefed intercept vectors, test friendly radar response, acknowledge sim contacts, then proceed to destination.",
+    "newBrief": "Stand up as Red Air today. Hold the briefed intercept vectors, test friendly radar response, log the sim contacts, then continue to destination.",
+    "imagePath": "../images-missions/mission218.jpg",
+    "reviewed": false
+  },
+  {
+    "imgId": 67,
+    "oldTitle": "VIP Private Gala",
+    "newTitle": "Private Gala Run",
+    "oldBrief": "This VIP charter has a bar stocked for comfort and fun. Make the landing butter-smooth so the passenger arrives in a good mood and ignore any guffawing coming from the cabin.",
+    "newBrief": "Tonight's {vip_type} expects the finer things. Bar's stocked, cabin's ready for the gala run. Keep the landing smooth enough that nobody in the back notices you working, and whatever's happening in the cabin stays in the cabin.",
+    "imagePath": "../images-missions/mission67.jpg",
+    "reviewed": false
+  },
+  {
+    "imgId": 224,
+    "oldTitle": "Cross-Country Task",
+    "newTitle": "Thermal Cross Country",
+    "oldBrief": "You will launch from {dep_field} and work lift toward {dest_field}. Read the sky — developing cumulus marks the thermals, with puffy tops and dark flat bases. Give decaying wispy cloud a wide berth. Stay VFR and arrive with height for a normal circuit.",
+    "newBrief": "Launch from {dep_field} and go hunting for lift toward {dest_field}. Puffy-topped cumulus with a flat, dark base is where the thermals live, so give the wispy, decaying stuff a wide berth. Stay VFR and keep enough height in hand for a normal circuit home.",
+    "imagePath": "../images-missions/mission224.jpg",
+    "reviewed": false
+  },
+  {
+    "imgId": 151,
+    "oldTitle": "Vintage Airframe ferry",
+    "newTitle": "Museum Bound Ferry",
+    "oldBrief": "You are ferrying a vintage airframe to the museum. Treat her gently, stay well inside the structural limits — she is old and the museum wants her in one piece.",
+    "newBrief": "She's not getting any younger, and the museum's waiting with open doors. Fly her gently, stay well clear of the structural limits, and bring her home in one piece. This old airframe's earned an easy last leg.",
+    "imagePath": "../images-missions/mission151.jpg",
+    "reviewed": false
+  }
+]

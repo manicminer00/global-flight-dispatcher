@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mission Copy Review Tool</title>
+<style>
+  :root {
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #1b1d21;
+    color: #f0f1f3;
+    padding: 24px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .sub { color: #a9adb4; font-size: 13px; margin-bottom: 20px; }
+
+  .picker {
+    border: 1px dashed #555;
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+  }
+  .picker button, .toolbar button, .footer button {
+    background: #3a6df0;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .picker button:hover, .toolbar button:hover, .footer button:hover { background: #2f5adf; }
+  .picker .note { color: #a9adb4; font-size: 12px; margin-top: 10px; }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    gap: 12px;
+  }
+  .progress { font-size: 14px; color: #d5d7db; }
+  .progress b { color: #fff; }
+  .export-btn { background: #b8860b !important; }
+  .export-btn:hover { background: #9c7209 !important; }
+
+  .image-row { text-align: center; margin-bottom: 18px; }
+  .image-row img {
+    max-width: 100%;
+    max-height: 320px;
+    border-radius: 8px;
+    border: 1px solid #3a3d44;
+  }
+  .image-row .no-img {
+    color: #a9adb4;
+    font-size: 13px;
+    padding: 40px;
+    border: 1px dashed #444;
+    border-radius: 8px;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .col {
+    border-radius: 8px;
+    padding: 16px;
+    background: #24262b;
+    border: 1px solid #34363c;
+  }
+  .col h2 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #a9adb4;
+    margin: 0 0 12px;
+  }
+  .col.old {
+    position: relative;
+    background: #e8eaed;
+  }
+  .col.old h2 { color: #5a5e66; }
+  .old-mask {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.20);
+    border-radius: 8px;
+    pointer-events: none;
+  }
+  .field-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8d9198;
+    margin: 14px 0 4px;
+  }
+  .col.old .field-label { color: #6b6f77; }
+  .field-label:first-of-type { margin-top: 0; }
+  .old-title, .old-brief {
+    font-size: 15px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+    color: #16181c;
+    position: relative;
+    z-index: 0;
+  }
+  .old-title { font-weight: 700; font-size: 17px; }
+
+  input[type=text], textarea {
+    width: 100%;
+    background: #16181c;
+    color: #fff;
+    border: 1px solid #454850;
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    line-height: 1.45;
+  }
+  input[type=text]:focus, textarea:focus {
+    outline: none;
+    border-color: #3a6df0;
+  }
+  textarea { min-height: 140px; resize: vertical; }
+
+  .char-count { font-size: 11px; color: #8d9198; margin-top: 4px; }
+  .char-count.warn { color: #ff8a65; }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+  }
+  .footer .left-actions button { background: #454850; margin-right: 8px; }
+  .footer .left-actions button:hover { background: #52565f; }
+  .save-btn { background: #2e9e5b !important; }
+  .save-btn:hover { background: #26893f !important; }
+
+  .status {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #a9adb4;
+    min-height: 18px;
+  }
+  .status.ok { color: #6fd18f; }
+  .status.err { color: #ff8a80; }
+
+  .done-banner {
+    background: #1e3a2a;
+    border: 1px solid #2e9e5b;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Mission Copy Review Tool</h1>
+  <div class="sub">Local, offline review of staged mission title/brief rewrites. Nothing leaves this browser tab.</div>
+
+  <div id="pickerScreen" class="picker">
+    <p>Load <code>mission-rewrites-staging.json</code> to begin.</p>
+    <p><input type="file" id="btnPickFile" accept="application/json"></p>
+    <div class="note">Edits stay in memory only during this session. Click "Export" (top right, once loaded) to download an updated JSON — as often as you like, whenever you want a checkpoint. Closing the tab without exporting loses unsaved edits.</div>
+  </div>
+
+  <div id="reviewScreen" style="display:none;">
+    <div class="toolbar">
+      <div class="progress">Mission <b id="posLabel">0</b> of <b id="totalLabel">0</b> &nbsp;&bull;&nbsp; <span id="reviewedLabel"></span></div>
+      <button id="btnExport" class="export-btn">Export mission-rewrites-staging.json</button>
+    </div>
+
+    <div id="doneBanner" class="done-banner" style="display:none;">
+      All missions reviewed. You can still go back and edit any of them, then export when ready.
+    </div>
+
+    <div class="image-row" id="imageRow"></div>
+
+    <div class="columns">
+      <div class="col old">
+        <div class="old-mask"></div>
+        <h2>Old (reference only)</h2>
+        <div class="field-label">Title</div>
+        <div class="old-title" id="oldTitle"></div>
+        <div class="field-label">Brief</div>
+        <div class="old-brief" id="oldBrief"></div>
+      </div>
+      <div class="col new">
+        <h2>New (editable)</h2>
+        <div class="field-label">Title</div>
+        <input type="text" id="newTitle">
+        <div class="char-count" id="titleCount"></div>
+        <div class="field-label">Brief</div>
+        <textarea id="newBrief"></textarea>
+        <div class="char-count" id="briefCount"></div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="left-actions">
+        <button id="btnBack">&larr; Back</button>
+        <button id="btnSkip">Skip &rarr;</button>
+      </div>
+      <div>
+        <button id="btnSave" class="save-btn">Save &amp; Next</button>
+      </div>
+    </div>
+    <div class="status" id="statusLine"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var missions = [];
+  var currentIndex = 0;
+
+  var pickerScreen = document.getElementById('pickerScreen');
+  var reviewScreen = document.getElementById('reviewScreen');
+  var btnPickFile = document.getElementById('btnPickFile');
+
+  btnPickFile.addEventListener('change', function (e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        missions = JSON.parse(reader.result);
+        enterReview();
+      } catch (err) {
+        alert('Invalid JSON: ' + err.message);
+      }
+    };
+    reader.readAsText(file);
+  });
+
+  function firstUnreviewedIndex() {
+    for (var i = 0; i < missions.length; i++) {
+      if (!missions[i].reviewed) return i;
+    }
+    return 0;
+  }
+
+  function enterReview() {
+    pickerScreen.style.display = 'none';
+    reviewScreen.style.display = 'block';
+    document.getElementById('totalLabel').textContent = missions.length;
+    currentIndex = firstUnreviewedIndex();
+    renderCurrent();
+  }
+
+  function renderCurrent() {
+    var m = missions[currentIndex];
+    document.getElementById('posLabel').textContent = (currentIndex + 1);
+    var reviewedCount = missions.filter(function (x) { return x.reviewed; }).length;
+    document.getElementById('reviewedLabel').textContent = reviewedCount + ' reviewed (in memory)';
+
+    var allReviewed = missions.every(function (x) { return x.reviewed; });
+    document.getElementById('doneBanner').style.display = allReviewed ? 'block' : 'none';
+
+    var imageRow = document.getElementById('imageRow');
+    imageRow.innerHTML = '';
+    if (m.imagePath) {
+      var img = document.createElement('img');
+      img.src = m.imagePath;
+      img.alt = 'imgId ' + m.imgId;
+      img.onerror = function () {
+        imageRow.innerHTML = '<div class="no-img">Image not found: ' + m.imagePath + '</div>';
+      };
+      imageRow.appendChild(img);
+    }
+
+    document.getElementById('oldTitle').textContent = m.oldTitle || '';
+    document.getElementById('oldBrief').textContent = m.oldBrief || '';
+    document.getElementById('newTitle').value = m.newTitle || '';
+    document.getElementById('newBrief').value = m.newBrief || '';
+    updateCounts();
+    document.getElementById('statusLine').textContent = '';
+    document.getElementById('statusLine').className = 'status';
+
+    document.getElementById('btnBack').disabled = (currentIndex === 0);
+  }
+
+  function updateCounts() {
+    var title = document.getElementById('newTitle').value;
+    var words = title.split(/\s+/).filter(Boolean);
+    var overCap = words.filter(function (w) { return w.replace(/[^A-Za-z0-9]/g, '').length > 9; });
+    var tc = document.getElementById('titleCount');
+    tc.textContent = words.length + ' word(s), ' + title.length + ' chars' + (overCap.length ? ' — OVER 9-CHAR CAP: ' + overCap.join(', ') : '');
+    tc.className = 'char-count' + (overCap.length ? ' warn' : '');
+
+    var brief = document.getElementById('newBrief').value;
+    var bc = document.getElementById('briefCount');
+    bc.textContent = brief.length + ' chars';
+    bc.className = 'char-count';
+  }
+
+  document.getElementById('newTitle').addEventListener('input', updateCounts);
+  document.getElementById('newBrief').addEventListener('input', updateCounts);
+
+  function captureEdits() {
+    var m = missions[currentIndex];
+    m.newTitle = document.getElementById('newTitle').value;
+    m.newBrief = document.getElementById('newBrief').value;
+  }
+
+  function downloadJSON(json) {
+    var blob = new Blob([json], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'mission-rewrites-staging.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  document.getElementById('btnExport').addEventListener('click', function () {
+    captureEdits();
+    downloadJSON(JSON.stringify(missions, null, 2));
+    var statusLine = document.getElementById('statusLine');
+    statusLine.textContent = 'Exported mission-rewrites-staging.json (' + missions.filter(function (x) { return x.reviewed; }).length + ' of ' + missions.length + ' reviewed).';
+    statusLine.className = 'status ok';
+  });
+
+  document.getElementById('btnBack').addEventListener('click', function () {
+    captureEdits();
+    if (currentIndex > 0) currentIndex--;
+    renderCurrent();
+  });
+
+  document.getElementById('btnSkip').addEventListener('click', function () {
+    captureEdits();
+    if (currentIndex < missions.length - 1) currentIndex++;
+    renderCurrent();
+  });
+
+  document.getElementById('btnSave').addEventListener('click', function () {
+    captureEdits();
+    missions[currentIndex].reviewed = true;
+
+    var next = -1;
+    for (var i = 0; i < missions.length; i++) {
+      if (!missions[i].reviewed) { next = i; break; }
+    }
+    if (next === -1) {
+      if (currentIndex < missions.length - 1) currentIndex++;
+    } else {
+      currentIndex = next;
+    }
+    renderCurrent();
+
+    var statusLine = document.getElementById('statusLine');
+    statusLine.textContent = 'Saved in memory (not yet exported).';
+    statusLine.className = 'status ok';
+  });
+})();
+</script>
+</body>
+</html>
