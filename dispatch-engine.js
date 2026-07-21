@@ -3826,18 +3826,24 @@ function isJetFuelCriticalSector(fuelDistanceNm) {
     const nm = Number(fuelDistanceNm) || 0;
     return nm >= 3500;
 }
+const MTOW_ENFORCED_CLASSES = ["JET", "BIZ JET", "TURBO"];
+function getMtowPlanningBlockFuelKg(fuelDistanceNm, spec) {
+    return spec.class === "JET"
+        ? getJetSimBriefPlanningBlockFuelKg(fuelDistanceNm, spec)
+        : Math.max(0, Number(fuelDistanceNm) || 0) * (Number(spec.fuelPerNm) || 0.5);
+}
 function capJetPaxForMtow(pax, cargoKg, safeMtow, safeOew, fuelDistanceNm, spec) {
-    if (!spec || spec.class !== "JET" || !(spec.maxPax > 0)) return pax;
-    const planFuel = getJetSimBriefPlanningBlockFuelKg(fuelDistanceNm, spec);
+    if (!spec || !MTOW_ENFORCED_CLASSES.includes(spec.class) || !(spec.maxPax > 0)) return pax;
+    const planFuel = getMtowPlanningBlockFuelKg(fuelDistanceNm, spec);
     const maxPax = getJetMaxPaxAtMtow(safeMtow, safeOew, planFuel, cargoKg, spec);
     if (maxPax <= 0) return 0;
     return Math.min(pax, maxPax);
 }
 function enforceJetTowPayloadCap(spec, pax, cargoKg, fuelDistanceNm, operationalMtow, chosenMission, blockMinutes, scenario) {
-    if (!spec || spec.class !== "JET") return { pax: pax, cargoKg: cargoKg };
+    if (!spec || !MTOW_ENFORCED_CLASSES.includes(spec.class)) return { pax: pax, cargoKg: cargoKg };
     const oew = Number(spec.oew) || 0;
     const mtow = operationalMtow || Number(spec.mtow) || 0;
-    const blockFuel = getJetSimBriefPlanningBlockFuelKg(fuelDistanceNm, spec);
+    const blockFuel = getMtowPlanningBlockFuelKg(fuelDistanceNm, spec);
     let outPax = pax;
     let outCargo = cargoKg;
     const maxPaxAtMtow = getJetMaxPaxAtMtow(mtow, oew, blockFuel, outCargo, spec);
@@ -3903,14 +3909,14 @@ function enforceMlwCap(spec, pax, cargoKg, fuelDistanceNm, chosenMission, scenar
  * Returns violation strings; empty array means the plan is internally consistent.
  */
 function validateJetDispatchPhysics(type, spec, origin, destination, gcDistNm, fuelDistNm, pax, cargoKg, operationalMtow) {
-    if (!spec || spec.class !== "JET") return [];
+    if (!spec || !MTOW_ENFORCED_CLASSES.includes(spec.class)) return [];
     const violations = [];
     const gc = Number(gcDistNm) || 0;
     const fuelNm = Number(fuelDistNm) || getJetFuelPlanningDistanceNm(gc, spec);
     const oew = Number(spec.oew) || 0;
     const mtow = operationalMtow || (origin ? getDepartureRunwayOperationalMtow(origin, spec) : Number(spec.mtow) || 0);
     const maxTank = getJetMaxFuelKg(spec);
-    const planFuel = getJetSimBriefPlanningBlockFuelKg(fuelNm, spec);
+    const planFuel = getMtowPlanningBlockFuelKg(fuelNm, spec);
     const paxN = Math.max(0, Number(pax) || 0);
     const cargoN = Math.max(0, Number(cargoKg) || 0);
     const zfw = oew + getSimBriefPassengerPayloadKg(spec, paxN) + cargoN;
@@ -3922,11 +3928,13 @@ function validateJetDispatchPhysics(type, spec, origin, destination, gcDistNm, f
     if (!isJetSimBriefRouteFeasible(gc, spec, origin, destination)) {
         violations.push("route fails range/tank/runway feasibility gate");
     }
-    if (jetTripFuelExceedsTankCapacity(gc, spec)) {
-        violations.push(`trip fuel exceeds tank capacity (max ${maxTank} kg)`);
-    }
-    if (maxTank > 0 && planFuel > maxTank + 1) {
-        violations.push(`planning fuel ${Math.round(planFuel)} kg exceeds tank ${maxTank} kg`);
+    if (spec.class === "JET") {
+        if (jetTripFuelExceedsTankCapacity(gc, spec)) {
+            violations.push(`trip fuel exceeds tank capacity (max ${maxTank} kg)`);
+        }
+        if (maxTank > 0 && planFuel > maxTank + 1) {
+            violations.push(`planning fuel ${Math.round(planFuel)} kg exceeds tank ${maxTank} kg`);
+        }
     }
     if (specIsHeavyJet(spec) && maxTank > 0) {
         const stillAir = estimateJetBlockFuelBudgetKg(fuelNm, spec);
@@ -5082,7 +5090,7 @@ function probeDispatchFlight(config) {
         }
     }
     if (missionRequiresPassengers(chosenMission, spec, chosenScenario) && (spec.maxPax || 0) > 0) {
-        if (spec.class === "JET") {
+        if (MTOW_ENFORCED_CLASSES.includes(spec.class)) {
             pax = capJetPaxForMtow(pax, cargoKg, safeMtow, safeOew, fuelDistanceNm, spec);
         }
         if (pax === 0) {
@@ -5156,7 +5164,7 @@ function probeDispatchFlight(config) {
 
     cargoKg = finalizeAssignedPayloadKg(cargoKg, hardCargoLimit);
 
-    if (spec.class === "JET") {
+    if (MTOW_ENFORCED_CLASSES.includes(spec.class)) {
         const towCapped = enforceJetTowPayloadCap(
             spec, pax, cargoKg, fuelDistanceNm, safeMtow, chosenMission, blockMinutes, chosenScenario
         );
@@ -5198,7 +5206,7 @@ function probeDispatchFlight(config) {
     }
     // Runway-length payload caps are applied silently — no NOTAM (avoids confusing routine heavy-jet ops).
 
-    if (spec.class === "JET") {
+    if (MTOW_ENFORCED_CLASSES.includes(spec.class)) {
         const physicsViolations = validateJetDispatchPhysics(
             type, spec, origin, destination, distanceNm, fuelDistanceNm, pax, cargoKg, safeMtow
         );
