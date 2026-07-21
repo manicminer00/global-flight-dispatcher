@@ -18,11 +18,11 @@ The wrap bug is NOT about total title length — it's individual words that
 don't fit the ticket column at ticket font size, so the browser force-breaks
 mid-word (no CSS fix in scope for this pass, per Toby's call).
 
-- **Per-word length cap: 12.** Measured in-browser against the live
-  `.contract-ticket-mission` CSS (Roboto 800, 33px, 276px box width): a
-  10-letter word like "Turnaround" renders at 219px, well inside the 276px
-  line, and only an unrealistic run of wide capitals (e.g. all "W"s) would
-  overflow. 12 is the verified safe cap — re-measure if the CSS changes.
+- **Per-word length cap: 10.** Measured in-browser against the live
+  `.contract-ticket-mission` CSS (Roboto 800, 39px, 276px box width) via
+  `getBoundingClientRect`/`getComputedStyle`, tested against real
+  mission-title vocabulary. 10 is the verified safe cap at this font size
+  and box width — re-measure if either changes again.
 - Aim for 3–5 words, ~24 characters total (down from the old ~28 guideline —
   giving headroom since the CSS itself isn't being fixed this pass).
 - Every word individually checked against the verified cap before a title is
