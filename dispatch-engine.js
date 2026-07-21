@@ -3004,7 +3004,7 @@ function updateCustomAircraftForm() {
     toggleWrap("acTagFighterWrap", rawClass === "WARBIRD");
     toggleWrap("acTagLightHeliWrap", rawClass === "HELI");
     toggleWrap("acTagMilHeliWrap", isMilitary && rawClass === "HELI");
-    toggleWrap("acTagGliderWrap", rawClass === "GLIDER", false);
+    toggleWrap("acTagGliderWrap", rawClass === "GLIDER");
     const cargoRole = document.getElementById("newAcRoleCargo");
     toggleWrap("acCargoTierWrap", !!(cargoRole && cargoRole.checked), false);
     const lengthEl = document.getElementById("newAcLength");
