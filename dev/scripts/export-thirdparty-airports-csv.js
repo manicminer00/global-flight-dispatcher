@@ -13,7 +13,7 @@ function csvEscape(value) {
 
 const root = path.join(__dirname, "..", "..");
 const dbPath = path.join(root, "airports-thirdparty-db.js");
-const outPath = path.join(root, "airports-thirdparty-map.csv");
+const outPath = path.join(root, "Vector-Dev-Tools", "airports-thirdparty-map.csv");
 
 const content = fs.readFileSync(dbPath, "utf8");
 eval(content);

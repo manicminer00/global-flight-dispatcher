@@ -43,7 +43,7 @@ const categories = [
 for (const { tag, file } of categories) {
   const rows = seedAsoboAirportDatabase.filter((r) => r.tag === tag);
   const airports = dedupeByIcao(rows);
-  const outPath = path.join(root, file);
+  const outPath = path.join(root, "Vector-Dev-Tools", file);
   writeCsv(outPath, airports);
   console.log(`Wrote ${airports.length} rows to ${file}`);
 }
