@@ -2825,18 +2825,6 @@ function updateDatabaseStats() {
     document.getElementById('savedAircraftList').innerHTML = customAcKeys.length > 0
         ? `<ul>${Object.values(customFleet).map(a => `<li>${a.name}</li>`).join('')}</ul>`
         : `<ul><li>No custom aircraft saved.</li></ul>`;
-    // --- Update Owned Airports Count ---
-    const ownedRaw = localStorage.getItem("dispatcher_owned_airports") || "";
-    const ownedList = ownedRaw.split(',').map(s => s.trim()).filter(s => s.length > 0);
-	const ownedCountEl = document.getElementById('ownedAirportsCount');
-    if (ownedCountEl) {
-        ownedCountEl.innerText = ownedList.length;
-    }
-    const logbookData = JSON.parse(localStorage.getItem("dispatcher_logbook")) || [];
-    const logbookCountEl = document.getElementById('backupLogbookCount');
-    if (logbookCountEl) {
-        logbookCountEl.innerText = logbookData.length;
-    }
     updateManageCustomDbUI();
 }
 function resolveCustomAirportSource(source) {
