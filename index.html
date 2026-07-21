@@ -78,11 +78,7 @@
                 <label for="timeSlider" class="slider-header-row" id="timeSliderHeading">
                     Block Time: <span id="timeVal">60</span> <span id="timeUnit">mins</span>
                 </label>
-                <input type="range" id="timeSlider" min="40" max="120" step="10" value="60" list="steplist" oninput="updateFlightTimeDisplay()" style="width: 100%; cursor: pointer;">
-                <datalist id="steplist">
-                    <option value="40"></option><option value="50"></option><option value="60"></option><option value="70"></option>
-                    <option value="80"></option><option value="90"></option><option value="100"></option><option value="110"></option><option value="120"></option>
-                </datalist>
+                <input type="range" id="timeSlider" min="40" max="120" step="10" value="60" oninput="updateFlightTimeDisplay()" style="width: 100%; cursor: pointer;">
                 <div class="slider-footer-row board-sidebar-slider-footer">
                     <span class="note-text slider-rotor-glider-note">Helicopter &amp; Glider missions are unaffected by this slider.</span>
                 </div>

@@ -930,16 +930,16 @@
             font-weight: 800 !important;
             padding: 16px 12px;
             min-height: 52px;
-            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
-            border: 1px solid #348538 !important;
+            background: linear-gradient(180deg, #4a9ed6 0%, #2f7cb8 100%) !important;
+            border: 1px solid #256a9c !important;
             border-radius: var(--board-ui-radius) !important;
-            border-color: #348538 !important;
+            border-color: #256a9c !important;
             color: #ffffff !important;
             transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
         #generateFlightBtn:hover {
-            background: linear-gradient(180deg, #4a9ed6 0%, #2f7cb8 100%) !important;
-            border-color: #256a9c !important;
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
+            border-color: #348538 !important;
             color: #ffffff !important;
         }
         .board-app-footer {
@@ -1903,6 +1903,8 @@
             width: 100%;
             cursor: grab;
             accent-color: #2f3338;
+            -webkit-appearance: none;
+            appearance: none;
             height: 6px;
             --slider-fill-pct: 50%;
             --slider-thumb-grip: #5c656e;
@@ -3925,13 +3927,13 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            width: 24px;
-            height: 24px;
+            width: 32px;
+            height: 32px;
             border: none;
             border-radius: 4px;
             background: transparent;
             color: #e85d5d;
-            font-size: 42px;
+            font-size: 64px !important;
             font-weight: 700;
             line-height: 0;
             cursor: pointer;
