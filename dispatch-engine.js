@@ -3400,7 +3400,9 @@ function exportDatabaseBackup() {
         fleet: JSON.parse(localStorage.getItem("dispatcher_custom_fleet") || "{}"),
         custom_assignments: JSON.parse(localStorage.getItem("dispatcher_custom_assignments") || "{}"),
         ticket_fx_user_settings: readTicketFxUserSettings(),
-        logbook: JSON.parse(localStorage.getItem("dispatcher_logbook") || "[]")
+        logbook: JSON.parse(localStorage.getItem("dispatcher_logbook") || "[]"),
+        owned_airports: localStorage.getItem("dispatcher_owned_airports") || "",
+        prefer_owned: localStorage.getItem("dispatcher_prefer_owned") === "true"
     };
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObject, null, 2));
     const a = document.createElement('a');
@@ -3408,9 +3410,13 @@ function exportDatabaseBackup() {
     a.setAttribute("download", "dispatcher_backup.json");
     a.click();
 }
-function importDatabaseBackup(inputElement) {
+async function importDatabaseBackup(inputElement) {
     const file = inputElement.files[0];
     if (!file) return;
+    if (!(await vectorConfirm("Importing this file will replace your current Logbook, Custom Airports, Custom Aircraft, and Owned Airports list with what's saved in it. Anything added since this backup was made will be lost. Continue?"))) {
+        inputElement.value = "";
+        return;
+    }
     const reader = new FileReader();
     reader.onload = async function(e) {
         try {
@@ -3420,6 +3426,16 @@ function importDatabaseBackup(inputElement) {
             if (d.custom_assignments) localStorage.setItem("dispatcher_custom_assignments", JSON.stringify(d.custom_assignments));
             if (d.ticket_fx_user_settings) saveTicketFxUserSettings(d.ticket_fx_user_settings);
             if (d.logbook) localStorage.setItem("dispatcher_logbook", JSON.stringify(d.logbook));
+            if (typeof d.owned_airports === "string") {
+                localStorage.setItem("dispatcher_owned_airports", d.owned_airports);
+                const ownedInput = document.getElementById("ownedAirportsInput");
+                if (ownedInput) ownedInput.value = d.owned_airports;
+            }
+            if (typeof d.prefer_owned === "boolean") {
+                localStorage.setItem("dispatcher_prefer_owned", d.prefer_owned ? "true" : "false");
+                const preferToggle = document.getElementById("preferOwnedToggle");
+                if (preferToggle) preferToggle.checked = d.prefer_owned;
+            }
             syncLastArrivalFromLogbook();
             refreshLastArrivalDepField();
             markAirportDatabaseDirty();
@@ -3435,17 +3451,26 @@ function importDatabaseBackup(inputElement) {
     reader.readAsText(file);
 }
 async function resetCustomDatabase() {
-    if (await vectorConfirm("Are you sure you want to completely wipe all custom airports and aircraft from your local database? This cannot be undone.")) {
+    if (await vectorConfirm("Would you like to export a backup of your custom data before wiping it?")) {
+        exportDatabaseBackup();
+    }
+    if (await vectorConfirm("Are you sure you want to completely wipe all custom airports, custom aircraft, Job Ticket FX settings, and your Owned Airports list from your local database? This cannot be undone.")) {
         localStorage.removeItem("dispatcher_custom_user_airports");
         localStorage.removeItem("dispatcher_custom_fleet");
         localStorage.removeItem("dispatcher_custom_assignments");
         localStorage.removeItem(TICKET_FX_USER_SETTINGS_KEY);
+        localStorage.removeItem("dispatcher_owned_airports");
+        localStorage.removeItem("dispatcher_prefer_owned");
+        const ownedInput = document.getElementById("ownedAirportsInput");
+        if (ownedInput) ownedInput.value = "";
+        const preferToggle = document.getElementById("preferOwnedToggle");
+        if (preferToggle) preferToggle.checked = false;
         reloadTicketFxProfiles();
         rebuildActiveDatabase();
         rebuildFleetDropdown();
         updateDatabaseStats();
         updateManageCustomDbUI();
-        vectorAlert("Custom databases have been successfully reset. Your Owned Airports list and Logbook were kept intact.");
+        vectorAlert("Custom databases have been successfully reset. Your Logbook was kept intact.");
     }
 }
 function calculateDistance(lat1, lon1, lat2, lon2) {

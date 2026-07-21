@@ -4723,14 +4723,15 @@
             </div>
             <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
             <details class="info-details reset-db-info">
-                <summary>What does Reset Custom Database do?</summary>
+                <summary>Custom Database Management Guide</summary>
                 <div class="info-details-body">
                     <strong>Step-by-Step</strong>
                     <ul class="numbered-list">
+                        <li><strong>What does Export Backup do?:</strong> Export Backup saves a local copy of any custom airports, aircraft, Job Ticket FX settings, custom mission assignments, your Logbook, and your Owned Airports list.</li>
                         <li><strong>1. Confirmation:</strong> A dialog asks for permission to wipe custom data.</li>
-                        <li><strong>2. Deletion:</strong> Only the (<code>dispatcher_custom_airports</code>, and <code>dispatcher_custom_fleet</code>) keys are removed from your browser's local memory.</li>
+                        <li><strong>2. Deletion:</strong> Custom airports, custom aircraft, custom mission assignments, Job Ticket FX settings, and your Owned Airports list are removed from your browser's local memory.</li>
                         <li><strong>3. Reassurance:</strong> This does not clear cookies, bookmarks, or browsing history; it only affects this specific dispatcher tool.</li>
-						<li><strong>4. What about my Logbook?:</strong> 'Reset Custom Database' only deletes custom airframes and custom airports that you have manually added. It does not clear your Logbook or remove your Owned Airport list.</li>
+						<li><strong>4. What about my Logbook?:</strong> Reset now clears all of the above (custom airports, custom aircraft, custom mission assignments, Job Ticket FX settings, and your Owned Airports list) — your Logbook is the only thing kept intact.</li>
                         <li><strong>5. Clean up:</strong> The interface instantly updates to reflect the empty database.</li>
                     </ul>
                 </div>
