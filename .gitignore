@@ -53,3 +53,7 @@ images/header0bak.png
 # ── GitHub metadata (sponsor button) ─────────────────────────────────────────
 !.github/
 !.github/**
+
+# ── Change history docs ───────────────────────────────────────────────────────
+!AUDIT.md
+!PATCH_NOTES.md
