@@ -1,10 +1,14 @@
 # ── Ignore everything by default (whitelist approach) ─────────────────────────
 *
-!ticket-fx-profiles.html
-!ticket-fx-profiles.js
 !settings.js
-!start-ticket-fx-profiles.bat
 AUDIT.md
+
+# ── Vector-Dev-Tools ──────────────────────────────────────────────────────────
+!Vector-Dev-Tools/
+Vector-Dev-Tools/*
+!Vector-Dev-Tools/ticket-fx-profiles.html
+!Vector-Dev-Tools/ticket-fx-profiles.js
+!Vector-Dev-Tools/start-ticket-fx-profiles.bat
 
 # ── Root config files ─────────────────────────────────────────────────────────
 !.gitignore
