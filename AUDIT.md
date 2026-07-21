@@ -73,9 +73,9 @@ sidebar-section-divider (617,631) · checkbox-q-tail (784) · slider-label (1165
 
 Verdict: NEEDS MY INPUT — I spot-checked 5 of these directly and confirmed zero usage, and I'm confident in the method, butalled all 16, so treat this batch as "very likely dead" rather than 100%-certain like A-D.
 
-F. long-haul-routes-db.js — entire file, never loaded
-Not in loader.js's load list, and zero references to it anywhere in the live app's files. short-haul-routes-db.js (its sibl
-Verdict: NEEDS MY INPUT — could be a planned feature you haven't wired up yet, so I'm not calling it safe-to-delete outright.
+F. long-haul-routes-db.js — file does not currently exist in the project
+A project-wide filename search found zero matches anywhere (root, Vector-Dev-Tools/, Orphaned Files/, dev/). It is also absent from loader.js's load list, has no referenced global variable anywhere in the live app's files, and has no un-ignore entry in .gitignore — unlike its sibling short-haul-routes-db.js, which has all three. See docs/cowork-notes/2026-07-21-plan-long-haul-routes-db.md for the full investigation.
+Verdict: NOT AN ORPHANED FILE — there is nothing on disk to delete or wire up. Building a long-haul curated-route feature would be new work, not a cleanup fix.
 
 ---
 2. Duplicate / conflicting CSS rules

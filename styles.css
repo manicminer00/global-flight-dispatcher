@@ -3721,6 +3721,56 @@
             border: 1px solid var(--board-border);
             border-radius: var(--board-ui-radius);
         }
+        .logbook-backup-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: var(--board-bg-panel-inner);
+            border: 1px solid var(--board-border);
+            border-radius: var(--board-ui-radius);
+        }
+        .logbook-backup-banner[hidden] {
+            display: none;
+        }
+        .logbook-backup-banner-msg {
+            color: var(--board-text-primary);
+            font-size: 14px;
+        }
+        .logbook-backup-banner-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .logbook-backup-banner-btn {
+            min-width: 96px;
+            padding: 8px 14px;
+            border-radius: var(--board-ui-radius);
+            border: 1px solid var(--board-border);
+            background: linear-gradient(
+                180deg,
+                var(--board-btn-idle-top) 0%,
+                var(--board-btn-idle-bottom) 100%
+            );
+            color: var(--board-text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        .logbook-backup-banner-btn--primary:hover {
+            background: linear-gradient(180deg, #4aad4e 0%, #358a39 100%);
+            border-color: #2d7330;
+            color: #ffffff;
+        }
+        .logbook-backup-banner-btn--ghost:hover {
+            background: linear-gradient(180deg, #e85d5d 0%, #c74a4a 100%);
+            border-color: #b33e3e;
+            color: #ffffff;
+        }
         #logbookPanel.board-logbook.settings-panel {
             border-top: none !important;
             padding-top: 0 !important;

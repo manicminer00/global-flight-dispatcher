@@ -314,6 +314,13 @@
 <div id="logbookPanel" class="settings-panel settings-group board-logbook">
         <h3>PILOT LOGBOOK</h3>
         <div class="logbook-sheet">
+        <div id="logbookBackupBanner" class="logbook-backup-banner" hidden>
+            <span id="logbookBackupBannerMsg" class="logbook-backup-banner-msg"></span>
+            <div class="logbook-backup-banner-actions">
+                <button type="button" class="logbook-backup-banner-btn logbook-backup-banner-btn--primary" onclick="exportFromLogbookBanner()">Export Now</button>
+                <button type="button" class="logbook-backup-banner-btn logbook-backup-banner-btn--ghost" onclick="dismissLogbookBackupBanner()">Dismiss</button>
+            </div>
+        </div>
         <div class="db-stats-container logbook-stats-grid">
             <div class="db-stat-item db-stat-item--static">
                 <span>Total Flights</span>

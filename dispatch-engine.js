@@ -3397,6 +3397,7 @@ function exportDatabaseBackup() {
     a.setAttribute("href", dataStr);
     a.setAttribute("download", "dispatcher_backup.json");
     a.click();
+    resetLogbookBackupNudgeState();
 }
 async function importDatabaseBackup(inputElement) {
     const file = inputElement.files[0];
@@ -5472,18 +5473,53 @@ function updateAddLastFlightLink() {
     link.textContent = `Add last flight to logbook (${last.orig} -> ${last.dest})`;
 }
 
-const LOGBOOK_BACKUP_INTERVAL = 20;
-const LOGBOOK_BACKUP_PROMPT_KEY = "dispatcher_logbook_backup_prompt_at";
+const LOGBOOK_BACKUP_BATCH = 4;
+const LOGBOOK_FLIGHTS_SINCE_EXPORT_KEY = "dispatcher_logbook_flights_since_export";
+const LOGBOOK_BACKUP_DISMISSED_AT_KEY = "dispatcher_logbook_backup_dismissed_at";
 
-async function maybePromptLogbookBackup() {
-    const logbook = JSON.parse(localStorage.getItem("dispatcher_logbook") || "[]");
-    const count = logbook.length;
-    if (count < LOGBOOK_BACKUP_INTERVAL || count % LOGBOOK_BACKUP_INTERVAL !== 0) return;
-    const lastPromptAt = parseInt(localStorage.getItem(LOGBOOK_BACKUP_PROMPT_KEY) || "0", 10);
-    if (lastPromptAt >= count) return;
-    localStorage.setItem(LOGBOOK_BACKUP_PROMPT_KEY, String(count));
-    if (await vectorConfirm("You have " + count + " flights in your logbook. Do you want to backup your logbook?\n\nThis saves a file to your computer so you do not lose your flight history if browser data is cleared.")) {
-        exportDatabaseBackup();
+function getLogbookFlightsSinceExport() {
+    return parseInt(localStorage.getItem(LOGBOOK_FLIGHTS_SINCE_EXPORT_KEY) || "0", 10);
+}
+
+function getLogbookBackupDismissedAt() {
+    return parseInt(localStorage.getItem(LOGBOOK_BACKUP_DISMISSED_AT_KEY) || "0", 10);
+}
+
+function resetLogbookBackupNudgeState() {
+    localStorage.removeItem(LOGBOOK_FLIGHTS_SINCE_EXPORT_KEY);
+    localStorage.removeItem(LOGBOOK_BACKUP_DISMISSED_AT_KEY);
+    hideLogbookBackupBanner();
+}
+
+function showLogbookBackupBanner(count) {
+    const banner = document.getElementById("logbookBackupBanner");
+    if (!banner) return;
+    const msgEl = document.getElementById("logbookBackupBannerMsg");
+    if (msgEl) msgEl.textContent = count + " flight" + (count === 1 ? "" : "s") + " saved since your last backup.";
+    banner.hidden = false;
+}
+
+function hideLogbookBackupBanner() {
+    const banner = document.getElementById("logbookBackupBanner");
+    if (banner) banner.hidden = true;
+}
+
+function dismissLogbookBackupBanner() {
+    localStorage.setItem(LOGBOOK_BACKUP_DISMISSED_AT_KEY, String(getLogbookFlightsSinceExport()));
+    hideLogbookBackupBanner();
+}
+
+function exportFromLogbookBanner() {
+    exportDatabaseBackup();
+}
+
+function maybeShowLogbookBackupBanner() {
+    const sinceExport = getLogbookFlightsSinceExport();
+    const dismissedAt = getLogbookBackupDismissedAt();
+    if (sinceExport - dismissedAt >= LOGBOOK_BACKUP_BATCH) {
+        showLogbookBackupBanner(sinceExport);
+    } else {
+        hideLogbookBackupBanner();
     }
 }
 
@@ -5547,6 +5583,7 @@ function appendFlightToLogbook(flight) {
         payoutValue: parsePayoutValue(flight.payout)
     });
     localStorage.setItem("dispatcher_logbook", JSON.stringify(logbook));
+    localStorage.setItem(LOGBOOK_FLIGHTS_SINCE_EXPORT_KEY, String(getLogbookFlightsSinceExport() + 1));
     syncLastArrivalFromLogbook();
     return logbook;
 }
@@ -5582,7 +5619,7 @@ function addLastFlightToLogbook() {
 
 async function runMaintenanceCheckAfterLog() {
     updateDatabaseStats();
-    maybePromptLogbookBackup();
+    maybeShowLogbookBackupBanner();
 }
 function toggleLastArrival() {
     const toggle = document.getElementById("useLastArrivalToggle");
@@ -5636,6 +5673,7 @@ function updateLogbookUI() {
     const totalSavings = logbook.reduce((sum, flight) => sum + (flight.payoutValue || 0), 0);
     const savingsEl = document.getElementById("lbTotalSavings");
     if (savingsEl) savingsEl.innerText = formatLogbookSavingsTotal(totalSavings);
+    maybeShowLogbookBackupBanner();
     const tbody = document.getElementById("logbookTableBody");
     const pagControls = document.getElementById("paginationControls");
     if (logbook.length === 0) {
@@ -5701,7 +5739,7 @@ async function clearLogbook() {
     if (await vectorConfirm("Are you sure you want to delete your entire flight history? This cannot be undone.")) {
         localStorage.removeItem("dispatcher_logbook");
         localStorage.removeItem("dispatcher_last_arrival");
-        localStorage.removeItem(LOGBOOK_BACKUP_PROMPT_KEY);
+        resetLogbookBackupNudgeState();
         document.getElementById("useLastArrivalToggle").checked = false;
         document.getElementById("depOverrideInput").value = "";
         currentLogbookPage = 1;
