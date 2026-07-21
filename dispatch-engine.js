@@ -614,9 +614,25 @@ const SHORT_HAUL_SLIDER = { min: 40, max: 120, step: 10, defaultValue: 60, listI
 const SHORT_HAUL_PRIMARY_DISTANCE_BAND = 0.12;
 const SHORT_HAUL_RELAXED_DISTANCE_BAND = 0.28;
 const SHORT_HAUL_SIMBRIEF_OVERHEAD_MINS = 12;
-const SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS = 8;
-const FIXED_DEPARTURE_BLOCK_TOLERANCE_MINS = 15;
-const FIXED_DEPARTURE_BLOCK_RELAXED_MINS = 20;
+const SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS = 10;
+// Tiers 2/3 scale with the slider target instead of being flat minutes, so the
+// proportional deviation stays similar at 40 min and at 120 min. Floor keeps
+// them from ever being tighter than tier 1; cap keeps them from exceeding the
+// old flat values at the high end of the slider (80-120 min was already fine).
+const SHORT_HAUL_FALLBACK_TOLERANCE_PCT = 0.20;
+const SHORT_HAUL_FALLBACK_TOLERANCE_FLOOR_MINS = 10;
+const SHORT_HAUL_FALLBACK_TOLERANCE_CAP_MINS = 15;
+const SHORT_HAUL_RELAXED_TOLERANCE_PCT = 0.30;
+const SHORT_HAUL_RELAXED_TOLERANCE_FLOOR_MINS = 10;
+const SHORT_HAUL_RELAXED_TOLERANCE_CAP_MINS = 20;
+function getShortHaulFallbackToleranceMins(targetMins) {
+    const raw = Math.round(Number(targetMins) * SHORT_HAUL_FALLBACK_TOLERANCE_PCT);
+    return Math.min(SHORT_HAUL_FALLBACK_TOLERANCE_CAP_MINS, Math.max(SHORT_HAUL_FALLBACK_TOLERANCE_FLOOR_MINS, raw));
+}
+function getShortHaulRelaxedToleranceMins(targetMins) {
+    const raw = Math.round(Number(targetMins) * SHORT_HAUL_RELAXED_TOLERANCE_PCT);
+    return Math.min(SHORT_HAUL_RELAXED_TOLERANCE_CAP_MINS, Math.max(SHORT_HAUL_RELAXED_TOLERANCE_FLOOR_MINS, raw));
+}
 function estimateShortHaulBlockMinutesForRoute(dist, spec, aircraftType) {
     return estimateBaseBlockMinutesForRoute(dist, spec, aircraftType);
 }
@@ -814,12 +830,12 @@ function buildJetRoutePairs(sources, destinations, depOverride, destOverride, sp
     };
     if (fixedDepShortHaul) {
         // Pinned departure: block-time window defines feasible sectors, not catalog minD or cruise-distance band.
-        candidatePairs.push(...collectPairs(0, relaxedMax, FIXED_DEPARTURE_BLOCK_RELAXED_MINS));
+        candidatePairs.push(...collectPairs(0, relaxedMax, getShortHaulRelaxedToleranceMins(routingTargetMins)));
     } else {
         primaryPairs = collectPairs(minTarget, maxTarget, SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS);
         if (primaryPairs.length === 0) {
             usedRelaxedRouting = true;
-            candidatePairs.push(...collectPairs(relaxedMin, relaxedMax, FIXED_DEPARTURE_BLOCK_RELAXED_MINS));
+            candidatePairs.push(...collectPairs(relaxedMin, relaxedMax, getShortHaulRelaxedToleranceMins(routingTargetMins)));
         } else {
             candidatePairs.push(...primaryPairs);
         }
@@ -933,8 +949,8 @@ function pickShortHaulRoute(pool, targetMins, spec, aircraftType) {
     };
     for (const tol of [
         SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS,
-        FIXED_DEPARTURE_BLOCK_TOLERANCE_MINS,
-        FIXED_DEPARTURE_BLOCK_RELAXED_MINS
+        getShortHaulFallbackToleranceMins(targetMins),
+        getShortHaulRelaxedToleranceMins(targetMins)
     ]) {
         const ranked = pool
             .map(rank)
@@ -947,7 +963,7 @@ function pickShortHaulRoute(pool, targetMins, spec, aircraftType) {
             });
         if (!ranked.length) continue;
         const weights = ranked.map((entry) => {
-            const proximity = Math.max(1, 8 - entry.proxyDelta);
+            const proximity = Math.max(1, SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS - entry.proxyDelta);
             return proximity + getShortHaulPairRouteBoost(entry.pair, spec);
         });
         const total = weights.reduce((sum, w) => sum + w, 0);

@@ -4,6 +4,26 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ---
 
+## 2026-07-22
+
+- **Short-haul dispatched block time now scales tolerance with the slider target** — the
+  actual dispatched block time was drifting well past the target (e.g. a 60 min target
+  often landing at 75). Root cause: the fallback/relaxed tolerance tiers used flat minutes
+  (±15 / ±20) regardless of target, so short targets (40-60 min) got the same leeway as
+  long ones (120 min), which is proportionally much worse at the low end.
+  `FIXED_DEPARTURE_BLOCK_TOLERANCE_MINS` (15) and `FIXED_DEPARTURE_BLOCK_RELAXED_MINS` (20)
+  were removed and replaced with `getShortHaulFallbackToleranceMins(targetMins)` (20% of
+  target, floor 10 / cap 15) and `getShortHaulRelaxedToleranceMins(targetMins)` (30% of
+  target, floor 10 / cap 20). Tier 1 tolerance (`SHORT_HAUL_SIMBRIEF_PICK_TOLERANCE_MINS`)
+  also raised from 8 to 10, and the proximity-weighting formula in `pickShortHaulRoute` now
+  references that constant instead of a separate hardcoded 8. Verified: no leftover
+  references to the removed constants, dispatch-fleet-smoke.mjs (112/112 pass),
+  dispatch-physics-verify.mjs --quick (pass), and manual dispatch probes at sliders
+  40/60/90/120 on C172 (GA), BE20 (TURBO), B738 (JET), C700 (BIZ JET) — 16 combinations,
+  5 runs each, all landed within the new tier bounds.
+
+---
+
 ## 2026-07-21
 
 - **Mission title per-word cap corrected from 9 to 12 characters** — GUIDE.md's
