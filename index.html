@@ -4661,15 +4661,14 @@
                     <li>Saves a missing airport to your browser so it appears in the departure search and route picker.</li>
                     <li>Runway length and largest permitted aircraft type control which airframes can use the airport.</li>
                     <li>Coordinates are used for distance, heading, and map routing — look them up if you are unsure.</li>
+                    <li>Custom glider strips: set largest permitted aircraft type to <strong>Glider strip / winch launch only</strong>.</li>
                 </ul>
                 <br>
                 <strong>Add New Aircraft (to Local DB):</strong>
                 <ul>
-                    <li>Saves a missing aircraft to your local fleet dropdown.</li>
-                    <li>Mission tags are used to define how the dispatcher classifies aircraft. Gliders need class <strong>Glider / Sailplane</strong>, category <strong>Glider</strong>, and the appropriate glider options (self-launch, sailplane, etc.).</li>
-                    <li>Enter maximum range (nm) from the aircraft manual — this controls sector routing. Minimum sector distance is set automatically by class.</li>
-                    <li>Military airlifters: class <strong>Turboprop</strong>, tick <strong>Military Aircraft</strong>, category <strong>Heavy Cargo / Airlifter</strong>. C-130/C-160 use standard military transport; A400-class heavies get the <strong>HEAVY_AIRLIFTER</strong> tag (airliner/military strips only).</li>
-                    <li>Custom glider strips: set largest permitted aircraft type to <strong>Glider strip / winch launch only</strong>.</li>
+                    <li>Saves an aircraft to your custom database.</li>
+                    <li>Mission tags are used to define how the dispatcher classifies aircraft. e.g. Gliders need Aircraft Type: <strong>Glider / Sailplane</strong>, category <strong>Glider</strong>, and the appropriate glider options (self-launch, sailplane, etc.).</li>
+                    <li>Enter maximum range (nm) from the aircraft manual. This controls sector routing. Minimum sector distance is set automatically by class.</li>
                 </ul>
             </div>
         </details>
@@ -4723,16 +4722,21 @@
             </div>
             <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
             <details class="info-details reset-db-info">
-                <summary>Custom Database Management Guide</summary>
+                <summary>What does Export Backup do?</summary>
+                <div class="info-details-body">
+                    Export Backup saves a local copy of any custom airports, custom aircraft (including Job Ticket FX settings and custom mission settings), your Logbook, and your Owned Airports list.
+                </div>
+            </details>
+            <details class="info-details reset-db-info">
+                <summary>What does Reset Custom Database do?</summary>
                 <div class="info-details-body">
                     <strong>Step-by-Step</strong>
                     <ul class="numbered-list">
-                        <li><strong>What does Export Backup do?:</strong> Export Backup saves a local copy of any custom airports, aircraft, Job Ticket FX settings, custom mission assignments, your Logbook, and your Owned Airports list.</li>
                         <li><strong>1. Confirmation:</strong> A dialog asks for permission to wipe custom data.</li>
                         <li><strong>2. Deletion:</strong> Custom airports, custom aircraft, custom mission assignments, Job Ticket FX settings, and your Owned Airports list are removed from your browser's local memory.</li>
-                        <li><strong>3. Reassurance:</strong> This does not clear cookies, bookmarks, or browsing history; it only affects this specific dispatcher tool.</li>
-						<li><strong>4. What about my Logbook?:</strong> Reset now clears all of the above (custom airports, custom aircraft, custom mission assignments, Job Ticket FX settings, and your Owned Airports list) — your Logbook is the only thing kept intact.</li>
-                        <li><strong>5. Clean up:</strong> The interface instantly updates to reflect the empty database.</li>
+                        <li><strong>3. What about my Logbook?:</strong> Your Logbook is not deleted when you click Reset Custom Database. You can clear your logbook entries on the Pilot Logbook page.</li>
+                        <li><strong>4. Reassurance:</strong> Clicking Reset Custom Database does not clear your cookies, bookmarks, or browsing history; it only affects the specific VECTOR information listed above.</li>
+                        <li><strong>5. Clean up:</strong> The interface will update to reflect the empty database.</li>
                     </ul>
                 </div>
             </details>
