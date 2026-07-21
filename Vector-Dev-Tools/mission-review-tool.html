@@ -294,9 +294,9 @@
   function updateCounts() {
     var title = document.getElementById('newTitle').value;
     var words = title.split(/\s+/).filter(Boolean);
-    var overCap = words.filter(function (w) { return w.replace(/[^A-Za-z0-9]/g, '').length > 9; });
+    var overCap = words.filter(function (w) { return w.replace(/[^A-Za-z0-9]/g, '').length > 12; });
     var tc = document.getElementById('titleCount');
-    tc.textContent = words.length + ' word(s), ' + title.length + ' chars' + (overCap.length ? ' — OVER 9-CHAR CAP: ' + overCap.join(', ') : '');
+    tc.textContent = words.length + ' word(s), ' + title.length + ' chars' + (overCap.length ? ' — OVER 12-CHAR CAP: ' + overCap.join(', ') : '');
     tc.className = 'char-count' + (overCap.length ? ' warn' : '');
 
     var brief = document.getElementById('newBrief').value;

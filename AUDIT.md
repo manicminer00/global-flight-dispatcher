@@ -216,6 +216,30 @@ Contracts Board sidebar layout (Pre-Flight card, logo, rule, Options
 container alignment) — RESOLVED (commit 1149258e, 2026-07-21).
 
 ---
+6. Mission title per-word length cap — corrected, session 21 Jul 2026
+
+GUIDE.md's title rule set a "per-word length cap: 9" for the mission ticket
+title (`.contract-ticket-mission`), enforced in
+Vector-Dev-Tools/mission-review-tool.html. The doc said the number should be
+verified against live CSS, not assumed — it had not actually been verified
+against the current CSS. Measured in-browser (Playwright, local static
+server) against the real rendered rule: Roboto 800, 33px, 276px available
+box width. A 10-letter word ("Turnaround") rendered at 219px, well inside
+the 276px line; only an unrealistic run of wide capitals (e.g. all "W"s)
+would overflow. 9 was too conservative and had been silently forcing
+awkward word substitutions (e.g. imgId 24's title used "Tight Turn Sector"
+instead of the more natural "Tight Turnaround" to dodge a cap that wasn't
+actually necessary).
+
+RESOLVED — cap raised to 12 (verified safe) in GUIDE.md and
+mission-review-tool.html. Re-reviewed the 10 entries in
+Vector-Dev-Tools/mission-rewrites-staging.json against the corrected cap:
+none had actually violated the old 9-char limit, but 4 titles were rewritten
+for better voice/word choice now that the false constraint is gone (imgId
+33, 24, 171, 67) — see PATCH_NOTES.md for the specific before/after titles.
+Re-measure if the ticket title CSS (font-size/weight/box width) changes.
+
+---
 What I did not check
 
 - I did not open the app in a browser or click through it — everything above is static code analysis, not observed behavior.

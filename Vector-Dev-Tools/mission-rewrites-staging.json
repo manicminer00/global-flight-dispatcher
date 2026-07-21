@@ -2,9 +2,9 @@
   {
     "imgId": 33,
     "oldTitle": "Regional Hop",
-    "newTitle": "Morning Meetings Run",
+    "newTitle": "Half-Awake Meeting Rush",
     "oldBrief": "This is a short regional sector. The cabin is full of young professionals on their way to meetings. The wheels of commerce keep turning thanks to your skills as a pilot.",
-    "newBrief": "Coffee in hand and half-awake, the regional crowd's stacked up for the morning meetings run. Keep the short hop easy and get them there while the caffeine's still working.",
+    "newBrief": "Coffee in hand and half-awake, the regional crowd's stacked up for another meeting rush. Keep the short hop easy and get them there while the caffeine's still working.",
     "imagePath": "../images-missions/mission33.jpg",
     "reviewed": false
   },
@@ -20,7 +20,7 @@
   {
     "imgId": 24,
     "oldTitle": "Scheduled Sector",
-    "newTitle": "Tight Turn Sector",
+    "newTitle": "Tight Turnaround",
     "oldBrief": "The clock is against you on this scheduled sector. Ask for priority on the approach, aim for vectors to finals, and get the passengers offloaded as soon as you block in.",
     "newBrief": "ATC expects you on the money today. Push for priority on the approach, line up for vectors to finals, and have the doors open the second you block in.",
     "imagePath": "../images-missions/mission24.jpg",
@@ -47,7 +47,7 @@
   {
     "imgId": 171,
     "oldTitle": "Highway Extraction",
-    "newTitle": "Roadside Trauma Run",
+    "newTitle": "Roadside Extraction",
     "oldBrief": "First responders have a landing zone ready on the roadway. Get in, get the patient aboard and go — the clock is running.",
     "newBrief": "First responders already have the LZ marked on the roadway. Get in, get the patient aboard, go. Every second counts now.",
     "imagePath": "../images-missions/mission171.jpg",
@@ -65,9 +65,9 @@
   {
     "imgId": 67,
     "oldTitle": "VIP Private Gala",
-    "newTitle": "Private Gala Run",
+    "newTitle": "Private Gala Charter",
     "oldBrief": "This VIP charter has a bar stocked for comfort and fun. Make the landing butter-smooth so the passenger arrives in a good mood and ignore any guffawing coming from the cabin.",
-    "newBrief": "Tonight's {vip_type} expects the finer things. Bar's stocked, cabin's ready for the gala run. Keep the landing smooth enough that nobody in the back notices you working, and whatever's happening in the cabin stays in the cabin.",
+    "newBrief": "Tonight's {vip_type} expects the finer things. Bar's stocked, cabin's ready for the charter. Keep the landing smooth enough that nobody in the back notices you working, and whatever's happening in the cabin stays in the cabin.",
     "imagePath": "../images-missions/mission67.jpg",
     "reviewed": false
   },

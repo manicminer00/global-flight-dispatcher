@@ -6,6 +6,20 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ## 2026-07-21
 
+- **Mission title per-word cap corrected from 9 to 12 characters** — GUIDE.md's
+  title rule said the cap should be verified against live CSS, but it never had
+  been. Measured in-browser against the real `.contract-ticket-mission` rule
+  (Roboto 800, 33px, 276px box): a 10-letter word like "Turnaround" renders at
+  219px, well inside the line. 9 was too conservative and had forced awkward
+  word substitutions. Updated GUIDE.md and mission-review-tool.html's cap
+  check to 12. Re-reviewed the 10 entries in
+  Vector-Dev-Tools/mission-rewrites-staging.json against the new cap: none
+  had violated the old limit, but 4 titles were rewritten for better wording
+  now that the false constraint is gone — imgId 33 "Morning Meetings Run" →
+  "Half-Awake Meeting Rush", imgId 24 "Tight Turn Sector" → "Tight
+  Turnaround", imgId 171 "Roadside Trauma Run" → "Roadside Extraction",
+  imgId 67 "Private Gala Run" → "Private Gala Charter" (briefs adjusted to
+  match where needed). See AUDIT.md §6.
 - **MTOW enforcement extended to BIZ JET and TURBO aircraft** — the MTOW (max takeoff
   weight) physics check previously only ran for JET-class aircraft; BIZ JET and TURBO
   had no final takeoff-weight verification. Fuel-budget formula was branched so this
