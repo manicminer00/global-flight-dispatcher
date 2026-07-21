@@ -1131,7 +1131,7 @@
             align-items: center;
             font-size: var(--font-size-ui);
             font-weight: var(--font-weight-body);
-            color: var(--text-muted);
+            color: var(--board-text-muted);
             cursor: pointer;
             margin: 0;
         }
@@ -1218,7 +1218,7 @@
             display: inline;
             margin: 0;
             font-weight: var(--font-weight-body);
-            color: var(--text-muted);
+            color: var(--board-text-muted);
             font-size: var(--font-size-ui);
             cursor: pointer;
         }
@@ -3452,7 +3452,6 @@
         }
         /* Settings: match board greyscale (no classic blue accents) */
         #settingsPanel.board-settings label,
-        #settingsPanel.board-settings .accent-checkbox-label,
         #settingsPanel.board-settings .field-title,
         #settingsPanel.board-settings .form-section-title,
         #settingsPanel.board-settings .form-section-subtitle,
