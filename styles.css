@@ -3052,7 +3052,7 @@
         /* Intentional: cascading override of font-size/weight/line-height/letter-spacing/color
            from the shared .contract-ticket-title block above — not a duplicate. */
         .contract-ticket-mission {
-            font-size: 33px;
+            font-size: 39px;
             font-weight: 800;
             line-height: 1.1;
             letter-spacing: 0;
@@ -3090,7 +3090,7 @@
             justify-content: flex-start;
             gap: 14px;
             width: 100%;
-            font-size: 33px;
+            font-size: 39px;
             font-weight: 700;
             color: var(--board-ticket-text);
             letter-spacing: 0;
@@ -3127,7 +3127,7 @@
         }
         .contract-ticket-value {
             margin: 0;
-            font-size: 33px;
+            font-size: 39px;
             font-weight: 700;
             color: var(--board-ticket-text);
             letter-spacing: 0;
