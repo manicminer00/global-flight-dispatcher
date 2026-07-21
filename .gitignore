@@ -20,6 +20,7 @@ tools/*
 
 # ── Core app files (WEB deploy) ───────────────────────────────────────────────
 !index.html
+!styles.css
 !loader.js
 !dispatch-engine.js
 !mission-assignment-core.js
