@@ -2684,6 +2684,12 @@ async function removeCustomAircraft(icao) {
     if (!(await vectorConfirm(`Remove custom aircraft ${fleetKey} - ${aircraft.name}?\n\nThis cannot be undone.`))) return;
     delete customFleet[fleetKey];
     localStorage.setItem("dispatcher_custom_fleet", JSON.stringify(customFleet));
+    const customAssignments = JSON.parse(localStorage.getItem("dispatcher_custom_assignments") || "{}");
+    const assignmentKey = Object.keys(customAssignments).find(k => k.toUpperCase() === fleetKey.toUpperCase());
+    if (assignmentKey) {
+        delete customAssignments[assignmentKey];
+        localStorage.setItem("dispatcher_custom_assignments", JSON.stringify(customAssignments));
+    }
     rebuildFleetDropdown();
     updateDatabaseStats();
     updateManageCustomDbUI();
@@ -3431,7 +3437,6 @@ function importDatabaseBackup(inputElement) {
 async function resetCustomDatabase() {
     if (await vectorConfirm("Are you sure you want to completely wipe all custom airports and aircraft from your local database? This cannot be undone.")) {
         localStorage.removeItem("dispatcher_custom_user_airports");
-        localStorage.removeItem("dispatcher_custom_airports");
         localStorage.removeItem("dispatcher_custom_fleet");
         localStorage.removeItem("dispatcher_custom_assignments");
         localStorage.removeItem(TICKET_FX_USER_SETTINGS_KEY);
