@@ -77,6 +77,29 @@ depending on who's on the mic:
 The point isn't a rigid lookup table — it's that the writer should ask "who
 is this dispatcher, on this day, for this job?" before writing the line.
 
+## Title vs. Brief Register
+
+Titles and briefs serve different jobs and should not blur together.
+
+**Titles** are functional dispatch-board headlines. A title states what the
+job is and where it's going, nothing more:
+  - Job type + context (e.g. "MEDICAL TRANSPORT", "CURRENCY FLIGHT")
+  - Destination/route flavor is fine if it fits the cap (e.g. "COASTAL
+    SURVEY", "BORDER RUN")
+  - No mood, emotional state, or personality adjectives about the crew or
+    passengers (reject "Half-Awake Meeting Rush", "Nervous First Flight",
+    "Grumpy VIP Pickup" style titles)
+  - No story beats in the title. If it needs a verb describing how someone
+    feels or behaves, it belongs in the brief, not here.
+
+**Briefs** are where personality, mood, and story beat live. This is the
+one place color and characterization belong, following the tonal register
+rules above.
+
+Rule of thumb: if you could read the title over a radio to ground crew and
+it would sound like a job label, it's right. If it sounds like the opening
+line of a short story, it's a brief, not a title.
+
 ## Opening variety (carried over from rewrite rules — still mandatory)
 
 Do not default to "You have..." Rotate naturally across nearby missions:
