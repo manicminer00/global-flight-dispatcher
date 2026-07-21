@@ -783,12 +783,8 @@
         .board-sidebar-form select {
             color: var(--board-text-primary);
         }
-        .board-sidebar-optional-details select,
-        .board-sidebar #routingScopeSelect,
-        .board-sidebar-form #routingScopeSelect,
-        .board-sidebar-optional-details #routingScopeSelect {
-            color: var(--board-text-primary) !important;
-        }
+        /* Removed: duplicate select/#routingScopeSelect group — same selector list and identical
+           color value already declared above (line ~650). */
         .board-sidebar-form input[type="text"]:focus,
         .board-sidebar-form select:focus {
             border-color: var(--board-border);
@@ -922,6 +918,9 @@
             gap: 6px;
             margin-top: 8px;
         }
+        /* Consolidated: merged duplicate idle-state rules formerly at #logbookTable section (background/color/border)
+           and dropped a dead #generateFlightBtn font-size/font-weight rule that this block's higher specificity
+           (.board-sidebar-form #generateFlightBtn) always overrode anyway. */
         .board-sidebar-form #generateFlightBtn {
             margin-top: 20px;
             width: 100%;
@@ -1592,10 +1591,8 @@
         .backup-btn--manage:hover  { background-color: var(--color-btn-hover-bg) !important; color: var(--color-btn-hover-text) !important; }
         a.simbrief-btn:hover       { background-color: var(--color-btn-hover-bg); color: var(--color-btn-hover-text); }
         /* UNIQUE EXCEPTIONS */
-        #generateFlightBtn {
-            font-weight: var(--font-weight-generate-btn) !important;
-            font-size: var(--font-size-generate-btn) !important; 
-        }
+        /* Removed: dead #generateFlightBtn font-weight/font-size rule — always overridden by the
+           higher-specificity .board-sidebar-form #generateFlightBtn block, never took effect. */
         /* END BUTTONS */
         table {
             width: 100%;
@@ -1648,9 +1645,11 @@
             width: 10%;
             white-space: nowrap;
         }
+        /* Consolidated: merged with the later duplicate #logbookTable .lb-route rule, which set
+           width/max-width: 104px (same specificity, later in source, so it was the effective value). */
         #logbookTable .lb-route {
-            width: 88px;
-            max-width: 88px;
+            width: 104px;
+            max-width: 104px;
             white-space: nowrap;
             padding-right: 2px;
         }
@@ -1661,6 +1660,8 @@
             width: 30%;
             max-width: 30%;
         }
+        /* Intentional: complementary to the width rule above — shares overflow handling with
+           .lb-aircraft, no overlapping properties, not a duplicate. */
         #logbookTable .lb-aircraft,
         #logbookTable .lb-mission {
             overflow: hidden;
@@ -2163,6 +2164,8 @@
         #logbookPanel.board-logbook.is-active {
             display: block !important;
         }
+        /* Intentional: overrides the padding-bottom from the shared 3-panel reset block above,
+           specific to this panel only — not a duplicate. */
         #contractsBoardPanel {
             padding-bottom: 0 !important;
         }
@@ -2330,7 +2333,9 @@
             color: #ffffff;
             border-color: #348538;
         }
-        /* Falklands Harrier — Extra Dark Sea Grey body, Medium Sea Grey accents (military tickets) */
+        /* Intentional: defines CSS custom properties only (military theme tokens) — distinct
+           purpose from the other two #contractsBoardPanel blocks, not a duplicate.
+           Falklands Harrier — Extra Dark Sea Grey body, Medium Sea Grey accents (military tickets) */
         #contractsBoardPanel {
             --bg-ticket-military: #3A4044;
             --border-ticket-military: #7A8794;
@@ -3037,6 +3042,8 @@
             text-transform: uppercase;
             letter-spacing: 0.02em;
         }
+        /* Intentional: cascading override of font-size/weight/line-height/letter-spacing/color
+           from the shared .contract-ticket-title block above — not a duplicate. */
         .contract-ticket-mission {
             font-size: 33px;
             font-weight: 800;
@@ -3316,6 +3323,8 @@
             background: var(--military-ticket-body, var(--bg-ticket-military));
         }
         /* SimBrief + PLN are the focus actions after Accept */
+        /* Intentional: complementary to the shared base block above (grouped with .contract-ticket-accept/
+           -reselect) — no overlapping properties, not a duplicate. */
         .contract-ticket-export .dispatch-action-btn {
             width: 100%;
             justify-content: center;
@@ -3669,6 +3678,8 @@
             box-shadow: none;
             box-sizing: border-box;
         }
+        /* Intentional: complementary to the shared reset block above (grouped with .logbook-sheet) —
+           no overlapping properties, not a duplicate. */
         .board-settings .settings-sheet {
             display: flex;
             flex-direction: column;
@@ -3770,19 +3781,11 @@
         .board-logbook .pagination-indicator {
             color: var(--board-text-muted);
         }
-        #logbookTable .lb-route {
-            width: 104px;
-            max-width: 104px;
-        }
         #dispatchRelease {
             display: none !important;
         }
-        /* TODO(cleanup): duplicate #generateFlightBtn idle rule — consolidate with .board-sidebar-form block above */
-        #generateFlightBtn {
-            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
-            color: #ffffff !important;
-            border: 1px solid #348538 !important;
-        }
+        /* Removed: duplicate #generateFlightBtn idle rule — identical values already set on the
+           .board-sidebar-form #generateFlightBtn block above; consolidated per TODO. */
         .form-grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
