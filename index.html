@@ -314,13 +314,6 @@
 <div id="logbookPanel" class="settings-panel settings-group board-logbook">
         <h3>PILOT LOGBOOK</h3>
         <div class="logbook-sheet">
-        <div id="logbookBackupBanner" class="logbook-backup-banner" hidden>
-            <span id="logbookBackupBannerMsg" class="logbook-backup-banner-msg"></span>
-            <div class="logbook-backup-banner-actions">
-                <button type="button" class="logbook-backup-banner-btn logbook-backup-banner-btn--primary" onclick="exportFromLogbookBanner()">Export Now</button>
-                <button type="button" class="logbook-backup-banner-btn logbook-backup-banner-btn--ghost" onclick="dismissLogbookBackupBanner()">Dismiss</button>
-            </div>
-        </div>
         <div class="db-stats-container logbook-stats-grid">
             <div class="db-stat-item db-stat-item--static">
                 <span>Total Flights</span>
@@ -359,7 +352,11 @@
         </div>
         <div class="logbook-actions">
             <a href="#" id="addLastFlightLink" onclick="event.preventDefault(); addLastFlightToLogbook();">Add last flight to logbook</a>
-            <a href="#" id="clearLogbookLink" class="link-danger is-disabled" aria-disabled="true" onclick="event.preventDefault(); clearLogbook();">Clear entire logbook</a>
+            <div class="logbook-actions-right">
+                <a href="#" id="exportLogbookLink" onclick="event.preventDefault(); exportDatabaseBackup();">Export Logbook</a>
+                <span class="field-hint-sep">/</span>
+                <a href="#" id="clearLogbookLink" class="link-danger is-disabled" aria-disabled="true" onclick="event.preventDefault(); clearLogbook();">Clear entire logbook</a>
+            </div>
         </div>
         </div>
     </div>
@@ -689,6 +686,28 @@
                 <button type="button" class="backup-btn backup-btn--reset" onclick="resetCustomDatabase()">Reset Custom Database</button>
                 <button type="button" class="backup-btn backup-btn--import" onclick="document.getElementById('importFileInput').click()">Import Backup</button>
             </div>
+            <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
+            <div class="backup-info-grid">
+                <details class="info-details reset-db-info backup-info-reset">
+                    <summary>What does Reset Custom Database do?</summary>
+                    <div class="info-details-body">
+                        <strong>Step-by-Step</strong>
+                        <ul class="numbered-list">
+                            <li><strong>1. Confirmation:</strong> A dialog asks for permission to wipe custom data.</li>
+                            <li><strong>2. Deletion:</strong> Custom airports, custom aircraft, custom mission assignments, Job Ticket FX settings, and your Owned Airports list are removed from your browser's local memory.</li>
+                            <li><strong>3. What about my Logbook?:</strong> Your Logbook is not deleted when you click Reset Custom Database. You can clear your logbook entries on the Pilot Logbook page.</li>
+                            <li><strong>4. Reassurance:</strong> Clicking Reset Custom Database does not clear your cookies, bookmarks, or browsing history; it only affects the specific VECTOR information listed above.</li>
+                            <li><strong>5. Clean up:</strong> The interface will update to reflect the empty database.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="info-details reset-db-info backup-info-export">
+                    <summary>What does Export Backup do?</summary>
+                    <div class="info-details-body">
+                        Export Backup saves a local copy of any custom airports, custom aircraft (including Job Ticket FX settings and custom mission settings), your Logbook, and your Owned Airports list.
+                    </div>
+                </details>
+            </div>
             <div id="manageCustomDbPanel" class="manage-custom-db-inline" style="display: none;">
             <h3 style="margin-top: 0;">Manage Custom Database</h3>
                 <h4 class="manage-custom-db-heading">Custom Airports</h4>
@@ -720,28 +739,6 @@
                         <tbody id="manageCustomAircraftBody"></tbody>
                     </table>
                 </div>
-            </div>
-            <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
-            <div class="backup-info-grid">
-                <details class="info-details reset-db-info backup-info-reset">
-                    <summary>What does Reset Custom Database do?</summary>
-                    <div class="info-details-body">
-                        <strong>Step-by-Step</strong>
-                        <ul class="numbered-list">
-                            <li><strong>1. Confirmation:</strong> A dialog asks for permission to wipe custom data.</li>
-                            <li><strong>2. Deletion:</strong> Custom airports, custom aircraft, custom mission assignments, Job Ticket FX settings, and your Owned Airports list are removed from your browser's local memory.</li>
-                            <li><strong>3. What about my Logbook?:</strong> Your Logbook is not deleted when you click Reset Custom Database. You can clear your logbook entries on the Pilot Logbook page.</li>
-                            <li><strong>4. Reassurance:</strong> Clicking Reset Custom Database does not clear your cookies, bookmarks, or browsing history; it only affects the specific VECTOR information listed above.</li>
-                            <li><strong>5. Clean up:</strong> The interface will update to reflect the empty database.</li>
-                        </ul>
-                    </div>
-                </details>
-                <details class="info-details reset-db-info backup-info-export">
-                    <summary>What does Export Backup do?</summary>
-                    <div class="info-details-body">
-                        Export Backup saves a local copy of any custom airports, custom aircraft (including Job Ticket FX settings and custom mission settings), your Logbook, and your Owned Airports list.
-                    </div>
-                </details>
             </div>
         </div>
         <hr class="config-separator">

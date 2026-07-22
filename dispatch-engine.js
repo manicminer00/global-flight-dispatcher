@@ -33,15 +33,15 @@ function bindVectorDialogChrome() {
     if (!els.backdrop || els.backdrop.dataset.bound === "1") return;
     els.backdrop.dataset.bound = "1";
     if (els.closeBtn) {
-        els.closeBtn.addEventListener("click", () => closeVectorDialog(false));
+        els.closeBtn.addEventListener("click", () => closeVectorDialog(null));
     }
     els.backdrop.addEventListener("click", (e) => {
-        if (e.target === els.backdrop) closeVectorDialog(false);
+        if (e.target === els.backdrop) closeVectorDialog(null);
     });
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape" && vectorDialogState.resolver != null) {
             e.preventDefault();
-            closeVectorDialog(false);
+            closeVectorDialog(null);
         }
     });
 }
@@ -54,7 +54,7 @@ function openVectorDialog(options) {
         return Promise.resolve(opts.kind === "confirm" ? false : undefined);
     }
     if (vectorDialogState.resolver != null) {
-        closeVectorDialog(false);
+        closeVectorDialog(null);
     }
     const kind = opts.kind || "info";
     const isConfirm = kind === "confirm";
@@ -75,8 +75,15 @@ function openVectorDialog(options) {
         return btn;
     };
     if (isConfirm) {
-        els.actions.appendChild(makeBtn(opts.cancelLabel || "Cancel", false, false));
-        els.actions.appendChild(makeBtn(opts.confirmLabel || "Confirm", true, true));
+        const cancelBtn = makeBtn(opts.cancelLabel || "Cancel", false, false);
+        const confirmBtn = makeBtn(opts.confirmLabel || "Confirm", true, true);
+        if (opts.confirmFirst) {
+            els.actions.appendChild(confirmBtn);
+            els.actions.appendChild(cancelBtn);
+        } else {
+            els.actions.appendChild(cancelBtn);
+            els.actions.appendChild(confirmBtn);
+        }
     } else {
         els.actions.appendChild(makeBtn(opts.confirmLabel || (isNotam ? "Accept" : "Close"), true, true));
     }
@@ -104,7 +111,8 @@ function vectorConfirm(message, options) {
         kind: "confirm",
         message: message,
         confirmLabel: (options && options.confirmLabel) || "Confirm",
-        cancelLabel: (options && options.cancelLabel) || "Cancel"
+        cancelLabel: (options && options.cancelLabel) || "Cancel",
+        confirmFirst: options && options.confirmFirst
     });
 }
 
@@ -5497,38 +5505,25 @@ function getLogbookBackupDismissedAt() {
 function resetLogbookBackupNudgeState() {
     localStorage.removeItem(LOGBOOK_FLIGHTS_SINCE_EXPORT_KEY);
     localStorage.removeItem(LOGBOOK_BACKUP_DISMISSED_AT_KEY);
-    hideLogbookBackupBanner();
 }
 
-function showLogbookBackupBanner(count) {
-    const banner = document.getElementById("logbookBackupBanner");
-    if (!banner) return;
-    const msgEl = document.getElementById("logbookBackupBannerMsg");
-    if (msgEl) msgEl.textContent = count + " flight" + (count === 1 ? "" : "s") + " saved since your last backup.";
-    banner.hidden = false;
-}
-
-function hideLogbookBackupBanner() {
-    const banner = document.getElementById("logbookBackupBanner");
-    if (banner) banner.hidden = true;
-}
-
-function dismissLogbookBackupBanner() {
+function dismissLogbookBackupReminder() {
     localStorage.setItem(LOGBOOK_BACKUP_DISMISSED_AT_KEY, String(getLogbookFlightsSinceExport()));
-    hideLogbookBackupBanner();
 }
 
-function exportFromLogbookBanner() {
-    exportDatabaseBackup();
-}
-
-function maybeShowLogbookBackupBanner() {
+async function maybeShowLogbookBackupBanner() {
     const sinceExport = getLogbookFlightsSinceExport();
     const dismissedAt = getLogbookBackupDismissedAt();
-    if (sinceExport - dismissedAt >= LOGBOOK_BACKUP_BATCH) {
-        showLogbookBackupBanner(sinceExport);
+    if (sinceExport - dismissedAt < LOGBOOK_BACKUP_BATCH) return;
+    const shouldExport = await vectorConfirm("Do you want to back up your logbook now?", {
+        confirmLabel: "Export Now",
+        cancelLabel: "Dismiss",
+        confirmFirst: true
+    });
+    if (shouldExport) {
+        exportDatabaseBackup();
     } else {
-        hideLogbookBackupBanner();
+        dismissLogbookBackupReminder();
     }
 }
 
@@ -5745,16 +5740,28 @@ async function removeLogbookEntry(index) {
 async function clearLogbook() {
     const logbook = JSON.parse(localStorage.getItem("dispatcher_logbook")) || [];
     if (!logbook.length) return;
-    if (await vectorConfirm("Are you sure you want to delete your entire flight history? This cannot be undone.")) {
-        localStorage.removeItem("dispatcher_logbook");
-        localStorage.removeItem("dispatcher_last_arrival");
-        resetLogbookBackupNudgeState();
-        document.getElementById("useLastArrivalToggle").checked = false;
-        document.getElementById("depOverrideInput").value = "";
-        currentLogbookPage = 1;
-        updateLogbookUI();
-        updateDatabaseStats();
+    const backupFirst = await vectorConfirm("This will permanently delete your entire flight history. Would you like to back it up first, or clear it without backing up?", {
+        confirmLabel: "Back Up & Clear",
+        cancelLabel: "Clear Without Backup",
+        confirmFirst: true
+    });
+    if (backupFirst === null) return; // dismissed (X, Escape, backdrop) - abort, no second prompt
+    if (backupFirst) {
+        exportDatabaseBackup();
+    } else if (!(await vectorConfirm("Are you sure you want to permanently delete your entire flight history without a backup? This cannot be undone.", {
+        confirmLabel: "Delete Without Backup",
+        cancelLabel: "Cancel"
+    }))) {
+        return;
     }
+    localStorage.removeItem("dispatcher_logbook");
+    localStorage.removeItem("dispatcher_last_arrival");
+    resetLogbookBackupNudgeState();
+    document.getElementById("useLastArrivalToggle").checked = false;
+    document.getElementById("depOverrideInput").value = "";
+    currentLogbookPage = 1;
+    updateLogbookUI();
+    updateDatabaseStats();
 }
 function initBoardPreviewTickets() {
     const session = loadBoardSession();
