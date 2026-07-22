@@ -62,9 +62,13 @@ window.VECTOR_DEFAULT_SETTINGS = {
       },
       "183": {
         "enabled": true,
-        "variant": "monolith"
+        "variant": "alien"
       },
       "204": {
+        "enabled": true,
+        "variant": "alien"
+      },
+      "210": {
         "enabled": true,
         "variant": "alien"
       }

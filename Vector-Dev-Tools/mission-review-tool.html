@@ -177,7 +177,7 @@
 
   <div id="reviewScreen" style="display:none;">
     <div class="toolbar">
-      <div class="progress">Mission <b id="posLabel">0</b> of <b id="totalLabel">0</b> &nbsp;&bull;&nbsp; <span id="reviewedLabel"></span></div>
+      <div class="progress">Mission <b id="posLabel">0</b> &nbsp;&bull;&nbsp; <span id="totalLabel">0</span> staged &nbsp;&bull;&nbsp; <span id="reviewedLabel"></span></div>
       <button id="btnExport" class="export-btn">Export mission-rewrites-staging.json</button>
     </div>
 
@@ -261,7 +261,7 @@
 
   function renderCurrent() {
     var m = missions[currentIndex];
-    document.getElementById('posLabel').textContent = (currentIndex + 1);
+    document.getElementById('posLabel').textContent = m.imgId;
     var reviewedCount = missions.filter(function (x) { return x.reviewed; }).length;
     document.getElementById('reviewedLabel').textContent = reviewedCount + ' reviewed (in memory)';
 
