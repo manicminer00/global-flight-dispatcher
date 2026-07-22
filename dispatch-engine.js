@@ -1342,12 +1342,23 @@ function formatBoardAircraftDisplayName(name) {
 }
 
 function fillBoardRouteCells(card, origin, destination) {
-    const setText = (role, text) => {
+    const ownedList = getOwnedAirportList();
+    const setIcao = (role, airport) => {
         const el = card.querySelector(`[data-role="${role}"]`);
-        if (el) el.textContent = text;
+        if (!el) return;
+        const icao = airport && airport.icao ? String(airport.icao).toUpperCase() : "";
+        if (!icao) {
+            el.textContent = "—";
+            return;
+        }
+        if (ownedList.includes(icao)) {
+            el.innerHTML = `<span class="owned-airport-icao">${escapeHtml(icao)}</span>`;
+        } else {
+            el.textContent = icao;
+        }
     };
-    setText("dep-icao", origin && origin.icao ? String(origin.icao).toUpperCase() : "—");
-    setText("arr-icao", destination && destination.icao ? String(destination.icao).toUpperCase() : "—");
+    setIcao("dep-icao", origin);
+    setIcao("arr-icao", destination);
 }
 
 function formatBoardTicketMetaHtml(result) {
@@ -4992,9 +5003,9 @@ function probeDispatchFlight(config) {
     const distanceAltCap = Math.max(distanceNm * climbProfile, finalMinAlt);
     const effectiveMaxAlt = Math.max(Math.min(spec.maxAlt, distanceAltCap), terrainSafetyFloor);
     const safeMaxAlt = effectiveMaxAlt;
-    const dynamicMinAlt = effectiveMaxAlt < finalMinAlt 
+    const dynamicMinAlt = effectiveMaxAlt < finalMinAlt
         ? Math.max(terrainSafetyFloor, safeMaxAlt - 4000)
-        : Math.max(finalMinAlt, safeMaxAlt - 4000);
+        : finalMinAlt;
         
     let baseThousands = Math.floor((Math.random() * (safeMaxAlt - dynamicMinAlt + 1) + dynamicMinAlt) / 1000);
     

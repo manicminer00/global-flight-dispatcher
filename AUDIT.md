@@ -67,6 +67,18 @@ D. 16 dead functions in dispatch-engine.js — each verified individually (zero 
 
 Verdict: SAFE TO REMOVE for all 16 (each confirmed with zero references).
 
+CORRECTION (2026-07-22): formatRoutingAirportLabel was NOT safe to remove and its removal
+was a real regression, confirmed and fixed. It was the function that rendered owned-airport
+ICAO codes in green (`.owned-airport-icao`, still defined in styles.css) on job tickets —
+a live, wanted feature, not junk. It had zero call sites only because the ticket-rendering
+code had already moved to `fillBoardRouteCells()` (dispatch-engine.js) without being updated
+to reproduce the green-highlight behavior, so the feature silently stopped working while the
+CSS class sat orphaned. Fixed by adding an owned-airport check directly into
+`fillBoardRouteCells()` instead of restoring the old function. User-tested and confirmed
+working. See PATCH_NOTES.md 2026-07-22 and memory file feedback_dead_code_audits.md for the
+general lesson: an orphaned CSS class or setting tied to a "dead" function is a sign of a
+regression, not proof the code was safe to delete.
+
 E. Other orphaned CSS classes (defined, never used in HTML or JS) — 16 more beyond the clusters above, all individually confirmed zero-usage:
 
 sidebar-section-divider (617,631) · checkbox-q-tail (784) · slider-label (1165) · checkbox-option--unavailable (1253) · dis · additional-options-title (1277,1307 — a third definition at 3586 IS used, see §2) · dep-routing-labels (1285,1288,1293) ·dep-routing-inputs (1296,1300) · custom-airframe-header-row (1435,1444,1448) · ticket-note-military/ticket-lined-rows/ticket-row/ticket-mission-text (1611-1636) · contracts-board-disclaimer (2148) · panel-btn-row (2188,2195) · military-airbase-row (2258) · contract-ticket-lock/contract-ticket-kicker/contract-ticket-airports/contract-ticket-photo-stripe (3178-3181) · mission-category-hint (3969) · mission-tags-grid (3980) · tag-hint (3985) · dispatch-hr (3988)

@@ -6,6 +6,28 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ## 2026-07-22
 
+- **Owned-airport green ICAO highlight restored on job tickets** — codes in the Owned
+  Airports list stopped showing green on tickets. Root cause: `formatRoutingAirportLabel`,
+  the function that applied the `.owned-airport-icao` CSS class, was removed as "dead code"
+  in a prior audit (AUDIT.md §1D) because it had zero call sites — but it was still a live
+  feature, just orphaned when ticket rendering moved to `fillBoardRouteCells()` without
+  being updated to match. Fixed by adding the owned-airport check directly into
+  `fillBoardRouteCells()` (dispatch-engine.js). Also reviewed the "Enable Preferred Routing"
+  logic (`buildContractorRoutePool`, used on both the contractor and normal dispatch paths)
+  and confirmed it was never affected — owned airports are still weighted into route
+  selection correctly. User-tested and confirmed working. AUDIT.md §1D corrected in place.
+- **Cruise-altitude randomization window widened off the ceiling** — the simplified
+  terrain/altitude dispatch logic (still live: feeds SimBrief's `fl=` param and the
+  generated `.pln` file's altitude, even though altitude was removed from the ticket
+  display long ago) was picking cruise altitude from only the top 4000ft below the
+  aircraft's effective ceiling, regardless of the true minimum required altitude. This
+  explains consistently near-max-altitude dispatches. Fixed the non-distance-limited case
+  in the altitude calc (dispatch-engine.js, `dynamicMinAlt`) to use the full min-to-max
+  range. Not yet tested in-app. Follow-up planned: the altitude cap still only accounts for
+  climb distance, not descent distance, which can dispatch altitudes unreachable within a
+  short flight's remaining distance before landing (user-reported: can't reach cruise
+  before ATC calls for descent on ~60-70 min flights). Full climb+descent-aware rework
+  planned for next session.
 - **Short-haul dispatched block time now scales tolerance with the slider target** — the
   actual dispatched block time was drifting well past the target (e.g. a 60 min target
   often landing at 75). Root cause: the fallback/relaxed tolerance tiers used flat minutes
