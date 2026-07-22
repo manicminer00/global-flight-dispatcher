@@ -606,7 +606,7 @@
                     <label class="checkbox-option" for="newAcMilitary">
                         <input type="checkbox" id="newAcMilitary" onchange="updateCustomAircraftForm()">Military Aircraft</label>
                     <label class="checkbox-option checkbox-sub-option" id="acTagCivilOkWrap" for="newAcCivilOk" style="display: none;">
-                        <input type="checkbox" id="newAcCivilOk"><span class="checkbox-sub-prefix">&gt;</span>Can also fly civilian contracts</label>
+                        <input type="checkbox" id="newAcCivilOk">Can also fly civilian contracts</label>
                 </div>
                 <div id="acTagFighterWrap" class="checkbox-option" style="display: none;">
                     <input type="checkbox" id="newAcFighter">
@@ -722,28 +722,30 @@
                 </div>
             </div>
             <input type="file" id="importFileInput" style="display:none;" accept=".json" onchange="importDatabaseBackup(this)">
-            <details class="info-details reset-db-info">
-                <summary>What does Export Backup do?</summary>
-                <div class="info-details-body">
-                    Export Backup saves a local copy of any custom airports, custom aircraft (including Job Ticket FX settings and custom mission settings), your Logbook, and your Owned Airports list.
-                </div>
-            </details>
-            <details class="info-details reset-db-info">
-                <summary>What does Reset Custom Database do?</summary>
-                <div class="info-details-body">
-                    <strong>Step-by-Step</strong>
-                    <ul class="numbered-list">
-                        <li><strong>1. Confirmation:</strong> A dialog asks for permission to wipe custom data.</li>
-                        <li><strong>2. Deletion:</strong> Custom airports, custom aircraft, custom mission assignments, Job Ticket FX settings, and your Owned Airports list are removed from your browser's local memory.</li>
-                        <li><strong>3. What about my Logbook?:</strong> Your Logbook is not deleted when you click Reset Custom Database. You can clear your logbook entries on the Pilot Logbook page.</li>
-                        <li><strong>4. Reassurance:</strong> Clicking Reset Custom Database does not clear your cookies, bookmarks, or browsing history; it only affects the specific VECTOR information listed above.</li>
-                        <li><strong>5. Clean up:</strong> The interface will update to reflect the empty database.</li>
-                    </ul>
-                </div>
-            </details>
+            <div class="backup-info-grid">
+                <details class="info-details reset-db-info backup-info-reset">
+                    <summary>What does Reset Custom Database do?</summary>
+                    <div class="info-details-body">
+                        <strong>Step-by-Step</strong>
+                        <ul class="numbered-list">
+                            <li><strong>1. Confirmation:</strong> A dialog asks for permission to wipe custom data.</li>
+                            <li><strong>2. Deletion:</strong> Custom airports, custom aircraft, custom mission assignments, Job Ticket FX settings, and your Owned Airports list are removed from your browser's local memory.</li>
+                            <li><strong>3. What about my Logbook?:</strong> Your Logbook is not deleted when you click Reset Custom Database. You can clear your logbook entries on the Pilot Logbook page.</li>
+                            <li><strong>4. Reassurance:</strong> Clicking Reset Custom Database does not clear your cookies, bookmarks, or browsing history; it only affects the specific VECTOR information listed above.</li>
+                            <li><strong>5. Clean up:</strong> The interface will update to reflect the empty database.</li>
+                        </ul>
+                    </div>
+                </details>
+                <details class="info-details reset-db-info backup-info-export">
+                    <summary>What does Export Backup do?</summary>
+                    <div class="info-details-body">
+                        Export Backup saves a local copy of any custom airports, custom aircraft (including Job Ticket FX settings and custom mission settings), your Logbook, and your Owned Airports list.
+                    </div>
+                </details>
+            </div>
         </div>
         <hr class="config-separator">
-        <div class="db-stats-container">
+        <div class="db-stats-container custom-db-stats">
             <div class="db-stat-item" onclick="toggleDropdown('customAirportsList')">
                 <span>Saved Airports</span>
                 <span id="customAirportsCount">0</span>
@@ -770,28 +772,28 @@
             </div>
             <div class="db-stat-cell">
                 <div class="db-stat-item" onclick="toggleDropdown('coreSmallDetailedList')">
-                    <span>📌 MSFS Small Detailed</span>
+                    <span>MSFS Small Detailed</span>
                     <span id="coreSmallDetailedCount">0</span>
                 </div>
                 <div id="coreSmallDetailedList" class="db-dropdown" style="display:none;"></div>
             </div>
             <div class="db-stat-cell">
                 <div class="db-stat-item" onclick="toggleDropdown('coreGliderportsList')">
-                    <span>🪂 MSFS Gliderports</span>
+                    <span>MSFS Gliderports</span>
                     <span id="coreGliderportsCount">0</span>
                 </div>
                 <div id="coreGliderportsList" class="db-dropdown" style="display:none;"></div>
             </div>
             <div class="db-stat-cell">
                 <div class="db-stat-item" onclick="toggleDropdown('coreThirdPartyList')">
-                    <span>🛒 Third Party Airports</span>
+                    <span>Third Party Airports</span>
                     <span id="coreThirdPartyCount">0</span>
                 </div>
                 <div id="coreThirdPartyList" class="db-dropdown" style="display:none;"></div>
             </div>
             <div class="db-stat-cell">
                 <div class="db-stat-item" onclick="toggleDropdown('coreMilitaryList')">
-                    <span>🪖 Military Bases</span>
+                    <span>Military Bases</span>
                     <span id="coreMilitaryCount">0</span>
                 </div>
                 <div id="coreMilitaryList" class="db-dropdown" style="display:none;"></div>

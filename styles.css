@@ -277,7 +277,7 @@
             gap: 28px;
             flex: 1 1 auto;
             min-width: 0;
-            margin-right: calc(var(--board-site-width) - var(--board-header-width));
+            margin-right: calc(var(--board-site-width) - var(--board-header-width) - var(--board-ticket-gutter-right));
         }
         .board-topbar-nav {
             display: flex;
@@ -342,7 +342,7 @@
             border-top: 1px solid var(--board-border);
             margin: 0 0 0 16px;
             flex-shrink: 0;
-            width: calc(var(--board-header-width) - 16px);
+            width: calc(var(--board-header-width) + var(--board-ticket-gutter-right) - 16px);
         }
         .app-body {
             display: flex;
@@ -944,8 +944,8 @@
         }
         .board-app-footer {
             position: absolute;
-            left: 0;
-            right: 0;
+            left: 16px;
+            right: var(--board-main-pad-x);
             bottom: 0;
             z-index: 30;
             flex-shrink: 0;
@@ -1550,8 +1550,8 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-template-rows: auto auto;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 0;
         }
         .backup-btn-grid .backup-btn {
             width: 100%;
@@ -1560,8 +1560,19 @@
         .backup-btn-grid .backup-btn--export { grid-column: 2; grid-row: 1; }
         .backup-btn-grid .backup-btn--reset  { grid-column: 1; grid-row: 2; }
         .backup-btn-grid .backup-btn--import { grid-column: 2; grid-row: 2; }
+        .backup-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding-top: var(--spacing-inner);
+        }
+        .backup-info-grid .info-details {
+            margin: 0 !important;
+        }
+        .backup-info-reset { grid-column: 1; }
+        .backup-info-export { grid-column: 2; }
         .backup-actions {
-            margin-bottom: 10px;
+            margin-bottom: 0;
         }
         button, .backup-btn, a.simbrief-btn {
             height: 48px;
@@ -1840,6 +1851,12 @@
             color: var(--color-link-readme);
         }
         .db-stats-container { margin-bottom: 15px; }
+        .custom-db-stats .db-stat-item {
+            margin-bottom: 12px;
+        }
+        .custom-db-stats .db-stat-item:last-of-type {
+            margin-bottom: 0;
+        }
         #appVersionLabel {
             margin: 0;
         }
@@ -2693,7 +2710,7 @@
             text-shadow: 0 0 8px rgba(109, 255, 150, 0.55);
         }
         .contract-ticket.ticket-photo-fx-crt .contract-ticket-photo-brief {
-            font-size: 14px;
+            font-size: 16px;
             line-height: 1.4;
         }
         /* Vintage phosphor CRT — heritage airframes; military tickets keep green above */
@@ -2740,14 +2757,7 @@
         .contract-ticket.ticket-photo-fx-crt.is-vintage-crt:not(.is-military) .contract-ticket-photo-matrix {
             background: #100c06;
         }
-        .contract-ticket.ticket-photo-fx-crt.is-vintage-crt:not(.is-military) .contract-ticket-matrix-col {
-            color: #6b5f2a;
-            text-shadow: 0 0 4px rgba(180, 160, 80, 0.35);
-        }
-        .contract-ticket.ticket-photo-fx-crt.is-vintage-crt:not(.is-military) .contract-ticket-matrix-col span:last-child {
-            color: #e8dcb0;
-            text-shadow: 0 0 10px rgba(232, 220, 176, 0.85), 0 0 4px rgba(201, 188, 122, 0.5);
-        }
+        /* Matrix/alien mission text always stays green — no per-style color override here (Vintage). */
         /* LED avionics (Garmin G5000-style) — modern business jets; FA50 stays vintage above */
         .contract-ticket.ticket-photo-fx-crt.is-led-crt:not(.is-military) .contract-ticket-photo {
             filter: none;
@@ -2779,16 +2789,7 @@
         .contract-ticket.ticket-photo-fx-crt.is-led-crt:not(.is-military) .contract-ticket-photo-matrix {
             background: #000000;
         }
-        .contract-ticket.ticket-photo-fx-crt.is-led-crt:not(.is-military) .contract-ticket-matrix-col {
-            font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-            font-weight: 400;
-            color: #00ffff;
-            text-shadow: none;
-        }
-        .contract-ticket.ticket-photo-fx-crt.is-led-crt:not(.is-military) .contract-ticket-matrix-col span:last-child {
-            color: #00ff00;
-            text-shadow: none;
-        }
+        /* Matrix/alien mission text always stays green — no per-style color override here (LED). */
         /* Airliner MCDU — A320 / 737-style mainline jets */
         .contract-ticket.ticket-photo-fx-crt.is-mcdu-crt:not(.is-military) .contract-ticket-photo {
             filter: none;
@@ -2821,16 +2822,7 @@
         .contract-ticket.ticket-photo-fx-crt.is-mcdu-crt:not(.is-military) .contract-ticket-photo-matrix {
             background: #000000;
         }
-        .contract-ticket.ticket-photo-fx-crt.is-mcdu-crt:not(.is-military) .contract-ticket-matrix-col {
-            font-family: "Courier New", Courier, monospace;
-            font-weight: 400;
-            color: #00ff41;
-            text-shadow: none;
-        }
-        .contract-ticket.ticket-photo-fx-crt.is-mcdu-crt:not(.is-military) .contract-ticket-matrix-col span:last-child {
-            color: #f0f0f0;
-            text-shadow: none;
-        }
+        /* Matrix/alien mission text always stays green — no per-style color override here (MCDU). */
         /* Regional jet MCDU — Collins CRJ-style */
         .contract-ticket.ticket-photo-fx-crt.is-regional-mcdu-crt:not(.is-military) .contract-ticket-photo {
             filter: none;
@@ -2862,16 +2854,7 @@
         .contract-ticket.ticket-photo-fx-crt.is-regional-mcdu-crt:not(.is-military) .contract-ticket-photo-matrix {
             background: #030812;
         }
-        .contract-ticket.ticket-photo-fx-crt.is-regional-mcdu-crt:not(.is-military) .contract-ticket-matrix-col {
-            font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-            font-weight: 400;
-            color: #5eb8d9;
-            text-shadow: none;
-        }
-        .contract-ticket.ticket-photo-fx-crt.is-regional-mcdu-crt:not(.is-military) .contract-ticket-matrix-col span:last-child {
-            color: #ffe566;
-            text-shadow: none;
-        }
+        /* Matrix/alien mission text always stays green — no per-style color override here (Regional MCDU). */
         /* Starship Collins CRT — cyan headers / green data */
         .contract-ticket.ticket-photo-fx-crt.is-starship-crt:not(.is-military) .contract-ticket-photo {
             filter: contrast(1.08) brightness(0.88);
@@ -2902,16 +2885,7 @@
         .contract-ticket.ticket-photo-fx-crt.is-starship-crt:not(.is-military) .contract-ticket-photo-matrix {
             background: #040a0e;
         }
-        .contract-ticket.ticket-photo-fx-crt.is-starship-crt:not(.is-military) .contract-ticket-matrix-col {
-            font-family: "Courier New", Courier, monospace;
-            font-weight: 400;
-            color: #5ce1e6;
-            text-shadow: none;
-        }
-        .contract-ticket.ticket-photo-fx-crt.is-starship-crt:not(.is-military) .contract-ticket-matrix-col span:last-child {
-            color: #4ade80;
-            text-shadow: none;
-        }
+        /* Matrix/alien mission text always stays green — no per-style color override here (Starship). */
         .contract-ticket-photo-brief.is-matrix-mode {
             top: auto;
             bottom: 10px;
@@ -3566,9 +3540,9 @@
         }
         #settingsPanel.board-settings .photo-filter-btn-grid .photo-filter-btn.photo-filter-btn--active,
         #settingsPanel.board-settings .photo-filter-btn-grid .photo-filter-btn.is-active {
-            background: #22252b !important;
-            color: var(--board-text-primary) !important;
-            border-color: var(--board-focus-ring) !important;
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%) !important;
+            color: #ffffff !important;
+            border: none !important;
         }
         #settingsPanel.board-settings .backup-btn-grid {
             display: grid;

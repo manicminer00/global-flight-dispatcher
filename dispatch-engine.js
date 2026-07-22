@@ -1216,14 +1216,7 @@ function isCelebrityJobTitle(result) {
 
 function getScenarioJobTitle(result) {
     if (!result) return "";
-    const imgId = Number(
-        result.scenarioImgId
-        ?? (result.scenario && result.scenario.imgId)
-        ?? result.imageId
-        ?? 0
-    );
-    if (!imgId || typeof SCENARIO_JOB_TITLES === "undefined") return "";
-    return SCENARIO_JOB_TITLES[imgId] || "";
+    return (result.scenario && result.scenario.title) || "";
 }
 
 function resolveContractJobTitle(result, ticketIndex) {

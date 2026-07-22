@@ -2,9 +2,9 @@
   {
     "imgId": 33,
     "oldTitle": "Regional Hop",
-    "newTitle": "Regional Commuter Run",
+    "newTitle": "Regional Commuter",
     "oldBrief": "This is a short regional sector. The cabin is full of young professionals on their way to meetings. The wheels of commerce keep turning thanks to your skills as a pilot.",
-    "newBrief": "Coffee in hand and half-awake, the regional crowd's stacked up for another meeting rush. Keep the short hop easy and get them there while the caffeine's still working.",
+    "newBrief": "Coffee in hand and half-awake, the queue is long for the first flight out. Keep it smooth and get your passengers to their destination while the caffeine's still working.",
     "imagePath": "../images-missions/mission33.jpg",
     "reviewed": true
   },
@@ -13,7 +13,7 @@
     "oldTitle": "Late-Evening Commuter",
     "newTitle": "Late Night Commuter",
     "oldBrief": "Tonight's late commuter sector should be a quiet one. The sky is empty tonight. Climb efficiently and do not waste fuel. The company is clamping down hard and wants to save money.",
-    "newBrief": "Tonight's board has gone quiet and the sky's empty. Climb clean and don't burn a drop you don't need. Ops upstairs is watching the fuel bill hard tonight.",
+    "newBrief": "Tonight's departure board has gone quiet. Climb smoothly and don't burn fuel you don't need. Ops are watching the fuel bill with eagle eyes.",
     "imagePath": "../images-missions/mission36.jpg",
     "reviewed": true
   },
@@ -31,7 +31,7 @@
     "oldTitle": "Formula One Chassis",
     "newTitle": "Podium Bound Freight",
     "oldBrief": "High-value, time-critical Formula One chassis needs transporting for a race. You cannot afford to make a mistake with this one. These cars cost upwards of $15 million, so take it easy.",
-    "newBrief": "The team needs this chassis trackside for the weekend, and it's worth more than most people's houses. These cars run $15 million a piece, so one rough patch of air could end a season early. Fly it like it matters.",
+    "newBrief": "The team needs this chassis trackside for the weekend, and it's worth more than most people's houses. These cars run $15 million a piece, so one rough patch of air could end a season early.",
     "imagePath": "../images-missions/mission119.jpg",
     "reviewed": true
   },
@@ -40,7 +40,7 @@
     "oldTitle": "Patient Airlift",
     "newTitle": "Priority Medical Transfer",
     "oldBrief": "The patient is stable, but rough air will not help their condition. Watch the weather radar and keep the ride smooth all the way in. The medical team are already on board and expecting the patient soon.",
-    "newBrief": "Turbulence won't do this patient any favors, so watch the radar and keep it smooth all the way down. The medical team's already strapped in beside you, counting on a gentle ride.",
+    "newBrief": "Turbulence won't do this patient any favors, so watch the radar and keep it smooth all the way down. The medical team's already strapped in beside you.",
     "imagePath": "../images-missions/mission69.jpg",
     "reviewed": true
   },
@@ -67,7 +67,7 @@
     "oldTitle": "VIP Private Gala",
     "newTitle": "Private Gala Charter",
     "oldBrief": "This VIP charter has a bar stocked for comfort and fun. Make the landing butter-smooth so the passenger arrives in a good mood and ignore any guffawing coming from the cabin.",
-    "newBrief": "Tonight's {vip_type} expects the finer things. The bar's stocked and the cabin is ready for our guest. Keep the landing smooth enough that nobody in the cabin notices, and just pretend they're not doing what it looks like they are in the back.",
+    "newBrief": "Tonight's {vip_type} expects the finer things. The bar's stocked and the cabin is ready for our guest. Keep the landing smooth enough that nobody in the cabin notices.",
     "imagePath": "../images-missions/mission67.jpg",
     "reviewed": true
   },
@@ -76,16 +76,16 @@
     "oldTitle": "Cross-Country Task",
     "newTitle": "Thermal Cross Country",
     "oldBrief": "You will launch from {dep_field} and work lift toward {dest_field}. Read the sky — developing cumulus marks the thermals, with puffy tops and dark flat bases. Give decaying wispy cloud a wide berth. Stay VFR and arrive with height for a normal circuit.",
-    "newBrief": "Launch from {dep_field} and go hunting for lift toward {dest_field}. Puffy-topped cumulus with a flat, dark base is where the thermals live, so give the wispy, decaying stuff a wide berth. Stay VFR and keep enough height in hand for a normal circuit home.",
+    "newBrief": "Launch from {dep_field} and go hunting for lift toward {dest_field}. Puffy-topped cumulus with a flat, dark base is where the thermals live, so give the wispy, decaying stuff a wide berth.",
     "imagePath": "../images-missions/mission224.jpg",
     "reviewed": true
   },
   {
     "imgId": 151,
     "oldTitle": "Vintage Airframe ferry",
-    "newTitle": "Museum Bound Ferry",
+    "newTitle": "Museum Ferry",
     "oldBrief": "You are ferrying a vintage airframe to the museum. Treat her gently, stay well inside the structural limits — she is old and the museum wants her in one piece.",
-    "newBrief": "She's not getting any younger, and the museum's waiting with open doors. Fly her gently, stay well clear of the structural limits, and bring her home in one piece. This old airframe's earned an easy last leg.",
+    "newBrief": "She's not getting any younger, and the museum's waiting. Fly her gently, stay clear of the structural limits, and bring her home in one piece. This old airframe's earned an easy last leg.",
     "imagePath": "../images-missions/mission151.jpg",
     "reviewed": true
   },
@@ -103,7 +103,7 @@
     "oldTitle": "EGNS Steep Climb",
     "newTitle": "EGNS Steep Departure",
     "oldBrief": "Today's EGNS departure follows the noise-abatement profile. Fly the steep climb and keep it clean for the community underneath.",
-    "newBrief": "EGNS keeps a tight lid on noise near the coast. Hold the steep-climb profile out and keep it clean for the town below.",
+    "newBrief": "EGNS keeps a tight lid on noise near the coast. Hold the steep-climb profile out and keep it quiet for the people below.",
     "imagePath": "../images-missions/mission2.jpg",
     "reviewed": true
   },
@@ -128,36 +128,36 @@
   {
     "imgId": 5,
     "oldTitle": "High-Altitude Express",
-    "newTitle": "High Alt Express",
+    "newTitle": "High Altitude Express",
     "oldBrief": "You have pressurization and climb rate to work with today. Use both to get above the regional weather and keep your block time tight.",
-    "newBrief": "You're above the weather today, not fighting through it. Climb to altitude, hold the block times tight, and let the pressurization do the work the regional traffic can't.",
+    "newBrief": "You're above the weather today, not fighting through it. Climb to altitude, hold the block times, and don't forget to turn on the Oxygen for your passengers.",
     "imagePath": "../images-missions/mission5.jpg",
     "reviewed": true
   },
   {
     "imgId": 7,
     "oldTitle": "Whisperjet Run",
-    "newTitle": "Whisperjet Descent",
+    "newTitle": "Whisperjet",
     "oldBrief": "You were picked for this run because you are flying the 'Whisperjet'. Stick to the descent profile and be sure to lower flaps and gear in time for a clean landing.",
-    "newBrief": "This airframe is renowned for its exceptionally low noise levels and is why you got the call today. Fly the descent profile precisely, and lower flaps and gear in time for a clean landing without any errors.",
+    "newBrief": "This airframe is renowned for its exceptionally low noise levels and is why you got the call today. Fly the descent profile precisely, and lower flaps and gear in time for a clean landing.",
     "imagePath": "../images-missions/mission7.jpg",
     "reviewed": true
   },
   {
     "imgId": 8,
     "oldTitle": "Geological Research",
-    "newTitle": "Albatross Research Run",
+    "newTitle": "Geological Research",
     "oldBrief": "A local university wants optical data on changing topography below. Hold a steady low track and watch those radial engine temps on the Albatross.",
-    "newBrief": "A university team wants a look at how the ground's shifted since last season. Hold a steady low track and keep an eye on the radial temps, this old Albatross runs warm.",
+    "newBrief": "A university team wants to measure how the ground's shifted since last season. Hold a steady low track and keep an eye on the radial temps, this old Albatross runs warm.",
     "imagePath": "../images-missions/mission8.jpg",
     "reviewed": true
   },
   {
     "imgId": 9,
     "oldTitle": "Outpost Supply Run",
-    "newTitle": "Remote Outpost Run",
+    "newTitle": "Outpost Supply Run",
     "oldBrief": "Bulk provisions are bound for a distant outpost today. The Albatross is heavy and the equipment is getting old. Fly a standard approach and expect firm control inputs.",
-    "newBrief": "This outpost hasn't had a resupply run in weeks, and the Albatross is hauling every pound of it today. Lean on that heavy lift capacity and rugged gear, fly a standard approach, and expect the heavy control feel this old airframe is known for.",
+    "newBrief": "This outpost hasn't had a resupply in weeks, and the Albatross is hauling every pound of it today. Lean on that heavy lift capacity and rugged gear. Fly a smooth approach, and expect the heavy controls this old airframe is known for.",
     "imagePath": "../images-missions/mission9.jpg",
     "reviewed": true
   },
@@ -175,7 +175,7 @@
     "oldTitle": "Survey Flight",
     "newTitle": "Survey Team Transfer",
     "oldBrief": "Today you are flying a research team to their destination. Their equipment is sensitive to being thrown around, so fly a gentle landing and no steep turns.",
-    "newBrief": "The research team's gear in back doesn't like being thrown around. Fly a gentle landing, skip the steep turns, and get this survey crew down easy.",
+    "newBrief": "The research team's gear in the back doesn't like being thrown around. Fly a gentle landing, skip the steep turns, and get this crew down on the ground.",
     "imagePath": "../images-missions/mission11.jpg",
     "reviewed": true
   },
@@ -184,7 +184,7 @@
     "oldTitle": "Supply Drop",
     "newTitle": "Bulk Supply Drop",
     "oldBrief": "The team at your destination is waiting on bulk provisions. Fly a controlled approach and check landing conditions before you arrive.",
-    "newBrief": "The camp downrange is down to its last crates and waiting on you. Fly a controlled approach, check the strip conditions before committing, and get the drop in clean.",
+    "newBrief": "The camp at your destination is down to its last supplies and is waiting on you. Fly a controlled approach, check the strip conditions before committing, and get the drop in clean.",
     "imagePath": "../images-missions/mission12.jpg",
     "reviewed": true
   },
@@ -193,7 +193,7 @@
     "oldTitle": "SAR Operations",
     "newTitle": "Heritage SAR Demo",
     "oldBrief": "This commemorative route honours the crews who operated these flying boats. Keep your eyes outside, stay low where you can and fly smooth, sweeping turns.",
-    "newBrief": "Today's flight honours the old flying-boat crews who ran search and rescue in the Albatross. Keep your eyes outside, stay low where the terrain allows, and fly the sweeping turns like they used to.",
+    "newBrief": "Today's flight honours the old flying-boat crews who ran search and rescue in the Albatross. Keep your eyes outside and stay low where the terrain allows.",
     "imagePath": "../images-missions/mission13.jpg",
     "reviewed": true
   },
@@ -202,7 +202,7 @@
     "oldTitle": "Sports Team Charter",
     "newTitle": "Team Charter",
     "oldBrief": "{team}, the coaching staff and their medical kit are aboard. Keep the climb and descent gentle so nobody is bouncing around before the whistle blows.",
-    "newBrief": "{team}, the coaching staff and the medical team are enroute to their next match. Keep the climb and descent gentle so nobody's out of their seat before the whistle blows.",
+    "newBrief": "{team}, the coaching staff and the medical team are en route to their next match. Keep the climb and descent gentle so nobody's out of their seat before the whistle blows.",
     "imagePath": "../images-missions/mission14.jpg",
     "reviewed": true
   },
@@ -211,16 +211,16 @@
     "oldTitle": "Holiday Charter",
     "newTitle": "Annual Leave Charter",
     "oldBrief": "The cabin is full of holiday passengers on annual leave. Give them a steady ride and let their holidays start early.",
-    "newBrief": "This cabin's buzzing with excitement all around. Give your passengers a steady ride and let the holidays start as soon as the seatbelt sign goes off.",
+    "newBrief": "This cabin's buzzing with excitement all around. It looks like a lot of your passengers have already started the party before boarding the aircraft. Uh-oh.",
     "imagePath": "../images-missions/mission15.jpg",
     "reviewed": true
   },
   {
     "imgId": 16,
     "oldTitle": "Recovery Sector",
-    "newTitle": "Storm Recovery Sector",
+    "newTitle": "Storm Recovery",
     "oldBrief": "Yesterday's storms grounded half the network. You have a full cabin of tired passengers who just need to get where they were meant to be.",
-    "newBrief": "Yesterday's storms took out half the network and this cabin's been waiting it out. Get your passengers to where they were meant to be, steady and on time.",
+    "newBrief": "Yesterday's storms took out half the network and these people been waiting it out. Get your passengers to where they were meant to be, steady and on time.",
     "imagePath": "../images-missions/mission16.jpg",
     "reviewed": true
   },
@@ -265,7 +265,7 @@
     "oldTitle": "Network Recovery",
     "newTitle": "System Recovery Run",
     "oldBrief": "The passengers have been stuck for hours after the network went down. Climb smoothly, plan ahead during Cruise and call for Top of descent early. Time to get these people back home.",
-    "newBrief": "The network's been down for hours and these passengers are exhausted. Climb smooth, plan ahead through the cruise, call for top of descent early, and get these people home.",
+    "newBrief": "The network's been down for hours and these passengers are exhausted. Climb smooth, plan ahead, call for top of descent early, and get these people home.",
     "imagePath": "../images-missions/mission21.jpg",
     "reviewed": true
   },
@@ -274,7 +274,7 @@
     "oldTitle": "Corporate Summit",
     "newTitle": "Corporate Offsite Run",
     "oldBrief": "A corporate group is in the back after a long week away at a global offsite. No need for chatty PAs tonight. Fly a quiet, smooth sector and bring these folks back home.",
-    "newBrief": "This corporate group's had a long week away at their global offsite. Skip the chatty PAs tonight. Fly it quiet and smooth and get them home.",
+    "newBrief": "This corporate group's had a long week away at their global offsite. Fly the route, no deviations from the plan and get these people home.",
     "imagePath": "../images-missions/mission22.jpg",
     "reviewed": true
   },
@@ -283,14 +283,14 @@
     "oldTitle": "Flagship Route",
     "newTitle": "Flagship Service Route",
     "oldBrief": "Today's sector is the airline's flagship route. Fly quickly and safely and expect a quick turnaround once the passengers have disembarked and you have refuelled.",
-    "newBrief": "This is the airline's flagship sector, so fly it quick and clean. Expect a fast turnaround the moment the doors open and the tanks are full again.",
+    "newBrief": "This is the airline's flagship sector, so fly it well. Expect a fast turnaround the moment the tanks are full again.",
     "imagePath": "../images-missions/mission23.jpg",
     "reviewed": true
   },
   {
     "imgId": 25,
     "oldTitle": "Standard Commercial Route",
-    "newTitle": "Standard Line Sector",
+    "newTitle": "Standard Sector",
     "oldBrief": "Ordinary line flying is on the board today. Fly it by the book and keep to the schedule. This is what you trained for. You are in charge of a $350 million aircraft, enjoy the flight.",
     "newBrief": "Ordinary line flying, nothing more. Fly it by the book, keep to the schedule, and remember you're in charge of a $350 million aircraft. Enjoy it.",
     "imagePath": "../images-missions/mission25.jpg",
@@ -299,9 +299,9 @@
   {
     "imgId": 26,
     "oldTitle": "Early Bird Business Shuttle",
-    "newTitle": "Business Hub Shuttle",
+    "newTitle": "Business Shuttle",
     "oldBrief": "You are shuttling morning business passengers between hubs. ATC has a full sky today, so hold the assigned speed and plan ahead. Call for top of descent and who knows, you might even get vectored to the top of the glideslope if you're lucky.",
-    "newBrief": "Morning business traffic between hubs, and a full sky to match. Hold the assigned speed, plan ahead, and call for top of descent. You might even get vectored all the way to the glideslope if today's a good day.",
+    "newBrief": "Morning business traffic between hubs, and a full sky to match. Hold the assigned speed, plan ahead, and call for top of descent. You might even get vectored all the way to the IAF if you're lucky.",
     "imagePath": "../images-missions/mission26.jpg",
     "reviewed": true
   },
@@ -310,7 +310,7 @@
     "oldTitle": "Student Charter",
     "newTitle": "Student Charter",
     "oldBrief": "University students have taken over your cabin on their way to a massive event. Expect lots of overhead cabins opening and closing and, if it gets rowdy back there, send in the cavalry and turn the seat belt signs on.",
-    "newBrief": "University students have taken over the cabin on the way to a massive event. Expect the overhead bins working overtime, and if it gets rowdy back there, the seatbelt sign is your best friend.",
+    "newBrief": "University students have taken over the cabin on the way to a massive event. Expect dancing in the aisles, and if it gets rowdy back there, the seatbelt sign is your best friend.",
     "imagePath": "../images-missions/mission27.jpg",
     "reviewed": true
   },
@@ -319,7 +319,7 @@
     "oldTitle": "Symphony Orchestra",
     "newTitle": "Touring Orchestra",
     "oldBrief": "A touring symphony orchestra need to get to their next concert. You now have a hold full of instrument cases that do not bounce well. Fly a clean departure and watch the weather radar for turbulence.",
-    "newBrief": "A touring symphony orchestra needs to make their next concert, and the hold's full of instrument cases that do not bounce well. Fly a clean departure and keep an eye on the radar for turbulence.",
+    "newBrief": "A touring symphony orchestra needs to make their next concert, and the hold's full of instrument cases that do not bounce well. Plan ahead and keep an eye on the radar for turbulence.",
     "imagePath": "../images-missions/mission28.jpg",
     "reviewed": true
   },
@@ -337,7 +337,7 @@
     "oldTitle": "Company Seminar",
     "newTitle": "Merger Seminar Run",
     "oldBrief": "Company personnel are headed to a major post-merger integration seminar. The cabin is full and it's up to you to get the workforce to their destination on time and in one piece.",
-    "newBrief": "Company personnel are headed to a major post-merger seminar, and the cabin's full to capacity today. Don't worry that they all look the same, they're not robots, are they? Just get them there safely, on time and in one piece.",
+    "newBrief": "Company personnel are headed to a major post-merger seminar, and the cabin's full to capacity today. ",
     "imagePath": "../images-missions/mission30.jpg",
     "reviewed": true
   },
@@ -346,7 +346,7 @@
     "oldTitle": "Championship Final",
     "newTitle": "Title Match Charter",
     "oldBrief": "You have a lively team of sports fans filling the cabin today. Warn the crew to steel themselves as some fans are already celebrating in row twelve.",
-    "newBrief": "A lively crowd of sports fans is filling this cabin for the championship final. Give the cabin crew a heads-up, row twelve's already celebrating.",
+    "newBrief": "A lively crowd of fans is filling this cabin on their way to the final. Give the cabin crew a heads-up, row twelve's already celebrating.",
     "imagePath": "../images-missions/mission31.jpg",
     "reviewed": true
   },
@@ -355,7 +355,7 @@
     "oldTitle": "Sun-Seekers",
     "newTitle": "Sun Seekers",
     "oldBrief": "Retired sun-seekers fill every seat. Give them a soft rotation, a soft landing and don't spill their Bloody Marys with steep turns.",
-    "newBrief": "Every row is full of retirees chasing warmer skies for the winter. Give them a soft rotation, a softer landing, and don't spill their Bloody Marys with steep turns.",
+    "newBrief": "Every row is full of retirees chasing warmer skies for the winter. Give them a soft landing and don't spill their Bloody Marys with steep turns.",
     "imagePath": "../images-missions/mission32.jpg",
     "reviewed": true
   },
@@ -364,14 +364,14 @@
     "oldTitle": "Regional Sector",
     "newTitle": "Short Sector Circuit",
     "oldBrief": "A string of short sectors is on today's roster. Keep the cabin cool on the ground, use Hotel mode if your airframe has it and stay clear of developing weather fronts.",
-    "newBrief": "Today's roster is a string of short sectors back to back. Keep the cabin cool between hops, flip on Hotel mode if you've got it, and steer wide of any weather building nearby.",
+    "newBrief": "Today's roster is a string of short sectors back to back. Keep the cabin cool between hops, flip on Hotel mode if you've got it, and steer clear of any weather building nearby.",
     "imagePath": "../images-missions/mission34.jpg",
     "reviewed": true
   },
   {
     "imgId": 35,
     "oldTitle": "Network Support",
-    "newTitle": "Regional Link Run",
+    "newTitle": "Regional Link",
     "oldBrief": "This run matters to the towns it serves. Stick to the schedule as plenty of passengers are counting on a connection at the other end.",
     "newBrief": "This run matters more than it looks. Stick to the schedule, there's a whole community counting on you making the connection at the other end.",
     "imagePath": "../images-missions/mission35.jpg",
@@ -380,7 +380,7 @@
   {
     "imgId": 37,
     "oldTitle": "Weather Recovery",
-    "newTitle": "Short-Haul Recovery",
+    "newTitle": "Bad Weather, Good Vibes",
     "oldBrief": "You have a full cabin of tired short-haul passengers who just want to get back home after yesterday's groundings.",
     "newBrief": "Yesterday's groundings left a cabin full of tired short-haul passengers who just want to be home. Get them there.",
     "imagePath": "../images-missions/mission37.jpg",
@@ -389,9 +389,9 @@
   {
     "imgId": 38,
     "oldTitle": "Regional Holiday Run",
-    "newTitle": "Holiday Sector Run",
+    "newTitle": "Holiday Sector",
     "oldBrief": "Every seat is taken on this regional sector. Hit the block times and tell the crew that the passengers are ready to start their holiday when the doors open.",
-    "newBrief": "Every seat's taken and everyone's ready for the doors to open so that they can start their holiday. Hit the block times and let the crew know it's go time the second we're on stand.",
+    "newBrief": "Every seat's taken and everyone's ready for the doors to open so that they can start their holiday. Hit the block times and let the crew know it's go the second we're on stand.",
     "imagePath": "../images-missions/mission38.jpg",
     "reviewed": true
   },
@@ -463,7 +463,7 @@
     "oldTitle": "Sports Charter",
     "newTitle": "Wheels Up",
     "oldBrief": "{athlete} is on board, and you have been booked to fly them to their next event. Fly smoothly so {athlete} can rest during the flight.",
-    "newBrief": "{athlete}'s catching what sleep they can before the next fixture. Keep it smooth end to end so they land rested, not rattled.",
+    "newBrief": "{athlete} needs a quiet cabin to rest and relax in. Keep it smooth end to end so they land rested, not rattled.",
     "imagePath": "../images-missions/mission46.jpg",
     "reviewed": true
   },
@@ -481,7 +481,7 @@
     "oldTitle": "Executive Offsite",
     "newTitle": "Suited and Booted",
     "oldBrief": "Your cabin is an office today. The laptops are out and the chatter is constant. Keep the coffee running and fly a smooth descent.",
-    "newBrief": "Today's cabin doubles as the boardroom, laptops open and non-stop chatter. Keep the coffee coming and grease that descent. Don't forget to turn the Wi-Fi on, our clients need constant internet access throughout the flight.",
+    "newBrief": "Today's cabin doubles as the boardroom, laptops open and non-stop chatter. Keep the coffee coming and grease that descent. ",
     "imagePath": "../images-missions/mission48.jpg",
     "reviewed": true
   },
@@ -508,7 +508,7 @@
     "oldTitle": "Executive Facility Run",
     "newTitle": "Tight Schedule",
     "oldBrief": "You have executives with a tight ground schedule waiting to board. Get them to their destination early if you can. These people keep our company in the air, so treat them well.",
-    "newBrief": "This executive group is getting impatient waiting in the terminal for you to choose the contract. Get there early if winds allow, these are the people paying our bills, so treat them well.",
+    "newBrief": "This executive group is getting impatient waiting in the terminal for you to choose the contract. ",
     "imagePath": "../images-missions/mission51.jpg",
     "reviewed": true
   },
@@ -517,7 +517,7 @@
     "oldTitle": "Fractional Owner",
     "newTitle": "Fractional Owner Flight",
     "oldBrief": "A premium share owner used to the best is aboard today's flight. Make the whole piloting thing look effortless and go as fast as you can, I heard they like big numbers.",
-    "newBrief": "A fractional owner used to first-class everything is in the back today. Make it look effortless, and push the speed, word is they like big numbers. FLC puts smiles on faces, remember that.",
+    "newBrief": "A fractional owner used to first-class everything is in the back today. Make it look effortless, and push the speed.",
     "imagePath": "../images-missions/mission52.jpg",
     "reviewed": true
   },
@@ -535,7 +535,7 @@
     "oldTitle": "Witness Transport",
     "newTitle": "Secure Witness Transfer",
     "oldBrief": "Local forces need a state witness transported. Fly A to B, no fuss and don't attract attention. Park at the FBO after landing and stay away from the main terminal.",
-    "newBrief": "A state witness needs moving quietly today. Fly straight to the destination coordinates, no fuss, no attention. Park at the FBO when you're down and steer clear of the main terminal. Make sure the door is locked.",
+    "newBrief": "A state witness needs moving quietly today. Fly straight to the destination, no fuss, no attention. Make sure the door is locked.",
     "imagePath": "../images-missions/mission54.jpg",
     "reviewed": true
   },
@@ -544,7 +544,7 @@
     "oldTitle": "Private Buyer",
     "newTitle": "Priceless Cargo",
     "oldBrief": "A Renaissance masterpiece worth more than the jet is secured to one of the seats in the cabin, which is rather strange. Keep cabin temperature chilled, and stay clear of convective weather. The world needs more art and today you are the messenger.",
-    "newBrief": "A Renaissance piece worth more than the aircraft is strapped to a seat in the cabin. Keep the cabin cool, steer well clear of any building weather. The buyer has asked you to play soothing classical music during the flight. Fruit loops anyone?",
+    "newBrief": "A Renaissance piece worth more than the aircraft is strapped to a seat in the cabin. Keep the cabin cool, steer clear of any building weather. ",
     "imagePath": "../images-missions/mission55.jpg",
     "reviewed": true
   },
@@ -562,7 +562,7 @@
     "oldTitle": "First-Class Feline",
     "newTitle": "First-Class Feline",
     "oldBrief": "A tech billionaire's fabulous feline has claimed the cabin. Keep the fish flowing, the banks shallow and the landing soft. This passenger expects the very best service on her way home.",
-    "newBrief": "A tech mogul's very spoiled cat has claimed the whole cabin today. Keep the fish coming, the banks shallow and the landing soft, she expects nothing less than the best on her way home. And yes, she likes to sit in the front for takeoff.",
+    "newBrief": "A tech mogul's cat has claimed the whole cabin today. Keep the fish coming, the banks shallow and the landing soft, she expects nothing less than the best.",
     "imagePath": "../images-missions/mission57.jpg",
     "reviewed": true
   },
@@ -571,7 +571,7 @@
     "oldTitle": "Champagne Shopping Run",
     "newTitle": "Shopping Spree",
     "oldBrief": "{musician} wants to go shopping. Keep the champagne in the glass and turn a blind eye to any shenanigans above the clouds. What happens in the cabin, stays in the cabin. Remember that if you want to keep your job.",
-    "newBrief": "{musician} is off on a shopping spree today. Keep the champagne flowing and turn a blind eye to whatever's happening back there. What happens in the cabin stays in the cabin, remember that if you like having a job.",
+    "newBrief": "{musician} is off on a shopping spree. Keep the champagne flowing and turn a blind eye to whatever's happening back there.",
     "imagePath": "../images-missions/mission58.jpg",
     "reviewed": true
   },
@@ -580,7 +580,7 @@
     "oldTitle": "Weekend Retreat",
     "newTitle": "Golf Weekend",
     "oldBrief": "The owner of this aircraft is loading their golf clubs in the back and has asked especially for you as their pilot. It must be your sparkling personality. Enjoy the scenic approach and keep the landing soft.",
-    "newBrief": "The owner's caddy is loading his golf clubs in the back and you were specifically booked for this flight. Must be your sparkling personality. Enjoy the scenic approach and keep that landing soft.",
+    "newBrief": "The caddy is loading the golf clubs in the back and you were hand-picked for this flight. Must be your sparkling personality. Enjoy the scenic approach and keep that landing soft.",
     "imagePath": "../images-missions/mission59.jpg",
     "reviewed": true
   },
@@ -589,7 +589,7 @@
     "oldTitle": "Business Commute",
     "newTitle": "Business Commute",
     "oldBrief": "Today's passengers are skipping the airline queues. Ask for directs where ATC allows and shorten your block time where you can.",
-    "newBrief": "Today's passengers are dodging the airline queues altogether. Ask ATC for directs where you can get them to trim the block time down.",
+    "newBrief": "Today's passengers are dodging the airline queues. Ask ATC for directs where you can get them to trim the block time down.",
     "imagePath": "../images-missions/mission60.jpg",
     "reviewed": true
   },
@@ -598,7 +598,7 @@
     "oldTitle": "Stadium Charter",
     "newTitle": "Stadium Gig",
     "oldBrief": "{musician} and their management team need sleep before the show. Climb above the weather, dodge the bumps and keep cabin pressure steady. No alcohol on today's flight by order of the management.",
-    "newBrief": "{musician} and the crew need sleep before tomorrow's show. Climb above the weather, dodge the bumps, hold that cabin pressure steady. No alcohol on this leg, management's orders.",
+    "newBrief": "{musician} and the crew need sleep before tomorrow's show. Climb above the weather, dodge the bumps and hold that cabin pressure steady.",
     "imagePath": "../images-missions/mission61.jpg",
     "reviewed": true
   },
@@ -607,7 +607,7 @@
     "oldTitle": "Spiritual Retreat",
     "newTitle": "Spiritual Retreat",
     "oldBrief": "{name} is meeting a spiritual guru, and the press is watching this tail number. Park somewhere quiet and keep any mention of your passenger off open channels.",
-    "newBrief": "{name} is meeting their spiritual guru today and the press already has your tail number. Find a quiet corner to park and keep any mention of your passenger off open channels.",
+    "newBrief": "{name} is meeting a spiritual guru today and the press already have your tail number. Find a quiet corner to park and keep any mention of your passenger off open channels.",
     "imagePath": "../images-missions/mission62.jpg",
     "reviewed": true
   },
@@ -616,7 +616,7 @@
     "oldTitle": "Championship Charter",
     "newTitle": "Athletic Luxury",
     "oldBrief": "{athlete} needs to arrive rested and on time for the championship event. Ask for priority clearance and keep the ride smooth.",
-    "newBrief": "{athlete} needs to land rested and on schedule for their next event. Ask for priority clearance and keep this one smooth all the way down.",
+    "newBrief": "{athlete} needs to land rested and on schedule for an upcoming event. Ask for priority clearance and keep this one smooth all the way down.",
     "imagePath": "../images-missions/mission63.jpg",
     "reviewed": true
   },
@@ -625,7 +625,7 @@
     "oldTitle": "VIP Film Premiere",
     "newTitle": "Premiere Escort",
     "oldBrief": "{name} needs a discreet ride to a film premiere. Avoid the paparazzi hanging around the apron. Keep comms to a minimum, fly a clean approach and park quickly at the FBO.",
-    "newBrief": "{name} needs a quiet ride to tonight's premiere. Keep the radio calls short and avoid the main terminals on arrival. Go straight to the private FBO, as the paparazzi are waiting at the VIP terminal.",
+    "newBrief": "{name} needs a quiet ride to tonight's premiere. Go straight to the private FBO, as the paparazzi are waiting at the VIP terminal.",
     "imagePath": "../images-missions/mission64.jpg",
     "reviewed": true
   },
@@ -634,7 +634,7 @@
     "oldTitle": "Club Executive",
     "newTitle": "Transfer News",
     "oldBrief": "{team} executives are on board for an away fixture and the media are watching. Keep it professional, you are a professional aren't you? and don't forget to smile and be polite. These people keep our company in the air!",
-    "newBrief": "{team} executives are riding to today's away fixture with the media watching close. Keep it sharp, keep it polite, you are a professional after all. These are the people keeping the company airborne.",
+    "newBrief": "{team} executives are riding to today's away fixture with the media watching close. These are the people keeping the company airborne.",
     "imagePath": "../images-missions/mission65.jpg",
     "reviewed": true
   },
@@ -652,7 +652,7 @@
     "oldTitle": "Executive Support",
     "newTitle": "Boardroom Rescue",
     "oldBrief": "His stock is in free-fall and the CEO needs to get back to his offices as quickly as possible to save the day. Expedite your checklists and do not forget the fuel.",
-    "newBrief": "The stock's in free-fall and this CEO needs to be back at the office before the board meeting starts without him. Expedite your checklists, and don't forget to check the weather before you leave.",
+    "newBrief": "The stock's in free-fall and this CEO needs to be back at the office before the board meeting starts without him. ",
     "imagePath": "../images-missions/mission68.jpg",
     "reviewed": true
   },
@@ -661,7 +661,7 @@
     "oldTitle": "Medical Transport",
     "newTitle": "Lifeguard Priority",
     "oldBrief": "Lifeguard priority! You are carrying essential medial tissue for a transplant. Ask ATC for priority on the way in. Helicopters go to the hospital; everyone else meets the ground crew on arrival.",
-    "newBrief": "This is a Lifeguard priority run, essential tissue for a transplant is secured in the back. Ask ATC to expedite the whole way in. Helicopters go straight to the hospital, everyone else hands off to the ground crew on arrival.",
+    "newBrief": "This is a Lifeguard priority run, essential tissue for a transplant is secured in the back. Ask ATC to expedite the whole way in. ",
     "imagePath": "../images-missions/mission70.jpg",
     "reviewed": true
   },
@@ -670,7 +670,7 @@
     "oldTitle": "Patient Transport",
     "newTitle": "Medevac Transport",
     "oldBrief": "You may be heading into an uncontrolled field for this patient pickup. Check the runway before you commit to the approach.",
-    "newBrief": "The patient has been stabilised and the medevac team are waiting for you to arrive. Check the runway condition before you commit to the approach, this one's on you and check the oxygen tanks are full before you leave.",
+    "newBrief": "The patient has been stabilised and the medevac team are waiting for you to arrive. Check the runway condition before you commit to the approach.",
     "imagePath": "../images-missions/mission71.jpg",
     "reviewed": true
   },
@@ -679,7 +679,7 @@
     "oldTitle": "Diplomatic Files",
     "newTitle": "Diplomatic Escort",
     "oldBrief": "Classified diplomatic files are on board chained to someone who looks like John Cena. It can't be him, can it? Don't stop for anyone unless you want to be thrown off your own plane.",
-    "newBrief": "Classified files are chained to a guy who looks exactly like John Cena. It can't be him, can it? Don't stop for anyone between here and the drop, unless you fancy getting thrown off your own aircraft.",
+    "newBrief": "Classified files are chained to a guy who looks exactly like John Cena. It can't be him, can it? ",
     "imagePath": "../images-missions/mission72.jpg",
     "reviewed": true
   },
@@ -688,7 +688,7 @@
     "oldTitle": "Prototype Hardware",
     "newTitle": "Prototype Delivery",
     "oldBrief": "You are carrying prototype hardware that is sensitive to static and temperature. Check your environmental controls before taxi and departure. If this arrives damaged, you can look for a new job in the morning.",
-    "newBrief": "This prototype hardware doesn't like static or swings in temperature. Run the environmental checks before you even think about taxiing. Show up with a cracked case and you'll be job hunting by morning.",
+    "newBrief": "This prototype hardware doesn't like static or swings in temperature. Run the environmental checks before you even think about taxiing.",
     "imagePath": "../images-missions/mission73.jpg",
     "reviewed": true
   },
@@ -697,7 +697,7 @@
     "oldTitle": "Protected Species",
     "newTitle": "Live Cargo Hop",
     "oldBrief": "Today we have live cargo riding in the back. No, not passengers, animals! Keep the banks shallow and go easy on the thrust unless you want to re-enact The Lion King at FL200.",
-    "newBrief": "Live cargo's riding in back today, no not passengers, animals. Keep the banks shallow and ease off the thrust unless you're angling for a Lion King re-enactment enroute.",
+    "newBrief": "Live cargo's riding in back today. Keep the banks shallow and ease off the thrust unless you're angling for a Lion King re-enactment enroute.",
     "imagePath": "../images-missions/mission74.jpg",
     "reviewed": true
   },
@@ -706,7 +706,7 @@
     "oldTitle": "Conservation Team",
     "newTitle": "Sapling Delivery",
     "oldBrief": "You are transporting living plants that are sensitive to pressure and temperature. Watch the descent rate on the way in and keep the cabin temps tropical.",
-    "newBrief": "These saplings are alive and picky about pressure and temperature. Fly a gentle descent rate on the way in and keep the cabin tropical, these plants won't forgive a rough ride.",
+    "newBrief": "These saplings are alive and picky about pressure and temperature. Fly a gentle descent rate on the way in and keep the cabin tropical.",
     "imagePath": "../images-missions/mission75.jpg",
     "reviewed": true
   },
@@ -715,7 +715,7 @@
     "oldTitle": "Digital Masters",
     "newTitle": "Digital Masters",
     "oldBrief": "Unedited production footage is in the hold, and the editing suite is waiting. It's up to you to deliver the digital masters on time. We've been told a representative from Marvel will meet you at the FBO. Please let it be Deadpool.",
-    "newBrief": "Unedited footage is in the hold and the editing suite's waiting on it. Get the digital masters there on schedule. Word is a rep from Marvel will be meeting you at the FBO, let's hope it's Deadpool.",
+    "newBrief": "Unedited footage is in the hold and the editing suite's waiting on it. Get the digital masters there on schedule.",
     "imagePath": "../images-missions/mission76.jpg",
     "reviewed": true
   },
@@ -724,7 +724,7 @@
     "oldTitle": "Rare Manuscripts",
     "newTitle": "Manuscript Rescue",
     "oldBrief": "Climate-controlled manuscript cases have been packed into the hold. Have ground handling ready the moment you block in, these manuscripts are irreplaceable and sensitive to temperature and moisture. Keep the cabin cool and dry.",
-    "newBrief": "These manuscripts are irreplaceable and fussy about both temperature and moisture. Have ground handling ready the second you block in, and keep the cabin cool and dry the whole way there.",
+    "newBrief": "These manuscripts are irreplaceable and fussy about both temperature and moisture. Have ground handling ready the second you block in.",
     "imagePath": "../images-missions/mission77.jpg",
     "reviewed": true
   },
@@ -769,7 +769,7 @@
     "oldTitle": "Farm Produce",
     "newTitle": "Farm Produce Delivery",
     "oldBrief": "Fresh produce from the field to the hold to the shops. Get airborne while it is still cold and dry and keep an eye on cabin temps. The cabin smells amazing today.",
-    "newBrief": "Fresh produce is going straight from the field to the shops today. Get airborne while it's still cold and dry and mind the cabin temps. Whatever's back there, it smells fantastic.",
+    "newBrief": "Fresh produce is going straight from the field to the shops today. Whatever's back there, it smells fantastic.",
     "imagePath": "../images-missions/mission82.jpg",
     "reviewed": true
   },
@@ -832,7 +832,7 @@
     "oldTitle": "Premium Seafood",
     "newTitle": "Seafood Express",
     "oldBrief": "The ice is already melting on this catch. Get it to the restaurants before the dinner rush and keep the cabin cold. You don't need lobsters on the loose in the cabin (again).",
-    "newBrief": "The ice on this catch is already melting. Get it to the restaurants before the dinner rush and keep that cabin cold. And no, we are not doing the loose lobster thing again.",
+    "newBrief": "The ice on this catch is already melting. Get it to the restaurants before the dinner rush. And no, we are not doing the loose lobster thing again.",
     "imagePath": "../images-missions/mission89.jpg",
     "reviewed": true
   },
@@ -859,7 +859,7 @@
     "oldTitle": "Mail Run",
     "newTitle": "Last Light Mail Run",
     "oldBrief": "Last flight before the sun goes down and it's up to you to bring the regional mail to the hub for distribution to rural areas. Fly a clean pattern and butter that landing. Who knows what condition the runway is in!",
-    "newBrief": "This is the last flight before the sun goes down, and the mail's got to make the hub for onward distribution. Fly a clean pattern and butter that landing, nobody's vouching for the runway condition tonight.",
+    "newBrief": "This is the last flight before the sun goes down, and the mail's got to make the hub for onward distribution. ",
     "imagePath": "../images-missions/mission94.jpg",
     "reviewed": true
   },
@@ -868,16 +868,16 @@
     "oldTitle": "Community Supply",
     "newTitle": "Community Supply Circuit",
     "oldBrief": "Food, fuel and mail are bound for a place with no road in. Check landing performance for your destination and watch for birds on approach.",
-    "newBrief": "Food, fuel and mail are bound for a community that's counting on this delivery. Check your landing performance for the strip and keep an eye out for birds on approach.",
+    "newBrief": "Food, fuel and mail are bound for a community that's counting on this delivery. Watch out for birds on approach.",
     "imagePath": "../images-missions/mission95.jpg",
     "reviewed": true
   },
   {
     "imgId": 145,
     "oldTitle": "The Gentleman's Estate",
-    "newTitle": "Private Estate Drop",
+    "newTitle": "Private Estate",
     "oldBrief": "A rural estate needs materials now and it is a short strip. Watch the crosswind on final and get the freight down cleanly.",
-    "newBrief": "This estate needs its materials now and we've been told the strip's a short one. Check the final destination on the job ticket, it might have changed since we took the contract and we're now being told that there appears to be some trouble at the estate with the authorities. Watch the crosswind on final and get the freight down clean wherever you do land.",
+    "newBrief": "The client is waiting for you. Watch the crosswind on final and get this pungent smelling cargo off this plane asap.",
     "imagePath": "../images-missions/mission145.jpg",
     "reviewed": true
   },
@@ -931,7 +931,7 @@
     "oldTitle": "Field Machinery",
     "newTitle": "Field Machinery",
     "oldBrief": "You are collecting machine parts for regional farmers today. Say the word and the teams will secure the loads in the hold. Expect a sluggish climb with so much weight on board.",
-    "newBrief": "You're collecting machine parts for regional farmers today. Say the word and the ground teams will secure the loads in the hold. Expect a sluggish climb with all that weight aboard.",
+    "newBrief": "You're collecting machine parts for regional farmers today. Say the word and the ground teams will secure the loads in the hold. ",
     "imagePath": "../images-missions/mission101.jpg",
     "reviewed": true
   },
@@ -949,7 +949,7 @@
     "oldTitle": "Late Night Regional",
     "newTitle": "Late Night Regional",
     "oldBrief": "A late night red-eye for a quiet regional network. Traffic is thin; fly efficiently and keep the chain moving through the night.",
-    "newBrief": "It's a late-night red-eye through a quiet regional network tonight. Traffic's thin, so fly efficient and keep the chain moving.",
+    "newBrief": "It's a late-night flight through a quiet regional network tonight. Traffic's thin, so take it easy and save some fuel.",
     "imagePath": "../images-missions/mission103.jpg",
     "reviewed": true
   },
@@ -958,7 +958,7 @@
     "oldTitle": "Relief Supplies",
     "newTitle": "Relief Pallet Run",
     "oldBrief": "Local supply chains are broken and relief pallets are on board. Ask for vectors where you can and get the supplies on the ground where they are needed most.",
-    "newBrief": "Local supply chains are broken and these relief pallets can't wait. Ask for vectors where you can and get them and check the drop zone coordinates twice, we don't want a repeat of the 'cargo pallet falls through church roof' situation from last month.",
+    "newBrief": "Check the drop zone coordinates twice, we don't want a repeat of 'cargo pallet falls through church roof' from last month.",
     "imagePath": "../images-missions/mission104.jpg",
     "reviewed": true
   },
@@ -985,7 +985,7 @@
     "oldTitle": "Cargo Delivery",
     "newTitle": "Cargo Delivery",
     "oldBrief": "Engineers are expecting this delivery of {cargo_type}. Stick to the block times and get it to the destination. Work has been suspended until you deliver these goods. Don't make them wait.",
-    "newBrief": "Engineers are waiting on this {cargo_type} and work's stopped until it lands. Stick to the block times and get it there asap, don't make them wait any longer.",
+    "newBrief": "Engineers are waiting on this {cargo_type} and work's stopped until it lands. Stick to the block times and get it there asap.",
     "imagePath": "../images-missions/mission107.jpg",
     "reviewed": true
   },
@@ -1012,7 +1012,7 @@
     "oldTitle": "Oilfield Equipment",
     "newTitle": "Oilfield Equipment",
     "oldBrief": "{cargo_type} and heavy oilfield equipment are bolted to the floor rails. Expect a slower flight; watch the fuel and stay ahead of the power curve on final. We don't want you dropping out of the sky just before you land. Yes, we all remember when that happened.",
-    "newBrief": "{cargo_type} and heavy oilfield equipment are bolted to the floor rails today. Expect a slower flight, watch your fuel, and stay ahead of the power curve on final. Yes, we all remember the broken landing gear story and no, we don't want a repeat of that this time.",
+    "newBrief": "{cargo_type} and heavy oilfield equipment are bolted to the floor rails today. Expect a slower flight, watch your fuel, and stay ahead of the power curve on final. ",
     "imagePath": "../images-missions/mission110.jpg",
     "reviewed": true
   },
@@ -1021,7 +1021,7 @@
     "oldTitle": "Avionics Bay",
     "newTitle": "Avionics Bay Return",
     "oldBrief": "A retired avionics bay has been requested by a team at your destination airport. Check the tie-downs before you roll and no steep turns on this one.",
-    "newBrief": "A retired avionics bay is heading back to a restoration team before being transported to a local aviation museum for preservation. Check the tie-downs before you roll, and keep the turns gentle on this one.",
+    "newBrief": "A retired avionics bay is heading back to a restoration team before being transported to a local aviation museum for preservation.",
     "imagePath": "../images-missions/mission111.jpg",
     "reviewed": true
   },
@@ -1030,7 +1030,7 @@
     "oldTitle": "Premium Perishables",
     "newTitle": "Perishable Delivery",
     "oldBrief": "The supermarkets are waiting for this delivery. Keep the temperature steady so nothing spoils. You do want to get paid, don't you?",
-    "newBrief": "The supermarkets are waiting on this one and nothing back there likes to spoil. Keep the temperature steady the whole way. You do want to get paid this month, don't you?",
+    "newBrief": "The supermarkets are waiting on this one and nothing back there likes to spoil. Keep the temperature steady the whole way. ",
     "imagePath": "../images-missions/mission112.jpg",
     "reviewed": true
   },
@@ -1057,7 +1057,7 @@
     "oldTitle": "Secure Bullion",
     "newTitle": "Bullion Transfer",
     "oldBrief": "A central-bank transfer of gold bullion needs transporting and there are lots of frowning people dressed in black waiting on the ramp. The ground team will handle loading and offload. Expect an armed team on board for this job.",
-    "newBrief": "A central-bank gold transfer is waiting on the ramp, along with a lot of serious-looking people dressed in black. The ground crew handles the loading and offload. Expect an armed team riding along for this one.",
+    "newBrief": "A central-bank gold transfer is waiting on the ramp, along with a lot of serious-looking people dressed in black. The ground crew handles the loading and offload. ",
     "imagePath": "../images-missions/mission115.jpg",
     "reviewed": true
   },
@@ -1093,7 +1093,7 @@
     "oldTitle": "Heavy Machinery",
     "newTitle": "Heavy Machinery",
     "oldBrief": "The loadmaster is still chaining the oversized plant kit to the main deck. Confirm tie-downs and floor limits before you call for pushback and check fuel before you leave.",
-    "newBrief": "The loadmaster's still chaining down an oversized plant kit on the main deck. Confirm your tie-downs and floor limits before you call for pushback, and check the fuel before you go.",
+    "newBrief": "The loadmaster's still chaining down an oversized plant kit on the main deck. Confirm your tie-downs and floor limits before you call for pushback.",
     "imagePath": "../images-missions/mission120.jpg",
     "reviewed": true
   },
@@ -1102,7 +1102,7 @@
     "oldTitle": "Industrial Generator",
     "newTitle": "Generator Haul",
     "oldBrief": "The ground crew are locking down an oversized generator on the deck. Check floor limits, chains and CG before pushback.",
-    "newBrief": "Ground crew are locking down an oversized generator on the deck. Check your floor limits, chains, and CG before you call for pushback.",
+    "newBrief": "Ground crew are locking down an oversized generator on the deck. Check your fuel calculations and CG before you start her up.",
     "imagePath": "../images-missions/mission121.jpg",
     "reviewed": true
   },
@@ -1120,7 +1120,7 @@
     "oldTitle": "Server Rack Delivery",
     "newTitle": "Server Rack Delivery",
     "oldBrief": "You have server racks and data-centre hardware in the hold. Fly smooth, keep cabin temp in spec and do not ask what runs on these machines.",
-    "newBrief": "Server racks and data-centre hardware are riding in the hold today. Fly smooth, keep the cabin temperature in spec, and don't ask what runs on these machines.",
+    "newBrief": "Server racks and data-centre hardware are riding in the hold today. Get this cargo to the destination on time.",
     "imagePath": "../images-missions/mission123.jpg",
     "reviewed": true
   },
@@ -1129,7 +1129,7 @@
     "oldTitle": "Misinformation",
     "newTitle": "Civic Leaflet Drop",
     "oldBrief": "You are flying the assigned grid so the civic leaflet drop covers the sector evenly. Stay on the planned track.",
-    "newBrief": "You're flying a pre-assigned route today to ensure leaflet distribution covers the sector evenly. Stay locked on the planned track the whole way and don't let anyone tell you this is a propaganda, this is freedom of speech.",
+    "newBrief": "You're flying a pre-assigned route today to ensure leaflet distribution covers the sector evenly. ",
     "imagePath": "../images-missions/mission124.jpg",
     "reviewed": true
   },
@@ -1183,7 +1183,7 @@
     "oldTitle": "LIDAR Assessment",
     "newTitle": "LIDAR Survey",
     "oldBrief": "Researchers want LIDAR passes over suspected ruins below. Hold altitude and track tight across the grid so the survey team gets clean coverage.",
-    "newBrief": "Researchers want LIDAR passes over some recently discovered ruins today. Hold your altitude and keep the track tight across the grid for clean coverage. One of the researchers is called Lara...",
+    "newBrief": "Researchers want LIDAR passes over some recently discovered ruins today. One of the researchers is called Lara...",
     "imagePath": "../images-missions/mission130.jpg",
     "reviewed": true
   },
@@ -1201,7 +1201,7 @@
     "oldTitle": "Anomaly Survey",
     "newTitle": "Anomaly Survey",
     "oldBrief": "Researchers want you over a {sci_fi} on this route. Map it from above and try to ignore the weird static chewing through the radios.",
-    "newBrief": "Researchers want you over the {sci_fi} so that they can take readings, pretty sure they're not talking about books. Map whatever it is from above and try to ignore the weird static chewing through the radios.",
+    "newBrief": "Researchers want you over the {sci_fi} so that they can take readings. Try to ignore the weird static chewing through the radios.",
     "imagePath": "../images-missions/mission132.jpg",
     "reviewed": true
   },
@@ -1210,7 +1210,7 @@
     "oldTitle": "Missing Vehicle Search",
     "newTitle": "Missing Vehicle Search",
     "oldBrief": "You are assisting a visual search for a missing vehicle. Fly low over the last known coordinates and keep your eyes outside for anything that looks like a signal.",
-    "newBrief": "You're assisting local authorities with a visual search for a missing vehicle today. Fly low over the last known coordinates and keep your eyes outside for anything that looks like a signal.",
+    "newBrief": "You're assisting local authorities with a visual search for a missing vehicle today. ",
     "imagePath": "../images-missions/mission133.jpg",
     "reviewed": true
   },
@@ -1219,7 +1219,7 @@
     "oldTitle": "Acting up",
     "newTitle": "Avionics Shop Run",
     "oldBrief": "The owner of this aircraft says that the GPS is acting up and has asked you to bring it to the nearest service center. Fly carefully and keep your eyes outside if the GPS turns off unexpectedly.",
-    "newBrief": "The owner says the GPS has been acting up and wants it looked at the nearest service center. Fly carefully, and keep your eyes outside if it suddenly drops out and stops working.",
+    "newBrief": "The owner says the GPS has been acting up and wants it looked at the nearest service center. ",
     "imagePath": "../images-missions/mission90.jpg",
     "reviewed": true
   },
@@ -1228,7 +1228,7 @@
     "oldTitle": "Ferry flight",
     "newTitle": "New Owner Ferry Flight",
     "oldBrief": "The broker just handed over the keys. This is your new aircraft, congratulations. Fly her home, watch the temperatures and don't push her too hard on your first flight.",
-    "newBrief": "The broker just handed over the keys to you, this is your aircraft now. Fly her home, watch the temperatures, and don't push her too hard on the first flight.",
+    "newBrief": "The broker just handed over the keys to you, this is your aircraft now. Fly her home and don't push her too hard on the first flight.",
     "imagePath": "../images-missions/mission93.jpg",
     "reviewed": true
   },
@@ -1273,7 +1273,7 @@
     "oldTitle": "Private Schedule",
     "newTitle": "Private Charter",
     "oldBrief": "{name} wants quiet and discretion on this run. Smooth climb, smooth descent and keep the ride soft.",
-    "newBrief": "{name} wants anonymity and privacy on this charter today. Smooth climb, smooth descent, and keep the ride soft the whole way and please don't tell anyone who you're flying with.",
+    "newBrief": "{name} wants anonymity and privacy on this charter today. Do not mention your client's name on open frequencies.",
     "imagePath": "../images-missions/mission138.jpg",
     "reviewed": true
   },
@@ -1282,7 +1282,7 @@
     "oldTitle": "VIP Spiritual Retreat",
     "newTitle": "VIP Spiritual Retreat",
     "oldBrief": "You are flying {name} to meet a spiritual guru and the press is watching this flight. Park away from the main building and keep {name} off open channels.",
-    "newBrief": "{name}'s meeting their spiritual guru today and the press is already watching this tail number. Park away from the main building and keep your client's name off any open channels.",
+    "newBrief": "{name} is meeting a spiritual guru today. Park away from the main building and keep your client's name off any open channels.",
     "imagePath": "../images-missions/mission139.jpg",
     "reviewed": true
   },
@@ -1390,7 +1390,7 @@
     "oldTitle": "Commemorative Fly-by",
     "newTitle": "Memorial Fly-by",
     "oldBrief": "You are flying a commemorative low-level transit. Hit time-on-target over the memorial clean and keep it respectful.",
-    "newBrief": "You're flying a commemorative low-level transit today. Hit your time-on-target over the memorial, and keep it professional throughout. Check the paraffin-based oil levels before you leave in case a smoke trail is requested.",
+    "newBrief": "You're flying a commemorative low-level transit today. Check the paraffin-based oil levels before you leave in case a smoke trail is requested.",
     "imagePath": "../images-missions/mission153.jpg",
     "reviewed": true
   },
@@ -1417,7 +1417,7 @@
     "oldTitle": "Aviation Festival",
     "newTitle": "Aviation Festival",
     "oldBrief": "You need to be on the staging grounds before sunset. Cruise power conservative to spare the engine — expect a crowd watching your arrival.",
-    "newBrief": "You need to be on the staging grounds before sunset today. Keep the cruise power conservative to spare the engine, we've been told that there's already a crowd of early-birds waiting for your arrival.",
+    "newBrief": "You need to be on the staging grounds before sunset today. Keep the cruise power conservative to spare the engine.",
     "imagePath": "../images-missions/mission156.jpg",
     "reviewed": true
   },
@@ -1426,7 +1426,7 @@
     "oldTitle": "Remembrance Flight",
     "newTitle": "Tribute Flight",
     "oldBrief": "You are flying a chartered remembrance flight in memory of those who flew this airframe before you. Keep the maneuvers gentle and the fluids in the green.",
-    "newBrief": "You're flying a memorial remembrance flight today, in memory of those who flew this airframe before you. Keep the maneuvers gentle and the gauges in the green.",
+    "newBrief": "You're flying a memorial flight in memory of those who flew this airframe before you. Keep the gauges in the green.",
     "imagePath": "../images-missions/mission157.jpg",
     "reviewed": true
   },
@@ -1435,7 +1435,7 @@
     "oldTitle": "Vintage Freight",
     "newTitle": "Vintage Freight",
     "oldBrief": "You have a classic load for a classic bird. Keep the RPMs synced, mind the cowl flaps and plan your descent early — no speedbrakes on this one.",
-    "newBrief": "You've got a classic load for a classic bird today. Keep the RPMs synced, mind the cowl flaps, and plan your descent early, there's no speedbrakes on this one.",
+    "newBrief": "You've got a classic load for a classic bird today. Keep the RPMs synced, mind the cowl flaps, and plan your descent early.",
     "imagePath": "../images-missions/mission158.jpg",
     "reviewed": true
   },
@@ -1453,7 +1453,7 @@
     "oldTitle": "Classic Heavy Lift",
     "newTitle": "Heavy Duty",
     "oldBrief": "You are moving heavy goods in a vintage airframe today. Watch the engine temps, work the flight engineer panel and expect the controls to feel a bit slow.",
-    "newBrief": "You're moving heavy goods in a vintage airframe today. Watch the engine temps, work the flight engineer panel, and expect the controls to feel a touch slower than you're used to.",
+    "newBrief": "You're moving heavy goods in a vintage airframe today. Watch the engine temps and expect the controls to feel a touch slower than you're used to.",
     "imagePath": "../images-missions/mission160.jpg",
     "reviewed": true
   },
@@ -1471,7 +1471,7 @@
     "oldTitle": "Overnight Liner",
     "newTitle": "Silver Sleeper Service",
     "oldBrief": "You have a premium overnight cross-country with half the cabin asleep. Keep the pitch smooth and the step-climb easy so the passengers stay that way.",
-    "newBrief": "Most of your passengers will be sleeping on this premium overnight cross-country. Keep the pitch smooth and the step-climb easy so they stay that way.",
+    "newBrief": "Most of your passengers will be sleeping on this premium overnight cross-country. ",
     "imagePath": "../images-missions/mission162.jpg",
     "reviewed": true
   },
@@ -1480,7 +1480,7 @@
     "oldTitle": "Holiday Liner",
     "newTitle": "Sunset Boulevard",
     "oldBrief": "You have holidaymakers across the country today. Watch the cylinder head temps on the ground and get the cowl flaps sorted early before you pick through any local weather.",
-    "newBrief": "Holidaymakers are riding cross-country with you today. Watch the cylinder head temps on the ground and get the cowl flaps sorted early, before you start picking through any weather.",
+    "newBrief": "Holidaymakers are riding cross-country with you today. Watch the cylinder head temps on the ground and get the cowl flaps sorted early.",
     "imagePath": "../images-missions/mission163.jpg",
     "reviewed": true
   },
@@ -1489,7 +1489,7 @@
     "oldTitle": "Executive Extraction",
     "newTitle": "Executive Extraction",
     "oldBrief": "You have a full load of {industry} executives and engineers for the extraction sites. Have the flight engineer keep cross-feeds tidy so the centre of gravity stays balanced.",
-    "newBrief": "A full load of {industry} executives and engineers is riding to the extraction site today. Have the flight engineer keep the cross-feeds tidy so the centre of gravity stays balanced.",
+    "newBrief": "A full load of {industry} executives and engineers is riding to the extraction site today. ",
     "imagePath": "../images-missions/mission164.jpg",
     "reviewed": true
   },
@@ -1516,7 +1516,7 @@
     "oldTitle": "Scenic Hop",
     "newTitle": "Scenic Hop",
     "oldBrief": "You have passengers on a local scenic hop today. Take them around the landmarks on a visual pattern, then set down at the destination and keep clear of the GA traffic.",
-    "newBrief": "You've got passengers for a local scenic route today. Take them around the landmarks on a visual pattern, then set down at the destination and keep clear of the GA traffic.",
+    "newBrief": "You've got passengers for a local scenic route today. Take them around the landmarks on a visual pattern, then set down at the destination.",
     "imagePath": "../images-missions/mission167.jpg",
     "reviewed": true
   },
@@ -1534,7 +1534,7 @@
     "oldTitle": "Traffic Watch",
     "newTitle": "Traffic Watch",
     "oldBrief": "You are watching the local transit corridors from above. Hold over the big interchanges so the spotter can call traffic conditions — easy turns, predictable track.",
-    "newBrief": "You're watching the local transit corridors from above today. Hold over the big interchanges so the spotter can call traffic conditions, easy turns and predictable flying for the cameraman please.",
+    "newBrief": "You're watching the local transit corridors from above today. Hold over the big interchanges so the spotter can call traffic conditions.",
     "imagePath": "../images-missions/mission169.jpg",
     "reviewed": true
   },
@@ -1552,7 +1552,7 @@
     "oldTitle": "SAR Ops",
     "newTitle": "Search And Rescue Ops",
     "oldBrief": "You are searching for a stranded group of travellers. Work patterns over the last known coordinates and be ready to hoist if you cannot put down.",
-    "newBrief": "You're searching for a stranded group of travellers today. Work your patterns over the last known coordinates and be ready to hoist if you can't put down.",
+    "newBrief": "You're searching for a stranded group of travellers today. Work your patterns over the last known coordinates and be ready to hoist.",
     "imagePath": "../images-missions/mission172.jpg",
     "reviewed": true
   },
@@ -1579,7 +1579,7 @@
     "oldTitle": "Industrial Support",
     "newTitle": "Industrial Support",
     "oldBrief": "You are positioning industrial equipment with a precision hover. Watch torque and engine limits the whole time you are hanging there.",
-    "newBrief": "You're positioning industrial equipment with a precision hover today. Watch your torque and engine limits the whole time and watch out for FOD intake.",
+    "newBrief": "You're positioning industrial equipment with a precision hover today. Watch your torque and engine limits the whole time and watch out for FOD.",
     "imagePath": "../images-missions/mission175.jpg",
     "reviewed": true
   },
@@ -1588,7 +1588,7 @@
     "oldTitle": "Wildlife Tracking",
     "newTitle": "Wildlife Tracking",
     "oldBrief": "You are locating tagged animal populations for the biologists. Keep visual contact while the telemetry is logged and do not spook the wildlife if you can help it.",
-    "newBrief": "You're locating tagged animal populations for the biologists today. Keep visual contact while the telemetry data is saved, and try not to spook the wildlife.",
+    "newBrief": "You're locating tagged animal populations for the biologists today. Keep visual contact while the telemetry data is saved.",
     "imagePath": "../images-missions/mission176.jpg",
     "reviewed": true
   },
@@ -1597,7 +1597,7 @@
     "oldTitle": "Executive Shuttle",
     "newTitle": "Executive Shuttle",
     "oldBrief": "You have an executive hop from the FBO to the helipad. Smooth transition, soft set-down and no drama.",
-    "newBrief": "You've got an executive hop from the FBO to the helipad today. Smooth transition, soft set-down, no drama. Is the champagne ready to serve?",
+    "newBrief": "You've got an executive hop from the FBO to the helipad today. Smooth transition, soft set-down, no drama.",
     "imagePath": "../images-missions/mission177.jpg",
     "reviewed": true
   },
@@ -1606,7 +1606,7 @@
     "oldTitle": "Live Event Monitoring",
     "newTitle": "Live Event Monitoring",
     "oldBrief": "You are covering a civic event live from the air. Set up a loiter clear of other traffic and keep your movements predictable for the camera operator.",
-    "newBrief": "You're covering a civic event live from the air today. Set up a loiter clear of other traffic and keep your movements predictable for the camera operator.",
+    "newBrief": "You're covering a civic event live from the air today. Set up a hover clear of other traffic and keep your movements predictable for the camera operator.",
     "imagePath": "../images-missions/mission178.jpg",
     "reviewed": true
   },
@@ -1624,7 +1624,7 @@
     "oldTitle": "Put that in your pipe",
     "newTitle": "Pipe Lift",
     "oldBrief": "You have external load work moving heavy pipe segments into rugged terrain. Watch torque and rotor RPM while you ease the segments into place.",
-    "newBrief": "You've got external load work today, moving heavy pipe segments into rugged terrain. Remember to use the specialized rigging techniques you were taught, to avoid dangerous load spinning. ",
+    "newBrief": "You've got external load work today. Remember to use the specialized rigging techniques you were taught, to avoid dangerous load spinning. ",
     "imagePath": "../images-missions/mission180.jpg",
     "reviewed": true
   },
@@ -1633,7 +1633,7 @@
     "oldTitle": "High Tension Cleaning",
     "newTitle": "Aerial Washing",
     "oldBrief": "You are cleaning high-tension lines today. Fly low and slow so the boom operator can hit the insulators. Mind the wind — you do not want to drift into the wires.",
-    "newBrief": "You're cleaning high-tension lines using high-pressure jets of demineralized water while the power grid remains fully active. Fly low and slow so the boom operator can hit the insulators and don't drift into the wires.",
+    "newBrief": "You're cleaning high-tension lines using high-pressure jets of demineralized water while the power grid remains fully active. ",
     "imagePath": "../images-missions/mission181.jpg",
     "reviewed": true
   },
@@ -1642,7 +1642,7 @@
     "oldTitle": "Sensitive Documents",
     "newTitle": "Sensitive Documents",
     "oldBrief": "You have highly sensitive legal tenders on board and the case is handcuffed to the courier. Fly straight and be ready for an engine-running offload the moment you arrive.",
-    "newBrief": "You've got highly sensitive documents on board and the package is handcuffed to the courier. Fly straight and be ready for an engine-running offload the moment you arrive.",
+    "newBrief": "You've got highly sensitive documents on board and the package is handcuffed to the courier. ",
     "imagePath": "../images-missions/mission182.jpg",
     "reviewed": true
   },
@@ -1651,7 +1651,7 @@
     "oldTitle": "Shiny but what is it?",
     "newTitle": "Unknown",
     "oldBrief": "Hikers found a smooth, heavy metal pillar in a slot canyon. Ground crews say the air goes cold near it and your compass will not settle.",
-    "newBrief": "Hikers found an impossibly smooth and heavy metal pillar out in a slot canyon and nobody can explain it. Ground crews say the air goes cold near it and their compasses go crazy. Just get it out of there and back to base so that we can open a portal.",
+    "newBrief": "A group of hikers found an impossibly smooth and heavy metal pillar out in a slot canyon. Ground crews say the air goes cold near it and their hair stands on end.",
     "imagePath": "../images-missions/mission183.jpg",
     "reviewed": true
   },
@@ -1723,7 +1723,7 @@
     "oldTitle": "Ground Team Deployment",
     "newTitle": "Ground Team Insertion",
     "oldBrief": "You are deploying a specialized ground team into the LZ. Use the terrain on the way in, stabilize the hover and get the team out clean.",
-    "newBrief": "Deploying a specialized ground team into the LZ. Use the terrain on the approach. Stabilize the hover. Do not let anyone fall out of the helicopter this time.",
+    "newBrief": "Deploying a specialized ground team into the LZ. Use the terrain on the approach. Stabilize the hover. ",
     "imagePath": "../images-missions/mission191.jpg",
     "reviewed": true
   },
@@ -1795,7 +1795,7 @@
     "oldTitle": "Relocating Defense Personnel",
     "newTitle": "Relocation Services",
     "oldBrief": "You have a standard military charter with contracted defense personnel on board. Hit the schedule and fly it like any heavy jet sector.",
-    "newBrief": "Standard military charter with contracted defense personnel aboard. Hit the schedule. Fly it like any heavy jet sector and bring these troops to their new base of operations.",
+    "newBrief": "Standard military charter with contracted defense personnel aboard. Fly it like any heavy jet sector and bring these troops to their new base.",
     "imagePath": "../images-missions/mission199.jpg",
     "reviewed": true
   },
@@ -1939,7 +1939,7 @@
     "oldTitle": "Two-Ship Transit",
     "newTitle": "Two-Ship Formation",
     "oldBrief": "You are on a two-ship proficiency transit. Keep wingman separation inside the limits through climb and cruise — no surprises.",
-    "newBrief": "Two-ship proficiency transit. Keep wingman separation inside limits through climb and cruise and do not try to recreate that scene from Top Gun again, you have your orders.",
+    "newBrief": "Two-ship proficiency transit. Do not try to recreate that scene from Top Gun again, you have your orders.",
     "imagePath": "../images-missions/mission215.jpg",
     "reviewed": true
   },
@@ -1948,7 +1948,7 @@
     "oldTitle": "Proficiency Check",
     "newTitle": "Handling Check",
     "oldBrief": "You are conducting a handling and proficiency check. Fly the filed route with sharp energy management and respect the floor altitudes in the simulated combat phase.",
-    "newBrief": "Handling and proficiency check. Fly the filed route and push the airframe limits in the simulated combat phase. Fight through the G's and try not to black out.",
+    "newBrief": "Handling and proficiency check. Fight through the G's and try not to black out.",
     "imagePath": "../images-missions/mission216.jpg",
     "reviewed": true
   },
@@ -1957,25 +1957,25 @@
     "oldTitle": "Terrain Masking",
     "newTitle": "Terrain Masking Run",
     "oldBrief": "You are executing a terrain-masking profile today. Terrain-following or strict visual low-level — hold 250 feet AGL through the corridor and watch for birds.",
-    "newBrief": "High-speed terrain-masking profile. Strict visual low-level. Hold 250 feet AGL through the corridor. Watch for birds and smile for the cameras.",
+    "newBrief": "High-speed terrain-masking profile. Hold 250 feet AGL through the corridor. Watch for birds and smile for the cameras.",
     "imagePath": "../images-missions/mission217.jpg",
     "reviewed": true
   },
   {
     "imgId": 219,
     "oldTitle": "Festival Ferry",
-    "newTitle": "Festival Staging Run",
+    "newTitle": "Air Show",
     "oldBrief": "You have been instructed to be on the staging grounds before sunset. Cruise power to spare the engines — expect a crowd watching your arrival.",
-    "newBrief": "Get to the airshow grounds before sunset, no exceptions. Conserve cruise power to spare the engines. This is a busy airfield, so watch out for slow civilian flights.",
+    "newBrief": "You've been instructed to arrive before 7am. This is a busy airfield, so watch out for slow civilian flights on arrival.",
     "imagePath": "../images-missions/mission219.jpg",
     "reviewed": true
   },
   {
     "imgId": 220,
     "oldTitle": "Tanker Practice",
-    "newTitle": "Tanker Approach Drill",
+    "newTitle": "Refuelling Practice",
     "oldBrief": "You are conducting aerial refuelling approach practice. Fly the assigned route and hold airspeed and altitude per your flightplan the whole way.",
-    "newBrief": "Aerial refuelling approach practice. Fly the assigned route. Hold airspeed and altitude per your flight plan the whole way.",
+    "newBrief": "Aerial refuelling approach practice, same drill as always. Hold airspeed and altitude as briefed, and try not to break another refuelling nozzle.",
     "imagePath": "../images-missions/mission220.jpg",
     "reviewed": true
   },
@@ -2018,7 +2018,7 @@
   {
     "imgId": 250,
     "oldTitle": "Tanker Practice",
-    "newTitle": "Second Chance Tanker",
+    "newTitle": "Refuelling Practice",
     "oldBrief": "You are conducting aerial refuelling approach practice. Hold airspeed and altitude as briefed and do not break another refuelling nozzle.",
     "newBrief": "Aerial refuelling approach practice, same drill as always. Hold airspeed and altitude as briefed, and try not to break another refuelling nozzle.",
     "imagePath": "../images-missions/mission250.jpg",
@@ -2047,7 +2047,7 @@
     "oldTitle": "Instructional Sortie",
     "newTitle": "Student Training Flight",
     "oldBrief": "You have a student aboard for handling and lookout practice. Demonstrate energy management and circuit work, and talk through how you read the sky as you fly. Keep the ride smooth and verbalize every decision.",
-    "newBrief": "A student's aboard from {dep_field} for handling and lookout practice today. Demonstrate energy management and circuit work, and talk through how you're reading the sky as you go. Keep it smooth, and say every decision out loud.",
+    "newBrief": "A student's aboard from {dep_field} for handling and lookout practice today. Talk through how you're reading the sky as you go. ",
     "imagePath": "../images-missions/mission227.jpg",
     "reviewed": true
   },
@@ -2056,7 +2056,7 @@
     "oldTitle": "Powered Ferry",
     "newTitle": "Powered Glider Ferry",
     "oldBrief": "The club needs this glider repositioned from {dep_field} to {dest_field}. Climb to a safe altitude, shut down to soar when you can and keep enough battery or fuel for a go-around reserve at destination.",
-    "newBrief": "The club needs this glider repositioned from {dep_field} to {dest_field}. Climb to a safe altitude, shut down and soar whenever you can, and keep enough battery or fuel in reserve for a go-around at the other end.",
+    "newBrief": "The club needs this glider repositioned from {dep_field} to {dest_field}. Climb to a safe altitude, shut down and soar whenever you can.",
     "imagePath": "../images-missions/mission228.jpg",
     "reviewed": true
   },
@@ -2065,7 +2065,7 @@
     "oldTitle": "Practice Task",
     "newTitle": "Contest Practice",
     "oldBrief": "You are flying a practice speed task from {dep_field} to {dest_field}. Work your height band, plan turns before weak lift and use cloud streets to cover ground. Progress by soaring technique, not minimum time under engine power.",
-    "newBrief": "A practice speed task from {dep_field} to {dest_field} today. Work your height band, plan the turns before you hit weak lift, and lean on cloud streets to cover distance. This one's about soaring technique, not minimum time under power.",
+    "newBrief": "A practice speed task from {dep_field} to {dest_field} today. Work your height band, plan the turns before you hit weak lift, and lean on cloud streets to cover distance.",
     "imagePath": "../images-missions/mission229.jpg",
     "reviewed": true
   }
