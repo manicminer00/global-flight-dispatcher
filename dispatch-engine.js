@@ -258,8 +258,8 @@ function gliderRoutePreferenceScore(pair) {
     return score;
 }
 
-const GLIDER_MIN_ROUTE_NM = 5;
-const GLIDER_MAX_ROUTE_NM = 50;
+const GLIDER_MIN_ROUTE_NM = 35;
+const GLIDER_MAX_ROUTE_NM = 70;
 const GLIDER_LOCAL_ROUTE_NM = 35;
 
 function buildGliderRoutePairs(validAirports, depOverride, spec) {
@@ -565,9 +565,6 @@ function missionRequiresPassengers(chosenMission, spec, scenario) {
     }
     return false;
 }
-function formatPassengerManifest(count) {
-    return count === 1 ? "1 Passenger" : `${count} Passengers`;
-}
 function normalizeIcao(icao) {
     return (icao || "").trim().toUpperCase();
 }
@@ -580,6 +577,7 @@ function estimateBaseBlockMinutesForRoute(dist, spec, aircraftType) {
     return estimateBaseBlockMinutes(Math.round(dist), spec, aircraftType);
 }
 function getEffectiveBlockMinutes(targetMins, spec, aircraftType) {
+    if (isGliderAircraft(spec)) return 45;
     if (isSliderIgnoredAircraft(spec)) return 20;
     return Math.max(10, targetMins - SHORT_HAUL_BLOCK_TIME_PAD_MINS - SHORT_HAUL_ROUTE_PLANNING_TRIM_MINS);
 }
@@ -985,8 +983,21 @@ function pickShortHaulRoute(pool, targetMins, spec, aircraftType) {
         }
         return ranked[ranked.length - 1].pair;
     }
+    // Nothing satisfied any tolerance band (e.g. HELI's fixed 30min target vs. the flat
+    // fixed-wing SHORT_HAUL_BLOCK_TIME_PAD_MINS pad, which always overshoots it) — still
+    // pick randomly, weighted toward the closest time fit, instead of deterministically
+    // returning the single best match every time (that collapsed every dispatch onto the
+    // same route whenever the candidate pool was small enough to skip HELI_ROUTE_PAIR_CAP's
+    // random subsampling).
     const ranked = pool.map(rank).sort((a, b) => a.proxyDelta - b.proxyDelta);
-    return ranked[0].pair;
+    const weights = ranked.map((entry) => 1 / (1 + entry.proxyDelta));
+    const total = weights.reduce((sum, w) => sum + w, 0);
+    let roll = Math.random() * total;
+    for (let i = 0; i < ranked.length; i++) {
+        roll -= weights[i];
+        if (roll <= 0) return ranked[i].pair;
+    }
+    return ranked[ranked.length - 1].pair;
 }
 function pickRouteByTimeFit(pool, targetMins, targetDistNm, spec, aircraftType) {
     if (!pool.length) return null;
@@ -1335,12 +1346,20 @@ function computePrestigePoints(distanceNm, spec, fromContractsBoard) {
     return Math.max(1, Math.round(dist * mult * (1 + contractBonus)));
 }
 
+// Ticket-only overrides for names that still run to 2 lines on the job ticket after the
+// prefix/suffix strip below. Keyed on the post-strip label so fleet-db.js names stay full
+// everywhere else (Aircraft Type list, etc.) — only the ticket rendering gets the shorter text.
+const BOARD_AIRCRAFT_DISPLAY_NAME_OVERRIDES = {
+    "Cessna Citation Longitude Model 700": "Citation Longitude 700",
+    "BAe Systems Avro RJ100 QT Freighter": "Avro RJ100 QT Freighter"
+};
 /** Strip developer prefix and redundant type suffixes from fleet display names for ticket UI. */
 function formatBoardAircraftDisplayName(name) {
     const raw = String(name || "").trim();
     const sep = raw.indexOf(" - ");
     let label = sep > 0 ? (raw.slice(sep + 3).trim() || raw) : raw;
     label = label.replace(/\s*\((Freighter|Passenger|Cargo|Turbo|Piston|Pressurized)\)\s*$/i, "").trim();
+    if (BOARD_AIRCRAFT_DISPLAY_NAME_OVERRIDES[label]) return BOARD_AIRCRAFT_DISPLAY_NAME_OVERRIDES[label];
     return label;
 }
 
@@ -1375,9 +1394,11 @@ function formatBoardTicketMetaHtml(result) {
     // Job-ticket meta is intentionally compact: aircraft, pax/cargo, then destination aids.
     const aircraftLine = `<span class="contract-ticket-meta-key">ACFT:</span> ${escapeHtml(formatBoardAircraftDisplayName(result.spec.name))}`;
     const altFeet = Number(result.altFeet) || 0;
-    const crzAltText = altFeet < 10000
-        ? `${String(Math.round(altFeet)).padStart(4, "0")}ft`
-        : `FL${String(Math.round(altFeet / 100)).padStart(3, "0")}`;
+    const crzAltText = altFeet < 1000
+        ? `${String(Math.round(altFeet))}ft`
+        : altFeet < 10000
+            ? `${String(Math.round(altFeet)).padStart(4, "0")}ft`
+            : `FL${String(Math.round(altFeet / 100)).padStart(3, "0")}`;
     const crzAltLine = `<span class="contract-ticket-meta-key">CRZ ALT:</span> ${escapeHtml(crzAltText)}`;
     const pax = Number(result.pax) || 0;
     const weightKg = Number(result.cargoKg) || 0;
@@ -1802,14 +1823,6 @@ function getContractScenarioImgId(result) {
     if (result.scenarioImgId != null) return result.scenarioImgId;
     if (result.scenario && result.scenario.imgId != null) return result.scenario.imgId;
     return null;
-}
-
-function estimateCrtBriefLines(text) {
-    if (!text) return 0;
-    return String(text).split("\n").reduce((sum, line) => {
-        if (!line.length) return sum + 1;
-        return sum + Math.ceil(line.length / CRT_BRIEF_CHARS_PER_LINE);
-    }, 0);
 }
 
 function trimCrtBriefBody(body, bodyLineBudget) {
@@ -2810,11 +2823,6 @@ async function removeCustomAircraft(icao) {
     rebuildFleetDropdown();
     updateDatabaseStats();
     updateManageCustomDbUI();
-}
-function getCurrentThemeMode() {
-    if (document.documentElement.classList.contains("light-mode")) return "light";
-    if (document.documentElement.classList.contains("greyscale-mode")) return "greyscale";
-    return "dark";
 }
 function missionImageUrl(fileName) {
     const path = `images-missions/${fileName}`;
@@ -5121,24 +5129,29 @@ function probeDispatchFlight(config) {
     let terrainSafetyFloor = Math.max(depElev, arrElev) + 3000;
     let midLat = (origin.lat + destination.lat) / 2;
     let midLon = (origin.lon + destination.lon) / 2;
+    // heliSafeFloor: real-world helicopter mountain-crossing transit tops out around
+    // 8,000-12,000ft MSL regardless of range (engine/rotor performance in thin air), unlike
+    // fixed-wing safeFloor which scales with the actual terrain height.
     const globalRanges = [
-        { name: "Alps", latMin: 45.0, latMax: 48.0, lonMin: 5.0, lonMax: 15.0, safeFloor: 11500 },
-        { name: "Pyrenees", latMin: 42.0, latMax: 43.3, lonMin: -2.0, lonMax: 3.3, safeFloor: 9500 },
-        { name: "North American Rockies", latMin: 35.0, latMax: 60.0, lonMin: -125.0, lonMax: -105.0, safeFloor: 14500 },
-        { name: "South American Andes", latMin: -55.0, latMax: 10.0, lonMin: -76.0, lonMax: -65.0, safeFloor: 15500 },
-        { name: "Himalayas / Tibetan Plateau", latMin: 26.0, latMax: 38.0, lonMin: 70.0, lonMax: 105.0, safeFloor: 21500 },
-        { name: "Japanese Alps / Central Ranges", latMin: 34.5, latMax: 37.5, lonMin: 136.0, lonMax: 139.5, safeFloor: 10500 }
+        { name: "Alps", latMin: 45.0, latMax: 48.0, lonMin: 5.0, lonMax: 15.0, safeFloor: 11500, heliSafeFloor: 10000 },
+        { name: "Pyrenees", latMin: 42.0, latMax: 43.3, lonMin: -2.0, lonMax: 3.3, safeFloor: 9500, heliSafeFloor: 8500 },
+        { name: "North American Rockies", latMin: 35.0, latMax: 60.0, lonMin: -125.0, lonMax: -105.0, safeFloor: 14500, heliSafeFloor: 12000 },
+        { name: "South American Andes", latMin: -55.0, latMax: 10.0, lonMin: -76.0, lonMax: -65.0, safeFloor: 15500, heliSafeFloor: 12000 },
+        { name: "Himalayas / Tibetan Plateau", latMin: 26.0, latMax: 38.0, lonMin: 70.0, lonMax: 105.0, safeFloor: 21500, heliSafeFloor: 12000 },
+        { name: "Japanese Alps / Central Ranges", latMin: 34.5, latMax: 37.5, lonMin: 136.0, lonMax: 139.5, safeFloor: 10500, heliSafeFloor: 9000 }
     ];
+    let heliMountainTransitFloor = 0;
     for (let range of globalRanges) {
         let dMatch = (origin.lat >= range.latMin && origin.lat <= range.latMax && origin.lon >= range.lonMin && origin.lon <= range.lonMax);
         let aMatch = (destination.lat >= range.latMin && destination.lat <= range.latMax && destination.lon >= range.lonMin && destination.lon <= range.lonMax);
         let mMatch = (midLat >= range.latMin && midLat <= range.latMax && midLon >= range.lonMin && midLon <= range.lonMax);
         if (dMatch || aMatch || mMatch) {
             if (spec.class !== "HELI") terrainSafetyFloor = Math.max(terrainSafetyFloor, range.safeFloor);
-            break; 
+            else heliMountainTransitFloor = range.heliSafeFloor;
+            break;
         }
     }
-    
+
     // Real-world sea-level rate of climb per class (POH/manufacturer figures). Decay
     // toward each aircraft's actual service ceiling (spec.maxAlt) is handled by
     // solveMaxAltitudeForTimeBudget below, not baked into these numbers.
@@ -5162,9 +5175,29 @@ function probeDispatchFlight(config) {
     }
     const timeAltCap = solveMaxAltitudeForTimeBudget(targetMins, climbRateFpm, descentRateFpm, spec.maxAlt, depElev, arrElev);
 
-    const finalMinAlt = Math.max(spec.minAlt, terrainSafetyFloor);
+    // Every aircraft's cruise altitude — HELI included — is always a whole thousand (IFR)
+    // or whole thousand + 500ft (VFR), matching hemispheric direction. That convention is
+    // never broken; HELI only gets tighter min/max bounds (realistic AGL band instead of
+    // the generic fixed-wing +3000ft floor), fed through the exact same rounding pipeline.
+    const isHeli = spec.class === "HELI";
+    let heliBandMinAlt = 0, heliBandMaxAlt = 0;
+    if (isHeli) {
+        // Standard cruise is 1,000-5,000ft AGL; hover/tactical work (LZ insertions, hoists,
+        // line/photo work — flagged per-mission via hatPick.scenario.lowLevelOps) is flown
+        // much lower, 100-500ft AGL. Mountain-crossing terrain gets an occasional
+        // 8,000-12,000ft MSL transit exception instead. The aircraft's own maxAlt (real
+        // service ceiling) is always the hard cap.
+        const heliGroundRef = Math.max(depElev, arrElev);
+        const isLowLevelHeliMission = !!(hatPick && hatPick.scenario && hatPick.scenario.lowLevelOps);
+        const heliBandMin = isLowLevelHeliMission ? 100 : 1000;
+        const heliBandMax = isLowLevelHeliMission ? 500 : 5000;
+        heliBandMaxAlt = Math.min(spec.maxAlt, Math.max(heliGroundRef + heliBandMax, heliMountainTransitFloor));
+        heliBandMinAlt = Math.min(heliGroundRef + heliBandMin, heliBandMaxAlt);
+    }
+
+    const finalMinAlt = isHeli ? heliBandMinAlt : Math.max(spec.minAlt, terrainSafetyFloor);
     const distanceAltCap = Math.max(timeAltCap, finalMinAlt);
-    const effectiveMaxAlt = Math.max(Math.min(spec.maxAlt, distanceAltCap), terrainSafetyFloor);
+    const effectiveMaxAlt = isHeli ? heliBandMaxAlt : Math.max(Math.min(spec.maxAlt, distanceAltCap), terrainSafetyFloor);
     // VFR is only legal below Class A airspace (18,000ft MSL in the US) — the highest legal
     // VFR cruising altitudes are 17,500ft eastbound and 16,500ft westbound (odd/even thousand
     // + 500), never the aircraft's own ceiling. Capping the pre-rounding thousand at 17/16
@@ -5177,17 +5210,17 @@ function probeDispatchFlight(config) {
     const dynamicMinAlt = Math.min(
         safeMaxAlt,
         effectiveMaxAlt < finalMinAlt
-            ? Math.max(terrainSafetyFloor, safeMaxAlt - 4000)
+            ? Math.max(isHeli ? heliBandMinAlt : terrainSafetyFloor, safeMaxAlt - 4000)
             : finalMinAlt
     );
-        
+
     // "Prefer lower cruise altitude" hard-restricts sampling to the bottom third of the
     // valid range (not just a probabilistic nudge) — with only 3 tickets shown at once, a
     // soft bias could still occasionally hand back a high pick and look like it did nothing.
     const cruiseSampleMaxAlt = preferLowerCruise
         ? dynamicMinAlt + (safeMaxAlt - dynamicMinAlt) / 3
         : safeMaxAlt;
-    let baseThousands = Math.floor((Math.random() * (cruiseSampleMaxAlt - dynamicMinAlt + 1) + dynamicMinAlt) / 1000);
+    let baseThousands = Math.max(1, Math.floor((Math.random() * (cruiseSampleMaxAlt - dynamicMinAlt + 1) + dynamicMinAlt) / 1000));
 
     // Hemispheric Rules: IFR uses whole thousands, odd/even by direction. VFR adds the
     // standard +500ft on top of the same odd/even convention (FAA 91.159 / SERA).

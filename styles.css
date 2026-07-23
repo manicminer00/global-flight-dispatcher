@@ -1994,7 +1994,8 @@
             color: var(--color-link-readme);
             font-weight: var(--font-weight-time-val);
         }
-        .board-sidebar-form .slider-header-row #timeVal {
+        .board-sidebar-form .slider-header-row #timeVal,
+        .board-sidebar-form .slider-header-row #heliFixedBlockVal {
             color: var(--color-link-readme);
             font-size: 1em;
             font-weight: 800;
