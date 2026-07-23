@@ -3161,6 +3161,10 @@
             letter-spacing: 0;
             line-height: 1.1;
         }
+        .contract-ticket-route--long-icao {
+            font-size: 31px;
+            gap: 10px;
+        }
         .contract-ticket-route-icao {
             font-size: inherit;
             font-weight: inherit;

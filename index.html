@@ -80,8 +80,11 @@
                 </label>
                 <input type="range" id="timeSlider" min="40" max="120" step="10" value="60" oninput="updateFlightTimeDisplay()" style="width: 100%; cursor: pointer;">
                 <div class="slider-footer-row board-sidebar-slider-footer">
-                    <span class="note-text slider-rotor-glider-note">Helicopter &amp; Glider missions are unaffected by this slider.</span>
+                    <span class="note-text slider-rotor-glider-note">Glider missions are unaffected by this slider.</span>
                 </div>
+            </div>
+            <div class="slider-section board-sidebar-slider" id="heliFixedBlockTime" style="display:none;">
+                <label class="slider-header-row">BLOCK TIME: 30 MINS</label>
             </div>
             <hr class="preflight-rules-divider" aria-hidden="true">
             <div class="preflight-rules-row">
@@ -596,7 +599,16 @@
                 <label for="newAcOew">OEW (kg):<span class="field-hint">(<a href="https://ansperformance.eu/acronym/oew/" target="_blank" rel="noopener noreferrer">OEW definition</a>)</span></label>
                 <input type="number" id="newAcOew" placeholder="e.g. 42000">
             </div>
+            <div>
+                <label for="newAcMlw">MLW (kg, optional):<span class="field-hint">(Max Landing Weight)</span></label>
+                <input type="number" id="newAcMlw" placeholder="e.g. 63000">
+            </div>
+            <div>
+                <label for="newAcMzfw">MZFW (kg, optional):<span class="field-hint">(Max Zero-Fuel Weight)</span></label>
+                <input type="number" id="newAcMzfw" placeholder="e.g. 58000">
+            </div>
         </div>
+        <div class="note-text" style="margin-bottom: 12px;">N.B. MLW and MZFW are optional. Leave blank if unknown from the POH/AFM — the dispatcher simply won't apply that weight cap for this aircraft. Both must be at or below MTOW.</div>
         <div class="form-grid-2-mt section-before-mission-tags">
             <div>
                 <label for="newAcFuel">Fuel Burn (kg/nm):</label>

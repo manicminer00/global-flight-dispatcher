@@ -617,6 +617,9 @@ function getBlockSpeedForSpec(spec, aircraftType) {
     return BLOCK_SPEED_KTS.GA;
 }
 const SHORT_HAUL_SLIDER = { min: 40, max: 120, step: 10, defaultValue: 60, listId: "steplist" };
+// Helicopter block time is fixed, not slider-driven (real heli hops run well under the
+// short-haul slider's 40-min floor) — the UI hides the slider and shows this instead.
+const HELI_FIXED_BLOCK_MINS = 30;
 // Short-haul slider = target SimBrief block. Routing cruise subtracts SHORT_HAUL_BLOCK_TIME_PAD_MINS;
 // pick/filter adds SIMBRIEF_OVERHEAD to proxy block so filed routes land near the slider.
 const SHORT_HAUL_PRIMARY_DISTANCE_BAND = 0.12;
@@ -1359,6 +1362,13 @@ function fillBoardRouteCells(card, origin, destination) {
     };
     setIcao("dep-icao", origin);
     setIcao("arr-icao", destination);
+    const routeEl = card.querySelector('[data-role="route"]');
+    if (routeEl) {
+        const depIcao = origin && origin.icao ? String(origin.icao).trim() : "";
+        const arrIcao = destination && destination.icao ? String(destination.icao).trim() : "";
+        const isLong = depIcao.length > 4 || arrIcao.length > 4;
+        routeEl.classList.toggle("contract-ticket-route--long-icao", isLong);
+    }
 }
 
 function formatBoardTicketMetaHtml(result) {
@@ -1537,9 +1547,14 @@ function applyFlightRulesModeToBoard(mode) {
 }
 
 function getDispatchUiProbeConfig() {
+    const aircraftType = resolveAircraftTypeFromInput(document.getElementById("aircraftInput").value.trim());
+    const spec = aircraftType && typeof activeFleetSpecs !== "undefined" ? activeFleetSpecs[aircraftType] : null;
+    const targetMins = (spec && spec.class === "HELI")
+        ? HELI_FIXED_BLOCK_MINS
+        : parseInt(document.getElementById("timeSlider").value, 10);
     return {
-        aircraftType: resolveAircraftTypeFromInput(document.getElementById("aircraftInput").value.trim()),
-        targetMins: parseInt(document.getElementById("timeSlider").value, 10),
+        aircraftType: aircraftType,
+        targetMins: targetMins,
         callsign: document.getElementById("callsignInput").value,
         depOverride: document.getElementById("depOverrideInput").value,
         isContractorMode: document.getElementById("contractorToggle").checked,
@@ -3134,7 +3149,7 @@ function applyCustomAircraftRangeDefaults() {
     maxEl.placeholder = `e.g. ${defs.maxD}`;
 }
 function clearCustomAircraftForm() {
-    ["newAcName", "newAcIcao", "newAcLength", "newAcMaxPax", "newAcMaxCargo", "newAcMtow", "newAcOew", "newAcFuel", "newAcMaxD"].forEach(id => {
+    ["newAcName", "newAcIcao", "newAcLength", "newAcMaxPax", "newAcMaxCargo", "newAcMtow", "newAcOew", "newAcMlw", "newAcMzfw", "newAcFuel", "newAcMaxD"].forEach(id => {
         const el = document.getElementById(id);
         if (el) {
             el.value = "";
@@ -3209,6 +3224,8 @@ function saveCustomAircraft() {
     const maxCargo = parseInt(document.getElementById("newAcMaxCargo").value, 10) || 0;
     const mtow = parseInt(document.getElementById("newAcMtow").value, 10) || 0;
     const oew = parseInt(document.getElementById("newAcOew").value, 10) || 0;
+    const mlw = parseInt(document.getElementById("newAcMlw").value, 10) || 0;
+    const mzfw = parseInt(document.getElementById("newAcMzfw").value, 10) || 0;
     const fuelPerNm = parseFloat(document.getElementById("newAcFuel").value);
     const minD = getDefaultMinDistanceNm(rawClass);
     const maxD = parseInt(document.getElementById("newAcMaxD").value, 10);
@@ -3236,6 +3253,14 @@ function saveCustomAircraft() {
     }
     if (oew >= mtow) {
         vectorAlert("OEW must be lower than MTOW.");
+        return;
+    }
+    if (mlw > 0 && mlw > mtow) {
+        vectorAlert("MLW cannot be higher than MTOW.");
+        return;
+    }
+    if (mzfw > 0 && mzfw > mtow) {
+        vectorAlert("MZFW cannot be higher than MTOW.");
         return;
     }
     const missionRoles = readCustomMissionRolesFromForm(rawClass, isMilitary);
@@ -3290,6 +3315,8 @@ function saveCustomAircraft() {
         class: acClass,
         mtow: mtow,
         oew: oew,
+        mlw: mlw,
+        mzfw: mzfw,
         fuelPerNm: fuelPerNm,
         isMilitary: isMilitary,
         isTactical: rawClass === "MIL_JET" || (rawClass === "WARBIRD" && document.getElementById("newAcFighter") && document.getElementById("newAcFighter").checked),
@@ -3382,11 +3409,17 @@ function getSelectedAircraftSpec() {
 function updateFlightTimeSliderState() {
     const slider = document.getElementById("timeSlider");
     const section = document.querySelector(".slider-section");
+    const heliBlockTime = document.getElementById("heliFixedBlockTime");
     if (!slider) return;
     const spec = getSelectedAircraftSpec();
+    const isHeli = !!(spec && spec.class === "HELI");
     const sliderIgnored = spec && isSliderIgnoredAircraft(spec);
     slider.disabled = false;
-    if (section) section.classList.toggle("slider-section--rotor-glider", !!sliderIgnored);
+    if (section) {
+        section.style.display = isHeli ? "none" : "";
+        section.classList.toggle("slider-section--rotor-glider", !!sliderIgnored);
+    }
+    if (heliBlockTime) heliBlockTime.style.display = isHeli ? "" : "none";
     refreshBoardCrtSkinFromSelection();
     updateFlightRulesButtonAvailability(spec);
 }
