@@ -1364,6 +1364,11 @@ function fillBoardRouteCells(card, origin, destination) {
 function formatBoardTicketMetaHtml(result) {
     // Job-ticket meta is intentionally compact: aircraft, pax/cargo, then destination aids.
     const aircraftLine = `<span class="contract-ticket-meta-key">ACFT:</span> ${escapeHtml(formatBoardAircraftDisplayName(result.spec.name))}`;
+    const altFeet = Number(result.altFeet) || 0;
+    const crzAltText = altFeet < 10000
+        ? `${String(Math.round(altFeet)).padStart(4, "0")}ft`
+        : `FL${String(Math.round(altFeet / 100)).padStart(3, "0")}`;
+    const crzAltLine = `<span class="contract-ticket-meta-key">CRZ ALT:</span> ${escapeHtml(crzAltText)}`;
     const pax = Number(result.pax) || 0;
     const weightKg = Number(result.cargoKg) || 0;
     const payloadLine = `<span class="contract-ticket-meta-key">PAX</span> ${escapeHtml(String(pax))} <span class="contract-ticket-meta-key">/</span> <span class="contract-ticket-meta-key">CARGO</span> ${escapeHtml(`${weightKg.toLocaleString("en-GB")} KG`)}`;
@@ -1374,6 +1379,7 @@ function formatBoardTicketMetaHtml(result) {
     const wrapMetaLine = (line) => `<span class="contract-ticket-meta-line">${line}</span>`;
     return [
         wrapMetaLine(aircraftLine),
+        wrapMetaLine(crzAltLine),
         wrapMetaLine(payloadLine),
         destDivider,
         wrapMetaLine(destIlsLine),
@@ -1464,6 +1470,72 @@ function buildDispatchExportBundle(result) {
     };
 }
 
+function getSelectedFlightRulesMode() {
+    const vfrBtn = document.getElementById("vfrRulesBtn");
+    return vfrBtn && vfrBtn.classList.contains("is-active") ? "VFR" : "IFR";
+}
+
+function setFlightRulesMode(mode) {
+    const resolved = mode === "VFR" ? "VFR" : "IFR";
+    const vfrBtn = document.getElementById("vfrRulesBtn");
+    const ifrBtn = document.getElementById("ifrRulesBtn");
+    if (vfrBtn) {
+        vfrBtn.classList.toggle("is-active", resolved === "VFR");
+        vfrBtn.setAttribute("aria-pressed", resolved === "VFR" ? "true" : "false");
+    }
+    if (ifrBtn) {
+        ifrBtn.classList.toggle("is-active", resolved === "IFR");
+        ifrBtn.setAttribute("aria-pressed", resolved === "IFR" ? "true" : "false");
+    }
+    try { localStorage.setItem("dispatcher_flight_rules_mode", resolved); } catch (e) {}
+    applyFlightRulesModeToBoard(resolved);
+}
+
+// Highest legal VFR cruising altitude (eastbound, odd thousand + 500), just below the
+// 18,000ft Class A floor. If an aircraft's own minimum cruise altitude is already above
+// this, VFR is never actually achievable for it, so the button is hidden rather than
+// left selectable with no real effect.
+const VFR_MAX_LEGAL_ALT = 17500;
+function updateFlightRulesButtonAvailability(spec) {
+    const vfrBtn = document.getElementById("vfrRulesBtn");
+    if (!vfrBtn) return;
+    const vfrPossible = !spec || (Number(spec.minAlt) || 0) <= VFR_MAX_LEGAL_ALT;
+    vfrBtn.style.display = vfrPossible ? "" : "none";
+    if (!vfrPossible && vfrBtn.classList.contains("is-active")) {
+        setFlightRulesMode("IFR");
+    }
+}
+
+// Re-rounds the already-dispatched cruise altitude for every ticket currently on the
+// board when VFR/IFR is toggled post-generation, instead of requiring a full regenerate.
+// altFeetBase (whole thousand, hemispheric-correct) never changes — only whether the
+// VFR +500ft is added on top of it — so the route/payload/mission stay exactly as dispatched.
+// VFR is only legal below 18,000ft MSL (Class A floor in the US) — 17,500ft eastbound /
+// 16,500ft westbound are the highest legal VFR cruising altitudes, so toggling VFR on an
+// already-dispatched high-altitude ticket (e.g. a jet at FL350) must re-cap down to that,
+// not just add 500 to whatever altitude was already picked under IFR.
+function applyFlightRulesModeToBoard(mode) {
+    const resolved = mode === "VFR" ? "VFR" : "IFR";
+    if (typeof boardContractResults === "undefined" || !Array.isArray(boardContractResults) || !boardContractResults.length) return;
+    let changed = false;
+    boardContractResults.forEach((result) => {
+        if (!result || typeof result.altFeetBase !== "number") return;
+        let newAltFeet = result.altFeetBase;
+        if (resolved === "VFR") {
+            const vfrCeilingThousands = result.isEasterly ? 17 : 16;
+            newAltFeet = Math.min(result.altFeetBase, vfrCeilingThousands * 1000) + 500;
+        }
+        if (result.altFeet !== newAltFeet) {
+            result.altFeet = newAltFeet;
+            result._exportBundle = buildDispatchExportBundle(result);
+            changed = true;
+        }
+    });
+    if (changed && typeof renderContractsBoard === "function") {
+        renderContractsBoard(boardContractResults, { inactive: false });
+    }
+}
+
 function getDispatchUiProbeConfig() {
     return {
         aircraftType: resolveAircraftTypeFromInput(document.getElementById("aircraftInput").value.trim()),
@@ -1475,6 +1547,8 @@ function getDispatchUiProbeConfig() {
         preferOwned: document.getElementById("preferOwnedToggle").checked,
         navigraphOnly: document.getElementById("navigraphOnlyToggle").checked,
         routingScope: getRoutingScope(),
+        flightRulesMode: getSelectedFlightRulesMode(),
+        preferLowerCruise: !!(document.getElementById("preferLowerCruiseToggle") && document.getElementById("preferLowerCruiseToggle").checked),
         mutateHistory: true
     };
 }
@@ -3314,6 +3388,7 @@ function updateFlightTimeSliderState() {
     slider.disabled = false;
     if (section) section.classList.toggle("slider-section--rotor-glider", !!sliderIgnored);
     refreshBoardCrtSkinFromSelection();
+    updateFlightRulesButtonAvailability(spec);
 }
 function rebuildFleetDropdown() {
     migrateCustomMissionAssignmentsOnLoad();
@@ -4742,6 +4817,40 @@ function formatScenery(apt) {
         return `${apt.icao} - Hand-Crafted`;
     }
 }
+// Real climb performance decays roughly linearly toward zero as altitude approaches
+// an aircraft's service ceiling (POH charts / MSFS testing confirm this pattern across
+// GA, turboprop, and jet types alike) — a flat average fpm can't represent that, so the
+// last few thousand feet below ceiling take disproportionately longer than a flat rate
+// would suggest, which is why aircraft rarely dispatch near their absolute ceiling.
+// Descent is flown to hold a constant 3° path (pilot/ATC managed, not thrust-limited),
+// so it stays a flat rate with no decay.
+// climbMins(A) = climb time from actual field elevation (depElev) to A, not from sea level —
+// an airport at 5,000-8,000ft field elevation needs that much less climbing to reach any given A.
+// descentMins(A) = time to descend from A down to the arrival field elevation (arrElev), not to
+// sea level. Solve climbMins(A) + descentMins(A) <= availableMins for max A via bisection.
+function solveMaxAltitudeForTimeBudget(availableMins, climbRateSeaLevel, descentRateFpm, serviceCeiling, depElev, arrElev) {
+    if (availableMins <= 0 || climbRateSeaLevel <= 0 || descentRateFpm <= 0 || serviceCeiling <= 0) return 0;
+    const depAlt = Math.max(0, Math.min(depElev || 0, serviceCeiling * 0.9999));
+    const arrAlt = Math.max(0, Math.min(arrElev || 0, serviceCeiling * 0.9999));
+    const climbTimeFromSeaLevelTo = (alt) => {
+        const ratio = Math.min(Math.max(alt, 0) / serviceCeiling, 0.9999);
+        return (serviceCeiling / climbRateSeaLevel) * -Math.log(1 - ratio);
+    };
+    const depClimbBaseline = climbTimeFromSeaLevelTo(depAlt);
+    const timeForAlt = (alt) => {
+        const climbMins = Math.max(0, climbTimeFromSeaLevelTo(alt) - depClimbBaseline);
+        const descentMins = Math.max(0, alt - arrAlt) / descentRateFpm;
+        return climbMins + descentMins;
+    };
+    let lo = depAlt;
+    let hi = serviceCeiling * 0.9999;
+    if (timeForAlt(hi) <= availableMins) return hi;
+    for (let i = 0; i < 30; i++) {
+        const mid = (lo + hi) / 2;
+        if (timeForAlt(mid) <= availableMins) lo = mid; else hi = mid;
+    }
+    return lo;
+}
 function probeDispatchFlight(config) {
     const fail = (reason, message, extra) => Object.assign({ ok: false, reason, message: message || "" }, extra || {});
     const cfg = config || {};
@@ -4755,6 +4864,8 @@ function probeDispatchFlight(config) {
     const navigraphOnly = !!cfg.navigraphOnly;
     const routingScope = cfg.routingScope === "americas" || cfg.routingScope === "row" ? cfg.routingScope : "worldwide";
     const mutateHistory = cfg.mutateHistory !== false;
+    const flightRulesMode = cfg.flightRulesMode === "VFR" ? "VFR" : "IFR";
+    const preferLowerCruise = !!cfg.preferLowerCruise;
     const warnings = [];
 
     rebuildActiveDatabase();
@@ -4995,24 +5106,63 @@ function probeDispatchFlight(config) {
         }
     }
     
-    let climbProfile = 150; 
-    if (spec.class === "GA" || spec.class === "HELI" || spec.class === "WARBIRD") climbProfile = 100;
-    if (spec.class === "BIZ JET") climbProfile = 250;
-    
+    // Real-world sea-level rate of climb per class (POH/manufacturer figures). Decay
+    // toward each aircraft's actual service ceiling (spec.maxAlt) is handled by
+    // solveMaxAltitudeForTimeBudget below, not baked into these numbers.
+    let climbRateFpm = 1500; // GA / HELI
+    let descentRateFpm = 500;
+    if (spec.class === "WARBIRD") {
+        climbRateFpm = 2100; descentRateFpm = 1000;
+    }
+    if (spec.class === "TURBO") {
+        climbRateFpm = 1900; descentRateFpm = 1000;
+        if (spec.tags && spec.tags.includes("MILITARY_TRANSPORT")) climbRateFpm = 2100;
+    }
+    if (type && VINTAGE_PROPLINER_TYPES.has(type)) {
+        climbRateFpm = 1000; descentRateFpm = 1000;
+    }
+    if (spec.class === "BIZ JET") {
+        climbRateFpm = 3800; descentRateFpm = 2000;
+    }
+    if (spec.class === "JET") {
+        climbRateFpm = 2750; descentRateFpm = 1500;
+    }
+    const timeAltCap = solveMaxAltitudeForTimeBudget(targetMins, climbRateFpm, descentRateFpm, spec.maxAlt, depElev, arrElev);
+
     const finalMinAlt = Math.max(spec.minAlt, terrainSafetyFloor);
-    const distanceAltCap = Math.max(distanceNm * climbProfile, finalMinAlt);
+    const distanceAltCap = Math.max(timeAltCap, finalMinAlt);
     const effectiveMaxAlt = Math.max(Math.min(spec.maxAlt, distanceAltCap), terrainSafetyFloor);
-    const safeMaxAlt = effectiveMaxAlt;
-    const dynamicMinAlt = effectiveMaxAlt < finalMinAlt
-        ? Math.max(terrainSafetyFloor, safeMaxAlt - 4000)
-        : finalMinAlt;
+    // VFR is only legal below Class A airspace (18,000ft MSL in the US) — the highest legal
+    // VFR cruising altitudes are 17,500ft eastbound and 16,500ft westbound (odd/even thousand
+    // + 500), never the aircraft's own ceiling. Capping the pre-rounding thousand at 17/16
+    // guarantees the post-parity value (+500) can never land on or above 18,000ft.
+    let safeMaxAlt = effectiveMaxAlt;
+    if (flightRulesMode === "VFR") {
+        const vfrCeilingThousands = isEasterly ? 17 : 16;
+        safeMaxAlt = Math.min(safeMaxAlt, vfrCeilingThousands * 1000);
+    }
+    const dynamicMinAlt = Math.min(
+        safeMaxAlt,
+        effectiveMaxAlt < finalMinAlt
+            ? Math.max(terrainSafetyFloor, safeMaxAlt - 4000)
+            : finalMinAlt
+    );
         
-    let baseThousands = Math.floor((Math.random() * (safeMaxAlt - dynamicMinAlt + 1) + dynamicMinAlt) / 1000);
-    
-    // Strict Hemispheric Rules - Always whole thousands, no VFR offsets.
+    // "Prefer lower cruise altitude" hard-restricts sampling to the bottom third of the
+    // valid range (not just a probabilistic nudge) — with only 3 tickets shown at once, a
+    // soft bias could still occasionally hand back a high pick and look like it did nothing.
+    const cruiseSampleMaxAlt = preferLowerCruise
+        ? dynamicMinAlt + (safeMaxAlt - dynamicMinAlt) / 3
+        : safeMaxAlt;
+    let baseThousands = Math.floor((Math.random() * (cruiseSampleMaxAlt - dynamicMinAlt + 1) + dynamicMinAlt) / 1000);
+
+    // Hemispheric Rules: IFR uses whole thousands, odd/even by direction. VFR adds the
+    // standard +500ft on top of the same odd/even convention (FAA 91.159 / SERA).
     if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
     if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
-    let altFeet = baseThousands * 1000;
+    const altFeetBase = baseThousands * 1000;
+    let altFeet = altFeetBase;
+    if (flightRulesMode === "VFR") altFeet += 500;
 
     // --- PHASE 5: CALCULATE PAYLOAD ---
     const chosenScenario = hatPick && hatPick.scenario ? hatPick.scenario : null;
@@ -5270,6 +5420,7 @@ function probeDispatchFlight(config) {
         isLocalFlight,
         isEasterly,
         altFeet,
+        altFeetBase,
         pax,
         cargoKg,
         payout,

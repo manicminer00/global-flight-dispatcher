@@ -83,6 +83,37 @@
                     <span class="note-text slider-rotor-glider-note">Helicopter &amp; Glider missions are unaffected by this slider.</span>
                 </div>
             </div>
+            <hr class="preflight-rules-divider" aria-hidden="true">
+            <div class="preflight-rules-row">
+                <div class="preflight-rules-toggle" role="group" aria-label="Flight rules">
+                    <button type="button" id="ifrRulesBtn" class="rules-toggle-btn is-active" aria-pressed="true" onclick="setFlightRulesMode('IFR')">IFR</button>
+                    <button type="button" id="vfrRulesBtn" class="rules-toggle-btn" aria-pressed="false" onclick="setFlightRulesMode('VFR')">VFR</button>
+                </div>
+                <label class="preflight-prefer-lower" for="preferLowerCruiseToggle">
+                    <input type="checkbox" id="preferLowerCruiseToggle"> Prefer lower cruise altitude
+                </label>
+            </div>
+            <script>
+            (function () {
+                try {
+                    var saved = localStorage.getItem("dispatcher_flight_rules_mode");
+                    if (saved === "VFR") {
+                        var vfrEl = document.getElementById("vfrRulesBtn");
+                        var ifrEl = document.getElementById("ifrRulesBtn");
+                        if (vfrEl) { vfrEl.classList.add("is-active"); vfrEl.setAttribute("aria-pressed", "true"); }
+                        if (ifrEl) { ifrEl.classList.remove("is-active"); ifrEl.setAttribute("aria-pressed", "false"); }
+                    }
+                    var lowerEl = document.getElementById("preferLowerCruiseToggle");
+                    var savedLower = localStorage.getItem("dispatcher_prefer_lower_cruise");
+                    if (lowerEl && savedLower === "1") lowerEl.checked = true;
+                    if (lowerEl) {
+                        lowerEl.addEventListener("change", function () {
+                            localStorage.setItem("dispatcher_prefer_lower_cruise", lowerEl.checked ? "1" : "0");
+                        });
+                    }
+                } catch (e) {}
+            })();
+            </script>
             <button id="generateFlightBtn" type="button" onclick="dispatchFlight()">GENERATE FLIGHT</button>
         </div>
         </div>
