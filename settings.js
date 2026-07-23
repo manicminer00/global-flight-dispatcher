@@ -1,5 +1,5 @@
 window.VECTOR_DEFAULT_SETTINGS = {
-  "ticketPhotoFilterFx": "zoom",
+  "ticketPhotoFilterFx": "crt",
   "ticketFx": {
     "groupDefaults": {
       "BIZ JET": "crt-business",

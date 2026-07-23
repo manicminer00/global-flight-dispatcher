@@ -398,16 +398,13 @@
             margin-top: -10px;
         }
         .board-sidebar-navigraph-panel {
-            margin-top: 16px;
-            margin-bottom: 18px;
-            padding: 10px 12px;
+            margin-top: 14px;
+            margin-bottom: 14px;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 8px;
-            background: var(--board-bg-panel-inner);
-            border: 1px solid var(--board-border);
-            border-radius: var(--board-ui-radius);
             box-sizing: border-box;
             cursor: pointer;
         }
@@ -415,8 +412,13 @@
             color: var(--board-text-muted);
             font-weight: 400;
         }
-        .board-sidebar-navigraph-panel:hover {
-            border-color: #3f9e44;
+        .board-sidebar-navigraph-divider {
+            border: none;
+            border-top: 1px solid var(--board-border);
+            margin: 0;
+        }
+        .board-sidebar-navigraph-divider--bottom {
+            margin-bottom: 14px;
         }
         .board-sidebar-form .board-sidebar-navigraph-option,
         .board-sidebar-navigraph-option {

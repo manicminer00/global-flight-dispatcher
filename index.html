@@ -132,14 +132,15 @@
                     <input type="checkbox" id="useLastArrivalToggle" onchange="toggleLastArrival()">CONTINUE FROM LAST AIRPORT?
                 </label>
             </div>
+            <hr class="board-sidebar-navigraph-divider" aria-hidden="true">
             <label class="board-sidebar-navigraph-panel" for="navigraphOnlyToggle">
                 <span class="board-sidebar-navigraph-option">
                     <input type="checkbox" id="navigraphOnlyToggle">
                     <img src="images/icon_navi_color.png" alt="" class="board-sidebar-navigraph-icon" aria-hidden="true">
                     <span class="board-sidebar-navigraph-text">Only use Navigraph airports</span>
                 </span>
-                <span class="note-text slider-rotor-glider-note">Select this option to ensure that both your departure and arrival airport are available in Navigraph.</span>
             </label>
+            <hr class="board-sidebar-navigraph-divider board-sidebar-navigraph-divider--bottom" aria-hidden="true">
                 <script>
                 (function () {
                     try {
@@ -427,13 +428,13 @@
                 <div class="photo-filter-preview-wrap photo-filter-preview-wrap--zoom">
                     <div class="photo-filter-preview-photo" data-role="photo-filter-preview" aria-hidden="true"></div>
                 </div>
-                <button type="button" class="photo-filter-btn" data-fx="zoom" aria-pressed="true">Zoom</button>
+                <button type="button" class="photo-filter-btn" data-fx="zoom" aria-pressed="false">Zoom</button>
             </div>
             <div class="photo-filter-option photo-filter-option--crt">
                 <div class="photo-filter-preview-wrap photo-filter-preview-wrap--crt">
                     <div class="photo-filter-preview-photo" data-role="photo-filter-preview" aria-hidden="true"></div>
                 </div>
-                <button type="button" class="photo-filter-btn" data-fx="crt" aria-pressed="false">CRT</button>
+                <button type="button" class="photo-filter-btn" data-fx="crt" aria-pressed="true">CRT</button>
             </div>
         </div>
             </div>
