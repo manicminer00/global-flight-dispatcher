@@ -1640,7 +1640,7 @@ function refreshBoardFlightLabels() {
 
 const TICKET_PHOTO_FX_STORAGE_KEY = "vector_ticket_photo_fx_v1";
 const TICKET_FX_USER_SETTINGS_KEY = "vector_ticket_fx_user_settings_v1";
-const TICKET_PHOTO_FX_MODES = ["static", "zoom", "crt"];
+const TICKET_PHOTO_FX_MODES = ["static", "crt"];
 const TICKET_FX_PROFILE_MODES = ["crt-standard", "crt-military", "crt-vintage", "crt-business", "crt-commercial", "crt-regional", "crt-starship", "crt-helicopter"];
 const TICKET_PHOTO_TYPEWRITER_CPS = 40;
 const CRT_BRIEF_VISIBLE_LINES = 9;
@@ -1713,10 +1713,10 @@ function getGlobalTicketFxFallback() {
     try {
         const stored = localStorage.getItem(TICKET_PHOTO_FX_STORAGE_KEY);
         const defaultMode = (window.VECTOR_DEFAULT_SETTINGS || {}).ticketPhotoFilterFx;
-        return TICKET_PHOTO_FX_MODES.includes(stored) ? stored : (TICKET_PHOTO_FX_MODES.includes(defaultMode) ? defaultMode : "zoom");
+        return TICKET_PHOTO_FX_MODES.includes(stored) ? stored : (TICKET_PHOTO_FX_MODES.includes(defaultMode) ? defaultMode : "static");
     } catch (e) {
         const defaultMode = (window.VECTOR_DEFAULT_SETTINGS || {}).ticketPhotoFilterFx;
-        return TICKET_PHOTO_FX_MODES.includes(defaultMode) ? defaultMode : "zoom";
+        return TICKET_PHOTO_FX_MODES.includes(defaultMode) ? defaultMode : "static";
     }
 }
 
@@ -1746,13 +1746,12 @@ function applyTicketFxToCard(card, result) {
     if (!card) return;
     const globalPhotoMode = getGlobalTicketFxFallback();
     const fx = resolveTicketFxForResult(result);
-    ["static", "zoom", "crt", "legacy", "matrix", ...TICKET_FX_PROFILE_MODES].forEach((mode) => card.classList.remove("ticket-photo-fx-" + mode));
+    ["static", "crt", "legacy", "matrix", ...TICKET_FX_PROFILE_MODES].forEach((mode) => card.classList.remove("ticket-photo-fx-" + mode));
     card.classList.remove("is-force-military-crt");
     ["is-vintage-crt", "is-led-crt", "is-starship-crt", "is-regional-mcdu-crt", "is-mcdu-crt", "is-helicopter-crt"].forEach((name) => card.classList.remove(name));
     if (globalPhotoMode !== "crt") {
         card.classList.remove("is-crt-pinned");
         resetTicketPhotoCrtDisplay(card);
-        if (globalPhotoMode === "zoom") card.classList.add("ticket-photo-fx-zoom");
         card.dataset.ticketFx = globalPhotoMode;
         return;
     }
