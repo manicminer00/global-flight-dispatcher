@@ -6,6 +6,64 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ## 2026-07-24
 
+- **Job ticket redesign (Scenery Links section, height, panel title alignment)** —
+  not yet committed. Fixed three things reported as messy:
+  1. CONTRACTS BOARD/LOGBOOK/SETTINGS titles were not aligned with each other or
+     with the Pre-Flight container's top edge. Root cause found via Playwright pixel
+     measurement (PNG crop + ImageMagick trim, since JS Range/getBoundingClientRect
+     do not report true glyph-ink position for large uppercase text): each heading's
+     visible ink rendered ~5-12px below its own CSS box top, and Logbook/Settings had
+     never been converted to the Contracts Board heading treatment. Fixed with
+     `transform: translateY(-5px)` on all three headings (styles.css ~2328,
+     ~3481) — verified via pixel trim that ink-top now lands exactly on box-top
+     (108px) for all three. Also reduced the heading-to-content margin-bottom from
+     28px to 12px (styles.css ~2324, ~3484) to compensate for font-metric
+     whitespace inside the line box, so the ink-bottom-to-next-content gap is a true
+     28px, matching `--board-sidebar-rhythm` used elsewhere (Pre-Flight-to-Options
+     gap, gap between the 3 side-by-side tickets - both already 28px, unchanged).
+  2. Added a "SCENERY LINKS" label above the DEP:/ARR: lines and a dotted
+     `.contract-ticket-meta-divider` beneath them (index.html, all 3 ticket
+     templates) so the section reads as its own block instead of running into
+     CONTRACT VALUE.
+  3. Ticket card height (`.contract-ticket`, styles.css ~2591) increased from a
+     fixed 783px to 876px, measured live via Playwright to match the bottom of the
+     opened Options accordion. This also fixes the clipping bug logged
+     2026-07-24 below (confirmed via `scrollHeight` vs `clientHeight`: content
+     needed 860px, was clipped by 77px at 783px height; at 876px content now fits
+     with ~16px to spare, no clipping, footer/Accept button fully visible).
+     Scenery-link capping (first store + "+N more") was discussed but deliberately
+     deferred — user wants to see real-world behaviour at the new height first
+     before deciding if it's still needed.
+
+- **Added 6 named high-terrain boxes to `globalRanges`** (dispatch-engine.js
+  ~line 5179): Caucasus, Ethiopian Highlands, Mexican Sierra Madre /
+  Trans-Mexican Volcanic Belt, New Zealand Southern Alps, Scandinavian
+  Mountains, Papua New Guinea Highlands. Same cheap-approximation approach as
+  the existing 6 boxes (broad lat/lon box + fixed-wing/heli safeFloor), no DEM
+  data. Verified region matching against real airports in the live DB for all
+  6 (Caucasus/NZ/Scandinavia/Mexico/PNG had matches; Ethiopian Highlands
+  currently has 0 airports in VECTOR's DB, so that box is inert until/unless
+  airports are added there — harmless). Verified one live dispatch
+  end-to-end (Caucasus, UGIZ departure, Piper Comanche 250, prefer-lower-
+  cruise): 5 consecutive dispatches all landed at 12,000ft, never below the
+  10,500ft safeFloor. Commit 2f37cd7.
+- **Wired the dead `formatScenery()` function into the job ticket board** —
+  it was fully unused (confirmed no callers), written for a `#dispatchRelease`
+  panel that's been `display: none !important` since the board-ticket UI
+  replaced it. Real data backing it still exists (`apt.tag`/`apt.allOptions`
+  built in `rebuildActiveDatabase()`, comment there literally says "kept for
+  Job Ticket scenery links only"). Added DEP:/ARR: lines to the job ticket
+  (dispatch-engine.js: `formatSceneryTicketDetail`, `formatBoardTicketSceneryLine`,
+  wired via `fillBoardRouteCells`; index.html: new `dep-scenery`/`arr-scenery`
+  spans on all 3 ticket templates). Commit 2f37cd7.
+  - **Known issue, not yet fixed:** airports with several third-party store
+    options render 3+ "OR"-joined links, wrapping to multiple lines and
+    pushing ticket content past the fixed 783px card height (`overflow:
+    hidden` silently clips the accept button/footer — looked like a visual
+    glitch in testing). Follow-up layout task agreed with user, tracked as a
+    to-do: add a "Scenery Links" label, cap store links shown (first + "+N
+    more"), and increase ticket height using a consistent spacing value also
+    applied to nav-tab-title alignment. Not started yet.
 - **IFR/VFR/HELI cruise altitude could round below its own safety floor** — reported case:
   Piper Comanche 250, EDGI (elev 1375ft) -> EDSP (elev 1315ft), IFR + Prefer Lower Cruise,
   dispatched at 4000ft. The safety floor for that route (`terrainSafetyFloor`, field
