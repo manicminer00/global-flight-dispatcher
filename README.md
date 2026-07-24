@@ -1,9 +1,6 @@
 <img src="images/header.png" alt="VECTOR — FLIGHT DISPATCH" width="1376">
 
-### **[VECTOR](https://manicminer00.github.io/global-flight-dispatcher/)** builds realistic flights and exports them to SimBrief or MSFS 2024.
-
----
-### Quick start
+## Quick start
 
 1. Open **[VECTOR](https://manicminer00.github.io/global-flight-dispatcher/)** in your browser.
 2. Enter (or auto-generate) a callsign, pick an aircraft, and click **GENERATE FLIGHT**.
