@@ -2638,6 +2638,7 @@
         .contract-ticket-photo-wrap {
             position: relative;
             overflow: hidden;
+            flex-shrink: 0;
             padding-top: 42px; /* Reserve the header strip above, rather than over, the mission image. */
             border-bottom: none;
         }
@@ -2696,15 +2697,13 @@
         }
         .contract-ticket.is-military .contract-ticket-label,
         .contract-ticket.is-military .contract-ticket-pp,
-        .contract-ticket.is-military .contract-ticket-meta-key,
-        .contract-ticket.is-military .contract-ticket-ref {
+        .contract-ticket.is-military .contract-ticket-meta-key {
             color: var(--military-ticket-muted, color-mix(in srgb, var(--text-ticket-military) 62%, transparent));
         }
         .contract-ticket.is-military .contract-ticket-route-arrow {
             color: color-mix(in srgb, var(--military-ticket-text, var(--text-ticket-military)) 55%, transparent);
         }
         .contract-ticket.is-military .contract-ticket-rule,
-        .contract-ticket.is-military .contract-ticket-meta-rule,
         .contract-ticket.is-military .contract-ticket-meta-divider {
             border-top-color: color-mix(in srgb, var(--military-ticket-text, var(--text-ticket-military)) 28%, transparent);
         }
@@ -3258,29 +3257,6 @@
             color: var(--board-ticket-text);
             font-weight: 700;
         }
-        .contract-ticket-meta-rule {
-            display: block;
-            width: var(--board-ticket-rule-width);
-            max-width: none;
-            height: 0;
-            margin: 0 auto;
-            border: 0;
-            border-top: 1px dotted #9aa0a8;
-        }
-        .contract-ticket-ref {
-            margin: 8px 0 0;
-            padding: 0;
-            text-align: right;
-            font-size: 11px;
-            font-weight: 600;
-            color: #a4abb4;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            flex: 0 0 auto;
-            line-height: 1.2;
-            min-height: 1.2em;
-        }
-        /* Pin rule + REF + Accept as one footer so REF stays fixed above the button */
         .contract-ticket-footer {
             margin-top: auto;
             flex: 0 0 auto;
@@ -3348,9 +3324,7 @@
         }
         .contract-ticket.is-selected .contract-ticket-pp,
         .contract-ticket.is-selected .contract-ticket-rule,
-        .contract-ticket.is-selected .contract-ticket-meta,
-        .contract-ticket.is-selected .contract-ticket-footer > .contract-ticket-meta-rule,
-        .contract-ticket.is-selected .contract-ticket-ref {
+        .contract-ticket.is-selected .contract-ticket-meta {
             display: none;
         }
         .contract-ticket.is-selected .contract-ticket-footer {
