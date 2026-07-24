@@ -76,28 +76,28 @@ window.VECTOR_DEFAULT_SETTINGS = {
   },
   "missionImageCrops": {
     "mission1.jpg": {
-      "x": 77,
-      "y": 100,
+      "x": 63,
+      "y": 98,
       "zoom": 108
     },
     "mission2.jpg": {
-      "x": 53,
-      "y": 50,
+      "x": 57,
+      "y": 60,
       "zoom": 104
     },
     "mission3.jpg": {
-      "x": 50,
+      "x": 51,
       "y": 50,
       "zoom": 110
     },
     "mission4.jpg": {
-      "x": 71,
-      "y": 50,
+      "x": 77,
+      "y": 51,
       "zoom": 100
     },
     "mission5.jpg": {
-      "x": 62,
-      "y": 50,
+      "x": 72,
+      "y": 51,
       "zoom": 100
     },
     "mission7.jpg": {
@@ -106,8 +106,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission8.jpg": {
-      "x": 68,
-      "y": 70,
+      "x": 62,
+      "y": 65,
       "zoom": 115
     },
     "mission9.jpg": {
@@ -116,38 +116,38 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission10.jpg": {
-      "x": 32,
-      "y": 45,
+      "x": 35,
+      "y": 68,
       "zoom": 115
     },
     "mission11.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 30,
+      "y": 55,
       "zoom": 100
     },
     "mission12.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 56,
+      "y": 74,
       "zoom": 100
     },
     "mission13.jpg": {
-      "x": 67,
-      "y": 0,
+      "x": 75,
+      "y": 9,
       "zoom": 115
     },
     "mission14.jpg": {
-      "x": 20,
-      "y": 50,
+      "x": 23,
+      "y": 51,
       "zoom": 100
     },
     "mission15.jpg": {
-      "x": 32,
-      "y": 88,
+      "x": 56,
+      "y": 100,
       "zoom": 110
     },
     "mission16.jpg": {
-      "x": 0,
-      "y": 50,
+      "x": 16,
+      "y": 55,
       "zoom": 100
     },
     "mission17.jpg": {
@@ -236,23 +236,23 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission34.jpg": {
-      "x": 56,
-      "y": 50,
+      "x": 50,
+      "y": 52,
       "zoom": 100
     },
     "mission35.jpg": {
-      "x": 56,
+      "x": 47,
       "y": 100,
       "zoom": 115
     },
     "mission36.jpg": {
-      "x": 60,
-      "y": 0,
+      "x": 62,
+      "y": 11,
       "zoom": 115
     },
     "mission37.jpg": {
-      "x": 55,
-      "y": 50,
+      "x": 50,
+      "y": 54,
       "zoom": 111
     },
     "mission38.jpg": {
@@ -261,23 +261,23 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission39.jpg": {
-      "x": 20,
-      "y": 72,
+      "x": 24,
+      "y": 89,
       "zoom": 115
     },
     "mission40.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 62,
+      "y": 57,
       "zoom": 100
     },
     "mission41.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 46,
+      "y": 53,
       "zoom": 100
     },
     "mission42.jpg": {
-      "x": 50,
-      "y": 0,
+      "x": 46,
+      "y": 7,
       "zoom": 115
     },
     "mission43.jpg": {
@@ -286,13 +286,13 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission44.jpg": {
-      "x": 10,
-      "y": 0,
+      "x": 9,
+      "y": 29,
       "zoom": 115
     },
     "mission45.jpg": {
-      "x": 59,
-      "y": 50,
+      "x": 61,
+      "y": 76,
       "zoom": 100
     },
     "mission46.jpg": {
@@ -306,8 +306,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 104
     },
     "mission48.jpg": {
-      "x": 53,
-      "y": 27,
+      "x": 51,
+      "y": 37,
       "zoom": 100
     },
     "mission49.jpg": {
@@ -336,33 +336,33 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission54.jpg": {
-      "x": 90,
-      "y": 0,
-      "zoom": 107
+      "x": 86,
+      "y": 1,
+      "zoom": 104
     },
     "mission55.jpg": {
-      "x": 57,
+      "x": 2,
       "y": 100,
       "zoom": 115
     },
     "mission56.jpg": {
-      "x": 45,
-      "y": 21,
+      "x": 20,
+      "y": 24,
       "zoom": 115
     },
     "mission57.jpg": {
-      "x": 79,
-      "y": 89,
+      "x": 100,
+      "y": 100,
       "zoom": 115
     },
     "mission58.jpg": {
-      "x": 26,
-      "y": 52,
+      "x": 24,
+      "y": 66,
       "zoom": 115
     },
     "mission59.jpg": {
-      "x": 88,
-      "y": 50,
+      "x": 45,
+      "y": 49,
       "zoom": 103
     },
     "mission60.jpg": {
@@ -381,8 +381,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission63.jpg": {
-      "x": 48,
-      "y": 28,
+      "x": 99,
+      "y": 65,
       "zoom": 115
     },
     "mission64.jpg": {
@@ -391,17 +391,17 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission65.jpg": {
-      "x": 49,
-      "y": 50,
+      "x": 44,
+      "y": 31,
       "zoom": 115
     },
     "mission66.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 66,
+      "y": 54,
       "zoom": 100
     },
     "mission67.jpg": {
-      "x": 48,
+      "x": 46,
       "y": 0,
       "zoom": 115
     },
@@ -412,7 +412,7 @@ window.VECTOR_DEFAULT_SETTINGS = {
     },
     "mission69.jpg": {
       "x": 56,
-      "y": 50,
+      "y": 69,
       "zoom": 100
     },
     "mission70.jpg": {
@@ -421,7 +421,7 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission71.jpg": {
-      "x": 54,
+      "x": 27,
       "y": 100,
       "zoom": 115
     },
@@ -431,8 +431,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission73.jpg": {
-      "x": 78,
-      "y": 50,
+      "x": 94,
+      "y": 53,
       "zoom": 100
     },
     "mission74.jpg": {
@@ -451,8 +451,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission77.jpg": {
-      "x": 88,
-      "y": 35,
+      "x": 100,
+      "y": 51,
       "zoom": 115
     },
     "mission78.jpg": {
@@ -486,28 +486,28 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission84.jpg": {
-      "x": 75,
-      "y": 42,
+      "x": 100,
+      "y": 100,
       "zoom": 105
     },
     "mission85.jpg": {
-      "x": 85,
-      "y": 50,
+      "x": 6,
+      "y": 90,
       "zoom": 100
     },
     "mission86.jpg": {
-      "x": 66,
-      "y": 50,
+      "x": 69,
+      "y": 54,
       "zoom": 100
     },
     "mission87.jpg": {
-      "x": 58,
+      "x": 32,
       "y": 100,
       "zoom": 107
     },
     "mission88.jpg": {
-      "x": 25,
-      "y": 100,
+      "x": 2,
+      "y": 94,
       "zoom": 115
     },
     "mission89.jpg": {
@@ -541,7 +541,7 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission95.jpg": {
-      "x": 80,
+      "x": 49,
       "y": 100,
       "zoom": 115
     },
@@ -566,8 +566,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission100.jpg": {
-      "x": 50,
-      "y": 85,
+      "x": 37,
+      "y": 100,
       "zoom": 115
     },
     "mission101.jpg": {
@@ -586,8 +586,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission104.jpg": {
-      "x": 81,
-      "y": 67,
+      "x": 64,
+      "y": 78,
       "zoom": 109
     },
     "mission105.jpg": {
@@ -596,8 +596,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission106.jpg": {
-      "x": 67,
-      "y": 50,
+      "x": 25,
+      "y": 70,
       "zoom": 100
     },
     "mission107.jpg": {
@@ -606,18 +606,18 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission108.jpg": {
-      "x": 69,
-      "y": 50,
+      "x": 86,
+      "y": 67,
       "zoom": 100
     },
     "mission109.jpg": {
-      "x": 60,
+      "x": 100,
       "y": 100,
       "zoom": 115
     },
     "mission110.jpg": {
-      "x": 41,
-      "y": 50,
+      "x": 100,
+      "y": 73,
       "zoom": 100
     },
     "mission111.jpg": {
@@ -626,8 +626,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 107
     },
     "mission112.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 100,
+      "y": 59,
       "zoom": 100
     },
     "mission113.jpg": {
@@ -722,13 +722,13 @@ window.VECTOR_DEFAULT_SETTINGS = {
     },
     "mission131.jpg": {
       "x": 63,
-      "y": 24,
+      "y": 23,
       "zoom": 115
     },
     "mission132.jpg": {
-      "x": 50,
-      "y": 50,
-      "zoom": 100
+      "x": 52,
+      "y": 100,
+      "zoom": 102
     },
     "mission133.jpg": {
       "x": 22,
@@ -746,18 +746,18 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission136.jpg": {
-      "x": 44,
-      "y": 0,
+      "x": 48,
+      "y": 25,
       "zoom": 115
     },
     "mission137.jpg": {
-      "x": 91,
+      "x": 92,
       "y": 100,
       "zoom": 100
     },
     "mission138.jpg": {
-      "x": 17,
-      "y": 50,
+      "x": 27,
+      "y": 100,
       "zoom": 115
     },
     "mission139.jpg": {
@@ -766,8 +766,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission140.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 100,
+      "y": 73,
       "zoom": 100
     },
     "mission141.jpg": {
@@ -776,13 +776,13 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission142.jpg": {
-      "x": 23,
-      "y": 33,
+      "x": 13,
+      "y": 46,
       "zoom": 100
     },
     "mission143.jpg": {
-      "x": 53,
-      "y": 50,
+      "x": 55,
+      "y": 52,
       "zoom": 100
     },
     "mission144.jpg": {
@@ -806,8 +806,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 115
     },
     "mission148.jpg": {
-      "x": 67,
-      "y": 50,
+      "x": 71,
+      "y": 62,
       "zoom": 100
     },
     "mission149.jpg": {
@@ -827,7 +827,7 @@ window.VECTOR_DEFAULT_SETTINGS = {
     },
     "mission152.jpg": {
       "x": 100,
-      "y": 14,
+      "y": 97,
       "zoom": 115
     },
     "mission153.jpg": {
@@ -841,32 +841,32 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission155.jpg": {
-      "x": 56,
-      "y": 0,
+      "x": 60,
+      "y": 1,
       "zoom": 115
     },
     "mission156.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 0,
+      "y": 54,
       "zoom": 100
     },
     "mission157.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 16,
+      "y": 58,
       "zoom": 100
     },
     "mission158.jpg": {
-      "x": 25,
-      "y": 80,
+      "x": 13,
+      "y": 79,
       "zoom": 115
     },
     "mission159.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 43,
+      "y": 74,
       "zoom": 100
     },
     "mission160.jpg": {
-      "x": 32,
+      "x": 40,
       "y": 100,
       "zoom": 115
     },
@@ -881,17 +881,17 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission163.jpg": {
-      "x": 57,
-      "y": 0,
+      "x": 55,
+      "y": 28,
       "zoom": 115
     },
     "mission164.jpg": {
-      "x": 33,
+      "x": 38,
       "y": 100,
       "zoom": 105
     },
     "mission165.jpg": {
-      "x": 62,
+      "x": 60,
       "y": 79,
       "zoom": 115
     },
@@ -901,8 +901,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission167.jpg": {
-      "x": 60,
-      "y": 0,
+      "x": 71,
+      "y": 100,
       "zoom": 115
     },
     "mission168.jpg": {
@@ -921,8 +921,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 114
     },
     "mission171.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 12,
+      "y": 56,
       "zoom": 100
     },
     "mission172.jpg": {
@@ -1046,13 +1046,13 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission196.jpg": {
-      "x": 75,
-      "y": 100,
+      "x": 71,
+      "y": 80,
       "zoom": 115
     },
     "mission197.jpg": {
-      "x": 54,
-      "y": 27,
+      "x": 53,
+      "y": 67,
       "zoom": 113
     },
     "mission198.jpg": {
@@ -1087,7 +1087,7 @@ window.VECTOR_DEFAULT_SETTINGS = {
     },
     "mission204.jpg": {
       "x": 9,
-      "y": 50,
+      "y": 61,
       "zoom": 100
     },
     "mission205.jpg": {
@@ -1121,8 +1121,8 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 107
     },
     "mission211.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 34,
+      "y": 30,
       "zoom": 100
     },
     "mission212.jpg": {
@@ -1131,19 +1131,19 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission213.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 54,
+      "y": 65,
       "zoom": 100
     },
     "mission214.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 12,
+      "y": 38,
       "zoom": 100
     },
     "mission215.jpg": {
-      "x": 49,
-      "y": 30,
-      "zoom": 114
+      "x": 52,
+      "y": 20,
+      "zoom": 100
     },
     "mission216.jpg": {
       "x": 50,
@@ -1151,9 +1151,9 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission217.jpg": {
-      "x": 61,
-      "y": 50,
-      "zoom": 100
+      "x": 57,
+      "y": 25,
+      "zoom": 104
     },
     "mission218.jpg": {
       "x": 61,
@@ -1181,13 +1181,13 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission223.jpg": {
-      "x": 62,
-      "y": 13,
+      "x": 64,
+      "y": 16,
       "zoom": 105
     },
     "mission224.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 60,
+      "y": 53,
       "zoom": 100
     },
     "mission225.jpg": {
@@ -1196,18 +1196,18 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission226.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 76,
+      "y": 56,
       "zoom": 100
     },
     "mission227.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 44,
+      "y": 55,
       "zoom": 100
     },
     "mission228.jpg": {
-      "x": 50,
-      "y": 50,
+      "x": 93,
+      "y": 60,
       "zoom": 100
     },
     "mission229.jpg": {
@@ -1216,9 +1216,9 @@ window.VECTOR_DEFAULT_SETTINGS = {
       "zoom": 100
     },
     "mission249.jpg": {
-      "x": 50,
-      "y": 0,
-      "zoom": 112
+      "x": 44,
+      "y": 76,
+      "zoom": 115
     },
     "mission250.jpg": {
       "x": 50,
