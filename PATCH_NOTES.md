@@ -4,6 +4,182 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ---
 
+## 2026-07-24 (later session, part 5)
+
+- **Divider restored below IFR/VFR row** — re-added `<hr class="preflight-rules-divider">` in its
+  original CSS form (`border-top: 1px solid var(--board-border); margin: 14px 0 12px;`), now
+  positioned after `.preflight-rules-row` instead of before Block Time (index.html, styles.css).
+  Removed the `margin-bottom: 18px` added to `.preflight-rules-row` in part 4, since the divider's
+  own margins now provide that spacing (avoids doubling up).
+- **Removed "Glider missions are unaffected by this slider." note** and its now-empty
+  `.slider-footer-row` wrapper (index.html) — no longer true.
+- **Block Time label→slider gap fixed to 8px** — matches the ALTITUDE→IFR/VFR gap. Added
+  `.board-sidebar-form #timeSliderHeading { margin-bottom: -1px; }`; the -1px (not 0) was needed
+  because the slider element has an unaccounted ~7px offset above its own margin that doesn't
+  come from any label spacing — tested empirically via `getBoundingClientRect()`, not derived from
+  the CSS cascade.
+- **IFR button now shows red when active; VFR unchanged; both green on hover** — added
+  `#ifrRulesBtn.is-active` (red gradient) and `#ifrRulesBtn.is-active:hover` (green, same as
+  before) in styles.css. ID selector needed to win over the shared `.rules-toggle-btn.is-active`
+  green rule without touching VFR.
+- **Job-ticket meta value text now matches key label's font-weight (600), not its colour** —
+  corrected a same-session mistake: an earlier change had made the key labels themselves bold
+  (700), including DEP:/ARR: which the user explicitly excluded (they share the same wrapper
+  class as the other keys, so a wrapper-based CSS selector couldn't distinguish them). Reverted
+  that, and instead wrapped the value text (aircraft name, CRZ ALT, PAX/CARGO, ILS/OTHER/NAVIGRAPH
+  results) in a new `.contract-ticket-meta-value` span at `font-weight: 600` — matching the key's
+  weight, keeping the value's own (different) colour. dispatch-engine.js
+  `formatBoardTicketMetaHtml`, styles.css.
+- Confirmed via read-only checks (no code change needed): F28 mission assignments already
+  identical across all 4 marks (Round 3 fix holds, both files agree). "Prefer lower cruise
+  altitude" and "Only use Navigraph airports" default to unchecked in the HTML/JS — any observed
+  default-on state is leftover `localStorage` from prior testing, not a code bug.
+
+## 2026-07-24 (later session, part 4)
+
+- **ALTITUDE section moved above BLOCK TIME, dotted divider removed** — index.html: ALTITUDE
+  title + IFR/VFR row now sit directly under AIRCRAFT TYPE; Block Time slider section(s) moved
+  below it. Removed `<hr class="preflight-rules-divider">` entirely (and its now-unused CSS
+  rule). Replaced the old `.preflight-rules-divider + .dispatch-form-field` selector (which
+  depended on the divider's position) with a stable `.altitude-title-field` class on the ALTITUDE
+  wrapper div, keeping the exact-8px title-to-row spacing from the prior fix. Added
+  `margin-bottom: 18px` to `.preflight-rules-row` so it has proper spacing before Block Time now
+  that it's no longer the last element before the Generate button. Tested: no console errors,
+  layout renders as expected.
+
+## 2026-07-24 (later session, part 3)
+
+- **Route-header ICAO shrink fixed** — `.contract-ticket-route--long-icao` (39px→31px) was
+  triggering whenever EITHER side was 5 characters; tested it only actually risks overflow when
+  BOTH sides are 5 characters (single-5-char-side fits fine at full size). Changed the trigger
+  from `||` to `&&` (dispatch-engine.js `fillBoardRouteCells`). Unrelated to the earlier
+  logbook-column test — that was a different UI element (104px table cell vs this 39px ticket
+  header), never tested until now.
+- **Small DEP:/ARR: ICAO now colour-matches the big header ICAO** — refactored the owned/Asobo
+  colour logic into one shared `getIcaoHighlightClass()` helper (dispatch-engine.js), used by
+  both the big route-header ICAO and `formatBoardTicketSceneryLine()`'s small ICAO. Owned (green)
+  still wins over Asobo-default when both apply.
+- **Asobo-default highlight changed from blue to dark green** — `.msfs-default-airport-icao`
+  colour changed to `#1f5c22` (was `#4a9ed6`), per updated preference.
+- **Military ticket footer strip now matches the top military accent colours** — added
+  `.contract-ticket.is-military.is-selected .contract-ticket-export::before` overriding the
+  civilian silver gradient with `var(--military-ticket-accent-bottom/top)`, mirroring the
+  existing `.contract-ticket-photo-wrap::before` military override. The drop-shadow `::after`
+  also gets a darker 0.2 opacity (vs civilian's 0.12) on military tickets. Verified via computed
+  style (not just screenshot, since an unrelated ticket-FX preset made visual comparison
+  misleading in this test).
+- **Options box height, drop shadow, civilian highlight direction** — all confirmed working from
+  the prior session's changes; no further action.
+- **F28 split into 4 separate aircraft** — Just Flight's F28 Professional bundles all 4 marks;
+  fleet-db.js previously had one "F28" entry (confirmed via matching mtow/oew/range to be the Mk
+  4000). Added F28_1000, F28_2000, F28_3000 as new fleet entries (all `simbriefIcao:"F28"` since
+  the real ICAO type code doesn't distinguish marks), sourced from the Just Flight F28
+  Professional Operations Manual, cross-checked against SimBrief airframe profiles for all 4
+  marks (near-exact agreement). Added matching mission-assignment coverage (copied F28's imgId
+  list) to BOTH mission-assignments-data.js AND mission-assignments.json — the JSON file is
+  loaded in preference to the embedded script data (`initMissionAssignments()` tries
+  `mission-assignments.json` first) and was the actual cause of a fatal "VECTOR cannot start"
+  error until both were updated. Ran `node dev/scripts/validate-assignments.mjs` (115/115) and a
+  live browser smoke test after — passing.
+- **MLW/MZFW: 15 more aircraft resolved via real SimBrief airframe profiles** — found a large
+  folder of saved SimBrief profile screenshots at
+  `Vector-Dev-Tools/references/` covering most of the previously-ambiguous aircraft. Cross-checked
+  each against this database's stored MTOW (exact match = correct source) before applying:
+  A346, A388, B722, B72F, CRJ7, E190, E195, FA50, LJ35, MD11, MD1F, MD82 (mzfw), MD88 (mzfw) all
+  added/completed. **F70 and F100 corrected** — the manual figures pasted earlier didn't match
+  this database's stored MTOW (a different/higher weight variant); the SimBrief profile's MTOW
+  matched exactly, so MLW/MZFW were replaced with the SimBrief-sourced figures instead
+  (F70: mlw 36741/mzfw 32659; F100: mlw 39916/mzfw 36741). E190/E195 resolved cleanly this way
+  too — the FSS Documentation Hub page pasted earlier didn't match either aircraft's stored MTOW
+  at all (38,790 kg vs our 50,299/50,790 kg), so those figures were discarded in favour of the
+  matching SimBrief dual-class profile. Full post-change sanity check run: no MLW>MTOW or
+  MZFW>MLW inconsistencies across all 21+15 entries added this session.
+- **Not resolved, still open**: JAGR (Jaguar) and TOR (Tornado) confirmed to have no publicly
+  published MLW/MZFW (military types, operationally rather than structurally limited) — correctly
+  left blank, not pending further work.
+
+## 2026-07-24 (later session, part 2)
+
+- **Altitude spacing fix, corrected** — the earlier fix in this session (10px wrapper margin) was
+  wrong: the ALTITUDE label's own margin-bottom (8px) doesn't collapse into its wrapping
+  `.dispatch-form-field` div (that div isn't a plain block-margin-collapse context here), so the
+  10px I added stacked on top of the label's 8px for an 18px total gap instead of matching the
+  8px reference gap used by DEPARTURE AIRPORT/ATC CALLSIGN/AIRCRAFT TYPE. Changed
+  `.preflight-rules-divider + .dispatch-form-field` margin-bottom to 0 (styles.css) — tested,
+  gap is now exactly 8px on both, matching pixel-for-pixel.
+- **Asobo/MSFS-default airport highlight** — airports that ship with MSFS by default (tags
+  `Hand-Crafted`, `Asobo Detailed Airports`, `MSFS 2024 Detailed Small Airports`, `Asobo
+  Gliderport`) now render their ICAO in blue (`#4a9ed6`, reusing the Generate Flight button's
+  existing blue rather than introducing a new hue) on job tickets, via a new
+  `airportIsAsoboDefaultIncluded()` helper and `.msfs-default-airport-icao` class
+  (dispatch-engine.js, styles.css). This is purely visual — it does NOT add these airports to
+  the Owned Airports pool or the "prefer owned" routing weight, which stays exactly as before.
+  Owned-green still wins if an airport is both owned and Asobo-default.
+- **Options box bottom alignment** — `.board-sidebar-app-version` padding-bottom 20px → 26px so
+  the Options card's bottom edge lines up with the bottom of the 3-ticket stack again (this had
+  drifted by ~6px after the altitude-spacing fix shortened the card). Tested: now within 0.3px.
+- **Ticket footer drop shadow** — added a faint (12% black, fading to transparent) 22px shadow
+  above the existing 44px silver strip on the post-Accept ticket footer
+  (`.contract-ticket.is-selected .contract-ticket-export::after`, styles.css) — half the strip's
+  height, per spec. Shown to user for review before considering final.
+- **MLW/MZFW added for 21 aircraft** — CRJ7, AT46, AT76, M600, C160, C20F, C208, BE20, FA50,
+  A319, LJ35, B38M, A359, MD82, MD88, H47D, B737, B77W, B105, AS65, H65M (fleet-db.js). Sourced
+  from user-provided manufacturer/product-manual figures (cross-checked against an earlier
+  background web search where they overlapped — e.g. B38M and B77W matched independently, high
+  confidence). B737 specifically uses the PMDG raw-config figures (58,605/55,196 kg) rather than
+  the "Typical 737-700" manual table (58,059/54,657 kg) because the config figures match this
+  aircraft's exact stored MTOW (155,000 lb); the manual table is a different, lower-MTOW variant.
+  Helicopters (H47D, B105, AS65, H65M) got mlw = mtow, matching the real-world fact that
+  helicopters have no separate landing weight limit. Left blank/unresolved, pending
+  clarification: A346, A321 (variant/MTOW mismatch), B72F, B722, E190, E195 (user-provided
+  figures directly conflicted with each other), A388 (range only, no single figure), F100, F70
+  (combined ambiguous source sentence), F28 (clean data exists but ties equally to two different
+  marks sharing this aircraft's MTOW — need to know which mark the addon models), MD1F, MD11
+  (internally contradictory figures in the sourced text). JAGR and TOR confirmed to have no
+  publicly published MLW/MZFW (military types, operationally rather than structurally limited)
+  — left blank, not pending.
+- **Navigraph-only + Military-airbases interaction investigated, not changed** — checked whether
+  the two toggles should be mutually exclusive. Found 63 of the app's 69 military-tagged
+  airports (91%) are already present in the Navigraph ICAO dataset (data/navigraph-airport-icaos.js),
+  contradicting the assumption that Navigraph has no military coverage. Recommended NOT making
+  them mutually exclusive, since combining both already works correctly as an intersection filter
+  in the vast majority of cases — no code change made.
+
+## 2026-07-24 (later session)
+
+- **Scenery ticket labels renamed for clarity** — `formatSceneryTicketLines()` (dispatch-engine.js)
+  now displays "MSFS hand-crafted airport" instead of "Hand-Crafted", and "MSFS default detailed
+  airport" instead of "MSFS Small Detailed". Display-only; db.js tag values (`Hand-Crafted`,
+  `Asobo Detailed Airports`, etc.) untouched. Tested (Playwright, real ticket render): both new
+  strings fit on one line with room to spare.
+- **Logbook Remove column left-aligned** — `#logbookTable .lb-action` was `text-align: center`
+  (styles.css), which is why it looked misaligned versus the other left-aligned columns; not a
+  width problem (route/aircraft/mission columns were re-tested with worst-case 5-char ICAOs and
+  the longest real aircraft/mission strings — all already fit, no width changes needed there).
+- **Military toggle fold** — removed the separate "CIVILIAN AIRCRAFT CAN FLY MILITARY JOBS"
+  sidebar checkbox (index.html) and its `contractorToggle`/`syncContractorMilitaryOptions()`
+  wiring (dispatch-engine.js). "USE MILITARY AIRBASES" alone now drives `isContractorMode`, so a
+  civilian aircraft becomes eligible for military jobs whenever military airbases are enabled —
+  no separate opt-in. Updated the Add New Airport note-text to match. Left `RECON` (Strategic
+  Recon. Missions) and `CIVIL_OK` (Can also fly civilian contracts) checkboxes in the Add New
+  Aircraft form alone — checked missions-db.js/fleet-db.js and both are load-bearing (6 real
+  recon-type mission scenarios; 6 built-in military transports use CIVIL_OK to also fly civilian
+  freight) and not made redundant by the toggle fold.
+- **Add New Aircraft: Fighter Jet auto-ticks Military Aircraft** — `updateCustomAircraftForm()`
+  already auto-ticked Fighter and Military-role when Aircraft Type = "Fighter Jet" (MIL_JET); now
+  also auto-ticks the "Military Aircraft" checkbox itself, closing the one gap.
+- **Sidebar spacing** — ALTITUDE title-to-row gap reduced from 18px to 10px (new scoped rule
+  `.preflight-rules-divider + .dispatch-form-field`, styles.css) to match the ATC
+  CALLSIGN/AIRCRAFT TYPE title-to-field spacing; Generate Flight button moves up as a normal
+  document-flow side effect. Tested: Options box bottom now sits ~4px from the job ticket stack
+  bottom (was a larger gap before). The "equalize routing checkbox spacing" ask became moot once
+  the civilian-toggle checkbox was removed — only one checkbox (Military Airbases) remains under
+  the Navigraph option, at the existing 14px gap, nothing left to make consistent.
+- **DESIGN.md added** — snapshot of the current visual language (colour, typography, spacing
+  rhythm, borders/radius, component patterns) plus guidance for keeping new work consistent with
+  it, mirroring ARCHITECTURE.md's role for how things work. CLAUDE.md now points to it before any
+  CSS/layout change.
+
 ## 2026-07-24
 
 - **Job ticket redesign completed (VALUE placement, scenery block reorder, overflow fix, sidebar tweaks)** —

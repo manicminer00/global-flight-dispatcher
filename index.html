@@ -74,20 +74,7 @@
                     <div id="customAircraftList" class="custom-datalist"></div>
                 </div>
             </div>
-            <div class="slider-section board-sidebar-slider">
-                <label for="timeSlider" class="slider-header-row" id="timeSliderHeading">
-                    Block Time: <span id="timeVal">60</span> <span id="timeUnit">mins</span>
-                </label>
-                <input type="range" id="timeSlider" min="40" max="120" step="10" value="60" oninput="updateFlightTimeDisplay()" style="width: 100%; cursor: pointer;">
-                <div class="slider-footer-row board-sidebar-slider-footer">
-                    <span class="note-text slider-rotor-glider-note">Glider missions are unaffected by this slider.</span>
-                </div>
-            </div>
-            <div class="slider-section board-sidebar-slider" id="heliFixedBlockTime" style="display:none;">
-                <label class="slider-header-row">BLOCK TIME: <span id="heliFixedBlockVal">30</span> MINS</label>
-            </div>
-            <hr class="preflight-rules-divider" aria-hidden="true">
-            <div class="dispatch-form-field">
+            <div class="dispatch-form-field altitude-title-field">
                 <label class="field-title">ALTITUDE:</label>
             </div>
             <div class="preflight-rules-row">
@@ -120,6 +107,16 @@
                 } catch (e) {}
             })();
             </script>
+            <hr class="preflight-rules-divider">
+            <div class="slider-section board-sidebar-slider">
+                <label for="timeSlider" class="slider-header-row" id="timeSliderHeading">
+                    Block Time: <span id="timeVal">60</span> <span id="timeUnit">mins</span>
+                </label>
+                <input type="range" id="timeSlider" min="40" max="120" step="10" value="60" oninput="updateFlightTimeDisplay()" style="width: 100%; cursor: pointer;">
+            </div>
+            <div class="slider-section board-sidebar-slider" id="heliFixedBlockTime" style="display:none;">
+                <label class="slider-header-row">BLOCK TIME: <span id="heliFixedBlockVal">30</span> MINS</label>
+            </div>
             <button id="generateFlightBtn" type="button" onclick="dispatchFlight()">GENERATE FLIGHT</button>
         </div>
         </div>
@@ -184,9 +181,6 @@
             <div class="dispatch-form-field board-sidebar-checks">
                 <label class="checkbox-option" for="militaryBaseToggle">
                     <input type="checkbox" id="militaryBaseToggle">USE MILITARY AIRBASES
-                </label>
-                <label class="checkbox-option" for="contractorToggle">
-                    <input type="checkbox" id="contractorToggle" onchange="syncContractorMilitaryOptions()">CIVILIAN AIRCRAFT CAN FLY MILITARY JOBS
                 </label>
             </div>
             <div class="board-sidebar-flourish" aria-hidden="true">
@@ -520,7 +514,7 @@
         </div>
         <div class="control-group mission-tags-section airport-additional-options">
             <h4 class="form-section-title">Additional Options</h4>
-            <div class="note-text" style="margin-bottom: 12px;">N.B. If 'Military airbase' is selected, Civilian aircraft require 'CIVILIAN AIRCRAFT CAN FLY MILITARY JOBS' selected to use this field.</div>
+            <div class="note-text" style="margin-bottom: 12px;">N.B. If 'Military airbase' is selected, this field is only used when 'Use Military Airbases' is enabled in the sidebar Options panel.</div>
             <div class="checkbox-grid">
                 <label class="checkbox-option" for="newApMilitary">
                     <input type="checkbox" id="newApMilitary">Military airbase</label>

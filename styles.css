@@ -562,7 +562,7 @@
         }
         .board-sidebar-app-version {
             margin: 18px 0 0;
-            padding: 0 18px 20px;
+            padding: 0 18px 26px;
             text-align: center;
             font-size: var(--font-size-small);
             color: var(--board-text-muted);
@@ -600,6 +600,9 @@
         .board-sidebar-form .dispatch-form-field {
             margin-bottom: 18px;
         }
+        .board-sidebar-form .altitude-title-field {
+            margin-bottom: 0;
+        }
         .board-sidebar-form .dispatch-form-field:has(+ .sidebar-section-divider),
         .board-sidebar-form .dispatch-form-field:has(+ .board-sidebar-slider) {
             margin-bottom: 18px;
@@ -636,6 +639,9 @@
             font-weight: 800;
             letter-spacing: 0.03em;
             text-transform: uppercase;
+        }
+        .board-sidebar-form #timeSliderHeading {
+            margin-bottom: -1px;
         }
         .board-sidebar-form .field-hint,
         .board-sidebar-form .field-hint a {
@@ -984,6 +990,16 @@
             border: 1px solid #348538 !important;
             color: #ffffff;
         }
+        #ifrRulesBtn.is-active {
+            background: linear-gradient(180deg, #e05d56 0%, #a52a24 100%);
+            border: 1px solid #8f2622 !important;
+            color: #ffffff;
+        }
+        #ifrRulesBtn.is-active:hover {
+            background: linear-gradient(180deg, #58c15c 0%, #3f9e44 100%);
+            border: 1px solid #348538 !important;
+            color: #ffffff;
+        }
         .preflight-rules-row .preflight-prefer-lower {
             margin: 0 !important;
             margin-left: auto !important;
@@ -1107,6 +1123,9 @@
         }
         .owned-airport-icao {
             color: var(--color-link-readme);
+        }
+        .msfs-default-airport-icao {
+            color: #1f5c22;
         }
         .settings-panel {
             display: none;
@@ -1779,10 +1798,8 @@
         #logbookTable .lb-action {
             width: 40px;
             max-width: 40px;
-            text-align: center;
+            text-align: left;
             white-space: nowrap;
-            padding-left: 0;
-            padding-right: 0;
         }
         .custom-db-table .cdb-icao {
             width: 48px;
@@ -3268,6 +3285,9 @@
             color: var(--board-ticket-muted);
             font-weight: 600;
         }
+        .contract-ticket-meta-value {
+            font-weight: 600;
+        }
         .contract-ticket-meta strong {
             color: var(--board-ticket-text);
             font-weight: 700;
@@ -3401,6 +3421,23 @@
             border-top: 1px solid #aeb7be;
             background: linear-gradient(to bottom, #aeb7be 0%, #d0d6d9 100%);
             pointer-events: none;
+        }
+        .contract-ticket.is-selected .contract-ticket-export::after {
+            content: "";
+            position: absolute;
+            top: -64px;
+            left: 0;
+            right: 0;
+            height: 22px;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.12) 100%);
+            pointer-events: none;
+        }
+        .contract-ticket.is-military.is-selected .contract-ticket-export::before {
+            border-top: 1px solid var(--military-ticket-accent-bottom);
+            background: linear-gradient(to bottom, var(--military-ticket-accent-bottom) 0%, var(--military-ticket-accent-top) 100%);
+        }
+        .contract-ticket.is-military.is-selected .contract-ticket-export::after {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%);
         }
         .contract-ticket.is-military.is-selected .contract-ticket-export {
             background: var(--military-ticket-body, var(--bg-ticket-military));

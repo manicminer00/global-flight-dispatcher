@@ -709,11 +709,6 @@ function getDefaultMinDistanceNm(rawClass) {
 function hasMilitaryAirportAccess(spec, isContractorMode, forceMilitaryBases) {
     return !!(spec.isMilitary || isContractorMode || forceMilitaryBases);
 }
-function syncContractorMilitaryOptions() {
-    const militaryEl = document.getElementById("militaryBaseToggle");
-    if (!militaryEl) return;
-    militaryEl.disabled = false;
-}
 function getEffectiveMilitaryBaseRouting(isContractorMode, forceMilitaryBases) {
     return !!forceMilitaryBases;
 }
@@ -1163,7 +1158,6 @@ function loadSettings() {
     loadRoutingScope();
     initRoutingScope();
     initFlightTimeSlider(true);
-    syncContractorMilitaryOptions();
 }
 
 const BOARD_TICKET_KICKERS = [
@@ -1363,6 +1357,24 @@ function formatBoardAircraftDisplayName(name) {
     return label;
 }
 
+/** True if the airport ships as part of MSFS by default (no purchase needed) — the same
+ *  tag set formatSceneryTicketLines() treats as "MSFS hand-crafted"/"MSFS default detailed"/
+ *  "MSFS Gliderport", checked across allOptions the same way holdsHandcrafted does. */
+function airportIsAsoboDefaultIncluded(apt) {
+    if (!apt) return false;
+    const isDefaultTag = (tag) => tag === "Hand-Crafted" || tag === "Both"
+        || tag === "Asobo Detailed Airports" || tag === "MSFS 2024 Detailed Small Airports"
+        || tag === "Asobo Gliderport";
+    return apt.allOptions ? apt.allOptions.some(v => isDefaultTag(v.tag)) : isDefaultTag(apt.tag);
+}
+/** Owned airports (bright green) take priority over the Asobo-default tier (dark green); returns "" for neither. */
+function getIcaoHighlightClass(airport, ownedList) {
+    const icao = airport && airport.icao ? String(airport.icao).toUpperCase() : "";
+    if (!icao) return "";
+    if (ownedList.includes(icao)) return "owned-airport-icao";
+    if (airportIsAsoboDefaultIncluded(airport)) return "msfs-default-airport-icao";
+    return "";
+}
 function fillBoardRouteCells(card, origin, destination) {
     const ownedList = getOwnedAirportList();
     const setIcao = (role, airport) => {
@@ -1373,11 +1385,8 @@ function fillBoardRouteCells(card, origin, destination) {
             el.textContent = "—";
             return;
         }
-        if (ownedList.includes(icao)) {
-            el.innerHTML = `<span class="owned-airport-icao">${escapeHtml(icao)}</span>`;
-        } else {
-            el.textContent = icao;
-        }
+        const cls = getIcaoHighlightClass(airport, ownedList);
+        el.innerHTML = cls ? `<span class="${cls}">${escapeHtml(icao)}</span>` : escapeHtml(icao);
     };
     setIcao("dep-icao", origin);
     setIcao("arr-icao", destination);
@@ -1385,13 +1394,13 @@ function fillBoardRouteCells(card, origin, destination) {
     if (routeEl) {
         const depIcao = origin && origin.icao ? String(origin.icao).trim() : "";
         const arrIcao = destination && destination.icao ? String(destination.icao).trim() : "";
-        const isLong = depIcao.length > 4 || arrIcao.length > 4;
+        const isLong = depIcao.length > 4 && arrIcao.length > 4;
         routeEl.classList.toggle("contract-ticket-route--long-icao", isLong);
     }
     const setSceneryLine = (role, label, airport) => {
         const el = card.querySelector(`[data-role="${role}"]`);
         if (!el) return;
-        el.innerHTML = formatBoardTicketSceneryLine(label, airport);
+        el.innerHTML = formatBoardTicketSceneryLine(label, airport, ownedList);
     };
     setSceneryLine("dep-scenery", "DEP", origin);
     setSceneryLine("arr-scenery", "ARR", destination);
@@ -1420,12 +1429,12 @@ function formatSceneryTicketLines(apt) {
         thirdPartyLinks.push(makeLink(apt));
     }
     const lines = [];
-    if (holdsHandcrafted) lines.push("Hand-Crafted");
+    if (holdsHandcrafted) lines.push("MSFS hand-crafted airport");
     if (thirdPartyLinks.length > 0) lines.push(thirdPartyLinks.join(" / "));
     if (lines.length === 0) {
-        if (apt.tag === "Asobo Detailed Airports" || apt.tag === "MSFS 2024 Detailed Small Airports") lines.push("MSFS Small Detailed");
+        if (apt.tag === "Asobo Detailed Airports" || apt.tag === "MSFS 2024 Detailed Small Airports") lines.push("MSFS default detailed airport");
         else if (apt.tag === "Asobo Gliderport") lines.push("MSFS Gliderport");
-        else lines.push("Hand-Crafted");
+        else lines.push("MSFS hand-crafted airport");
     }
     return lines;
 }
@@ -1433,11 +1442,13 @@ function formatSceneryTicketLines(apt) {
 /** Job Ticket scenery meta block: DEP:/ARR: label + bold ICAO header (no room for the full airport name at
  *  this width — tested, wraps to 2 lines even for a mid-length name), then at most two scenery lines
  *  (Hand-Crafted, third-party). */
-function formatBoardTicketSceneryLine(label, apt) {
+function formatBoardTicketSceneryLine(label, apt, ownedList) {
     const keySpan = `<span class="contract-ticket-meta-key">${escapeHtml(label)}:</span>`;
     if (!apt) return `${keySpan} —`;
     const icao = apt.icao ? String(apt.icao).toUpperCase() : "";
-    const headerLine = `${keySpan} <span class="contract-ticket-scenery-icao">${escapeHtml(icao)}</span>`;
+    const highlightCls = getIcaoHighlightClass(apt, ownedList || []);
+    const icaoCls = highlightCls ? `contract-ticket-scenery-icao ${highlightCls}` : "contract-ticket-scenery-icao";
+    const headerLine = `${keySpan} <span class="${icaoCls}">${escapeHtml(icao)}</span>`;
     const itemLines = formatSceneryTicketLines(apt)
         .map(line => `<span class="contract-ticket-scenery-item">${line}</span>`)
         .join("");
@@ -1446,21 +1457,22 @@ function formatBoardTicketSceneryLine(label, apt) {
 
 function formatBoardTicketMetaHtml(result) {
     // Job-ticket meta is intentionally compact: aircraft, pax/cargo, then destination aids.
-    const aircraftLine = `<span class="contract-ticket-meta-key">ACFT:</span> ${escapeHtml(formatBoardAircraftDisplayName(result.spec.name))}`;
+    const metaValue = (text) => `<span class="contract-ticket-meta-value">${text}</span>`;
+    const aircraftLine = `<span class="contract-ticket-meta-key">ACFT:</span> ${metaValue(escapeHtml(formatBoardAircraftDisplayName(result.spec.name)))}`;
     const altFeet = Number(result.altFeet) || 0;
     const crzAltText = altFeet < 1000
         ? `${String(Math.round(altFeet))}ft`
         : altFeet < 10000
             ? `${String(Math.round(altFeet)).padStart(4, "0")}ft`
             : `FL${String(Math.round(altFeet / 100)).padStart(3, "0")}`;
-    const crzAltLine = `<span class="contract-ticket-meta-key">CRZ ALT:</span> ${escapeHtml(crzAltText)}`;
+    const crzAltLine = `<span class="contract-ticket-meta-key">CRZ ALT:</span> ${metaValue(escapeHtml(crzAltText))}`;
     const pax = Number(result.pax) || 0;
     const weightKg = Number(result.cargoKg) || 0;
-    const payloadLine = `<span class="contract-ticket-meta-key">PAX</span> ${escapeHtml(String(pax))} <span class="contract-ticket-meta-key">/</span> <span class="contract-ticket-meta-key">CARGO</span> ${escapeHtml(`${weightKg.toLocaleString("en-GB")} KG`)}`;
+    const payloadLine = `<span class="contract-ticket-meta-key">PAX</span> ${metaValue(escapeHtml(String(pax)))} <span class="contract-ticket-meta-key">/</span> <span class="contract-ticket-meta-key">CARGO</span> ${metaValue(escapeHtml(`${weightKg.toLocaleString("en-GB")} KG`))}`;
     const destDivider = `<span class="contract-ticket-meta-divider" aria-hidden="true"></span>`;
-    const destIlsLine = `<span class="contract-ticket-meta-key">DESTINATION HAS ILS:</span> ${escapeHtml(formatDestinationIlsTicketLabel(result.destination))}`;
-    const destApprLine = `<span class="contract-ticket-meta-key">OTHER:</span> ${escapeHtml(formatDestinationApproachTicketLabel(result.destination))}`;
-    const navigraphLine = `<span class="contract-ticket-meta-key">NAVIGRAPH:</span> ${airportIsInNavigraph(result.destination) ? "YES" : "NO"}`;
+    const destIlsLine = `<span class="contract-ticket-meta-key">DESTINATION HAS ILS:</span> ${metaValue(escapeHtml(formatDestinationIlsTicketLabel(result.destination)))}`;
+    const destApprLine = `<span class="contract-ticket-meta-key">OTHER:</span> ${metaValue(escapeHtml(formatDestinationApproachTicketLabel(result.destination)))}`;
+    const navigraphLine = `<span class="contract-ticket-meta-key">NAVIGRAPH:</span> ${metaValue(airportIsInNavigraph(result.destination) ? "YES" : "NO")}`;
     const wrapMetaLine = (line) => `<span class="contract-ticket-meta-line">${line}</span>`;
     const destBlock = [
         destDivider,
@@ -1635,7 +1647,7 @@ function getDispatchUiProbeConfig() {
         targetMins: targetMins,
         callsign: document.getElementById("callsignInput").value,
         depOverride: document.getElementById("depOverrideInput").value,
-        isContractorMode: document.getElementById("contractorToggle").checked,
+        isContractorMode: document.getElementById("militaryBaseToggle").checked,
         militaryBasesToggle: document.getElementById("militaryBaseToggle").checked,
         preferOwned: document.getElementById("preferOwnedToggle").checked,
         navigraphOnly: document.getElementById("navigraphOnlyToggle").checked,
@@ -3164,6 +3176,7 @@ function updateCustomAircraftForm() {
     const militaryEl = document.getElementById("newAcMilitary");
     if (!classEl) return;
     const rawClass = classEl.value;
+    if (militaryEl && rawClass === "MIL_JET") militaryEl.checked = true;
     const isMilitary = (militaryEl && militaryEl.checked) || rawClass === "MIL_JET";
     const toggleWrap = (id, show, useFlex = true) => {
         const el = document.getElementById(id);
