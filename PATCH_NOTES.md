@@ -4,6 +4,25 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ---
 
+## 2026-07-24 (later session, part 6)
+
+- **Logbook row font-weight eased to normal** — `--font-weight-logbook-row` (styles.css) taken
+  down from 600 (matched to job-ticket meta value weight, part 5) to `normal` after user
+  feedback that 600 still read as too heavy. Iterated 600 → 500 → normal, confirmed by user at
+  each step; normal is final.
+- **MLW/MZFW sourced and added for 9 aircraft** — C160 (mzfw only, mlw already present), A321,
+  BE20 (mzfw only), B58T, B36T, LEG2, LEG2_T, A33E, DC2F (fleet-db.js). All values sourced from
+  screenshots the user added to `Vector-Dev-Tools/references/` (manufacturer manuals and
+  SimBrief airframe configs where available, AI-search summaries as secondary corroboration);
+  cross-checked against each aircraft's existing mtow/oew before applying. H65M's mlw (4172)
+  was checked against a conflicting AI-search source (4300) but left unchanged per user
+  instruction. C20F, C208, H47D, B105, AS65, H65M confirmed to have no separate published MZFW
+  (helicopters and this Caravan variant only publish a single MTOW=MLW limit) — closed as "no
+  data exists", not left as open gaps. Commits 1b3f28f, 3efca73 (the latter fixing a BE20 mzfw
+  value that was named in the first commit message but not actually applied until the follow-up).
+- Remaining MLW/MZFW gap: 11 aircraft in the "probably no published data" group (BE36, DG1E,
+  LS18, PITA, S12G, A6M5, T210, DA42, BF109, FW08, PA38) not yet chased.
+
 ## 2026-07-24 (later session, part 5)
 
 - **Divider restored below IFR/VFR row** — re-added `<hr class="preflight-rules-divider">` in its
