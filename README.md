@@ -3,8 +3,8 @@
 ## Quick start
 
 1. Open **[VECTOR](https://manicminer00.github.io/global-flight-dispatcher/)** in your browser.
-2. Enter (or auto-generate) a callsign, pick an aircraft, and click **GENERATE FLIGHT**.
-3. Pick a job ticket, then dispatch via SimBrief or download an MSFS **.pln** for the EFB.
+2. Select your favourite aircraft and click **GENERATE FLIGHT**.
+3. Choose a job and then dispatch via SimBrief or download an MSFS **.pln**.
 
 ## Why VECTOR?
 Every flight simmer knows the problem. You have a hangar full of aircraft you love, a hard drive full of scenery you paid for, and no particular reason to fly any of it tonight. You end up doing the same familiar hop, or spending twenty minutes browsing charts instead of flying.
