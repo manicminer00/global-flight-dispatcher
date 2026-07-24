@@ -87,6 +87,9 @@
                 <label class="slider-header-row">BLOCK TIME: <span id="heliFixedBlockVal">30</span> MINS</label>
             </div>
             <hr class="preflight-rules-divider" aria-hidden="true">
+            <div class="dispatch-form-field">
+                <label class="field-title">ALTITUDE:</label>
+            </div>
             <div class="preflight-rules-row">
                 <div class="preflight-rules-toggle" role="group" aria-label="Flight rules">
                     <button type="button" id="ifrRulesBtn" class="rules-toggle-btn is-active" aria-pressed="true" onclick="setFlightRulesMode('IFR')">IFR</button>
@@ -135,29 +138,7 @@
                     <input type="checkbox" id="useLastArrivalToggle" onchange="toggleLastArrival()">CONTINUE FROM LAST AIRPORT?
                 </label>
             </div>
-            <hr class="board-sidebar-navigraph-divider" aria-hidden="true">
-            <label class="board-sidebar-navigraph-panel" for="navigraphOnlyToggle">
-                <span class="board-sidebar-navigraph-option">
-                    <input type="checkbox" id="navigraphOnlyToggle">
-                    <img src="images/icon_navi_color.png" alt="" class="board-sidebar-navigraph-icon" aria-hidden="true">
-                    <span class="board-sidebar-navigraph-text">Only use Navigraph airports</span>
-                </span>
-            </label>
             <hr class="board-sidebar-navigraph-divider board-sidebar-navigraph-divider--bottom" aria-hidden="true">
-                <script>
-                (function () {
-                    try {
-                        var el = document.getElementById("navigraphOnlyToggle");
-                        var saved = localStorage.getItem("dispatcher_navigraph_only");
-                        if (el && saved === "1") el.checked = true;
-                        if (el) {
-                            el.addEventListener("change", function () {
-                                localStorage.setItem("dispatcher_navigraph_only", el.checked ? "1" : "0");
-                            });
-                        }
-                    } catch (e) {}
-                })();
-                </script>
             <div class="dispatch-form-field">
                 <div class="routing-options-header">
                     <label for="routingScopeSelect" class="field-title">ROUTING OPTIONS:</label>
@@ -179,6 +160,27 @@
                 })();
                 </script>
             </div>
+            <label class="board-sidebar-navigraph-panel" for="navigraphOnlyToggle">
+                <span class="board-sidebar-navigraph-option">
+                    <input type="checkbox" id="navigraphOnlyToggle">
+                    <img src="images/icon_navi_color.png" alt="" class="board-sidebar-navigraph-icon" aria-hidden="true">
+                    <span class="board-sidebar-navigraph-text">Only use Navigraph airports</span>
+                </span>
+            </label>
+                <script>
+                (function () {
+                    try {
+                        var el = document.getElementById("navigraphOnlyToggle");
+                        var saved = localStorage.getItem("dispatcher_navigraph_only");
+                        if (el && saved === "1") el.checked = true;
+                        if (el) {
+                            el.addEventListener("change", function () {
+                                localStorage.setItem("dispatcher_navigraph_only", el.checked ? "1" : "0");
+                            });
+                        }
+                    } catch (e) {}
+                })();
+                </script>
             <div class="dispatch-form-field board-sidebar-checks">
                 <label class="checkbox-option" for="militaryBaseToggle">
                     <input type="checkbox" id="militaryBaseToggle">USE MILITARY AIRBASES
@@ -227,18 +229,17 @@
                     <span class="contract-ticket-route-arrow" aria-hidden="true"></span>
                     <span class="contract-ticket-route-icao" data-role="arr-icao">—</span>
                 </p>
-                <hr class="contract-ticket-rule" aria-hidden="true">
-                <p class="contract-ticket-label">SCENERY LINKS</p>
-                <div class="contract-ticket-meta">
-                    <span class="contract-ticket-meta-line" data-role="dep-scenery"></span>
-                    <span class="contract-ticket-meta-line" data-role="arr-scenery"></span>
-                </div>
-                <hr class="contract-ticket-meta-divider" aria-hidden="true">
-                <p class="contract-ticket-label">CONTRACT VALUE</p>
+                <p class="contract-ticket-label">VALUE</p>
                 <p class="contract-ticket-value" data-role="value">$ —</p>
-                <p class="contract-ticket-pp" data-role="pp">+0 Prestige Points</p>
                 <hr class="contract-ticket-rule" aria-hidden="true">
                 <div class="contract-ticket-meta" data-role="meta">Awaiting dispatch</div>
+                <hr class="contract-ticket-rule" aria-hidden="true">
+                <div class="contract-ticket-meta">
+                    <div class="contract-ticket-meta-line" data-role="dep-scenery"></div>
+                    <hr class="contract-ticket-meta-divider" aria-hidden="true">
+                    <div class="contract-ticket-meta-line" data-role="arr-scenery"></div>
+                </div>
+                <p class="contract-ticket-pp" data-role="pp">+0 Prestige Points</p>
                 <div class="contract-ticket-footer">
                 <div class="contract-ticket-actions">
                     <button type="button" class="contract-ticket-accept" data-role="accept" disabled>Accept Contract</button>
@@ -278,18 +279,17 @@
                     <span class="contract-ticket-route-arrow" aria-hidden="true"></span>
                     <span class="contract-ticket-route-icao" data-role="arr-icao">—</span>
                 </p>
-                <hr class="contract-ticket-rule" aria-hidden="true">
-                <p class="contract-ticket-label">SCENERY LINKS</p>
-                <div class="contract-ticket-meta">
-                    <span class="contract-ticket-meta-line" data-role="dep-scenery"></span>
-                    <span class="contract-ticket-meta-line" data-role="arr-scenery"></span>
-                </div>
-                <hr class="contract-ticket-meta-divider" aria-hidden="true">
-                <p class="contract-ticket-label">CONTRACT VALUE</p>
+                <p class="contract-ticket-label">VALUE</p>
                 <p class="contract-ticket-value" data-role="value">$ —</p>
-                <p class="contract-ticket-pp" data-role="pp">+0 Prestige Points</p>
                 <hr class="contract-ticket-rule" aria-hidden="true">
                 <div class="contract-ticket-meta" data-role="meta">Awaiting dispatch</div>
+                <hr class="contract-ticket-rule" aria-hidden="true">
+                <div class="contract-ticket-meta">
+                    <div class="contract-ticket-meta-line" data-role="dep-scenery"></div>
+                    <hr class="contract-ticket-meta-divider" aria-hidden="true">
+                    <div class="contract-ticket-meta-line" data-role="arr-scenery"></div>
+                </div>
+                <p class="contract-ticket-pp" data-role="pp">+0 Prestige Points</p>
                 <div class="contract-ticket-footer">
                 <div class="contract-ticket-actions">
                     <button type="button" class="contract-ticket-accept" data-role="accept" disabled>Accept Contract</button>
@@ -329,18 +329,17 @@
                     <span class="contract-ticket-route-arrow" aria-hidden="true"></span>
                     <span class="contract-ticket-route-icao" data-role="arr-icao">—</span>
                 </p>
-                <hr class="contract-ticket-rule" aria-hidden="true">
-                <p class="contract-ticket-label">SCENERY LINKS</p>
-                <div class="contract-ticket-meta">
-                    <span class="contract-ticket-meta-line" data-role="dep-scenery"></span>
-                    <span class="contract-ticket-meta-line" data-role="arr-scenery"></span>
-                </div>
-                <hr class="contract-ticket-meta-divider" aria-hidden="true">
-                <p class="contract-ticket-label">CONTRACT VALUE</p>
+                <p class="contract-ticket-label">VALUE</p>
                 <p class="contract-ticket-value" data-role="value">$ —</p>
-                <p class="contract-ticket-pp" data-role="pp">+0 Prestige Points</p>
                 <hr class="contract-ticket-rule" aria-hidden="true">
                 <div class="contract-ticket-meta" data-role="meta">Awaiting dispatch</div>
+                <hr class="contract-ticket-rule" aria-hidden="true">
+                <div class="contract-ticket-meta">
+                    <div class="contract-ticket-meta-line" data-role="dep-scenery"></div>
+                    <hr class="contract-ticket-meta-divider" aria-hidden="true">
+                    <div class="contract-ticket-meta-line" data-role="arr-scenery"></div>
+                </div>
+                <p class="contract-ticket-pp" data-role="pp">+0 Prestige Points</p>
                 <div class="contract-ticket-footer">
                 <div class="contract-ticket-actions">
                     <button type="button" class="contract-ticket-accept" data-role="accept" disabled>Accept Contract</button>

@@ -1397,10 +1397,15 @@ function fillBoardRouteCells(card, origin, destination) {
     setSceneryLine("arr-scenery", "ARR", destination);
 }
 
-/** Detail text (link/tag) portion of a Job Ticket scenery line, mirroring formatScenery()'s tag logic. */
-function formatSceneryTicketDetail(apt) {
+/** Strips a scenery linkText down to the developer name only, e.g. "LVFR via Contrail" -> "LVFR". */
+function shortenSceneryDevName(text) {
+    return String(text || "").split(" via ")[0].split(" (")[0].trim();
+}
+
+/** Scenery lines (capped at: header, optional Hand-Crafted line, optional joined third-party line) for a Job Ticket DEP:/ARR: block, mirroring formatScenery()'s tag logic. */
+function formatSceneryTicketLines(apt) {
     function makeLink(item) {
-        const text = item.linkText ? item.linkText : "Store";
+        const text = shortenSceneryDevName(item.linkText) || "Store";
         return item.url ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="scenery-link">${text}</a>` : text;
     }
     const holdsHandcrafted = apt.allOptions
@@ -1414,22 +1419,29 @@ function formatSceneryTicketDetail(apt) {
     } else if (apt.tag === "Third Party" || apt.tag === "Both") {
         thirdPartyLinks.push(makeLink(apt));
     }
-    if (holdsHandcrafted && thirdPartyLinks.length > 0) return `Hand-Crafted / ${thirdPartyLinks.join(" OR ")}`;
-    if (thirdPartyLinks.length > 0) return thirdPartyLinks.join(" OR ");
-    if (apt.tag === "Asobo Detailed Airports" || apt.tag === "MSFS 2024 Detailed Small Airports") return "MSFS Small Detailed";
-    if (apt.tag === "Asobo Gliderport") return "MSFS Gliderport";
-    return "Hand-Crafted";
+    const lines = [];
+    if (holdsHandcrafted) lines.push("Hand-Crafted");
+    if (thirdPartyLinks.length > 0) lines.push(thirdPartyLinks.join(" / "));
+    if (lines.length === 0) {
+        if (apt.tag === "Asobo Detailed Airports" || apt.tag === "MSFS 2024 Detailed Small Airports") lines.push("MSFS Small Detailed");
+        else if (apt.tag === "Asobo Gliderport") lines.push("MSFS Gliderport");
+        else lines.push("Hand-Crafted");
+    }
+    return lines;
 }
 
-/** DEP:/ARR: Job Ticket meta line: airport name preferred, ICAO fallback if it doesn't fit. */
+/** Job Ticket scenery meta block: DEP:/ARR: label + bold ICAO header (no room for the full airport name at
+ *  this width — tested, wraps to 2 lines even for a mid-length name), then at most two scenery lines
+ *  (Hand-Crafted, third-party). */
 function formatBoardTicketSceneryLine(label, apt) {
     const keySpan = `<span class="contract-ticket-meta-key">${escapeHtml(label)}:</span>`;
     if (!apt) return `${keySpan} —`;
-    const name = stripIrlNameSuffix(apt.name || "").trim();
     const icao = apt.icao ? String(apt.icao).toUpperCase() : "";
-    const idLabel = name || icao;
-    const detail = formatSceneryTicketDetail(apt);
-    return `${keySpan} ${escapeHtml(idLabel)} - ${detail}`;
+    const headerLine = `${keySpan} <span class="contract-ticket-scenery-icao">${escapeHtml(icao)}</span>`;
+    const itemLines = formatSceneryTicketLines(apt)
+        .map(line => `<span class="contract-ticket-scenery-item">${line}</span>`)
+        .join("");
+    return `${headerLine}${itemLines}`;
 }
 
 function formatBoardTicketMetaHtml(result) {
@@ -1450,14 +1462,17 @@ function formatBoardTicketMetaHtml(result) {
     const destApprLine = `<span class="contract-ticket-meta-key">OTHER:</span> ${escapeHtml(formatDestinationApproachTicketLabel(result.destination))}`;
     const navigraphLine = `<span class="contract-ticket-meta-key">NAVIGRAPH:</span> ${airportIsInNavigraph(result.destination) ? "YES" : "NO"}`;
     const wrapMetaLine = (line) => `<span class="contract-ticket-meta-line">${line}</span>`;
-    return [
-        wrapMetaLine(aircraftLine),
-        wrapMetaLine(crzAltLine),
-        wrapMetaLine(payloadLine),
+    const destBlock = [
         destDivider,
         wrapMetaLine(destIlsLine),
         wrapMetaLine(destApprLine),
         wrapMetaLine(navigraphLine)
+    ].join("");
+    return [
+        wrapMetaLine(aircraftLine),
+        wrapMetaLine(crzAltLine),
+        wrapMetaLine(payloadLine),
+        `<span class="contract-ticket-meta-dest">${destBlock}</span>`
     ].join("");
 }
 
@@ -2652,7 +2667,7 @@ function clearContractTicketSelection() {
 }
 
 function onContractTicketClick(event, index) {
-    if (event.target.closest(".contract-ticket-export, .contract-ticket-reselect")) return;
+    if (event.target.closest(".contract-ticket-export, .contract-ticket-reselect, .scenery-link")) return;
     const card = event.currentTarget;
     if (card.classList.contains("is-selected") || card.classList.contains("is-dimmed")) return;
     const grid = document.getElementById("contractsTicketGrid");

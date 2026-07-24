@@ -6,8 +6,40 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ## 2026-07-24
 
+- **Job ticket redesign completed (VALUE placement, scenery block reorder, overflow fix, sidebar tweaks)** —
+  finishes the redesign logged further below. Fixed the fixed-840px-ticket overflow bug
+  (Accept Contract button clipped, worst case ~+10.67px over) via several changes:
+  1. Removed the "SCENERY LINKS" label entirely (index.html, all 3 ticket templates) — won
+     back ~22px.
+  2. Moved the DEP:/ARR: scenery block from directly under VALUE to below the
+     ACFT/CRZ ALT/PAX/CARGO/DESTINATION HAS ILS/OTHER/NAVIGRAPH block, so ACFT is now the
+     first row after VALUE. Dotted `.contract-ticket-meta-divider` between DEP and ARR was
+     removed then re-added after testing showed there was still headroom for it (kept, it
+     reads better).
+  3. Unified every dotted-line-adjacent gap in the ticket to a flat 8px
+     (`.contract-ticket-rule + .contract-ticket-meta` and `.contract-ticket-meta-divider`
+     margins, styles.css ~3220/~3259) — was inconsistently 8px/12px/14px depending on
+     location.
+  4. `.contract-ticket-actions` had a duplicate `padding-top: 12px` stacking on top of
+     `.contract-ticket-footer`'s own 12px (styles.css ~3271/~3279) — removed the duplicate.
+     The `is-selected` state already zeroed both, which is what exposed this as dead
+     redundancy rather than intentional spacing.
+  5. `.contract-ticket-scenery-icao` font-size 13px → 12px; `.contract-ticket-body >
+     .contract-ticket-label:first-child` margin-top 20px → 10px (moves ROUTE/VALUE up
+     toward the CONTRACT heading); `.contract-ticket-mission` line-height 1.1 → 1.02
+     (and its matching min/max-height calc) to trim the fixed 3-line title box slightly.
+  - Tested worst case via Playwright: EICK on both DEP and ARR (a real airport with both
+    Hand-Crafted and third-party tags — 50 such airports exist in the DB, so this isn't
+    contrived) combined with a mission title long enough to hit the 3-line wrap cap.
+    Accept Contract button now sits ~15-16px inside the ticket bottom, no overflow.
+  - Sidebar Options panel: moved "Only use Navigraph airports" to below the Routing
+    Options dropdown; removed the divider that sat directly below "Continue from last
+    airport?" (kept the one now sitting directly above Routing Options); added an
+    "ALTITUDE:" title above the IFR/VFR buttons, styled like the other field titles
+    (index.html ~123-189).
+
 - **Job ticket redesign (Scenery Links section, height, panel title alignment)** —
-  not yet committed. Fixed three things reported as messy:
+  Fixed three things reported as messy:
   1. CONTRACTS BOARD/LOGBOOK/SETTINGS titles were not aligned with each other or
      with the Pre-Flight container's top edge. Root cause found via Playwright pixel
      measurement (PNG crop + ImageMagick trim, since JS Range/getBoundingClientRect
