@@ -5219,12 +5219,22 @@ function probeDispatchFlight(config) {
     const cruiseSampleMaxAlt = preferLowerCruise
         ? dynamicMinAlt + (safeMaxAlt - dynamicMinAlt) / 3
         : safeMaxAlt;
-    let baseThousands = Math.max(1, Math.floor((Math.random() * (cruiseSampleMaxAlt - dynamicMinAlt + 1) + dynamicMinAlt) / 1000));
 
     // Hemispheric Rules: IFR uses whole thousands, odd/even by direction. VFR adds the
-    // standard +500ft on top of the same odd/even convention (FAA 91.159 / SERA).
-    if (isEasterly && baseThousands % 2 === 0) baseThousands += 1;
-    if (!isEasterly && baseThousands % 2 !== 0) baseThousands += 1;
+    // standard +500ft on top of the same odd/even convention (FAA 91.159 / SERA). Round the
+    // floor UP to the nearest thousand of the correct parity (never down) so the safety
+    // floor (terrain/HAT-derived, rarely itself a round thousand) can never be undershot —
+    // picking a random continuous value and then flooring it, as before, could land below
+    // dynamicMinAlt whenever that floor wasn't already a round thousand.
+    let minThousands = Math.max(1, Math.ceil(dynamicMinAlt / 1000));
+    if (isEasterly && minThousands % 2 === 0) minThousands += 1;
+    if (!isEasterly && minThousands % 2 !== 0) minThousands += 1;
+    let maxThousands = Math.floor(cruiseSampleMaxAlt / 1000);
+    if (isEasterly && maxThousands % 2 === 0) maxThousands -= 1;
+    if (!isEasterly && maxThousands % 2 !== 0) maxThousands -= 1;
+    if (maxThousands < minThousands) maxThousands = minThousands;
+    const thousandSteps = (maxThousands - minThousands) / 2;
+    const baseThousands = minThousands + 2 * Math.floor(Math.random() * (thousandSteps + 1));
     const altFeetBase = baseThousands * 1000;
     let altFeet = altFeetBase;
     if (flightRulesMode === "VFR") altFeet += 500;
