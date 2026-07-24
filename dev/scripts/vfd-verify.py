@@ -186,7 +186,6 @@ def verify_fleet(manifest: dict, *, force: bool, stamp: bool) -> bool:
     print("Fleet checks per aircraft:")
     print("  • Required performance fields (range, weights, fuel, runway, tags)")
     print("  • Structural sanity (minD < maxD, oew < mtow, etc.)")
-    print("  • POH / developer reference match (dev/scripts/fleet-reference.json when present)")
     if uses_mission_assignments():
         print("  • Mission eligibility (mission-assignments.json + Node dispatch probes)")
     else:

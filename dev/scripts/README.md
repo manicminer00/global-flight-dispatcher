@@ -33,8 +33,6 @@ Use `--force` to re-audit everything.
 
 Useful flags: `--stamp` (write internal vfVerified tags into .js), `--dedupe-exact` (remove exact copy-paste duplicate airport lines).
 
-**Fleet POH / developer data:** add rows to `dev/scripts/fleet-reference.json` (see `STAR` example). Aircraft without a reference row still get structural checks.
-
 ### ICAO safeguard (verification only)
 
 The checker **never** normalizes or replaces `icao` values. In particular, MSFS custom / sim identifiers in these files must stay exactly as stored:
@@ -59,8 +57,6 @@ When editing airport data or fixing audit findings, **never** “correct” a si
 | `CURSOR-PREDEPLOY-PROMPT.md` | Prompt for Cursor before a release |
 | `audit-fleet-missions.py` | Fleet ↔ mission eligibility (called automatically by vfd-verify) |
 | `audit-predeploy.py` | Images, imgIds, version sync (called automatically) |
-| `audit-longhaul-math.py` | Long-haul range/block math spot-check (called automatically) |
-| `fleet-reference.json` | Optional POH / developer specs for fleet verification |
 | `dispatch-fleet-smoke.mjs` | **Headless QA** — runs `probeDispatchFlight()` 20× per aircraft (see root `dispatch-fleet-smoke.bat`) |
 | `lib/load-dispatch.mjs` | Shared loader for dispatch smoke tests |
 | `validate-imgids.mjs` | Check scenario imgIds vs `images-missions/` files |

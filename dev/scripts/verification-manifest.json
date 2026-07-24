@@ -10822,172 +10822,172 @@
   },
   "fleet": {
     "verified": true,
-    "verifiedAt": "2026-07-06T14:35:56Z",
-    "checksum": "93da7968b1a6b5c16f65f7fa50ec7bb3baa5b71282eb0f825316c92e97a75ae0",
+    "verifiedAt": "2026-07-24T19:31:53Z",
+    "checksum": "a1cd0278fdb7a20d5592f8c84596823df2571608bac21d58bee2fb19c04d5edc",
     "aircraft": {
       "A319": {
         "fp": "9a0b4348e8ece35a",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "A320": {
-        "fp": "277a625ff8d3d701",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "fp": "c294f912cb148cd0",
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "A321": {
         "fp": "d594ba956d5100bc",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "A33E": {
         "fp": "0fbb2935c1d10953",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "A346": {
         "fp": "cf7adc74a73acead",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "A359": {
         "fp": "739258e487f5e628",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "A388": {
         "fp": "3ae796ffdf1e4e20",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "A400": {
         "fp": "8117d359791f7bb8",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "A6M5": {
         "fp": "f8d3539caa4df8de",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "AEST": {
         "fp": "80ee8cc428f68ffe",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "ALO3": {
         "fp": "719306ba6b70dd2e",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "AT46": {
         "fp": "0206b2d3e19ee942",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "AT76": {
         "fp": "876bde8c603bab00",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B105": {
         "fp": "2e059b76d286a64e",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B36T": {
         "fp": "e3e923fe6e288978",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B38M": {
         "fp": "6aee5625c9cb1887",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B461": {
         "fp": "51f8088447742095",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B461_MIL": {
         "fp": "7aa3cbb6e1837263",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B462": {
         "fp": "53d13c708e661bbf",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B462_MIL": {
         "fp": "473f485a9ef66d4d",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B462_QT": {
         "fp": "42405188839b4a8f",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B463": {
         "fp": "a8ba79150b7cd1f9",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B463_QT": {
         "fp": "8ba2535a084781e7",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B58T": {
-        "fp": "4eb7fa067cc13d89",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "fp": "9ec944ba07c3d61f",
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B60T": {
         "fp": "a2e4b8ff3ece82df",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B722": {
         "fp": "1ccf38642a9ff3a5",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B72F": {
         "fp": "92327030f8f64ef2",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B736": {
         "fp": "ca55a20c0e6047b2",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B737": {
         "fp": "e1df5a48733d438f",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B738": {
         "fp": "c486ce2cbe9d1ad5",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B738_BCF": {
         "fp": "0ff1ad1918b0c733",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B738_BDSF": {
         "fp": "2712649f0a3f557e",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "B77W": {
         "fp": "7653c3fecbbe0010",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "BE20": {
         "fp": "e88a5a79847178bc",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "BE36": {
         "fp": "0b618672c748e03b",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "BE60": {
         "fp": "f648afd80a4b1d88",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "BF109": {
         "fp": "8d523fd8af9d135d",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "C160": {
         "fp": "0880802569fb8d42",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "C172": {
         "fp": "fca8188b1184e2de",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "C208": {
         "fp": "caf74f88acedbb21",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "C20F": {
         "fp": "185b51c1ee95b91e",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "C30J": {
         "fp": "0b311cd167c8d485",
@@ -10995,287 +10995,303 @@
       },
       "C310": {
         "fp": "8979cfe83082ddbe",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "C414": {
         "fp": "e2c9805bea4a3f2c",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "C680": {
         "fp": "a67cb076908ae740",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "C700": {
         "fp": "af2c39b2b706a3d4",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "C750": {
         "fp": "0ff9c4c253ba4a1b",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "CRJ7": {
         "fp": "6c07b5f995e63837",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "DA42": {
         "fp": "bda457ee78c20588",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "DC2F": {
         "fp": "61f4f4d36d8cf3e2",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "DC6A": {
         "fp": "5d51de1a483ad1cc",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "DC6B": {
         "fp": "a56e8966726be73b",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "DG1E": {
         "fp": "8a4af9a64ecc876b",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "E190": {
         "fp": "a8c308668a519890",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "E195": {
         "fp": "753d8329d013a754",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "E55P": {
         "fp": "02619d7723695acd",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "FA50": {
         "fp": "cadb678c7027dd36",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "F14A": {
         "fp": "d55bb238486fcaeb",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "F14B": {
         "fp": "d592592efa76b414",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "F28": {
-        "fp": "11314aeb3b4da356",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "fp": "fc9e1e89055a3290",
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "F6F": {
         "fp": "1b6f9b899936a7b2",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "F70": {
         "fp": "f7ba19f2344c2ac4",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "F100": {
         "fp": "e32e86c5755f51b0",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "FW08": {
         "fp": "cb2590019854be71",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "H145": {
         "fp": "864259133799b9f5",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "H14M": {
         "fp": "09623390dc73f785",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "H47D": {
         "fp": "404aef99b3a27fe3",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "H500": {
         "fp": "3fee1f4845f62a6e",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "HAWK": {
         "fp": "a270dead36657f2a",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "HDJT": {
         "fp": "a5054a59e290de08",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "JAGR": {
         "fp": "a0c4fb36be7bf643",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "KODF": {
         "fp": "509f2fc0a7917188",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "KODI": {
         "fp": "dd50b9c69fd6838d",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "LAMA": {
         "fp": "a4fb8f64a7d57ec8",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "LEG2": {
         "fp": "d16eb6b5e39129b0",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "LEG2_T": {
         "fp": "28329680e33a0af2",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "LJ35": {
         "fp": "8f69afdfc24ea2d9",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "LS18": {
         "fp": "124088d0a6fa404f",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "M600": {
         "fp": "c254fa87546058f6",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "MD11": {
         "fp": "085afa45c7743065",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "MD1F": {
         "fp": "392f0103a39071fd",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "MD82": {
         "fp": "0ebb2dd98e8ef811",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "MD88": {
         "fp": "9ee44f3c4aa8e2bf",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "P180": {
         "fp": "3e0e0c873d213837",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "P28A": {
         "fp": "08877856b5ea609d",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "P38": {
         "fp": "f769558cb6ab1b6f",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "P46T": {
         "fp": "2116c0e11232875e",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "PA24": {
         "fp": "c713d5ee0670378e",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "PA28": {
         "fp": "e966bb9ffd4e5ed4",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "PA38": {
         "fp": "48c3a26c4ef99585",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "PC12": {
         "fp": "9b4fd329db425e40",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "PC1F": {
         "fp": "2310280df19a3343",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "PITA": {
         "fp": "a68f6c7bc6bb1e74",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "R22": {
         "fp": "a99edbb818092d3d",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "RJ1F": {
         "fp": "736491567f89503d",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "RJ1H": {
         "fp": "31551ed15b71080a",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "RJ70": {
         "fp": "d848fd0cc785b234",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "RJ85": {
         "fp": "deff5271a554e628",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "S12G": {
         "fp": "7e8cdff0a2969a4d",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "SF50": {
         "fp": "d01f2c25db6af412",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "SPIT": {
         "fp": "f522b9ad81104245",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "STAR": {
         "fp": "e2ef6d80b8d6ef80",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "T210": {
         "fp": "645c50dea6b0488d",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "TBM8": {
         "fp": "fd52b2e6f4202ac1",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "TOR": {
         "fp": "bd58049cd9dce914",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "U16": {
         "fp": "d710b1d8fe001965",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "UH1": {
         "fp": "3a4423dec18cf4e0",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "V10": {
         "fp": "e9becb04afad79f7",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "VULC": {
         "fp": "0e1c0c1fe36b2e3d",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "AS65": {
         "fp": "ae4dbf355ce91d76",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "H65M": {
         "fp": "f84daa48f1208a81",
-        "verifiedAt": "2026-07-03T20:26:14Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
       },
       "H60": {
         "fp": "794834bda1aa9e32",
-        "verifiedAt": "2026-07-06T14:35:56Z"
+        "verifiedAt": "2026-07-24T19:31:53Z"
+      },
+      "C130": {
+        "fp": "22141f0664d1375a",
+        "verifiedAt": "2026-07-24T19:31:53Z"
+      },
+      "F28_1000": {
+        "fp": "bec760516d45a1b9",
+        "verifiedAt": "2026-07-24T19:31:53Z"
+      },
+      "F28_2000": {
+        "fp": "3eed2455607150a6",
+        "verifiedAt": "2026-07-24T19:31:53Z"
+      },
+      "F28_3000": {
+        "fp": "52b1448aa9f1db26",
+        "verifiedAt": "2026-07-24T19:31:53Z"
       }
     },
-    "aircraftCount": 112,
-    "verifiedCount": 112
+    "aircraftCount": 115,
+    "verifiedCount": 115
   },
   "missions": {
     "verified": true,

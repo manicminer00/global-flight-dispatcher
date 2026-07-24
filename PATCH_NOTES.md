@@ -4,6 +4,22 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ---
 
+## 2026-07-24 (later session, part 9)
+
+- **Removed the fleet-reference.json POH cross-check entirely** — deleted
+  `dev/scripts/fleet-reference.json` and the code that read it
+  (`load_fleet_reference()`, `_within_tolerance()`, and the reference-lookup block inside
+  `audit_fleet_specs()` in dev/scripts/vfd_verify_lib.py), plus the menu line and README/table
+  rows describing it. This was a working, live-wired check (confirmed via code trace, not
+  assumption) but only ever had reference rows for 2 of 115 aircraft (STAR, H60); user judged it
+  not worth keeping given fleet-db.js values are already sourced from real-world data directly.
+  Structural checks (required fields, oew<mtow, minD<maxD, etc.) are unaffected and still run
+  for all 115 aircraft. Also dropped the now-inaccurate `audit-longhaul-math.py` README row
+  (its automatic call was removed in part 8; the script itself still exists standalone,
+  unreferenced by any pipeline).
+- Re-ran `python dev/scripts/vfd-verify.py --fleet --force` after the removal: 0 errors,
+  0 warnings across all 115 aircraft.
+
 ## 2026-07-24 (later session, part 8)
 
 - **Removed stale long-haul-mode test logic from the verify pipeline** — the long-haul dispatch

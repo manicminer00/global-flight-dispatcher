@@ -30,7 +30,6 @@ KNOWN_CUSTOM_ASOBO_ICAO = frozenset({"LF0429"})  # French ULM local code, Sainte
 # These bypass the 3-4 character ICAO length rule — add new ones here when confirmed.
 KNOWN_CUSTOM_THIRDPARTY_ICAO = frozenset({"GB-0002", "IDJ93", "IDS93"})
 VALID_FLEET_CLASS = frozenset({"GA", "TURBO", "BIZ JET", "JET", "HELI", "GLIDER", "WARBIRD"})
-FLEET_REFERENCE_PATH = os.path.join(SCRIPTS_DIR, "fleet-reference.json")
 
 AIRPORT_AUDIT_FIELDS = (
     "ICAO (3–4 chars; up to 5 chars allowed in Asobo DB for MSFS custom identifiers)",
@@ -719,26 +718,11 @@ def fleet_needing_audit(
     return sorted(t for t, s in fleet.items() if not is_fleet_entry_verified(manifest, t, s))
 
 
-def load_fleet_reference() -> dict[str, Any]:
-    if not os.path.isfile(FLEET_REFERENCE_PATH):
-        return {}
-    with open(FLEET_REFERENCE_PATH, encoding="utf-8") as fh:
-        data = json.load(fh)
-    return {k: v for k, v in data.items() if not k.startswith("_") and isinstance(v, dict)}
-
-
-def _within_tolerance(actual: float, expected: float, pct: float) -> bool:
-    if expected == 0:
-        return actual == expected
-    return abs(actual - expected) <= max(abs(expected) * pct / 100.0, 1.0)
-
-
 def audit_fleet_specs(
     fleet: dict[str, dict[str, Any]], *, only_types: list[str] | None = None
 ) -> tuple[list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
-    reference = load_fleet_reference()
     required = (
         "name",
         "class",
@@ -756,7 +740,6 @@ def audit_fleet_specs(
         "tags",
     )
     targets = only_types if only_types is not None else sorted(fleet.keys())
-    no_reference: list[str] = []
     for ac_type in targets:
         spec = fleet.get(ac_type, {})
         label = f"{ac_type} ({spec.get('name', '?')})"
@@ -794,37 +777,6 @@ def audit_fleet_specs(
         rwy = spec.get("minRunwayLength")
         if ac_class not in ("HELI", "GLIDER") and isinstance(rwy, (int, float)) and rwy <= 0:
             warnings.append(f"{label}: minRunwayLength is 0 for non-heli/glider")
-
-        ref = reference.get(ac_type)
-        if ref:
-            ref_spec = ref.get("spec") or {}
-            tol = float(ref.get("tolerance_pct", 5))
-            for key, expected in ref_spec.items():
-                actual = spec.get(key)
-                if actual is None:
-                    errors.append(f"{label}: missing {key} (required by fleet-reference.json)")
-                    continue
-                if isinstance(expected, (int, float)) and isinstance(actual, (int, float)):
-                    if not _within_tolerance(float(actual), float(expected), tol):
-                        errors.append(
-                            f"{label}: {key}={actual} differs from reference {expected} "
-                            f"(>{tol}% — source: {ref.get('source', 'reference')})"
-                        )
-                elif actual != expected:
-                    errors.append(
-                        f"{label}: {key}={actual!r} differs from reference {expected!r} "
-                        f"(source: {ref.get('source', 'reference')})"
-                    )
-        else:
-            no_reference.append(ac_type)
-
-    if no_reference:
-        sample = ", ".join(no_reference[:8])
-        extra = f" (+{len(no_reference) - 8} more)" if len(no_reference) > 8 else ""
-        warnings.append(
-            f"{len(no_reference)} aircraft have no row in fleet-reference.json "
-            f"(structural checks only): {sample}{extra}"
-        )
 
     return errors, warnings
 
