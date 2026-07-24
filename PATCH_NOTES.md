@@ -4,6 +4,23 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ---
 
+## 2026-07-24 (later session, part 7)
+
+- **Military job ticket: Asobo-owned airport green lightened** — `.msfs-default-airport-icao`
+  was unreadable against the dark military ticket background (`--bg-ticket-military`). Added a
+  scoped override `.contract-ticket.is-military .msfs-default-airport-icao { color: #6fae74; }`
+  (styles.css) so only military tickets get the lighter shade; civilian tickets keep the
+  original `#1f5c22`. Chosen to stay visibly distinct from user-owned airports' green
+  (`--color-link-readme`, `#318F34`).
+- **MLW/MZFW sourced and added for 4 of the remaining 11 aircraft** — T210 (mlw 1724, matched
+  existing mtow exactly), BF109 (mlw 3400, matched existing mtow/oew exactly), PA38 (mlw 757,
+  official Ops Manual states combined take-off/landing weight), A6M5 (mlw/mzfw 2743, source cited
+  ~2796 but user chose to keep fleet-db's existing mtow value instead) (fleet-db.js). FW08 (Fw
+  190 A-8) explicitly has no published MLW per its source — period flight manuals never defined
+  one — so left unchanged, closed as "no data exists."
+- Remaining MLW/MZFW gap: 6 aircraft (BE36, DG1E, LS18, PITA, S12G, DA42) — user said to ignore
+  and remove from the to-do list; no longer tracked as open.
+
 ## 2026-07-24 (later session, part 6)
 
 - **Logbook row font-weight eased to normal** — `--font-weight-logbook-row` (styles.css) taken

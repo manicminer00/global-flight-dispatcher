@@ -2720,6 +2720,9 @@
         .contract-ticket.is-military .contract-ticket-meta-key {
             color: var(--military-ticket-muted, color-mix(in srgb, var(--text-ticket-military) 62%, transparent));
         }
+        .contract-ticket.is-military .msfs-default-airport-icao {
+            color: #6fae74;
+        }
         .contract-ticket.is-military .contract-ticket-route-arrow {
             color: color-mix(in srgb, var(--military-ticket-text, var(--text-ticket-military)) 55%, transparent);
         }
