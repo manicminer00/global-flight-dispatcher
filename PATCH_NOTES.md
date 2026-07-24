@@ -4,6 +4,55 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ---
 
+## 2026-07-24
+
+- **IFR/VFR/HELI cruise altitude could round below its own safety floor** — reported case:
+  Piper Comanche 250, EDGI (elev 1375ft) -> EDSP (elev 1315ft), IFR + Prefer Lower Cruise,
+  dispatched at 4000ft. The safety floor for that route (`terrainSafetyFloor`, field
+  elevation + 3000ft) was 4375ft, so 4000ft was below it. Root cause: altitude selection
+  sampled a continuous value in range then flooring it to the nearest thousand, only
+  bumping up on a hemispheric-parity mismatch — if the floored value already matched the
+  required parity (odd/even by direction), it shipped as-is even when below the floor,
+  since 4375ft isn't itself a round thousand. Fixed (dispatch-engine.js, altitude-selection
+  block ~line 5216) by computing the valid parity-correct thousand range first (floor
+  rounded up, ceiling rounded down) and sampling only from that integer set, so an
+  under-floor result is now structurally impossible. VFR and HELI dispatch share this exact
+  code path, so the fix applies to all three. Verified: 200k simulated draws at the reported
+  floor produced zero under-floor results (min 6000ft, correctly 2000ft above the old bad
+  4000ft since 4000 < 4375); a floor that's already a valid round/parity-matching thousand
+  (5000ft) is still exactly reachable, confirming no over-restriction. Live-tested in
+  Playwright (Comanche 250 + IFR + Prefer Lower Cruise, several routes, sane altitudes, no
+  errors). Commit 67fdc5b.
+  - Considered and declined: importing NOAA's public-domain GLOBE 1km DEM (via LittleNavMap's
+    same data source) for true terrain-following altitude checks. License is fine (public
+    domain, no-warranty disclaimers only), but the dataset is 1.83GB — impractical for this
+    repo/GitHub — and disproportionate to how VECTOR is actually used (straight A-to-B,
+    SimBrief handles routing, no route-around-terrain planning in VECTOR itself). Kept the
+    existing simplified floor (airport elevation + fixed buffer, plus named mountain-range
+    boxes); note for later: if a specific region keeps producing altitudes that feel wrong,
+    add more named high-terrain boxes rather than the full DEM.
+- **Removed the "Zoom" job-ticket photo animation filter** — user preference, only
+  Static/CRT remain. Removed from index.html (markup), styles.css (grid now 2 columns, all
+  `ticket-photo-fx-zoom` rules gone including a reduced-motion override), dispatch-engine.js
+  (`TICKET_PHOTO_FX_MODES`, fallback defaults, per-card class cleanup list). Also corrected
+  the Job Ticket Photo Filter settings-panel preview to be an exact 1:1 match of the real
+  ticket: box aspect-ratio 308/171 (was an approximate 298/178), and CRT preview brief text
+  font-size corrected from 13px to 16px after discovering via live measurement in Playwright
+  that CRT-mode ticket brief text actually renders at 16px (a generic
+  `.contract-ticket.ticket-photo-fx-crt .contract-ticket-photo-brief` rule overrides the
+  base 13px rule). Hint text updated to user's wording. Commit b4e7b49.
+- **Mission photos resized to eliminate downscale moire** — all 230 `images-missions/*.jpg`
+  resized from ~1024px-wide originals to 616x342 (2x the 308x171 ticket photo box) using
+  ImageMagick `mogrify -filter Lanczos -resize 616x342 -quality 88`, run by the user outside
+  Claude Code. Root cause of the moire: the browser was live-downscaling full-res source
+  images by a large, non-integer ratio combined with the crop tool's 100-115% zoom, which
+  a dedicated resize with proper resampling avoids. Also: ticket photo box height changed
+  210px -> 171px (styles.css) to match the images' native ~1.8:1 aspect ratio, crop settings
+  reset to defaults for the user's re-crop pass, and the crop tool's preview box resized to
+  match exactly and had a fake header-stripe overlay removed. Commit b4e7b49.
+
+---
+
 ## 2026-07-22
 
 - **Owned-airport green ICAO highlight restored on job tickets** — codes in the Owned
