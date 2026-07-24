@@ -1388,6 +1388,48 @@ function fillBoardRouteCells(card, origin, destination) {
         const isLong = depIcao.length > 4 || arrIcao.length > 4;
         routeEl.classList.toggle("contract-ticket-route--long-icao", isLong);
     }
+    const setSceneryLine = (role, label, airport) => {
+        const el = card.querySelector(`[data-role="${role}"]`);
+        if (!el) return;
+        el.innerHTML = formatBoardTicketSceneryLine(label, airport);
+    };
+    setSceneryLine("dep-scenery", "DEP", origin);
+    setSceneryLine("arr-scenery", "ARR", destination);
+}
+
+/** Detail text (link/tag) portion of a Job Ticket scenery line, mirroring formatScenery()'s tag logic. */
+function formatSceneryTicketDetail(apt) {
+    function makeLink(item) {
+        const text = item.linkText ? item.linkText : "Store";
+        return item.url ? `<a href="${item.url}" target="_blank" rel="noopener noreferrer" class="scenery-link">${text}</a>` : text;
+    }
+    const holdsHandcrafted = apt.allOptions
+        ? apt.allOptions.some(v => v.tag === "Hand-Crafted" || v.tag === "Both")
+        : (apt.tag === "Hand-Crafted" || apt.tag === "Both");
+    let thirdPartyLinks = [];
+    if (apt.allOptions) {
+        apt.allOptions.forEach(v => {
+            if (v.tag === "Third Party" || v.tag === "Both") thirdPartyLinks.push(makeLink(v));
+        });
+    } else if (apt.tag === "Third Party" || apt.tag === "Both") {
+        thirdPartyLinks.push(makeLink(apt));
+    }
+    if (holdsHandcrafted && thirdPartyLinks.length > 0) return `Hand-Crafted / ${thirdPartyLinks.join(" OR ")}`;
+    if (thirdPartyLinks.length > 0) return thirdPartyLinks.join(" OR ");
+    if (apt.tag === "Asobo Detailed Airports" || apt.tag === "MSFS 2024 Detailed Small Airports") return "MSFS Small Detailed";
+    if (apt.tag === "Asobo Gliderport") return "MSFS Gliderport";
+    return "Hand-Crafted";
+}
+
+/** DEP:/ARR: Job Ticket meta line: airport name preferred, ICAO fallback if it doesn't fit. */
+function formatBoardTicketSceneryLine(label, apt) {
+    const keySpan = `<span class="contract-ticket-meta-key">${escapeHtml(label)}:</span>`;
+    if (!apt) return `${keySpan} —`;
+    const name = stripIrlNameSuffix(apt.name || "").trim();
+    const icao = apt.icao ? String(apt.icao).toUpperCase() : "";
+    const idLabel = name || icao;
+    const detail = formatSceneryTicketDetail(apt);
+    return `${keySpan} ${escapeHtml(idLabel)} - ${detail}`;
 }
 
 function formatBoardTicketMetaHtml(result) {
@@ -5137,7 +5179,13 @@ function probeDispatchFlight(config) {
         { name: "North American Rockies", latMin: 35.0, latMax: 60.0, lonMin: -125.0, lonMax: -105.0, safeFloor: 14500, heliSafeFloor: 12000 },
         { name: "South American Andes", latMin: -55.0, latMax: 10.0, lonMin: -76.0, lonMax: -65.0, safeFloor: 15500, heliSafeFloor: 12000 },
         { name: "Himalayas / Tibetan Plateau", latMin: 26.0, latMax: 38.0, lonMin: 70.0, lonMax: 105.0, safeFloor: 21500, heliSafeFloor: 12000 },
-        { name: "Japanese Alps / Central Ranges", latMin: 34.5, latMax: 37.5, lonMin: 136.0, lonMax: 139.5, safeFloor: 10500, heliSafeFloor: 9000 }
+        { name: "Japanese Alps / Central Ranges", latMin: 34.5, latMax: 37.5, lonMin: 136.0, lonMax: 139.5, safeFloor: 10500, heliSafeFloor: 9000 },
+        { name: "Caucasus", latMin: 40.5, latMax: 44.5, lonMin: 40.0, lonMax: 49.0, safeFloor: 10500, heliSafeFloor: 9000 },
+        { name: "Ethiopian Highlands", latMin: 5.0, latMax: 15.0, lonMin: 34.0, lonMax: 43.0, safeFloor: 12000, heliSafeFloor: 10000 },
+        { name: "Mexican Sierra Madre / Trans-Mexican Volcanic Belt", latMin: 16.0, latMax: 20.5, lonMin: -102.0, lonMax: -95.0, safeFloor: 13500, heliSafeFloor: 11000 },
+        { name: "New Zealand Southern Alps", latMin: -46.0, latMax: -42.0, lonMin: 166.0, lonMax: 174.0, safeFloor: 9500, heliSafeFloor: 8000 },
+        { name: "Scandinavian Mountains", latMin: 59.0, latMax: 70.0, lonMin: 5.0, lonMax: 25.0, safeFloor: 6500, heliSafeFloor: 5500 },
+        { name: "Papua New Guinea Highlands", latMin: -10.0, latMax: 0.0, lonMin: 134.0, lonMax: 151.0, safeFloor: 14000, heliSafeFloor: 12000 }
     ];
     let heliMountainTransitFloor = 0;
     for (let range of globalRanges) {
