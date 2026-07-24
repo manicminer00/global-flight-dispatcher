@@ -1,121 +1,92 @@
-CONTINUE PROMPT — VECTOR Sightseeing/Scenic Route feature exploration
+CONTINUE PROMPT — VECTOR job ticket layout redesign
 (paste this at the start of a new chat to pick up where we left off)
 
-PROJECT
-VECTOR is Toby's flight-sim dispatch app, project folder: D:\CLAUDE WORKSPACE\VECTOR DEVELOPMENT v3.0
-Project rules live in D:\CLAUDE WORKSPACE\VECTOR DEVELOPMENT v3.0\CLAUDE.md — read it, and
-ARCHITECTURE.md for how the real app's files load (loader.js, dispatch-engine.js, etc.).
-VECTOR is free, ~50 regular users (per GitHub), may grow with the new version.
+Continuing VECTOR work in "d:\CLAUDE WORKSPACE\VECTOR DEVELOPMENT v3.0", branch `experiment`.
+Read CLAUDE.md first (strict rules: checked/tested/unknown separation, ask before multi-file
+changes, never commit unless asked, plain-English answers).
 
-WHAT WE'RE BUILDING
-A "Sightseeing" mode: curated scenic VFR corridors (<FL100) for both helicopter and small
-GA aircraft, e.g. Grand Canyon, Na Pali Coast, Hudson River, Chamonix. Idea originated from
-a ChatGPT/Gemini brainstorm about data model (curated waypoint "spine" + procedurally
-selected real airports at each end via a "gate" radius search — not airport pairs, not
-polygons).
+Per CLAUDE.md "Starting a new chat" rule: do NOT ask "what do you want to work on" or "where
+should we start." Open by presenting the to-do list below and let the user pick.
 
-CRITICAL CONSTRAINT — repeat this back before doing anything
-Toby explicitly does NOT want this touching the real Vector app yet. He's still deciding
-if he likes it. Rules:
-- NEVER edit loader.js, dispatch-engine.js, or any other real Vector file.
-- NEVER add the scenic files to loader.js's script list.
-- All scenic work stays in 3 standalone files in the project root, not linked from the
-  real app: scenic-routes-db.js, sightseeing-engine.js, scenic-lab.html (a self-contained
-  test page with the other two inlined into it — keep the standalone .js files and the
-  inlined copies in scenic-lab.html in sync BY HAND whenever one changes).
-- If/when Toby wants this wired into the real app, that's a separate, explicitly-requested,
-  reviewed step (touches dispatch-engine.js's ticket-building pipeline, which is complex —
-  payload/payout/mission-scenario logic — the exact integration shape hasn't been decided).
+## To-do list (present this, let user pick)
 
-CURRENT STATE OF scenic-lab.html (the test harness)
-- Loads Vector's real airports-asobo-db.js, airports-thirdparty-db.js, fleet-db.js
-  read-only for testing (not modified).
-- Mode picker (HELI/GA), aircraft dropdown (sets min runway length), "Generate Scenic
-  Flight" button.
-- Shows result card, repeat-avoidance history (localStorage), raw JSON.
-- Real interactive map (Leaflet, CDN-loaded): CARTO Voyager (street) + Esri World Topo
-  Map (terrain) as base layers — chosen specifically because tile.openstreetmap.org
-  blocks file:// pages (no Referer header = 403). Plus FAA VFR Sectional, FAA VFR
-  Terminal Area Chart, FAA IFR Low, FAA IFR High as optional overlays (US coverage
-  only — official ArcGIS tile service, confirmed via SDK/search, not guessed). Just
-  fixed maxNativeZoom vs maxZoom on those 4 FAA layers so they upscale gracefully past
-  their real native zoom (~11-12) instead of looking broken/blurry when zoomed in close.
-- Offline SVG fallback map below the real map (no internet needed), also enlarged.
-- "Download .pln" button — builds a real MSFS 2024 waypoint-by-waypoint flight plan
-  (origin airport -> each scenic spine point as a User waypoint carrying the route's
-  cruise altitude -> destination airport), schema confirmed against Microsoft's actual
-  MSFS 2024 SDK docs (fetched 2026-07-24), not guessed.
-- "Open route in SkyVector" button + copyable route string — builds a skyvector.com
-  ?fpl=... deep link (confirmed working format via search, and confirmed WORKING by
-  Toby's own screenshot: Na Pali route loaded correctly in SkyVector, even showed a
-  real "high volume tour aircraft" warning for that exact coastline). Idea: useful
-  during the few minutes waiting for the sim to load, not for someone just wanting to
-  get in the air fast.
+1. MAIN TASK — job ticket layout redesign (multi-file: styles.css primary, index.html small,
+   possibly dispatch-engine.js). Plan already agreed with Toby, not yet started:
+   a. Measure current pixel gaps via Playwright (getBoundingClientRect) for: nav-tab-title
+      (CONTRACTS BOARD / LOGBOOK / SETTINGS) top vs Pre-Flight container box top edge; the
+      horizontal separator's position relative to both; gap between Pre-Flight bottom and
+      Options panel top; gap between stacked job tickets. Derive ONE real spacing value from
+      these measurements — don't guess a number.
+   b. Align nav tab titles' top edge to the Pre-Flight container box's top edge using that
+      spacing value.
+   c. Make the gap from the separator up to the tab titles equal the gap from the separator
+      down to the Pre-Flight container top (symmetric).
+   d. Increase `.contract-ticket` height (currently fixed 783px, styles.css:2588) so the
+      ticket bottom lines up with the bottom of the OPENED Options panel — using the same
+      spacing value for the gap above the ticket stack (mirrors gap between Pre-Flight and
+      Options, between job tickets, etc. — Toby wants ONE shared spacing value used
+      everywhere).
+   e. Add a "Scenery Links" label above the DEP:/ARR: lines (same style as the existing
+      "ROUTE"/"CONTRACT VALUE" ticket-body labels).
+   f. Re-verify the ticket-slot stack-peek ::before/::after layers (styles.css:2546-2573,
+      sized off the same fixed height as .contract-ticket) still peek correctly once the
+      ticket height changes — this is also what's causing the current bottom-of-ticket visual
+      artifact (content clipped by overflow:hidden once it grew past 783px).
+   g. Cap third-party scenery links shown per airport — currently every store option is
+      joined with "OR" and some airports have 3-4, wrapping to multiple lines and pushing
+      ticket content past the card height. Agreed approach: show first store link + "+N more"
+      instead of listing every one.
+   h. Screenshot and iterate with Toby until it matches his description, then console-error
+      check.
+   IMPORTANT: styles.css:545 has a comment "LOCKED: Options <-> Departure spacing mirrors
+   Pre-Flight <-> ATC (18px / -10px). Do not change without explicit user request." — Toby's
+   ask here DOES touch that spacing relationship. Treat this session as the explicit request
+   that unlocks it — don't silently skip the area because of the guard comment, but don't
+   forget the comment exists and update/remove it if the locked relationship changes.
+   Because this is a multi-file layout change, confirm scope with Toby before editing, per
+   CLAUDE.md.
 
-LICENSING — IMPORTANT, DO NOT FORGET
-CARTO Voyager tiles require an Enterprise license for any commercial/distributed use —
-free tier does NOT cover shipping in redistributed software. Esri World Topo Map is
-deprecated (unmaintained, could disappear). OpenStreetMap's own server explicitly
-disallows this kind of embedded use (that's why it 403'd). NONE of these three are
-confirmed safe to ship inside the real Vector app for other users — they're fine ONLY
-as Toby's personal lab tool right now (single user, low volume, no automated bulk
-requests). Discussed with Toby (~50 users, free app) — low practical enforcement risk
-at that scale, but the terms don't scale with user count, so this is a known accepted
-risk for the lab, NOT a decision that it's fine to ship. If the shipped-app map feature
-ever gets built for real, the safe options are: (a) static screenshot baked in as an
-asset (Toby already doing this for personal reference — separate question is whether a
-screenshot becomes a *permanent shipped* UI asset, not resolved), (b) self-host a tile
-cache, or (c) a paid provider under Toby's own account (MapTiler etc.).
+2. Nothing else currently broken or blocking — items 2 and 3 from the previous handoff (dead
+   scenery-links code, terrain-box additions) are both done and tested, see below.
 
-ROUTE DATA — 10 curated scenic corridors, all in scenic-routes-db.js / inlined in
-scenic-lab.html, schema: id, name, region, countries, spine[] (ordered lat/lon/label
-waypoints), gates (start/end lat/lon/radiusNm/sampleIcaos for airport search), modes
-(HELI/GA enabled + fixed altitudeFt each — this OVERRIDES the normal time-budget
-altitude model on purpose), briefing (currently just 1 sentence — Toby wants this
-expanded into a fuller "story of the flight" narrative LATER, after he's reviewed the
-route list/foundations — DO NOT do this yet, he said hold off), restrictions (real-world
-info, NOT enforced by the engine), verified (false on all 10 — none flown in MSFS),
-notes (provenance/history of edits).
+## Recently completed (all committed, all tested — reference only, not to-do)
 
-Routes: Victoria Falls Gorge (HELI only — real fixed-wing/microlight ops exist nearby
-but fly a different, wider/higher profile, left as-is, ambiguous), Hudson River
-Exclusion (HELI+GA, 1200ft — corrected from a wrong 1500ft after Toby caught it against
-a real FAA SFRA chart he provided, transient band is 1000-1299ft), Na Pali Coastline
-(HELI+GA, 1500ft — GA added after confirming both aircraft types fly there in reality),
-Lauterbrunnen Valley (HELI only, ambiguous like Victoria Falls, left as-is),
-Grand Canyon Dragon Corridor (HELI+GA, 9500ft — kept at 9500 intentionally, real-world
-that's the commercial-tour-operator altitude, ordinary transient traffic must be
-10500/11500 but Toby's Sightseeing mode represents tour-category flying, so 9500 is
-correct, not a bug; HELI added after confirming FAA's own chart shows both fixed-wing
-and rotary routes through Dragon Corridor, though the exact HELI altitude hasn't been
-separately verified — same number reused from GA), Milford Sound Approach (HELI+GA,
-6500ft), Great Glen Fault/Loch Ness (HELI+GA, 5500ft), Columbia River Gorge (GA only —
-checked, no evidence of dedicated helicopter tours on this specific route, left as GA),
-Vegas to Hoover Dam (HELI+GA already, no change needed), Chamonix Mont Blanc Valley
-(HELI+GA already, no change needed).
+- Commit 2f37cd7: added 6 named high-terrain boxes to `globalRanges`
+  (dispatch-engine.js ~line 5179): Caucasus, Ethiopian Highlands, Mexican Sierra Madre /
+  Trans-Mexican Volcanic Belt, New Zealand Southern Alps, Scandinavian Mountains, Papua New
+  Guinea Highlands. Verified region-matching logic against real DB airports for all 6 (all
+  matched correctly; Ethiopian Highlands currently has 0 airports in VECTOR's DB, so that box
+  is inert until/unless airports are added there — harmless, not a bug). Verified one full
+  live dispatch end-to-end (Caucasus, UGIZ departure, Piper Comanche 250, prefer-lower-cruise):
+  5 consecutive dispatches all landed at 12,000ft, never below the 10,500ft safeFloor.
+- Same commit: wired the previously-dead `formatScenery()` function into the job ticket board
+  as DEP:/ARR: lines (dispatch-engine.js: `formatSceneryTicketDetail`,
+  `formatBoardTicketSceneryLine`, wired via `fillBoardRouteCells`; index.html: new
+  `dep-scenery`/`arr-scenery` spans on all 3 ticket templates). It had been fully unused,
+  written for the old `#dispatchRelease` panel (`display: none !important` since the
+  board-ticket UI replaced it years ago) but real backing data still exists
+  (`apt.tag`/`apt.allOptions`, built in `rebuildActiveDatabase()` with a comment confirming
+  it was "kept for Job Ticket scenery links only"). This surfaced the layout problem that is
+  now item 1's main task.
+- See PATCH_NOTES.md 2026-07-24 for full detail on both.
 
-All 10 routes were originally researched by Gemini (2026-07-23) from public map/chart
-knowledge — NOT flight-tested in MSFS, and Gemini's own altitude/category claims have
-already been caught wrong twice (Hudson altitude, aircraft-category assumptions) so
-treat anything not explicitly marked "confirmed 2026-07-24" as still worth
-double-checking, not gospel.
+## Do NOT do without being asked
 
-OPEN ITEMS / NEXT STEPS (nothing urgent, Toby will direct)
-- Victoria Falls and Lauterbrunnen: real fixed-wing options exist but fly a different
-  flight profile than the current spine — would need a second, wider/higher spine
-  variant if Toby wants GA enabled there, not just a flag flip.
-- Fuller "story of the flight" briefing text for all 10 routes — Toby wants this done
-  as a pass AFTER he's reviewed/approved the route list itself, not now.
-- No decision yet on what a Sightseeing "ticket" would actually contain if/when this
-  gets wired into the real dispatch-engine.js ticket pipeline (payout? pax/cargo? reuse
-  of missions-db.js scenario/imgId system, or a stripped-down ticket type?).
-- Toby is currently just testing/reviewing in scenic-lab.html — nothing has been
-  decided as final, treat this as still exploratory.
+- Do not re-touch the photo box size, crop tool, Zoom-filter removal, or the altitude
+  rounding fix — all settled, tested, committed in earlier sessions.
+- Do not re-open the terrain-box or scenery-link-wiring work above — done and tested this
+  session, only the layout follow-up (item 1) remains.
+- Do not import any large third-party terrain/elevation dataset (NOAA GLOBE DEM etc.) without
+  Toby raising it again — already considered and declined.
 
-HOW TO TALK TO TOBY (from his CLAUDE.md, condensed)
-Plain English, not a coder. Full file paths always. Tell him exactly where to paste
-things. Checked/Tested/Unknown split on claims — never say "fixed" or "works" without
-having actually verified it (sandbox/bash was frequently unavailable this session, so a
-lot of what got built was reviewed by reading, NOT executed — say so honestly every
-time). Smallest possible change. Ask before multi-file edits. Concise, bullet points
-over paragraphs, give the answer first.
+## Testing method reminder
+
+Local static server on :8791 (check `netstat -ano | grep 8791` before starting a new one) +
+Playwright MCP, driving the real app via browser_evaluate (not just reading code). Aircraft
+select is a text input (#aircraftInput) not a native <select> — set .value directly and
+dispatch input/change/blur events, then click #generateFlightBtn; the field's own autocomplete
+normalizes the value, so calling internal functions directly (e.g. probeDispatchFlight) needs
+the real activeFleetSpecs KEY (e.g. "PA24"), not the display name — look it up via
+Object.keys(activeFleetSpecs).find(...) first. Stylesheet changes need a cache-busted reload
+(plain reload can serve stale cached styles.css) — append a query string like ?cachebust=N.
+Close the Playwright browser and run /compact after finishing tests, per CLAUDE.md.

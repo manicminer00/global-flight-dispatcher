@@ -23,7 +23,7 @@
             --font-weight-manage-heading: bold;  /* Manage Custom Database subheadings */
             --font-weight-optgroup: bold;              /* aircraft select group headers */
             --font-weight-input: normal;                 /* aircraft search input */
-            --font-weight-logbook-header: bold;          /* logbook table heading row */
+            --font-weight-logbook-header: 600;           /* logbook table heading row, matches .contract-ticket-meta-key */
             --font-weight-logbook-row: normal;           /* logbook table data rows */
 			
             --spacing-inner: 15px;                       /* panel padding; settings section gaps */
@@ -1736,6 +1736,9 @@
             width: 100%;
             border-collapse: collapse;
         }
+        #logbookTable {
+            font-family: 'Roboto', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         #logbookTable th,
         #logbookTable td,
         .custom-db-table th,
@@ -1796,9 +1799,9 @@
             padding-right: 2px;
         }
         #logbookTable .lb-action {
-            width: 40px;
-            max-width: 40px;
-            text-align: left;
+            width: 60px;
+            max-width: 60px;
+            text-align: center;
             white-space: nowrap;
         }
         .custom-db-table .cdb-icao {

@@ -6013,7 +6013,7 @@ tbody.innerHTML = pageData.map((f, i) => {
             <td class="lb-date">${f.date}</td>
             <td class="lb-route">${f.orig} &rarr; ${f.dest}</td>
             <td class="lb-aircraft" title="${f.aircraft.replace(/"/g, "&quot;")}">${aircraftLabel}</td>
-            <td class="lb-mission" title="${missionLabel.replace(/"/g, "&quot;")}"><span style="opacity: 0.8;">${missionLabel}</span></td>
+            <td class="lb-mission" title="${missionLabel.replace(/"/g, "&quot;")}">${missionLabel}</td>
             <td class="lb-time">${(f.duration / 60).toFixed(1)}</td>
             <td class="lb-action">
                 <a href="#" class="lb-remove" onclick="event.preventDefault(); removeLogbookEntry(${globalIdx});" title="Remove this entry">&times;</a>
