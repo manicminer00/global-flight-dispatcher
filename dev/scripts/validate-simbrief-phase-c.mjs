@@ -19,8 +19,6 @@ import {
 const args = process.argv.slice(2);
 const seed = parseInt(args[args.indexOf("--seed") + 1], 10) || Date.now();
 const attempts = parseInt(args[args.indexOf("--attempts") + 1], 10) || 400;
-const A359_LONG_HAUL_ATTEMPTS = 40;
-const A359_LONG_HAUL_MIN_PASS_RATE = 0.95;
 
 function mulberry32(a) {
     return function () {
@@ -86,43 +84,16 @@ for (let i = 0; i < attempts; i++) {
     }
 }
 
-let a359LongOk = 0;
-for (let i = 0; i < A359_LONG_HAUL_ATTEMPTS; i++) {
-    const result = runProbe("A359", true);
-    if (result.ok) {
-        a359LongOk++;
-        checkPayload(result, `A359 LH gate #${i}`);
-    } else {
-        failures.push({
-            type: "A359",
-            longHaul: true,
-            reason: result.reason,
-            message: (result.message || "").slice(0, 120),
-            a359Gate: true,
-        });
-    }
-}
-
-const passRate = a359LongOk / A359_LONG_HAUL_ATTEMPTS;
-const randomFails = failures.filter((f) => !f.a359Gate);
+const randomFails = failures;
 const failRate = randomFails.length / attempts;
 
 console.log(`Jet stress  seed=${seed}  attempts=${attempts}  jetliners=${jetliners.length}`);
 console.log(`Random probes: ${attempts - randomFails.length}/${attempts} OK (${(100 - failRate * 100).toFixed(1)}%)`);
-console.log(`A359 long-haul: ${a359LongOk}/${A359_LONG_HAUL_ATTEMPTS} OK (${(passRate * 100).toFixed(0)}%, need ${(A359_LONG_HAUL_MIN_PASS_RATE * 100).toFixed(0)}%)`);
-console.log(`MTOW payload checks: ${attempts + a359LongOk - payloadViolations.length}/${attempts + a359LongOk} OK`);
+console.log(`MTOW payload checks: ${attempts - payloadViolations.length}/${attempts} OK`);
 
 if (payloadViolations.length) {
     console.error(`\nFAIL  ${payloadViolations.length} jet probe(s) exceed SimBrief MTOW payload`);
     payloadViolations.slice(0, 12).forEach((v) => console.error(`  ${v.err}`));
-    process.exit(1);
-}
-
-if (passRate < A359_LONG_HAUL_MIN_PASS_RATE) {
-    console.error("\nFAIL  A359 long-haul pass rate below threshold");
-    failures.filter((f) => f.a359Gate).slice(0, 8).forEach((f) => {
-        console.error(`  ${f.reason}: ${f.message}`);
-    });
     process.exit(1);
 }
 

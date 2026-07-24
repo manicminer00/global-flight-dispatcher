@@ -4,6 +4,27 @@ A running, plain-language log of what changed each session, so we don't have to 
 
 ---
 
+## 2026-07-24 (later session, part 8)
+
+- **Removed stale long-haul-mode test logic from the verify pipeline** — the long-haul dispatch
+  mode itself was already removed from the app (commit 32d781e, prior session), but three
+  verification checks still exercised it and were failing as a result:
+  `dev/scripts/lib/jet-payload-invariants.mjs` (4 pinned ultra-long A359 pairing tests, e.g.
+  YBBN→URSS), `dev/scripts/validate-simbrief-phase-c.mjs` (40-probe A359 long-haul stress block,
+  required 95% pass rate), and `dev/scripts/vfd_verify_lib.py` (ran `audit-longhaul-math.py` on
+  every fleet check, via `verify-vfd.bat` → F). All three removed. Left alone: inert
+  `longHaulRequested: false` params and an unreachable `long_haul` code path elsewhere in
+  dev/scripts — checked, confirmed dead but harmless, not part of either verify pipeline.
+- **Removed broken rPayload regression check** — `dev/scripts/dispatch-regression-probe.mjs`
+  compared the rendered ticket payload text (`result.rPayload`, placeholders like `{athlete}`
+  already substituted) against the raw unrendered `scenario.payload` template from
+  missions-db.js — these can never be equal for any scenario using a placeholder, so the check
+  was structurally broken, not detecting a real bug. Removed rather than fixed (no working
+  version of this check existed to restore).
+- Added a CLAUDE.md reminder ("After changing code") to use the short `verify-vfd.bat` → F/A
+  fleet/airport check after fleet-db.js or airport-db-*.js edits instead of the ~15-minute full
+  master-verify.
+
 ## 2026-07-24 (later session, part 7)
 
 - **Military job ticket: Asobo-owned airport green lightened** — `.msfs-default-airport-icao`

@@ -1021,11 +1021,6 @@ def audit_dispatch_code() -> tuple[list[str], list[str], str]:
     errors.extend(pd_errors)
     warnings.extend(pd_warnings)
 
-    _, out = run_subprocess("audit-longhaul-math.py")
-    logs.append(f"--- audit-longhaul-math.py ---\n{out.strip()}")
-    if "cannot use long haul" in out:
-        warnings.append("audit-longhaul-math: one or more aircraft cannot use long-haul mode")
-
     index = open(os.path.join(BASE, "index.html"), encoding="utf-8").read()
     if "loader.js" not in index:
         errors.append("index.html does not reference loader.js")

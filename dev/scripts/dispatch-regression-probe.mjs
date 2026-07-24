@@ -168,12 +168,6 @@ for (const [aircraftType, rules] of Object.entries(REGRESSION_AIRCRAFT)) {
             );
         }
 
-        if (scenario && scenario.payload && result.rPayload !== scenario.payload) {
-            failures.push(
-                `${aircraftType} probe ${i}: rPayload mismatch for imgId ${imgId} (ticket vs scenario)`
-            );
-        }
-
         if (aircraftType === "PA24" || aircraftType === "STAR") {
             typeCounts.total++;
             if (missionType === 4) typeCounts[4]++;

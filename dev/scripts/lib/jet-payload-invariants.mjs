@@ -7,36 +7,6 @@ import vm from "vm";
 
 export const PINNED_JET_REGRESSIONS = [
     {
-        label: "A359 YBBN→URSS ultra-long (max tank, ~150 pax cap)",
-        aircraftType: "A359",
-        depOverride: "YBBN",
-        destOverride: "URSS",
-        targetMins: 960,
-        maxPax: 160,
-    },
-    {
-        label: "A359 HKJK→NZAA tank-limited ultra-long",
-        aircraftType: "A359",
-        depOverride: "HKJK",
-        destOverride: "NZAA",
-        targetMins: 960,
-    },
-    {
-        label: "A359 EGLL→WSSS heavy sector",
-        aircraftType: "A359",
-        depOverride: "EGLL",
-        destOverride: "WSSS",
-        targetMins: 720,
-    },
-    {
-        label: "A359 dep HKJK (≥6000 nm sectors)",
-        aircraftType: "A359",
-        depOverride: "HKJK",
-        targetMins: 960,
-        minDistanceNm: 6000,
-        attempts: 12,
-    },
-    {
         label: "A359 KCAE→ZJHK infeasible (PMRTW runway vs ultra-long fuel)",
         aircraftType: "A359",
         depOverride: "KCAE",
