@@ -803,14 +803,29 @@ function buildJetRoutePairs(sources, destinations, depOverride, destOverride, sp
     let primaryPairs = [];
     const searchMax = Math.max(maxTarget, relaxedMax, minTarget);
     const latDelta = nmToLatDeltaDeg(searchMax + 10);
-    const destGrid = buildAirportSpatialGrid(destinations, HELI_GRID_CELL_DEG);
+    // Grid cell size scales with the search radius so the number of cells scanned per
+    // source airport stays roughly constant (~3-4 cells wide) instead of growing with
+    // duration/distance. A fixed small cell (HELI_GRID_CELL_DEG) is fine for HELI's short
+    // range, but for JET/TURBO routing at longer durations it forced forEachAirportNearGrid
+    // to iterate a quadratically growing number of mostly-empty buckets as targetMins rose
+    // toward 120 — that's what caused Generate Flight to slow down at longer durations.
+    const gridCellDeg = Math.max(HELI_GRID_CELL_DEG, latDelta / 3);
+    const destGrid = buildAirportSpatialGrid(destinations, gridCellDeg);
     const jetFeasCtx = spec.class === "JET" ? buildJetRouteFeasibilityContext(spec) : null;
+    // With no pinned departure, `sources` is the full eligible-airport pool (worldwide, this can be
+    // 1000+ entries), and the nested grid scan below runs once per source. Search cost was found to
+    // scale with sources.length even though the pair count is capped afterward by capRoutePairPool,
+    // so for the unpinned case we sample sources down before scanning, same random-sampling approach
+    // capRoutePairPool already uses on the result.
+    const scanSources = (!depCode && sources.length > JET_ROUTE_SOURCE_SCAN_CAP)
+        ? sampleRandomSubset(sources, JET_ROUTE_SOURCE_SCAN_CAP)
+        : sources;
     const collectPairs = (distMin, distMax, toleranceMins) => {
         const found = [];
-        for (const src of sources) {
+        for (const src of scanSources) {
             if (depCode && normalizeIcao(src.icao) !== depCode) continue;
             const lonDelta = nmToLonDeltaDeg(searchMax + 10, src.lat);
-            forEachAirportNearGrid(destGrid, src, HELI_GRID_CELL_DEG, latDelta, lonDelta, (dst) => {
+            forEachAirportNearGrid(destGrid, src, gridCellDeg, latDelta, lonDelta, (dst) => {
                 if (destCode && normalizeIcao(dst.icao) !== destCode) return;
                 if (normalizeIcao(src.icao) === normalizeIcao(dst.icao)) return;
                 const dist = calculateDistance(src.lat, src.lon, dst.lat, dst.lon);
@@ -851,7 +866,20 @@ function routeWithinAircraftRange(dist, spec, options) {
 }
 const HELI_ROUTE_PAIR_CAP = 8000;
 const JET_ROUTE_PAIR_CAP = 12000;
+const JET_ROUTE_SOURCE_SCAN_CAP = 500;
 const HELI_GRID_CELL_DEG = 0.45;
+function sampleRandomSubset(arr, cap) {
+    if (arr.length <= cap) return arr;
+    const picked = [];
+    const used = new Set();
+    while (picked.length < cap && used.size < arr.length) {
+        const idx = Math.floor(Math.random() * arr.length);
+        if (used.has(idx)) continue;
+        used.add(idx);
+        picked.push(arr[idx]);
+    }
+    return picked;
+}
 function nmToLatDeltaDeg(nm) {
     return nm / 60;
 }
@@ -2688,6 +2716,9 @@ function acceptContractTicket(index) {
     if (!result || !result._exportBundle || result._duplicateUnavailable) {
         vectorAlert("Generate three contracts first.");
         return;
+    }
+    if (result.warnings && result.warnings.length) {
+        showDispatchNotams(result.warnings.slice(0, 3));
     }
     boardSelectedIndex = index;
     clearContractLogbookPrompts();
@@ -5512,7 +5543,6 @@ function dispatchFlight() {
     boardContractResults = [];
     boardSelectedIndex = -1;
     const results = [];
-    const allWarnings = [];
     let lastError = "";
     const animateDeal = !boardTicketsDealt;
     // Up to 24 probe attempts to collect up to 3 contracts with distinct briefings
@@ -5525,11 +5555,6 @@ function dispatchFlight() {
         const sig = getContractResultSignature(result);
         if (results.some((r) => getContractResultSignature(r) === sig)) continue;
         if (isDuplicateBoardScenario(results, result)) continue;
-        if (result.warnings && result.warnings.length) {
-            result.warnings.forEach((w) => {
-                if (allWarnings.indexOf(w) === -1) allWarnings.push(w);
-            });
-        }
         results.push(result);
     }
     if (results.length === 0) {
@@ -5542,7 +5567,6 @@ function dispatchFlight() {
             r._exportBundle = buildDispatchExportBundle(r);
         }
     });
-    if (allWarnings.length) showDispatchNotams(allWarnings.slice(0, 3));
     boardContractResults = boardResults;
     boardTicketsDealt = true;
     renderContractsBoard(boardResults, { animateDeal, inactive: false });

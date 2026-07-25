@@ -130,11 +130,11 @@ const scenarioDB = {
     ],
 	medical: [
         { imgId: 69, title: "Priority Medical Transfer", payload: "airlifting a patient", instruction: "Turbulence won't do this patient any favors, so watch the radar and keep it smooth all the way down." },
-        { imgId: 70, title: "Lifeguard Priority", payload: "transporting tissue for surgery", instruction: "This is a Lifeguard priority run, essential tissue for a transplant is secured in the back." },
+        { imgId: 70, title: "Lifeguard Priority", payload: "transporting tissue for surgery", instruction: "This is a Lifeguard priority run, essential tissue for a transplant is secured in the back.", weight: 5 },
         { imgId: 71, title: "Medevac Transport", payload: "airlifting a patient from a rural strip", instruction: "The patient has been stabilised and the medevac team are waiting for you to arrive. " }
     ],
 	lightFreight: [
-        { imgId: 72, title: "Diplomatic Escort", payload: "moving classified diplomatic files", instruction: "Classified files are chained to a guy who looks exactly like John Cena. It can't be him, can it? ", minCargoLoadFactor: 0.40 },
+        { imgId: 72, title: "Diplomatic Escort", payload: "moving classified diplomatic files", instruction: "Classified files are chained to a guy who looks exactly like John Cena. It can't be him, can it? ", minCargoLoadFactor: 0.40, weight: 5 },
         { imgId: 73, title: "Prototype Delivery", payload: "delivering prototype processing units", instruction: "This prototype hardware doesn't like static or swings in temperature. Run the environmental checks before you even think about taxiing.", minCargoLoadFactor: 0.60 },
         { imgId: 74, title: "Live Cargo Hop", payload: "moving a protected animal species", instruction: "Live cargo's riding in back. Keep the banks shallow and ease off the thrust unless you're angling for a Lion King re-enactment enroute.", minCargoLoadFactor: 0.60 },
         { imgId: 75, title: "Sapling Delivery", payload: "delivering fragile conservation saplings", instruction: "These saplings are alive and picky about pressure and temperature. Fly a gentle descent rate on the way in and keep the cabin tropical.", minCargoLoadFactor: 0.40 },
@@ -226,8 +226,8 @@ const scenarioDB = {
         { imgId: 146, title: "New Owner Reposition", payload: "repositioning an aircraft for its new owner", instruction: "The owner has asked you to ferry her to her new home base, watch the temperatures, this airframe's still new to flying." }
     ],
     highAltServices: [
-        { imgId: 147, title: "Weather Ops", payload: "gathering specific meteorological data", instruction: "You're gathering meteorological data for the science team. " },
-        { imgId: 148, title: "Storm Chasers", payload: "flying atmospheric researchers to a developing system", instruction: "Atmospheric researchers need to drop sensors ahead of a major pressure shift. " }
+        { imgId: 147, title: "Weather Ops", payload: "gathering specific meteorological data", instruction: "You're gathering meteorological data for the science team. ", weight: 5 },
+        { imgId: 148, title: "Storm Chasers", payload: "flying atmospheric researchers to a developing system", instruction: "Atmospheric researchers need to drop sensors ahead of a major pressure shift. ", weight: 5 }
     ],
     vintageOps: [
         { imgId: 149, title: "Airshow Display", payload: "flying a historic airshow demonstration", instruction: "You're flying a historic airshow demonstration. Static display on the ground, then a short aerial routine, check the fluids before you roll.", allowedClasses: ["WARBIRD", "JET"], excludedAircraft: ["DC6A"], weight: 3 },
@@ -237,7 +237,7 @@ const scenarioDB = {
         { imgId: 153, title: "Memorial Fly-by", payload: "flying a commemorative low-level transit", instruction: "You're flying a commemorative low-level transit. Check the paraffin-based oil levels before you leave in case a smoke trail is requested." },
         { imgId: 154, title: "Keeping Current", payload: "keeping current in a historic airframe", instruction: "You're keeping current in this historic airframe so you can fly the next public display." },
         { imgId: 155, title: "Last Flight", payload: "delivering a newly restored airframe to a preservation trust", instruction: "This newly restored airframe is irreplaceable and headed to the Aviation museum. " },
-        { imgId: 156, title: "Aviation Festival", payload: "ferrying to a regional aviation festival", instruction: "You need to be on the staging grounds before sunset. Keep the cruise power conservative to spare the engine." },
+        { imgId: 156, title: "Aviation Festival", payload: "ferrying to a regional aviation festival", instruction: "You need to be on the staging grounds before sunset. Keep the cruise power conservative to spare the engine.", weight: 5 },
         { imgId: 157, title: "Tribute Flight", payload: "flying a chartered remembrance flight", instruction: "You're flying a memorial flight in memory of those who flew this airframe before you. Keep the gauges in the green.", weight: 3 }
     ],
 	// DC-6A freight exclusive
@@ -309,7 +309,6 @@ const scenarioDB = {
         { ...SCENARIO_220_TANKER_APPROACH_TEXT, excludedAircraft: ["SPIT", "BF109", "F6F", "P38"] }
     ],
     'reconnaissance-MIL': [
-        { ...SCENARIO_220_TANKER_APPROACH_TEXT, missionType: 32, excludedAircraft: ["SPIT", "BF109", "F6F", "P38", "FW08", "A6M5"] },
         { imgId: 221, title: "Transit Recon Sortie", missionType: 32, payload: "conducting a transit reconnaissance sortie", instruction: "Fly departure to destination on the assigned recon route. Hold altitude and airspeed. Sensors need continuous imagery along the corridor." },
         { imgId: 222, title: "Transit Corridor Map", missionType: 32, payload: "mapping the assigned transit corridor", instruction: "Mapping the assigned transit corridor. Fly direct. Hold a steady track and altitude. Let the mapping systems build a clean picture.", preferredAircraft: VULCAN_RECON_PREFERRED },
         { imgId: 223, title: "Eye In The Sky", missionType: 32, payload: "photographing designated areas along the route", instruction: "Your mission is to photograph designated areas along the route. Analysts need the imagery synced with the waypoints in your flight plan, no deviations.", preferredAircraft: VULCAN_RECON_PREFERRED },
