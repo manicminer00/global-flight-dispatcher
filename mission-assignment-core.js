@@ -14,18 +14,16 @@ var MISSION_POOL_ORDER = [
     "lightPax",
     "lightFreight",
     "regionalFreight",
-    "heavyFreight",
+    "heavyFreightMissions",
     "vintageOps",
     "vintageAirliner",
     "vintageProplinerFreight",
     "medical",
     "surveyServices",
     "highAltServices",
-    "helicopterOps-CIV",
+    "helicopterMissions",
     "gliderOps",
-    "heavyFreight-MIL",
     "militaryTransit-MIL",
-    "helicopterOps-MIL",
     "tacticalJet-MIL",
     "reconnaissance-MIL"
 ];
@@ -38,18 +36,16 @@ var MISSION_POOL_LABELS = {
     lightPax: "Air taxi",
     lightFreight: "Light freight ops",
     regionalFreight: "Regional freight",
-    heavyFreight: "Heavy cargo (civil)",
+    heavyFreightMissions: "Heavy cargo (civil + military)",
     vintageOps: "Heritage flight",
     vintageAirliner: "Classic airliner charter",
     vintageProplinerFreight: "Vintage propliner freight",
     medical: "Medical relay",
     surveyServices: "Aerial survey",
     highAltServices: "Weather ops",
-    "helicopterOps-CIV": "Civil helicopter ops",
+    helicopterMissions: "Helicopter ops (civil + military)",
     gliderOps: "Gliding",
-    "heavyFreight-MIL": "Mil-cargo ops",
     "militaryTransit-MIL": "Military logistics",
-    "helicopterOps-MIL": "Military helicopter ops",
     "tacticalJet-MIL": "Tactical sortie",
     "reconnaissance-MIL": "Strategic recon."
 };
@@ -131,7 +127,8 @@ var AIRCRAFT_MISSION_PRESETS = [
         id: "heavy-freight",
         label: "Heavy freighters (civil)",
         description: "B737BCF, MD-11F, B727F, DC-6A, etc.",
-        pools: ["heavyFreight", "vintageProplinerFreight"],
+        pools: ["heavyFreightMissions", "vintageProplinerFreight"],
+        militaryFilter: false,
         match: function (type, spec) {
             return hasTag(spec, "FREIGHTER")
                 && !spec.isMilitary
@@ -161,7 +158,8 @@ var AIRCRAFT_MISSION_PRESETS = [
         id: "military-transport",
         label: "Military transport",
         description: "A400, C-130, C-160, CH-47, etc.",
-        pools: ["heavyFreight-MIL", "militaryTransit-MIL", "helicopterOps-MIL"],
+        pools: ["heavyFreightMissions", "militaryTransit-MIL", "helicopterMissions"],
+        militaryFilter: true,
         match: function (type, spec) {
             return spec.isMilitary && (hasTag(spec, "MILITARY_TRANSPORT") || type === "H47D");
         }
@@ -188,7 +186,8 @@ var AIRCRAFT_MISSION_PRESETS = [
         id: "civil-helicopters",
         label: "Civil helicopters",
         description: "H145, Dauphin, R22, Bo 105, etc.",
-        pools: ["helicopterOps-CIV", "medical", "lightPax", "executive", "surveyServices"],
+        pools: ["helicopterMissions", "medical", "lightPax", "executive", "surveyServices"],
+        militaryFilter: false,
         match: function (type, spec) {
             return spec.class === "HELI" && !spec.isMilitary;
         }
@@ -420,12 +419,20 @@ function getPresetMatchingAircraft(preset, fleetSpecs) {
     return types.sort();
 }
 
-function applyPoolsToImgIds(poolKeys, poolMetadata, existingImgIds) {
+function applyPoolsToImgIds(poolKeys, poolMetadata, existingImgIds, wantMilitary) {
     var set = new Set(existingImgIds || []);
     poolKeys.forEach(function (poolKey) {
         var meta = poolMetadata[poolKey];
         if (!meta) return;
-        meta.imgIds.forEach(function (id) { set.add(id); });
+        // Only pools that actually mix civ+mil scenarios (e.g. merged helicopterMissions,
+        // heavyFreightMissions) get filtered by wantMilitary — pure pools (still gated by
+        // mission-type militaryOnly, no per-scenario isMilitary flag) are unaffected.
+        var isMixedPool = meta.scenarios.some(function (s) { return s.isMilitary; })
+            && meta.scenarios.some(function (s) { return !s.isMilitary; });
+        var scenarios = (typeof wantMilitary === "boolean" && isMixedPool)
+            ? meta.scenarios.filter(function (s) { return !!s.isMilitary === wantMilitary; })
+            : meta.scenarios;
+        scenarios.forEach(function (s) { set.add(s.imgId); });
     });
     return [...set].sort(function (a, b) { return a - b; });
 }
@@ -560,7 +567,7 @@ function resolvePoolKeysForCustomRoles(spec, roles) {
         } else if (cls === "GA") {
             pools.push("lightPax");
         } else if (cls === "HELI") {
-            pools.push("lightPax", "helicopterOps-CIV");
+            pools.push("lightPax", "helicopterMissions");
         } else if (cls === "BIZ JET") {
             pools.push("lightPax");
         }
@@ -573,9 +580,9 @@ function resolvePoolKeysForCustomRoles(spec, roles) {
     if (roles.cargo) {
         var tier = roles.cargoTier || inferCargoTierFromSpec(spec);
         if (tier === "military" || (spec.isMilitary && tier !== "light")) {
-            pools.push("heavyFreight-MIL", "militaryTransit-MIL");
+            pools.push("heavyFreightMissions", "militaryTransit-MIL");
         } else if (tier === "heavy") {
-            pools.push("heavyFreight", "vintageProplinerFreight");
+            pools.push("heavyFreightMissions", "vintageProplinerFreight");
         } else if (tier === "regional") {
             pools.push("regionalFreight", "lightFreight");
         } else {
@@ -585,12 +592,12 @@ function resolvePoolKeysForCustomRoles(spec, roles) {
 
     if (roles.military || spec.isTactical) {
         if (cls === "HELI" || specHasTag(spec, "ROTORCRAFT")) {
-            pools.push("helicopterOps-MIL");
+            pools.push("helicopterMissions");
         } else if (cls === "WARBIRD" || specHasTag(spec, "FIGHTER") || spec.isTactical) {
             pools.push("tacticalJet-MIL", "vintageOps");
             if (specHasTag(spec, "RECON")) pools.push("reconnaissance-MIL");
         } else if (spec.isMilitary) {
-            pools.push("militaryTransit-MIL", "heavyFreight-MIL");
+            pools.push("militaryTransit-MIL", "heavyFreightMissions");
         }
     } else if (specHasTag(spec, "RECON")) {
         pools.push("reconnaissance-MIL");
@@ -601,7 +608,7 @@ function resolvePoolKeysForCustomRoles(spec, roles) {
     }
 
     if (cls === "HELI" && !spec.isMilitary) {
-        pools.push("helicopterOps-CIV", "surveyServices");
+        pools.push("helicopterMissions", "surveyServices");
     }
 
     if (specHasTag(spec, "VINTAGE") && specHasTag(spec, "PAX") && !specHasTag(spec, "FIGHTER")) {

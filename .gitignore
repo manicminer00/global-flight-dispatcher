@@ -36,6 +36,8 @@ tools/*
 !airports-thirdparty-db.js
 !version.json
 !short-haul-routes-db.js
+!mission-scenario-flags-data.js
+!mission-scenario-flags.json
 !data/
 !data/**
 

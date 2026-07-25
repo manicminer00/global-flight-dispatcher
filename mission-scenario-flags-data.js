@@ -1,0 +1,3 @@
+// Auto-generated from mission-scenario-flags.json — do not edit by hand
+var SCENARIO_FLAGS_EMBED = {"schema":"mission-scenario-flags-v3","version":3,"generatedAt":"2026-07-25T14:03:18.834Z","source":"mission-editor.html","localImgIds":[167,168,169,193,225,227],"militaryImgIds":[184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,205,206,207,221,222,223,249,250],"civilOkImgIds":[184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,205,206,207,221,222,223,249]};
+if (typeof applyScenarioFlags === "function") { applyScenarioFlags(SCENARIO_FLAGS_EMBED); }

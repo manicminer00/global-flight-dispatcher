@@ -29,8 +29,6 @@
     document.write('<script src="' + loaderUrl + '"><\/script>');
 })();
 </script>
-	<script>
-</script>
 </head>
 <body>
 <div class="app-shell">
@@ -243,7 +241,6 @@
                         <hr class="contract-ticket-export-rule" aria-hidden="true">
                         <button type="button" class="contract-ticket-reselect" data-role="reselect" onclick="clearContractTicketSelection()">Select another job</button>
                         <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">Save Flight to Logbook</button>
-                        <p class="contract-ticket-heli" data-role="heli"></p>
                     </div>
                 </div>
                 </div>
@@ -293,7 +290,6 @@
                         <hr class="contract-ticket-export-rule" aria-hidden="true">
                         <button type="button" class="contract-ticket-reselect" data-role="reselect" onclick="clearContractTicketSelection()">Select another job</button>
                         <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">Save Flight to Logbook</button>
-                        <p class="contract-ticket-heli" data-role="heli"></p>
                     </div>
                 </div>
                 </div>
@@ -343,7 +339,6 @@
                         <hr class="contract-ticket-export-rule" aria-hidden="true">
                         <button type="button" class="contract-ticket-reselect" data-role="reselect" onclick="clearContractTicketSelection()">Select another job</button>
                         <button type="button" class="dispatch-action-btn" data-role="log" onclick="logCurrentFlight()">Save Flight to Logbook</button>
-                        <p class="contract-ticket-heli" data-role="heli"></p>
                     </div>
                 </div>
                 </div>
@@ -863,33 +858,6 @@
         </details>
         </div>
         </div>
-    </div>
-    <div id="dispatchRelease" class="dispatch-release">
-        <h2>Flight Dispatch Details</h2>
-        <table class="dispatch-details-table">
-            <tr><th>Callsign</th><td><strong id="outCallsign" class="text-accent">---</strong></td></tr>
-            <tr><th>Airframe</th><td id="outAirframe"></td></tr>
-            <tr><th>Routing</th><td><strong id="outOrig"></strong> ➔ <strong id="outDest"></strong></td></tr>
-            <tr><th>Cruise Altitude</th><td id="outAlt"></span></td></tr>
-            <tr><th>Scenery Links</th><td id="outScenery"></td></tr>
-        </table>
-        <img id="outMissionImage" class="mission-image" alt="Mission Image">
-        <div id="outTicketWrap" class="ticket-note">
-            <div id="outTicket"></div>
-            <p id="heliMessage" class="heli-warning" style="display: none;"></p>
-        </div>
-        <div class="dispatch-actions-row dispatch-actions-below-ticket">
-            <a id="outLink" class="simbrief-btn dispatch-action-btn" href="#" target="_blank" rel="noopener noreferrer"><img src="images/icon_navi_color.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Send Plan to SimBrief</a>
-            <a id="downloadPlnBtn" class="simbrief-btn dispatch-action-btn" href="#" style="cursor: pointer;"><img src="images/MSFS2024.png" alt="" class="dispatch-action-btn-icon" aria-hidden="true">Download MSFS.PLN</a>
-            <button id="logFlightBtn" type="button" class="dispatch-action-btn" style="display: none;" onclick="logCurrentFlight()">📋 Save Flight to Logbook</button>
-        </div>
-        <details class="info-details" style="margin-top: 15px;">
-            <summary>SimBrief Airport and Aircraft Profiles Notice</summary>
-            <div class="info-details-body">
-                <strong>NOTAM:</strong> Several Asobo airports use custom identifier codes instead of the real-world code. VECTOR sends the real-world identifier to SimBrief to avoid routing errors and the custom Asobo identifier code will be shown in the Job Ticket, so that you can find the airport in the MSFS 2024 world map.<br />
-				</br />Some airports and aircraft in VECTOR's database are not included in the <a href="https://www.simbrief.com/home/index.php?page=aircraft&sort=lastupdated_time" target="_blank" rel="noopener noreferrer" class="link-inline">SimBrief</a> database. To generate accurate flight plans in SimBrief, aircraft require an aircraft profile. If an airport or an aircraft is not included in the SimBrief database, and you cannot add it as a custom aircraft, you can use <a href="https://albar965.github.io/littlenavmap.html" target="_blank" rel="noopener noreferrer" class="link-inline">LittleNavMap</a> to plan and follow your flight instead. Jonathan Beckett has a comprehensive set of LNM aircraft profiles that you can purchase <a href="https://ko-fi.com/s/80ce405120" target="_blank" rel="noopener noreferrer" class="link-inline">here</a>.
-            </div>
-        </details>
     </div>
     <div class="footer-bar">
         

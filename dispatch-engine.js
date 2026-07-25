@@ -261,6 +261,17 @@ function gliderRoutePreferenceScore(pair) {
 const GLIDER_MIN_ROUTE_NM = 35;
 const GLIDER_MAX_ROUTE_NM = 70;
 const GLIDER_LOCAL_ROUTE_NM = 35;
+const DEFAULT_LOCAL_ROUTE_NM = 25;
+
+function buildLocalRoutePairs(validAirports, depOverride, spec, aircraftType) {
+    const depCode = normalizeIcao(depOverride);
+    const sources = depCode ? validAirports.filter(ap => normalizeIcao(ap.icao) === depCode) : validAirports;
+    if (isGliderAircraft(spec)) {
+        return sources.filter(ap => isGliderSuitableAirport(ap, spec))
+            .map(ap => ({ src: ap, dst: ap, dist: GLIDER_LOCAL_ROUTE_NM }));
+    }
+    return sources.map(ap => ({ src: ap, dst: ap, dist: DEFAULT_LOCAL_ROUTE_NM }));
+}
 
 function buildGliderRoutePairs(validAirports, depOverride, spec) {
     const gliderFields = validAirports.filter(ap => isGliderSuitableAirport(ap, spec));
@@ -283,14 +294,7 @@ function buildGliderRoutePairs(validAirports, depOverride, spec) {
             }
         });
     }
-    if (crossCountryPairs.length > 0) {
-        return capRoutePairPool(crossCountryPairs, HELI_ROUTE_PAIR_CAP);
-    }
-    const localPairs = [];
-    for (const src of sources) {
-        localPairs.push({ src, dst: src, dist: GLIDER_LOCAL_ROUTE_NM });
-    }
-    return localPairs;
+    return capRoutePairPool(crossCountryPairs, HELI_ROUTE_PAIR_CAP);
 }
 
 function getAllowedClassesForRunway(rwy) {
@@ -520,26 +524,19 @@ function isFreightMission(mission) {
 function isPassengerMission(mission) {
     if (!mission || isFreightMission(mission)) return false;
     if (PASSENGER_MISSION_TYPES.has(mission.type)) return true;
+    if (mission.passengerMission === true) return true;
     const name = (mission.name || "").toLowerCase();
     if (/\bairliner\b/.test(name) || /\bpassenger\b/.test(name) || /\bcommuter\b/.test(name)) return true;
-    if (mission.allowedAircraft && mission.allowedAircraft.length > 0) {
-        return mission.allowedAircraft.every(code => {
-            const acSpec = (typeof activeFleetSpecs !== "undefined" && activeFleetSpecs[code])
-                || (typeof coreFleetSpecs !== "undefined" && coreFleetSpecs[code]);
-            return acSpec && (acSpec.maxPax || 0) > 0;
-        });
-    }
     return false;
 }
 function isMilitaryTroopPassengerMission(mission) {
     if (!mission || !mission.militaryOnly) return false;
-    const missionType = mission.type;
-    return missionType === 24 || missionType === 30 || missionType === 31;
+    return mission.type === 24;
 }
 function scenarioRequiresPassengers(scenario) {
     if (!scenario) return false;
     if (scenario.requiresPax === false) return false;
-    if (scenario.requiresPax === true || scenario.staffShuttle === true) return true;
+    if (scenario.requiresPax === true) return true;
     const payload = String(scenario.payload || "");
     if (/\{(name|athlete|musician|team|vip_type)\}/.test(payload)) return true;
     const text = `${payload} ${scenario.instruction || ""}`.toLowerCase();
@@ -551,7 +548,7 @@ function missionRequiresPassengers(chosenMission, spec, scenario) {
     // Scenario text/flags win for mixed pools (e.g. military logistics cargo vs personnel).
     if (scenarioRequiresPassengers(scenario)) return true;
     if (scenario && (chosenMission.type === 24 || chosenMission.pool === "militaryTransit-MIL")
-        && scenario.requiresPax !== true && !scenario.staffShuttle) {
+        && scenario.requiresPax !== true) {
         // Cargo/ops briefing on a mixed logistics pool — do not force seats from mission type alone.
         return false;
     }
@@ -561,7 +558,7 @@ function missionRequiresPassengers(chosenMission, spec, scenario) {
     if (!specHasCargoCapacity(spec)) return true;
     // Dual-role military airlifters (C-130J, C-160, CH-47D, etc.): troop/passenger loads on logistics/heli missions.
     if (tags.includes("MILITARY_TRANSPORT") || tags.includes("MILITARY_HELI")) {
-        return isMilitaryTroopPassengerMission(chosenMission);
+        return isMilitaryTroopPassengerMission(chosenMission) || !!(scenario && scenario.isMilitary);
     }
     return false;
 }
@@ -910,7 +907,6 @@ function buildHelicopterRoutePairs(sources, destinations, depOverride, spec, min
         const found = [];
         for (const src of sources) {
             if (depCode && normalizeIcao(src.icao) !== depCode) continue;
-            found.push({ src, dst: src, dist: 25 });
             const lonDelta = nmToLonDeltaDeg(searchMax + 5, src.lat);
             forEachAirportNearGrid(destGrid, src, HELI_GRID_CELL_DEG, latDelta, lonDelta, (dst) => {
                 if (normalizeIcao(src.icao) === normalizeIcao(dst.icao)) return;
@@ -1521,7 +1517,6 @@ function buildDispatchExportBundle(result) {
     const navDest = airportIsInNavigraph(destination);
     const simbriefClassOk = spec.class !== "GLIDER" && spec.class !== "HELI" && spec.class !== "WARBIRD";
     const isSimbriefSupported = simbriefClassOk && navDep && navDest;
-    let heliMessage = "";
 
     const depElevStr = origin.elev || 0;
     const arrElevStr = destination.elev || 0;
@@ -1553,7 +1548,6 @@ function buildDispatchExportBundle(result) {
     return {
         simbriefUrl,
         isSimbriefSupported,
-        heliMessage,
         plnUrl,
         plnFilename: `${origin.icao}_to_${destination.icao}.pln`,
         prestigePoints,
@@ -2510,7 +2504,6 @@ function fillContractTicketCard(card, result, index, bundle) {
     const simbrief = card.querySelector('[data-role="simbrief"]');
     const pln = card.querySelector('[data-role="pln"]');
     const logBtn = card.querySelector('[data-role="log"]');
-    const heli = card.querySelector('[data-role="heli"]');
     if (logBtn) logBtn.classList.remove("is-logbook-prompt");
     if (simbrief) {
         simbrief.href = bundle.simbriefUrl;
@@ -2522,16 +2515,6 @@ function fillContractTicketCard(card, result, index, bundle) {
         pln.download = bundle.plnFilename;
         pln.style.display = "inline-flex";
         pln.onclick = () => promptSaveFlightToLogbook(card);
-    }
-    if (heli) {
-        const exportNote = bundle.heliMessage || "";
-        if (exportNote) {
-            heli.style.display = "block";
-            heli.textContent = exportNote;
-        } else {
-            heli.style.display = "none";
-            heli.textContent = "";
-        }
     }
 }
 
@@ -2576,7 +2559,6 @@ function persistBoardSession(results, inactive) {
                 imageUrl: r._exportBundle.imageUrl,
                 simbriefUrl: r._exportBundle.simbriefUrl,
                 isSimbriefSupported: r._exportBundle.isSimbriefSupported,
-                heliMessage: r._exportBundle.heliMessage,
                 plnUrl: r._exportBundle.plnUrl,
                 plnFilename: r._exportBundle.plnFilename,
                 pendingFlight: r._exportBundle.pendingFlight
@@ -2728,32 +2710,6 @@ function acceptContractTicket(index) {
     const bundle = result._exportBundle;
     currentPendingFlight = { ...bundle.pendingFlight };
     persistLastDispatch(currentPendingFlight);
-
-    // Keep hidden classic targets in sync for restore / add-last-flight helpers
-    const linkEl = document.getElementById("outLink");
-    if (linkEl) {
-        linkEl.href = bundle.simbriefUrl;
-        linkEl.style.display = bundle.isSimbriefSupported ? "inline-flex" : "none";
-    }
-    const downloadBtn = document.getElementById("downloadPlnBtn");
-    if (downloadBtn) {
-        downloadBtn.href = bundle.plnUrl;
-        downloadBtn.download = bundle.plnFilename;
-        downloadBtn.style.display = "inline-flex";
-    }
-    const logBtn = document.getElementById("logFlightBtn");
-    if (logBtn) logBtn.style.display = "inline-flex";
-    const heliMsgEl = document.getElementById("heliMessage");
-    if (heliMsgEl) {
-        const exportNote = bundle.heliMessage || "";
-        if (exportNote) {
-            heliMsgEl.textContent = exportNote;
-            heliMsgEl.style.display = "block";
-        } else {
-            heliMsgEl.textContent = "";
-            heliMsgEl.style.display = "none";
-        }
-    }
 }
 
 function toggleDropdown(id) {
@@ -4436,45 +4392,13 @@ function passesTemplateMinPaxSeats(m, searchClass, spec) {
 }
 function isMilitaryHelicopterMission(m) {
     if (!m) return false;
-    if (m.type === 30 || m.type === 31) return true;
-    if (m.pool === "helicopterOps-MIL") return true;
     const classes = m.allowedClasses;
     return !!(classes && classes.length === 1 && classes[0] === "HELI" && m.militaryOnly);
 }
-function isMilitaryMissionRestricted(spec) {
-    if (!spec.isMilitary) return false;
-    if (spec.class === "WARBIRD") return false;
-    const tags = spec.tags || [];
-    if (tags.includes("CIVIL_OK")) return false;
-    if (spec.class === "HELI") return tags.includes("MILITARY_HELI");
-    return true;
-}
-function isMilAirlifterCivilRestricted(type) {
-    if (typeof MIL_AIRLIFTER_CIVIL_TYPES !== "undefined") {
-        return MIL_AIRLIFTER_CIVIL_TYPES.includes(type);
-    }
-    return type === "A400";
-}
-function getMilAirlifterCivilScenarioAllowlist(type) {
-    if (typeof getMilAirlifterCivilScenarioImgIds === "function") {
-        return getMilAirlifterCivilScenarioImgIds(type);
-    }
-    if (type === "A400" && typeof A400_CIVIL_FREIGHT_SCENARIO_IMGIDS !== "undefined") {
-        return A400_CIVIL_FREIGHT_SCENARIO_IMGIDS;
-    }
-    return null;
-}
-function passesAircraftCivilMissionAllowlist(m, type, spec) {
-    if (!spec.isMilitary || m.militaryOnly) return true;
-    if (!isMilAirlifterCivilRestricted(type)) return true;
-    return m.type === 18;
-}
-function filterScenariosForLimitedCivilAircraft(pool, type, spec, mission) {
-    if (typeof usesMissionAssignments === "function" && usesMissionAssignments()) return pool;
-    if (!spec.isMilitary || mission.militaryOnly) return pool;
-    const allowlist = getMilAirlifterCivilScenarioAllowlist(type);
-    if (!allowlist) return pool;
-    return pool.filter(s => allowlist.includes(s.imgId));
+function scenarioPassesMilitaryGate(s, spec, isContractorMode) {
+    if (!s || !s.isMilitary) return true;
+    if (spec.isMilitary) return true;
+    return !!isContractorMode && !!s.civilOk;
 }
 function isWarbirdHeritageMission(m) {
     return !!(m && (m.type === 25 || m.pool === "vintageOps"));
@@ -4490,7 +4414,6 @@ function passesMissionContextFilter(m, spec, origin, isContractorMode, aircraftT
     if (m.tacticalOnly && !isTacticalAirframe) return false;
     if (m.civilianOnly && spec.isMilitary) return false;
     if (m.militaryOnly && !spec.isMilitary && !isContractorMode) return false;
-    if (!m.militaryOnly && isMilitaryMissionRestricted(spec)) return false;
     const isFreight = isFreightMission(m);
     if (origin && origin.isMilitary && !m.militaryOnly && !isFreight) {
         if (!(spec.class === "WARBIRD" && isWarbirdHeritageMission(m))) return false;
@@ -4535,7 +4458,7 @@ function passesAssignmentOnlyMissionLocks(m, type, searchClass, spec, origin) {
     if (!passesTemplateMtowCap(m, searchClass, spec)) return false;
     if (!passesTemplateMinPaxSeats(m, searchClass, spec)) return false;
     if (m.excludedAircraft && m.excludedAircraft.includes(type)) return false;
-    if (m.requiredDep) {
+    if (m.requiredDep && origin && origin.icao) {
         if (Array.isArray(m.requiredDep)) {
             if (!m.requiredDep.includes(origin.icao)) return false;
         } else if (origin.icao !== m.requiredDep) {
@@ -4547,37 +4470,24 @@ function passesAssignmentOnlyMissionLocks(m, type, searchClass, spec, origin) {
 function passesHardMissionLocksForAssignments(m, type, searchClass, spec, origin, isContractorMode) {
     return passesAssignmentOnlyMissionLocks(m, type, searchClass, spec, origin || { icao: "", isMilitary: false });
 }
-function applyAssignmentScenarioFilters(activePool, mission, type, spec, isLocalFlight) {
+function applyAssignmentScenarioFilters(activePool, mission, type, spec, isLocalFlight, isContractorMode) {
     let pool = filterScenariosByMissionType(activePool, mission);
-    if (mission.type === 31) {
-        const staffOnly = pool.filter(s => s.staffShuttle && !s.heliOps);
-        if (staffOnly.length > 0) pool = staffOnly;
-    } else if (mission.type === 30) {
-        const heliOnly = pool.filter(s => s.heliOps);
-        if (heliOnly.length > 0) pool = heliOnly;
-    }
     if (spec.class !== "HELI") {
         pool = pool.filter(s => !s.heliOps);
     }
-    if (mission.pool === "gliderOps" && typeof isLocalFlight === "boolean") {
-        if (isLocalFlight) {
-            const localOnly = pool.filter(s => s.isLocal);
-            if (localOnly.length > 0) pool = localOnly;
-        } else {
-            const transitOnly = pool.filter(s => !s.isLocal);
-            if (transitOnly.length > 0) pool = transitOnly;
-        }
+    pool = pool.filter(s => scenarioPassesMilitaryGate(s, spec, isContractorMode));
+    if (typeof isLocalFlight === "boolean") {
+        pool = isLocalFlight ? pool.filter(s => s.isLocal) : pool.filter(s => !s.isLocal);
     }
     return pool;
 }
-function missionHasAssignedPlayableScenario(mission, type, spec, isLocalFlight) {
+function missionHasAssignedPlayableScenario(mission, type, spec, isLocalFlight, isContractorMode) {
     if (!mission.pool || typeof scenarioDB === "undefined" || !scenarioDB[mission.pool]) return false;
     const assigned = getAssignedImgIdSetForAircraft(type);
     if (!assigned || assigned.size === 0) return false;
     const missionPool = scenarioDB[mission.pool];
     let activePool = missionPool.filter(s => assigned.has(s.imgId) && passesScenarioPhysicalHardLocks(s, type, spec));
-    activePool = filterScenariosForLimitedCivilAircraft(activePool, type, spec, mission);
-    activePool = applyAssignmentScenarioFilters(activePool, mission, type, spec, isLocalFlight);
+    activePool = applyAssignmentScenarioFilters(activePool, mission, type, spec, isLocalFlight, isContractorMode);
     return activePool.length > 0;
 }
 function buildFilteredMissionListFromAssignments(spec, type, searchClass, origin, isContractorMode, isLocalFlight) {
@@ -4586,26 +4496,30 @@ function buildFilteredMissionListFromAssignments(spec, type, searchClass, origin
     if (!assigned || assigned.size === 0) return [];
     let filteredMissions = missionMatrix.filter(m => {
         if (!passesHardMissionLocksForAssignments(m, type, searchClass, spec, originForLocks, isContractorMode)) return false;
-        if (m.requiredDep && !origin) return false;
-        if (!usesMissionAssignments() && !passesAircraftCivilMissionAllowlist(m, type, spec)) return false;
         if (origin && !passesMissionContextFilter(m, spec, origin, isContractorMode, type)) return false;
         if (!origin) {
             if (m.civilianOnly && spec.isMilitary) return false;
             if (m.militaryOnly && !spec.isMilitary && !isContractorMode) return false;
-            if (!m.militaryOnly && isMilitaryMissionRestricted(spec)) return false;
             if (isMilitaryHelicopterMission(m) && spec.class !== "HELI") return false;
             if (m.tacticalOnly && !isTacticalAirframeForMission(spec, type, m.type)) return false;
         }
-        return missionHasAssignedPlayableScenario(m, type, spec, isLocalFlight);
+        return missionHasAssignedPlayableScenario(m, type, spec, isLocalFlight, isContractorMode);
     });
     if (typeof isLocalFlight === "boolean") {
-        filteredMissions = filteredMissions.filter(m => !m.isLocal || isLocalFlight);
-        if (spec.class === "HELI" && isLocalFlight) {
-            const localMissions = filteredMissions.filter(m => m.isLocal);
-            if (localMissions.length > 0) filteredMissions = localMissions;
-        }
+        filteredMissions = filteredMissions.filter(m => missionHasScenarioMatchingLocalFlag(m, type, spec, isLocalFlight, isContractorMode));
     }
     return filteredMissions;
+}
+function missionHasScenarioMatchingLocalFlag(mission, type, spec, wantLocal, isContractorMode) {
+    if (!mission.pool || typeof scenarioDB === "undefined" || !scenarioDB[mission.pool]) return false;
+    const assigned = getAssignedImgIdSetForAircraft(type);
+    if (!assigned || assigned.size === 0) return false;
+    const missionPool = scenarioDB[mission.pool];
+    let activePool = missionPool.filter(s => assigned.has(s.imgId) && passesScenarioPhysicalHardLocks(s, type, spec));
+    activePool = filterScenariosByMissionType(activePool, mission);
+    if (spec.class !== "HELI") activePool = activePool.filter(s => !s.heliOps);
+    activePool = activePool.filter(s => scenarioPassesMilitaryGate(s, spec, isContractorMode));
+    return activePool.some(s => wantLocal ? !!s.isLocal : !s.isLocal);
 }
 function applyAssignedOnlyScenarioFilter(activePool, aircraftType) {
     if (typeof filterPoolToAssignedOnly === "function") {
@@ -4616,33 +4530,20 @@ function applyAssignedOnlyScenarioFilter(activePool, aircraftType) {
     }
     return activePool;
 }
-function buildActiveScenarioPoolForMission(mission, type, spec, isLocalFlight) {
+function buildActiveScenarioPoolForMission(mission, type, spec, isLocalFlight, isContractorMode) {
     if (!mission.pool || typeof scenarioDB === "undefined" || !scenarioDB[mission.pool]) {
         return [];
     }
     const missionPool = scenarioDB[mission.pool];
     const excludedImgIds = getExcludedScenarioImgIdsForPool(missionPool, type, spec);
     let activePool = filterScenarioPool(missionPool, type, spec, excludedImgIds);
-    activePool = filterScenariosForLimitedCivilAircraft(activePool, type, spec, mission);
     activePool = filterScenariosByMissionType(activePool, mission);
-    if (mission.type === 31) {
-        const staffOnly = activePool.filter(s => s.staffShuttle && !s.heliOps);
-        if (staffOnly.length > 0) activePool = staffOnly;
-    } else if (mission.type === 30) {
-        const heliOnly = activePool.filter(s => s.heliOps);
-        if (heliOnly.length > 0) activePool = heliOnly;
-    }
     if (spec.class !== "HELI") {
         activePool = activePool.filter(s => !s.heliOps);
     }
-    if (mission.pool === "gliderOps" && typeof isLocalFlight === "boolean") {
-        if (isLocalFlight) {
-            const localOnly = activePool.filter(s => s.isLocal);
-            if (localOnly.length > 0) activePool = localOnly;
-        } else {
-            const transitOnly = activePool.filter(s => !s.isLocal);
-            if (transitOnly.length > 0) activePool = transitOnly;
-        }
+    activePool = activePool.filter(s => scenarioPassesMilitaryGate(s, spec, isContractorMode));
+    if (typeof isLocalFlight === "boolean") {
+        activePool = isLocalFlight ? activePool.filter(s => s.isLocal) : activePool.filter(s => !s.isLocal);
     }
     return applyAssignedOnlyScenarioFilter(activePool, type);
 }
@@ -4679,13 +4580,9 @@ function applyMedevacHatWeighting(hat) {
         isMedevacMission(e.mission) ? { mission: e.mission, scenario: e.scenario, weight: e.weight * scale } : e
     ));
 }
-function isU16ExclusiveUniqueMission(mission) {
-    return !!(mission && mission.pool === "uniqueMissions" && Array.isArray(mission.allowedAircraft)
-        && mission.allowedAircraft.length === 1 && mission.allowedAircraft[0] === "U16");
-}
 function getAircraftExclusiveMissionWeight(mission, aircraftType) {
     if (!mission || !aircraftType) return null;
-    if (isU16ExclusiveUniqueMission(mission) && aircraftType === "U16") {
+    if (mission.pool === "uniqueMissions") {
         return mission.weight || 10;
     }
     if (mission.type === 26 && aircraftType === "DC6B" && mission.pool === "vintageAirliner") {
@@ -4708,10 +4605,10 @@ function getScenarioHatWeight(scenario, mission, searchClass, aircraftType) {
     }
     return DEFAULT_HAT_WEIGHT;
 }
-function buildMissionScenarioHat(missions, type, spec, searchClass, isLocalFlight) {
+function buildMissionScenarioHat(missions, type, spec, searchClass, isLocalFlight, isContractorMode) {
     const hat = [];
     for (const mission of missions) {
-        const activePool = buildActiveScenarioPoolForMission(mission, type, spec, isLocalFlight);
+        const activePool = buildActiveScenarioPoolForMission(mission, type, spec, isLocalFlight, isContractorMode);
         if (!activePool.length) continue;
         if (mission.type <= 13) {
             const scenario = activePool.find(s => s.imgId === mission.type);
@@ -4799,7 +4696,7 @@ function applyContractorMissionWeighting(weightedMissions, isContractorMode) {
         weight: entry.mission.militaryOnly ? entry.weight * 4 : entry.weight * 0.35
     }));
 }
-function filterRoutesForContractorMission(candidatePairs, mission, spec) {
+function filterRoutesForContractorMission(candidatePairs, mission, spec, isLocalFlight) {
     if (!mission) return candidatePairs;
     let matched;
     if (mission.militaryOnly) {
@@ -4818,13 +4715,9 @@ function filterRoutesForContractorMission(candidatePairs, mission, spec) {
         matched = candidatePairs.filter(pair => !pair.src.isMilitary && !pair.dst.isMilitary);
     }
     if (!matched.length) return matched;
-    if (mission.isLocal) {
-        matched = matched.filter(pair => normalizeIcao(pair.src.icao) === normalizeIcao(pair.dst.icao));
-    } else if (spec.class === "HELI") {
-        matched = matched.filter(pair => normalizeIcao(pair.src.icao) !== normalizeIcao(pair.dst.icao));
-    } else {
-        matched = matched.filter(pair => normalizeIcao(pair.src.icao) !== normalizeIcao(pair.dst.icao));
-    }
+    matched = isLocalFlight
+        ? matched.filter(pair => normalizeIcao(pair.src.icao) === normalizeIcao(pair.dst.icao))
+        : matched.filter(pair => normalizeIcao(pair.src.icao) !== normalizeIcao(pair.dst.icao));
     return matched;
 }
 function buildFilteredMissionList(spec, type, searchClass, origin, isContractorMode, isLocalFlight) {
@@ -4867,27 +4760,119 @@ function buildContractorRoutePool(candidatePairs, preferOwned) {
     if (weightedRoutePool.length === 0) weightedRoutePool = [...candidatePairs];
     return weightedRoutePool;
 }
-function dispatchContractorMissionFirst(candidatePairs, spec, type, searchClass, isContractorMode, routingTargetMins, targetDistNm, preferOwned) {
+function dispatchMissionFirst(spec, type, searchClass, isContractorMode, depOverrideUser, destOverride,
+                                routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, preferOwned) {
     let missionPool = buildFilteredMissionList(spec, type, searchClass, null, isContractorMode, null);
     if (!missionPool.length) return null;
+    const depUserCode = normalizeIcao(depOverrideUser);
+    const { minTarget, maxTarget, relaxedMin, relaxedMax, targetDist } = getRouteDistanceLimits(routingTargetMins, spec, type);
+    const targetDistNm = targetDist;
+    const routedAsGlider = isGliderAircraft(spec);
     const triedTypes = new Set();
     for (let attempt = 0; attempt < 12; attempt++) {
         const remaining = missionPool.filter(m => !triedTypes.has(m.type));
         if (!remaining.length) break;
-        const selectionPoolWithGuard = remaining;
         const weightedMissions = buildWeightedMissionSelectionPool(
-            selectionPoolWithGuard, spec, searchClass, type, isContractorMode
+            remaining, spec, searchClass, type, isContractorMode
         );
         const pickedEntry = pickWeightedMissionEntry(weightedMissions);
         if (!pickedEntry) break;
         const mission = pickedEntry.mission;
         triedTypes.add(mission.type);
-        const missionRoutes = filterRoutesForContractorMission(candidatePairs, mission, spec);
-        if (!missionRoutes.length) continue;
-        const weightedRoutePool = buildContractorRoutePool(missionRoutes, preferOwned);
-        const selectedRoute = pickRouteByTimeFit(weightedRoutePool, routingTargetMins, targetDistNm, spec, type);
+
+        // requiredDep missions (types 1/2/3) force their ICAO as the effective departure via the
+        // existing depOverride machinery, unless the user already pinned a conflicting departure.
+        const requiredDepCode = mission.requiredDep ? normalizeIcao(mission.requiredDep) : "";
+        if (requiredDepCode && depUserCode && depUserCode !== requiredDepCode) continue;
+        const effectiveDep = requiredDepCode || depOverrideUser;
+
+        const hat = buildMissionScenarioHat([mission], type, spec, searchClass, null, isContractorMode);
+        if (!hat.length) continue;
+        const hatPick = pickFromMissionScenarioHat(hat);
+        if (!hatPick) continue;
+        const isLocalFlight = !!hatPick.scenario.isLocal;
+
+        const { departureAirports, destinationAirports } = buildDispatchRoutingPools(
+            effectiveDep, routingScope, spec, type, routingMilitaryOnly, isContractorMode, navigraphOnly
+        );
+        const validAirports = effectiveDep
+            ? departureAirports.concat(
+                destinationAirports.filter(dst => !departureAirports.some(src => normalizeIcao(src.icao) === normalizeIcao(dst.icao)))
+              )
+            : destinationAirports;
+
+        let candidatePairs;
+        if (isLocalFlight) {
+            candidatePairs = buildLocalRoutePairs(validAirports, effectiveDep, spec, type);
+        } else if (routedAsGlider) {
+            candidatePairs = buildGliderRoutePairs(validAirports, effectiveDep, spec)
+                .filter(pair => normalizeIcao(pair.src.icao) !== normalizeIcao(pair.dst.icao));
+        } else {
+            const routeSources = effectiveDep ? departureAirports : destinationAirports;
+            const routeResult = buildJetRoutePairs(
+                routeSources, destinationAirports, effectiveDep, destOverride, spec,
+                minTarget, maxTarget, relaxedMin, relaxedMax, routingTargetMins, type
+            );
+            candidatePairs = routeResult.candidatePairs
+                .filter(pair => normalizeIcao(pair.src.icao) !== normalizeIcao(pair.dst.icao));
+        }
+        if (!candidatePairs.length) continue;
+
+        if (spec.class === "JET" && !effectiveDep) {
+            const fullRunwayPairs = candidatePairs.filter((p) => {
+                if (isJetWeightLimitedRunwayAirport(p.src, spec)) return false;
+                if (specIsHeavyJet(spec) && isJetDepartureRunwayPerformanceLimited(p.src, spec)) return false;
+                return true;
+            });
+            if (fullRunwayPairs.length) candidatePairs = fullRunwayPairs;
+        }
+
+        if (routingMilitaryOnly) {
+            candidatePairs.forEach(pair => {
+                let score = 0;
+                if (pair.src.isMilitary) score += 1;
+                if (pair.dst.isMilitary) score += 1;
+                pair.milScore = score;
+            });
+            const maxMilScore = Math.max(...candidatePairs.map(p => p.milScore || 0));
+            if (maxMilScore > 0) candidatePairs = candidatePairs.filter(p => p.milScore === maxMilScore);
+        }
+
+        if (isContractorMode) {
+            candidatePairs = filterRoutesForContractorMission(candidatePairs, mission, spec, isLocalFlight);
+            if (!candidatePairs.length) continue;
+        } else if (!isLocalFlight) {
+            // Preserves the old real-origin narrative check (passesMissionContextFilter): a
+            // civilian-flavoured mission shouldn't be narratively attached to a military-airbase departure.
+            candidatePairs = candidatePairs.filter(pair =>
+                !pair.src.isMilitary || mission.militaryOnly || isFreightMission(mission)
+                || (spec.class === "WARBIRD" && isWarbirdHeritageMission(mission))
+            );
+            if (!candidatePairs.length) continue;
+        }
+
+        if (routedAsGlider && !isLocalFlight && candidatePairs.length > 0) {
+            candidatePairs.forEach(pair => { pair.gliderScore = gliderRoutePreferenceScore(pair); });
+            const maxGliderScore = Math.max(...candidatePairs.map(p => p.gliderScore || 0));
+            if (maxGliderScore > 0) {
+                const preferred = candidatePairs.filter(p => p.gliderScore === maxGliderScore);
+                if (preferred.length > 0) candidatePairs = preferred;
+            }
+        }
+
+        let selectedRoute;
+        if (effectiveDep && destOverride && candidatePairs.length === 1) {
+            selectedRoute = candidatePairs[0];
+        } else {
+            const weightedRoutePool = buildContractorRoutePool(candidatePairs, preferOwned);
+            selectedRoute = pickRouteByTimeFit(weightedRoutePool, routingTargetMins, targetDistNm, spec, type);
+        }
         if (!selectedRoute) continue;
-        return { mission, route: selectedRoute };
+
+        return {
+            mission, scenario: hatPick.scenario, route: selectedRoute, isLocalFlight,
+            candidatePairCount: candidatePairs.length
+        };
     }
     return null;
 }
@@ -5005,7 +4990,6 @@ function probeDispatchFlight(config) {
     }
 
     let spec = JSON.parse(JSON.stringify(activeFleetSpecs[type]));
-    const contractorMissionFirst = usesContractorMissionFirstRouting(isContractorMode, spec);
     const routingMilitaryOnly = getRoutingMilitaryOnlyMode(isContractorMode, spec, militaryBasesToggle);
     const routingTargetMins = targetMins;
 
@@ -5045,149 +5029,45 @@ function probeDispatchFlight(config) {
         : destinationAirports;
     const departureAvailable = departureAirports.length > 0;
 
-    const { minTarget, maxTarget, relaxedMin, relaxedMax, targetDist } = getRouteDistanceLimits(
-        routingTargetMins, spec, type
-    );
-    const targetDistNm = targetDist;
-    
-    let candidatePairs = [];
-    const routedAsGlider = isGliderAircraft(spec);
-    if (routedAsGlider) {
-        candidatePairs = buildGliderRoutePairs(validAirports, depOverride, spec);
-    } else {
-        const routeSources = depOverride ? departureAirports : destinationAirports;
-        const routeResult = buildJetRoutePairs(
-            routeSources, destinationAirports, depOverride, destOverride, spec,
-            minTarget, maxTarget, relaxedMin, relaxedMax,
-            routingTargetMins, type
-        );
-        candidatePairs = routeResult.candidatePairs;
-    }
-    if (spec.class === "JET" && !depOverride && candidatePairs.length) {
-        const fullRunwayPairs = candidatePairs.filter((p) => {
-            if (isJetWeightLimitedRunwayAirport(p.src, spec)) return false;
-            if (specIsHeavyJet(spec) && isJetDepartureRunwayPerformanceLimited(p.src, spec)) return false;
-            return true;
-        });
-        if (fullRunwayPairs.length) candidatePairs = fullRunwayPairs;
-    }
-    if (candidatePairs.length === 0) {
-        return fail("no_routes",
-            buildRouteFailureMessage(depOverride, type, spec, validAirports, departureAvailable, routingMilitaryOnly, isContractorMode, navigraphOnly),
-            { candidatePairCount: 0, filteredMissionCount: 0 });
-    }
-    
-    if (routingMilitaryOnly) {
-        candidatePairs.forEach(pair => {
-            let score = 0;
-            if (pair.src.isMilitary) score += 1;
-            if (pair.dst.isMilitary) score += 1;
-            pair.milScore = score;
-        });
-        const maxMilScore = Math.max(...candidatePairs.map(p => p.milScore || 0));
-        if (maxMilScore > 0) {
-            candidatePairs = candidatePairs.filter(p => p.milScore === maxMilScore);
-        }
-    }
-
-    if (routedAsGlider && candidatePairs.length > 0) {
-        candidatePairs.forEach(pair => { pair.gliderScore = gliderRoutePreferenceScore(pair); });
-        const maxGliderScore = Math.max(...candidatePairs.map(p => p.gliderScore || 0));
-        if (maxGliderScore > 0) {
-            const preferredGlider = candidatePairs.filter(p => p.gliderScore === maxGliderScore);
-            if (preferredGlider.length > 0) candidatePairs = preferredGlider;
-        }
-    }
-    
     const searchClass = spec.class || "GA";
-    let selectedRoute;
-    let preChosenMission = null;
 
-    if (contractorMissionFirst) {
-        const contractorPick = dispatchContractorMissionFirst(
-            candidatePairs, spec, type, searchClass, isContractorMode,
-            routingTargetMins, targetDistNm, preferOwned
-        );
-        if (!contractorPick) {
-            return fail("contractor_routing",
-                "No valid contractor routing found. Military missions require military airbases; civilian missions require civilian airports. Try adjusting flight time, routing region, or departure airport.",
-                { candidatePairCount: candidatePairs.length });
-        }
-        preChosenMission = contractorPick.mission;
-        selectedRoute = contractorPick.route;
-    } else if (depOverride && destOverride && candidatePairs.length === 1) {
-        selectedRoute = candidatePairs[0];
-    } else {
-        const weightedRoutePool = buildContractorRoutePool(candidatePairs, preferOwned);
-        selectedRoute = pickRouteByTimeFit(weightedRoutePool, routingTargetMins, targetDistNm, spec, type);
-    }
-    if (!selectedRoute) {
-        return fail("no_routes",
-            buildRouteFailureMessage(depOverride, type, spec, validAirports, departureAvailable, routingMilitaryOnly, isContractorMode, navigraphOnly),
-            { candidatePairCount: candidatePairs.length, filteredMissionCount: 0 });
-    }
-
-    const origin = selectedRoute.src;
-    const destination = selectedRoute.dst;
-    const distanceNm = Math.round(selectedRoute.dist);
-    const bearing = calculateBearing(origin.lat, origin.lon, destination.lat, destination.lon);
-    const isEasterly = (bearing >= 0 && bearing < 180);
-    const isLocalFlight = (origin.icao === destination.icao);
-
-    // --- PHASE 1: FILTER MISSIONS ---
-    let filteredMissions = preChosenMission
-        ? [preChosenMission]
-        : buildFilteredMissionList(spec, type, searchClass, origin, isContractorMode, isLocalFlight);
-
-    if (filteredMissions.length === 0) {
+    // --- MISSION-FIRST: pick mission + scenario before building a route, then build a route to fit ---
+    const missionPoolCheck = buildFilteredMissionList(spec, type, searchClass, null, isContractorMode, null);
+    if (missionPoolCheck.length === 0) {
         const assigned = typeof getAssignedImgIdSetForAircraft === "function"
             ? getAssignedImgIdSetForAircraft(type) : null;
         const message = (!assigned || assigned.size === 0)
             ? getMissionAssignmentsUnavailableMessage(type)
             : "No valid missions found for this routing.";
-        return fail("no_missions", message, {
-            candidatePairCount: candidatePairs.length,
-            origin: origin.icao,
-            destination: destination.icao,
-            distanceNm
-        });
+        return fail("no_missions", message, { candidatePairCount: 0, filteredMissionCount: 0 });
     }
 
-    let chosenMission = preChosenMission;
-    let hatPick = null;
-    if (!chosenMission) {
-        const hat = buildMissionScenarioHat(
-            filteredMissions, type, spec, searchClass, isLocalFlight
-        );
-        if (!hat.length) {
-            return fail("no_scenario",
-                "No mission briefing images are available for this aircraft with the current settings.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+    const missionFirstPick = dispatchMissionFirst(
+        spec, type, searchClass, isContractorMode, depOverride, destOverride,
+        routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, preferOwned
+    );
+    if (!missionFirstPick) {
+        if (isContractorMode) {
+            return fail("contractor_routing",
+                "No valid contractor routing found. Military missions require military airbases; civilian missions require civilian airports. Try adjusting flight time, routing region, or departure airport.",
+                { candidatePairCount: 0 });
         }
-        hatPick = pickFromMissionScenarioHat(hat);
-        if (!hatPick) {
-            return fail("no_scenario",
-                "No mission briefing could be selected for this aircraft.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
-        }
-        chosenMission = hatPick.mission;
-    } else {
-        // Mission already chosen (e.g. contractor) — still pick briefing before payload so passenger jobs get seats.
-        const hat = buildMissionScenarioHat(
-            [chosenMission], type, spec, searchClass, isLocalFlight
-        );
-        if (!hat.length) {
-            return fail("no_scenario",
-                "No mission briefing images are available for this aircraft on the selected mission type. Try another airframe or mission settings.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
-        }
-        hatPick = pickFromMissionScenarioHat(hat);
-        if (!hatPick) {
-            return fail("no_scenario",
-                "No mission briefing could be selected for this aircraft.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
-        }
+        return fail("no_routes",
+            buildRouteFailureMessage(depOverride, type, spec, validAirports, departureAvailable, routingMilitaryOnly, isContractorMode, navigraphOnly),
+            { candidatePairCount: 0, filteredMissionCount: missionPoolCheck.length });
     }
+
+    const chosenMission = missionFirstPick.mission;
+    let hatPick = { mission: missionFirstPick.mission, scenario: missionFirstPick.scenario };
+    const selectedRoute = missionFirstPick.route;
+    const origin = selectedRoute.src;
+    const destination = selectedRoute.dst;
+    const distanceNm = Math.round(selectedRoute.dist);
+    const bearing = calculateBearing(origin.lat, origin.lon, destination.lat, destination.lon);
+    const isEasterly = (bearing >= 0 && bearing < 180);
+    const isLocalFlight = missionFirstPick.isLocalFlight;
+    const candidatePairCount = missionFirstPick.candidatePairCount;
+    const filteredMissionCount = missionPoolCheck.length;
 
     // --- PHASE 3: APPLY MISSION OVERRIDES ---
     if (chosenMission.minAlt) spec.minAlt = Math.max(spec.minAlt, chosenMission.minAlt);
@@ -5259,13 +5139,13 @@ function probeDispatchFlight(config) {
     if (isHeli) {
         // Standard cruise is 1,000-5,000ft AGL; hover/tactical work (LZ insertions, hoists,
         // line/photo work — flagged per-mission via hatPick.scenario.lowLevelOps) is flown
-        // much lower, 100-500ft AGL. Mountain-crossing terrain gets an occasional
+        // much lower, 300-1,000ft AGL. Mountain-crossing terrain gets an occasional
         // 8,000-12,000ft MSL transit exception instead. The aircraft's own maxAlt (real
         // service ceiling) is always the hard cap.
         const heliGroundRef = Math.max(depElev, arrElev);
         const isLowLevelHeliMission = !!(hatPick && hatPick.scenario && hatPick.scenario.lowLevelOps);
-        const heliBandMin = isLowLevelHeliMission ? 100 : 1000;
-        const heliBandMax = isLowLevelHeliMission ? 500 : 5000;
+        const heliBandMin = isLowLevelHeliMission ? 300 : 1000;
+        const heliBandMax = isLowLevelHeliMission ? 1000 : 5000;
         heliBandMaxAlt = Math.min(spec.maxAlt, Math.max(heliGroundRef + heliBandMax, heliMountainTransitFloor));
         heliBandMinAlt = Math.min(heliGroundRef + heliBandMin, heliBandMaxAlt);
     }
@@ -5352,7 +5232,7 @@ function probeDispatchFlight(config) {
         if (!weightLimitedAlloc.ok) {
             return fail("runway_performance",
                 "Runway length and sector distance do not allow a feasible takeoff weight for this aircraft. Try a shorter sector, a different airport, or another airframe.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+                { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
         }
         pax = weightLimitedAlloc.pax;
         cargoKg = weightLimitedAlloc.cargoKg;
@@ -5400,7 +5280,7 @@ function probeDispatchFlight(config) {
             if (pax === 0) {
                 return fail("runway_performance",
                     "Runway length and sector distance do not allow a feasible takeoff weight for this aircraft. Try a shorter sector, a different airport, or another airframe.",
-                    { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+                    { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
             }
         }
         const paxWeight = getSimBriefPassengerPayloadKg(spec, pax);
@@ -5426,7 +5306,7 @@ function probeDispatchFlight(config) {
         if (pax === 0) {
             return fail("runway_performance",
                 "Runway length and sector distance do not allow a feasible takeoff weight for this aircraft. Try a shorter sector, a different airport, or another airframe.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+                { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
         }
     }
     const mtowReducedForAirport = mtowReducedForRestrictedAirport;
@@ -5443,12 +5323,12 @@ function probeDispatchFlight(config) {
     if (chosenMission.pool && typeof scenarioDB !== 'undefined' && scenarioDB[chosenMission.pool]) {
         if (!scenario) {
             const hat = buildMissionScenarioHat(
-                [chosenMission], type, spec, searchClass, isLocalFlight
+                [chosenMission], type, spec, searchClass, isLocalFlight, isContractorMode
             );
             if (!hat.length) {
                 return fail("no_scenario",
                     "No mission briefing images are available for this aircraft on the selected mission type. Try another airframe or mission settings.",
-                    { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+                    { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
             }
             hatPick = pickFromMissionScenarioHat(hat);
             scenario = hatPick ? hatPick.scenario : null;
@@ -5456,18 +5336,18 @@ function probeDispatchFlight(config) {
         if (!scenario) {
             return fail("no_scenario",
                 "No mission briefing could be selected for this aircraft.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+                { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
         }
         if (chosenMission.type <= 13 && scenario.imgId !== chosenMission.type) {
             return fail("no_scenario",
                 "No briefing image matches this exclusive mission type for the selected aircraft.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+                { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
         }
         if (typeof usesMissionAssignments === "function" && usesMissionAssignments()
             && isScenarioAllowedForAircraft(type, scenario.imgId) !== true) {
             return fail("no_scenario",
                 "Selected scenario is not in mission-assignments.json for this aircraft. Regenerate mission-assignments-data.js and hard-refresh (Ctrl+F5).",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+                { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
         }
         rPayload = scenario.payload;
         rInstruction = scenario.instruction;
@@ -5479,7 +5359,7 @@ function probeDispatchFlight(config) {
     } else if (chosenMission.type > 13) {
         return fail("no_scenario",
             "No mission briefing is configured for this mission template.",
-            { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+            { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
     }
 
     if (!imageId) {
@@ -5501,7 +5381,7 @@ function probeDispatchFlight(config) {
         if (!towCapped) {
             return fail("runway_performance",
                 "Runway length and sector distance do not allow a feasible takeoff weight for this aircraft. Try a shorter sector, a different airport, or another airframe.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+                { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
         }
         pax = towCapped.pax;
         cargoKg = towCapped.cargoKg;
@@ -5512,7 +5392,7 @@ function probeDispatchFlight(config) {
         if (!zfwCapped) {
             return fail("runway_performance",
                 "Payload exceeds this aircraft's maximum zero fuel weight. Try a lighter load or another airframe.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+                { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
         }
         pax = zfwCapped.pax;
         cargoKg = zfwCapped.cargoKg;
@@ -5523,7 +5403,7 @@ function probeDispatchFlight(config) {
         if (!mlwCapped) {
             return fail("runway_performance",
                 "Payload and fuel combination exceeds this aircraft's maximum landing weight. Try a lighter load or another airframe.",
-                { candidatePairCount: candidatePairs.length, filteredMissionCount: filteredMissions.length });
+                { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
         }
         pax = mlwCapped.pax;
         cargoKg = mlwCapped.cargoKg;
@@ -5550,7 +5430,7 @@ function probeDispatchFlight(config) {
                     distanceNm,
                     pax,
                     cargoKg,
-                    candidatePairCount: candidatePairs.length
+                    candidatePairCount: candidatePairCount
                 });
         }
     }
@@ -5584,8 +5464,8 @@ function probeDispatchFlight(config) {
         mtowReducedForAirport,
         blockMinutes,
         hardCargoLimit,
-        candidatePairCount: candidatePairs.length,
-        filteredMissionCount: filteredMissions.length,
+        candidatePairCount: candidatePairCount,
+        filteredMissionCount: filteredMissionCount,
         routingMilitaryOnly,
         isContractorMode
     };
@@ -5771,8 +5651,6 @@ function restoreLastPendingFlight() {
         durationMins: last.durationMins,
         payout: last.payout
     };
-    const logBtn = document.getElementById("logFlightBtn");
-    if (logBtn) logBtn.style.display = "inline-flex";
 }
 
 function updateAddLastFlightLink() {
@@ -5926,8 +5804,6 @@ function addLastFlightToLogbook() {
     appendFlightToLogbook(flight);
     markLastDispatchLogged();
     currentPendingFlight = null;
-    const logBtn = document.getElementById("logFlightBtn");
-    if (logBtn) logBtn.style.display = "none";
     vectorAlert("Flight saved to logbook.");
     currentLogbookPage = 1;
     updateLogbookUI();
@@ -5958,8 +5834,6 @@ function logCurrentFlight() {
     appendFlightToLogbook(currentPendingFlight);
     markLastDispatchLogged();
     clearContractLogbookPrompts();
-    const logFlightBtn = document.getElementById("logFlightBtn");
-    if (logFlightBtn) logFlightBtn.style.display = "none";
     vectorAlert("Flight saved to logbook.");
     currentPendingFlight = null;
     currentLogbookPage = 1;

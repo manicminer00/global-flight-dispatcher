@@ -3537,14 +3537,6 @@
             color: #ffffff !important;
             box-shadow: none;
         }
-        .contract-ticket-heli {
-            display: none;
-            margin: 0;
-            font-size: 12px;
-            color: #8a5a20;
-            text-transform: none;
-            letter-spacing: 0;
-        }
         @media (prefers-reduced-motion: reduce) {
             .contract-ticket,
             .contract-ticket-photo,
@@ -3910,9 +3902,6 @@
         }
         .board-logbook .pagination-indicator {
             color: var(--board-text-muted);
-        }
-        #dispatchRelease {
-            display: none !important;
         }
         /* Removed: duplicate #generateFlightBtn idle rule — identical values already set on the
            .board-sidebar-form #generateFlightBtn block above; consolidated per TODO. */

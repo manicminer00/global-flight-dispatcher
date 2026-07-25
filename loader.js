@@ -2,7 +2,7 @@
 
     // Bump this string on every deploy (keep version.json in sync).
 
-    var APP_VERSION = "2.3.00";
+    var APP_VERSION = "2.3.8";
 
     var useFileProtocol = window.location.protocol === "file:";
 
@@ -220,7 +220,9 @@
 
         "fleet-db.js",
 
-        "missions-db.js"
+        "missions-db.js",
+
+        "mission-scenario-flags-data.js"
 
     ].forEach(loadScriptSync);
 
