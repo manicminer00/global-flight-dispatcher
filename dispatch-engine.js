@@ -1937,37 +1937,44 @@ function isLedAvionicsAirframeSpec(spec, aircraftType) {
     return spec.class === "BIZ JET";
 }
 
+function resultIsMilitary(result) {
+    return !!(result && (
+        (result.chosenMission && result.chosenMission.militaryOnly)
+        || (result.scenario && result.scenario.isMilitary)
+    ));
+}
+
 function shouldUseVintageCrtForResult(result) {
     if (!result || !result.spec) return false;
-    if (result.chosenMission && result.chosenMission.militaryOnly) return false;
+    if (resultIsMilitary(result)) return false;
     const type = result.aircraftType || result.type;
     return isVintageAirframeSpec(result.spec, type);
 }
 
 function shouldUseLedAvionicsCrtForResult(result) {
     if (!result || !result.spec) return false;
-    if (result.chosenMission && result.chosenMission.militaryOnly) return false;
+    if (resultIsMilitary(result)) return false;
     const type = result.aircraftType || result.type;
     return isLedAvionicsAirframeSpec(result.spec, type);
 }
 
 function shouldUseStarshipCrtForResult(result) {
     if (!result || !result.spec) return false;
-    if (result.chosenMission && result.chosenMission.militaryOnly) return false;
+    if (resultIsMilitary(result)) return false;
     const type = result.aircraftType || result.type;
     return isStarshipCrtSpec(result.spec, type);
 }
 
 function shouldUseRegionalMcduCrtForResult(result) {
     if (!result || !result.spec) return false;
-    if (result.chosenMission && result.chosenMission.militaryOnly) return false;
+    if (resultIsMilitary(result)) return false;
     const type = result.aircraftType || result.type;
     return isRegionalJetMcduSpec(result.spec, type);
 }
 
 function shouldUseAirlinerMcduCrtForResult(result) {
     if (!result || !result.spec) return false;
-    if (result.chosenMission && result.chosenMission.militaryOnly) return false;
+    if (resultIsMilitary(result)) return false;
     const type = result.aircraftType || result.type;
     return isAirlinerMcduSpec(result.spec, type);
 }
@@ -1982,7 +1989,7 @@ function refreshBoardCrtSkinFromSelection() {
     const airlinerMcdu = isAirlinerMcduSpec(spec, type);
     document.querySelectorAll("#contractsTicketGrid .contract-ticket").forEach((card, i) => {
         const result = boardContractResults[i];
-        const isMilitary = !!(result && result.chosenMission && result.chosenMission.militaryOnly);
+        const isMilitary = resultIsMilitary(result);
         card.classList.toggle("is-vintage-crt", vintageAirframe && !isMilitary);
         card.classList.toggle("is-led-crt", ledAirframe && !isMilitary);
         card.classList.toggle("is-starship-crt", starshipAirframe && !isMilitary);
@@ -2449,7 +2456,7 @@ function fillContractTicketCard(card, result, index, bundle) {
         const el = card.querySelector(`[data-role="${role}"]`);
         if (el) el.textContent = text;
     };
-    const isMilitary = !!(result.chosenMission && result.chosenMission.militaryOnly);
+    const isMilitary = resultIsMilitary(result);
     card.classList.toggle("is-military", isMilitary);
     card.classList.toggle("is-vintage-crt", shouldUseVintageCrtForResult(result));
     card.classList.toggle("is-led-crt", shouldUseLedAvionicsCrtForResult(result));
