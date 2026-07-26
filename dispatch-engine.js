@@ -116,8 +116,6 @@ function vectorConfirm(message, options) {
     });
 }
 
-const DEFAULT_HAT_WEIGHT = 10;
-const MEDEVAC_TARGET_SHARE = 0.2;
 let activeAirportDatabase = [];
 let activeAirportDatabaseNeedsRebuild = true;
 let cachedActiveAirportIcaoSet = null;
@@ -390,12 +388,6 @@ const TICKET_PHOTO_LED_TYPEWRITER_CPS = 44;
 const HEAVY_JET_MTOW_MIN = 136000;
 const FREIGHT_MISSION_TYPES = new Set([17, 18, 29, 33, 39]);
 const PASSENGER_MISSION_TYPES = new Set([14, 15, 16, 19, 20, 21, 22, 25, 26, 27, 28, 30, 31, 34]);
-function specHasPaxCapacity(spec) {
-    return !!spec && (spec.maxPax || 0) > 0;
-}
-function specHasCargoCapacity(spec) {
-    return !!spec && (spec.maxCargo || 0) > 0;
-}
 function getPaxWeightKg(spec) {
     const v = Number(spec && spec.paxWeightKg);
     return v > 0 ? v : DEFAULT_SIMBRIEF_PAX_WEIGHT_KG;
@@ -478,8 +470,14 @@ function getVipPassengerTarget(spec, blockMinutes, chosenMission) {
     return Math.max(1, Math.floor(seats * 0.15));
 }
 function getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes, scenario) {
-    if (!missionRequiresPassengers(chosenMission, spec, scenario) || maxSafePax <= 0) {
+    if (!missionRequiresPassengers(scenario) || maxSafePax <= 0) {
         return { minPax: 0, effectiveMax: 0 };
+    }
+    const exactPax = getScenarioExactPax(scenario);
+    if (exactPax > 0) {
+        return maxSafePax >= exactPax && spec.maxPax >= exactPax
+            ? { minPax: exactPax, effectiveMax: exactPax }
+            : { minPax: exactPax, effectiveMax: 0 };
     }
     const isScheduledCommercial = isScheduledCommercialMission(chosenMission);
     const isVipMission = chosenMission && (chosenMission.type === 16
@@ -489,7 +487,7 @@ function getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes, s
     let maxPaxTarget = spec.maxPax;
 
     if (isScheduledCommercial) {
-        minPax = Math.floor(spec.maxPax * SCHEDULED_COMMERCIAL_LOAD_MIN);
+        minPax = Math.ceil(spec.maxPax * SCHEDULED_COMMERCIAL_LOAD_MIN);
         maxPaxTarget = Math.floor(spec.maxPax * SCHEDULED_COMMERCIAL_LOAD_MAX);
     } else if (isVipMission) {
         maxPaxTarget = getVipPassengerTarget(spec, blockMinutes, chosenMission);
@@ -506,7 +504,10 @@ function getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes, s
 
     const effectiveMax = Math.min(maxPaxTarget, maxSafePax, spec.maxPax);
     if (effectiveMax < minPax) {
-        // Below commercial target (fuel/MTOW cap) — partial loads OK, not forced to maxSafePax every time.
+        if (isScheduledCommercial) {
+            return { minPax, effectiveMax: 0 };
+        }
+        // Other passenger missions may still use a reduced feasible band.
         minPax = Math.max(1, Math.floor(effectiveMax * SCHEDULED_COMMERCIAL_LOAD_MIN));
         if (minPax > effectiveMax) minPax = effectiveMax;
     }
@@ -529,38 +530,12 @@ function isPassengerMission(mission) {
     if (/\bairliner\b/.test(name) || /\bpassenger\b/.test(name) || /\bcommuter\b/.test(name)) return true;
     return false;
 }
-function isMilitaryTroopPassengerMission(mission) {
-    if (!mission || !mission.militaryOnly) return false;
-    return mission.type === 24;
+function missionRequiresPassengers(scenario) {
+    return !!(scenario && scenario.requiresPax);
 }
-function scenarioRequiresPassengers(scenario) {
-    if (!scenario) return false;
-    if (scenario.requiresPax === false) return false;
-    if (scenario.requiresPax === true) return true;
-    const payload = String(scenario.payload || "");
-    if (/\{(name|athlete|musician|team|vip_type)\}/.test(payload)) return true;
-    const text = `${payload} ${scenario.instruction || ""}`.toLowerCase();
-    return /\b(passenger|passengers|personnel|staff|troop|troops|dignitar\w*|tourist\w*|travell?er\w*|student\w*|athlete\w*|executive\w*|witness\w*|musician\w*|holidaymaker\w*|patient\w*|surgeon\w*|commander\w*|\bvip\b|\bceo\b|families|family|people|delegat\w*|group of)\b/.test(text);
-}
-function missionRequiresPassengers(chosenMission, spec, scenario) {
-    if (isFreightMission(chosenMission)) return false;
-    if ((spec.maxPax || 0) <= 0) return false;
-    // Scenario text/flags win for mixed pools (e.g. military logistics cargo vs personnel).
-    if (scenarioRequiresPassengers(scenario)) return true;
-    if (scenario && (chosenMission.type === 24 || chosenMission.pool === "militaryTransit-MIL")
-        && scenario.requiresPax !== true) {
-        // Cargo/ops briefing on a mixed logistics pool — do not force seats from mission type alone.
-        return false;
-    }
-    if (isPassengerMission(chosenMission)) return true;
-    const tags = spec.tags || [];
-    if (!specHasPaxCapacity(spec)) return false;
-    if (!specHasCargoCapacity(spec)) return true;
-    // Dual-role military airlifters (C-130J, C-160, CH-47D, etc.): troop/passenger loads on logistics/heli missions.
-    if (tags.includes("MILITARY_TRANSPORT") || tags.includes("MILITARY_HELI")) {
-        return isMilitaryTroopPassengerMission(chosenMission) || !!(scenario && scenario.isMilitary);
-    }
-    return false;
+function getScenarioExactPax(scenario) {
+    const exactPax = Number(scenario && scenario.exactPax);
+    return Number.isInteger(exactPax) && exactPax > 0 ? exactPax : 0;
 }
 function normalizeIcao(icao) {
     return (icao || "").trim().toUpperCase();
@@ -1224,10 +1199,8 @@ function resolveScenarioText(text, picks) {
 
 function getScenarioSourceText(result) {
     const scenario = result && result.scenario;
-    if (scenario) {
-        return `${scenario.payload || ""} ${scenario.instruction || ""}`;
-    }
-    return `${result.rPayload || ""} ${result.rInstruction || ""}`;
+    if (scenario) return String(scenario.instruction || "");
+    return String((result && result.rInstruction) || "");
 }
 
 function isMedevacJobTitle(result) {
@@ -1240,15 +1213,12 @@ function isDiplomaticJobTitle(result) {
     if (/\bdiplomat|\bdiplomatic\b|\bstate rep|\bpolitician/.test(text)) return true;
     const picks = result.scenarioPicks || {};
     if (/\{vip_type\}/.test(raw) && /diplomat/.test(String(picks.vip_type || "").toLowerCase())) return true;
-    const resolved = `${result.rPayload || ""} ${result.rInstruction || ""}`.toLowerCase();
+    const resolved = String(result.rInstruction || "").toLowerCase();
     return /\bglobal diplomat\b/.test(resolved);
 }
 
 function isCelebrityJobTitle(result) {
-    const scenario = result && result.scenario;
-    const raw = scenario
-        ? `${scenario.payload || ""} ${scenario.instruction || ""}`
-        : `${result.rPayload || ""} ${result.rInstruction || ""}`;
+    const raw = getScenarioSourceText(result);
     if (/\{(name|athlete|musician)\}/.test(raw)) return true;
     const text = raw.toLowerCase();
     return /celebrity|music icon|high-profile music/.test(text);
@@ -1283,7 +1253,6 @@ function getContractResultSignature(result) {
         result.origin && result.origin.icao,
         result.destination && result.destination.icao,
         result.scenarioImgId,
-        result.rPayload,
         result.rInstruction
     ].join("|");
 }
@@ -2046,9 +2015,8 @@ function resolveContractTicketBrief(result, ticketIndex) {
     let body = "";
     if (result && result.rInstruction) {
         body = String(result.rInstruction);
-    } else if (scenario) {
-        if (scenario.instruction) body = String(scenario.instruction);
-        else if (scenario.payload) body = String(scenario.payload);
+    } else if (scenario && scenario.instruction) {
+        body = String(scenario.instruction);
     }
     if (!body) return "";
     return trimCrtBriefBody(body, CRT_BRIEF_MAX_LINES);
@@ -2583,7 +2551,6 @@ function persistBoardSession(results, inactive) {
             pax: r.pax,
             cargoKg: r.cargoKg,
             payout: r.payout,
-            rPayload: r.rPayload,
             rInstruction: r.rInstruction,
             scenarioImgId: r.scenarioImgId,
             imageId: r.imageId,
@@ -3936,7 +3903,7 @@ function allocateWeightLimitedJetPayload(spec, type, chosenMission, blockMinutes
     }
     const paxAllInKg = getPaxAllInWeightKg(spec);
     const maxPaxByWeight = Math.floor(maxPayloadAtTow / paxAllInKg);
-    if (maxPaxByWeight < 1 && missionRequiresPassengers(chosenMission, spec, scenario) && (spec.maxPax || 0) > 0) {
+    if (maxPaxByWeight < 1 && missionRequiresPassengers(scenario) && (spec.maxPax || 0) > 0) {
         return { ok: false };
     }
     const bizJetPassengerOnly = spec.class === "BIZ JET" && type !== "LJ35" && !isFreightMission(chosenMission);
@@ -3944,7 +3911,7 @@ function allocateWeightLimitedJetPayload(spec, type, chosenMission, blockMinutes
     while (loadFactor + 1e-9 >= WEIGHT_LIMITED_MIN_LOAD_FACTOR) {
         const scaledMaxPax = Math.floor((spec.maxPax || 0) * loadFactor);
         const scaledMaxCargo = Math.floor((spec.maxCargo || 0) * loadFactor);
-        if (missionRequiresPassengers(chosenMission, spec, scenario) && (spec.maxPax || 0) > 0) {
+        if (missionRequiresPassengers(scenario) && (spec.maxPax || 0) > 0) {
             const paxCap = Math.min(scaledMaxPax, maxPaxByWeight);
             const { minPax, effectiveMax } = getPassengerLoadLimits(
                 chosenMission, spec, paxCap, blockMinutes, scenario
@@ -3977,7 +3944,7 @@ function allocateWeightLimitedJetPayload(spec, type, chosenMission, blockMinutes
             }
             return { ok: true, pax: pax, cargoKg: cargoKg, hardCargoLimit: hardCargoLimit, loadFactor: loadFactor };
         }
-        if ((spec.maxCargo || 0) > 0 && !missionRequiresPassengers(chosenMission, spec, scenario)) {
+        if ((spec.maxCargo || 0) > 0 && !missionRequiresPassengers(scenario)) {
             const hardCargoLimit = Math.floor(Math.min(scaledMaxCargo, maxPayloadAtTow));
             if (hardCargoLimit <= 0) {
                 loadFactor -= WEIGHT_LIMITED_LOAD_FACTOR_STEP;
@@ -4030,67 +3997,63 @@ function getJetSimBriefPlanningBlockFuelKg(tripDistanceNm, spec) {
     }
     return plan;
 }
-function isJetFuelCriticalSector(fuelDistanceNm) {
-    const nm = Number(fuelDistanceNm) || 0;
-    return nm >= 3500;
-}
 const MTOW_ENFORCED_CLASSES = ["JET", "BIZ JET", "TURBO"];
 function getMtowPlanningBlockFuelKg(fuelDistanceNm, spec) {
     return spec.class === "JET"
         ? getJetSimBriefPlanningBlockFuelKg(fuelDistanceNm, spec)
         : Math.max(0, Number(fuelDistanceNm) || 0) * (Number(spec.fuelPerNm) || 0.5);
 }
-function capJetPaxForMtow(pax, cargoKg, safeMtow, safeOew, fuelDistanceNm, spec) {
-    if (!spec || !MTOW_ENFORCED_CLASSES.includes(spec.class) || !(spec.maxPax > 0)) return pax;
-    const planFuel = getMtowPlanningBlockFuelKg(fuelDistanceNm, spec);
-    const maxPax = getJetMaxPaxAtMtow(safeMtow, safeOew, planFuel, cargoKg, spec);
-    if (maxPax <= 0) return 0;
-    return Math.min(pax, maxPax);
+function getPassengerTrimFloor(chosenMission, spec, blockMinutes, scenario) {
+    if (!missionRequiresPassengers(scenario) || !(spec.maxPax > 0)) return 0;
+    const limits = getPassengerLoadLimits(chosenMission, spec, spec.maxPax, blockMinutes, scenario);
+    return limits.effectiveMax > 0 ? limits.minPax : 0;
 }
-function enforceJetTowPayloadCap(spec, pax, cargoKg, fuelDistanceNm, operationalMtow, chosenMission, blockMinutes, scenario) {
+function getCargoTrimFloorKg(scenario, hardCargoLimit) {
+    const loadFactor = Number(scenario && scenario.minCargoLoadFactor);
+    return loadFactor > 0 ? getCargoAssignmentFloorKg(scenario, hardCargoLimit) : 0;
+}
+function enforceJetTowPayloadCap(spec, pax, cargoKg, fuelDistanceNm, operationalMtow, chosenMission, blockMinutes, scenario, hardCargoLimit) {
     if (!spec || !MTOW_ENFORCED_CLASSES.includes(spec.class)) return { pax: pax, cargoKg: cargoKg };
     const oew = Number(spec.oew) || 0;
     const mtow = operationalMtow || Number(spec.mtow) || 0;
     const blockFuel = getMtowPlanningBlockFuelKg(fuelDistanceNm, spec);
     let outPax = pax;
     let outCargo = cargoKg;
-    const maxPaxAtMtow = getJetMaxPaxAtMtow(mtow, oew, blockFuel, outCargo, spec);
-    if (missionRequiresPassengers(chosenMission, spec, scenario) && (spec.maxPax || 0) > 0 && maxPaxAtMtow < outPax) {
-        outPax = Math.max(0, maxPaxAtMtow);
-    }
+    const trimMinCargo = getCargoTrimFloorKg(scenario, hardCargoLimit);
+    const trimMinPax = getPassengerTrimFloor(chosenMission, spec, blockMinutes, scenario);
     function totalWeight() {
         return oew + getSimBriefPassengerPayloadKg(spec, outPax) + outCargo + blockFuel;
     }
-    while (totalWeight() > mtow && outCargo > 0) {
-        outCargo = Math.max(0, outCargo - 200);
+    while (totalWeight() > mtow && outCargo > trimMinCargo) {
+        outCargo = Math.max(trimMinCargo, outCargo - 200);
     }
-    const trimMinPax = missionRequiresPassengers(chosenMission, spec, scenario) && (spec.maxPax || 0) > 0 ? 1 : 0;
     while (totalWeight() > mtow && outPax > trimMinPax) {
         outPax--;
     }
     if (totalWeight() > mtow) return null;
     return { pax: outPax, cargoKg: outCargo };
 }
-function enforceMzfwCap(spec, pax, cargoKg, chosenMission, scenario) {
+function enforceMzfwCap(spec, pax, cargoKg, chosenMission, blockMinutes, scenario, hardCargoLimit) {
     if (!spec || !(spec.mzfw > 0)) return { pax: pax, cargoKg: cargoKg };
     const oew = Number(spec.oew) || 0;
     const mzfw = Number(spec.mzfw);
     let outPax = pax;
     let outCargo = cargoKg;
+    const trimMinCargo = getCargoTrimFloorKg(scenario, hardCargoLimit);
+    const trimMinPax = getPassengerTrimFloor(chosenMission, spec, blockMinutes, scenario);
     function zfw() {
         return oew + getSimBriefPassengerPayloadKg(spec, outPax) + outCargo;
     }
-    while (zfw() > mzfw && outCargo > 0) {
-        outCargo = Math.max(0, outCargo - 200);
+    while (zfw() > mzfw && outCargo > trimMinCargo) {
+        outCargo = Math.max(trimMinCargo, outCargo - 200);
     }
-    const trimMinPax = missionRequiresPassengers(chosenMission, spec, scenario) && (spec.maxPax || 0) > 0 ? 1 : 0;
     while (zfw() > mzfw && outPax > trimMinPax) {
         outPax--;
     }
     if (zfw() > mzfw) return null;
     return { pax: outPax, cargoKg: outCargo };
 }
-function enforceMlwCap(spec, pax, cargoKg, fuelDistanceNm, chosenMission, scenario) {
+function enforceMlwCap(spec, pax, cargoKg, fuelDistanceNm, chosenMission, blockMinutes, scenario, hardCargoLimit) {
     if (!spec || !(spec.mlw > 0)) return { pax: pax, cargoKg: cargoKg };
     const oew = Number(spec.oew) || 0;
     const mlw = Number(spec.mlw);
@@ -4099,13 +4062,14 @@ function enforceMlwCap(spec, pax, cargoKg, fuelDistanceNm, chosenMission, scenar
         : Math.max(0, Number(fuelDistanceNm) || 0) * (Number(spec.fuelPerNm) || 0.5);
     let outPax = pax;
     let outCargo = cargoKg;
+    const trimMinCargo = getCargoTrimFloorKg(scenario, hardCargoLimit);
+    const trimMinPax = getPassengerTrimFloor(chosenMission, spec, blockMinutes, scenario);
     function totalWeight() {
         return oew + getSimBriefPassengerPayloadKg(spec, outPax) + outCargo + blockFuel;
     }
-    while (totalWeight() > mlw && outCargo > 0) {
-        outCargo = Math.max(0, outCargo - 200);
+    while (totalWeight() > mlw && outCargo > trimMinCargo) {
+        outCargo = Math.max(trimMinCargo, outCargo - 200);
     }
-    const trimMinPax = missionRequiresPassengers(chosenMission, spec, scenario) && (spec.maxPax || 0) > 0 ? 1 : 0;
     while (totalWeight() > mlw && outPax > trimMinPax) {
         outPax--;
     }
@@ -4423,16 +4387,6 @@ function passesTemplateMtowCap(m, searchClass, spec) {
     if (m.maxMTOWAppliesTo && !m.maxMTOWAppliesTo.includes(searchClass)) return true;
     return spec.mtow <= m.maxMTOW;
 }
-function passesTemplateMinPaxSeats(m, searchClass, spec) {
-    if (!m.minPaxSeats) return true;
-    if (m.minPaxSeatsAppliesTo && !m.minPaxSeatsAppliesTo.includes(searchClass)) return true;
-    return (spec.maxPax || 0) >= m.minPaxSeats;
-}
-function isMilitaryHelicopterMission(m) {
-    if (!m) return false;
-    const classes = m.allowedClasses;
-    return !!(classes && classes.length === 1 && classes[0] === "HELI" && m.militaryOnly);
-}
 function scenarioPassesMilitaryGate(s, spec, isContractorMode) {
     if (!s || !s.isMilitary) return true;
     if (spec.isMilitary) return true;
@@ -4448,7 +4402,6 @@ function isTacticalAirframeForMission(spec, aircraftType, missionType) {
 }
 function passesMissionContextFilter(m, spec, origin, isContractorMode, aircraftType) {
     const isTacticalAirframe = isTacticalAirframeForMission(spec, aircraftType, m.type);
-    if (isMilitaryHelicopterMission(m) && spec.class !== "HELI") return false;
     if (m.tacticalOnly && !isTacticalAirframe) return false;
     if (m.civilianOnly && spec.isMilitary) return false;
     if (m.militaryOnly && !spec.isMilitary && !isContractorMode) return false;
@@ -4460,7 +4413,10 @@ function passesMissionContextFilter(m, spec, origin, isContractorMode, aircraftT
 }
 function passesScenarioPhysicalHardLocks(s, type, spec) {
     if (s.minCargo && spec.maxCargo < s.minCargo) return false;
-    if (s.excludedAircraft && s.excludedAircraft.includes(type)) return false;
+    if (missionRequiresPassengers(s)) {
+        const requiredPax = Math.max(1, getScenarioExactPax(s));
+        if ((spec.maxPax || 0) < requiredPax) return false;
+    }
     return true;
 }
 function getExcludedScenarioImgIdsForPool(pool, aircraftType, spec) {
@@ -4490,12 +4446,9 @@ function filterScenariosByMissionType(activePool, mission) {
     return activePool.filter(s => !s.missionType || s.missionType === mission.type);
 }
 function passesAssignmentOnlyMissionLocks(m, type, searchClass, spec, origin) {
-    if (isMilitaryHelicopterMission(m) && searchClass !== "HELI") return false;
     if (m.type === 23 && spec.class === "HELI" && type !== "H47D") return false;
     if (m.minCargo && spec.maxCargo < m.minCargo) return false;
     if (!passesTemplateMtowCap(m, searchClass, spec)) return false;
-    if (!passesTemplateMinPaxSeats(m, searchClass, spec)) return false;
-    if (m.excludedAircraft && m.excludedAircraft.includes(type)) return false;
     if (m.requiredDep && origin && origin.icao) {
         if (Array.isArray(m.requiredDep)) {
             if (!m.requiredDep.includes(origin.icao)) return false;
@@ -4538,7 +4491,6 @@ function buildFilteredMissionListFromAssignments(spec, type, searchClass, origin
         if (!origin) {
             if (m.civilianOnly && spec.isMilitary) return false;
             if (m.militaryOnly && !spec.isMilitary && !isContractorMode) return false;
-            if (isMilitaryHelicopterMission(m) && spec.class !== "HELI") return false;
             if (m.tacticalOnly && !isTacticalAirframeForMission(spec, type, m.type)) return false;
         }
         return missionHasAssignedPlayableScenario(m, type, spec, isLocalFlight, isContractorMode);
@@ -4588,9 +4540,9 @@ function buildActiveScenarioPoolForMission(mission, type, spec, isLocalFlight, i
 function filterScenarioPool(pool, type, spec, excludedImgIds) {
     return pool.filter(s => scenarioPassesHardLocks(s, type, spec, excludedImgIds));
 }
-function pickWeightedRandom(items, defaultWeight = 10, getWeight) {
+function pickWeightedRandom(items, getWeight) {
     if (!items.length) return null;
-    const resolveWeight = getWeight || ((item) => item.weight || defaultWeight);
+    const resolveWeight = getWeight || ((item) => item.weight);
     const totalWeight = items.reduce((sum, item) => sum + resolveWeight(item), 0);
     let randomNum = Math.random() * totalWeight;
     for (let item of items) {
@@ -4600,48 +4552,9 @@ function pickWeightedRandom(items, defaultWeight = 10, getWeight) {
     }
     return items[0];
 }
-function isMedevacMission(m) {
-    return !!(m && (m.type === 19 || m.pool === "medical"));
-}
-function applyMedevacHatWeighting(hat) {
-    const medevac = hat.filter(e => isMedevacMission(e.mission));
-    if (!medevac.length) return hat;
-    const nonMedevacSum = hat
-        .filter(e => !isMedevacMission(e.mission))
-        .reduce((sum, e) => sum + e.weight, 0);
-    if (nonMedevacSum <= 0) return hat;
-    const medevacSum = medevac.reduce((sum, e) => sum + e.weight, 0);
-    if (medevacSum <= 0) return hat;
-    const targetMedevacSum = nonMedevacSum * (MEDEVAC_TARGET_SHARE / (1 - MEDEVAC_TARGET_SHARE));
-    const scale = targetMedevacSum / medevacSum;
-    return hat.map(e => (
-        isMedevacMission(e.mission) ? { mission: e.mission, scenario: e.scenario, weight: e.weight * scale } : e
-    ));
-}
-function getAircraftExclusiveMissionWeight(mission, aircraftType) {
-    if (!mission || !aircraftType) return null;
-    if (mission.pool === "uniqueMissions") {
-        return mission.weight || 10;
-    }
-    if (mission.type === 26 && aircraftType === "DC6B" && mission.pool === "vintageAirliner") {
-        return mission.weight || 40;
-    }
-    if (mission.type === 33 && aircraftType === "DC6A" && mission.pool === "vintageProplinerFreight") {
-        return mission.weight || 40;
-    }
-    return null;
-}
-function getScenarioHatWeight(scenario, mission, searchClass, aircraftType) {
+function getScenarioHatWeight(scenario, mission) {
     if (scenario.weight != null) return scenario.weight;
-    const exclusiveWeight = getAircraftExclusiveMissionWeight(mission, aircraftType);
-    if (exclusiveWeight != null) return exclusiveWeight;
-    if (searchClass === "GA" && isSpiritualGuruScenario(scenario)) return 2;
-    if (mission.type <= 13) return getMissionTemplateWeight(mission, searchClass, aircraftType);
-    if (typeof usesMissionAssignments === "function" && usesMissionAssignments()
-        && (scenario.imgId === 4 || scenario.imgId === 5)) {
-        return DEFAULT_HAT_WEIGHT * 0.25;
-    }
-    return DEFAULT_HAT_WEIGHT;
+    return mission.weight;
 }
 function buildMissionScenarioHat(missions, type, spec, searchClass, isLocalFlight, isContractorMode) {
     const hat = [];
@@ -4654,7 +4567,7 @@ function buildMissionScenarioHat(missions, type, spec, searchClass, isLocalFligh
                 hat.push({
                     mission,
                     scenario,
-                    weight: getScenarioHatWeight(scenario, mission, searchClass, type)
+                    weight: getScenarioHatWeight(scenario, mission)
                 });
             }
             continue;
@@ -4663,7 +4576,7 @@ function buildMissionScenarioHat(missions, type, spec, searchClass, isLocalFligh
             hat.push({
                 mission,
                 scenario,
-                weight: getScenarioHatWeight(scenario, mission, searchClass, type)
+                weight: getScenarioHatWeight(scenario, mission)
             });
         }
     }
@@ -4671,68 +4584,10 @@ function buildMissionScenarioHat(missions, type, spec, searchClass, isLocalFligh
 }
 function pickFromMissionScenarioHat(hat) {
     if (!hat.length) return null;
-    const weightedHat = applyMedevacHatWeighting(hat);
-    return pickWeightedRandom(weightedHat, DEFAULT_HAT_WEIGHT, entry => entry.weight);
+    return pickWeightedRandom(hat, entry => entry.weight);
 }
-function isSpiritualGuruScenario(scenario) {
-    return !!(scenario && scenario.payload && scenario.payload.includes("spiritual guru"));
-}
-function buildWeightedMissionSelectionPool(missions, spec, searchClass, type, isContractorMode) {
-    return applyReconMissionWeighting(
-        applyContractorMissionWeighting(
-            applyCivilOkWeighting(missions, spec, searchClass, type),
-            isContractorMode
-        ),
-        type,
-        spec
-    );
-}
-function getMissionTemplateWeight(m, searchClass, aircraftType) {
-    const defaultWeight = 10;
-    const exclusiveWeight = getAircraftExclusiveMissionWeight(m, aircraftType);
-    if (exclusiveWeight != null) return exclusiveWeight;
-    const base = searchClass === "GA" ? defaultWeight : (m.weight || defaultWeight);
-    if (m.type === 7) return base * 0.1;
-    if (typeof usesMissionAssignments === "function" && usesMissionAssignments() && m.pool === "uniqueMissions") {
-        if (m.type === 4 || m.type === 5) return base * 0.08;
-        return base * 0.35;
-    }
-    return base;
-}
-function applyCivilOkWeighting(missions, spec, searchClass, aircraftType) {
-    const defaultWeight = 10;
-    const baseWeight = (m) => getMissionTemplateWeight(m, searchClass, aircraftType);
-    if (!spec.isMilitary || !spec.tags || !spec.tags.includes("CIVIL_OK")) {
-        return missions.map(m => ({ mission: m, weight: baseWeight(m) }));
-    }
-    const mil = missions.filter(m => m.militaryOnly);
-    const civ = missions.filter(m => !m.militaryOnly);
-    if (mil.length === 0 || civ.length === 0) {
-        return missions.map(m => ({ mission: m, weight: baseWeight(m) }));
-    }
-    const sumMil = mil.reduce((s, m) => s + baseWeight(m), 0);
-    const sumCiv = civ.reduce((s, m) => s + baseWeight(m), 0);
-    const targetMil = 0.65;
-    const milMult = (targetMil * sumCiv) / ((1 - targetMil) * sumMil);
-    return missions.map(m => ({
-        mission: m,
-        weight: m.militaryOnly ? baseWeight(m) * milMult : baseWeight(m)
-    }));
-}
-function applyReconMissionWeighting(weightedMissions, aircraftType, spec) {
-    const tags = (spec && spec.tags) || [];
-    if (aircraftType !== "VULC" && !tags.includes("RECON")) return weightedMissions;
-    return weightedMissions.map(entry => ({
-        mission: entry.mission,
-        weight: entry.mission.type === 32 ? entry.weight * 4 : entry.weight
-    }));
-}
-function applyContractorMissionWeighting(weightedMissions, isContractorMode) {
-    if (!isContractorMode) return weightedMissions;
-    return weightedMissions.map(entry => ({
-        mission: entry.mission,
-        weight: entry.mission.militaryOnly ? entry.weight * 4 : entry.weight * 0.35
-    }));
+function buildWeightedMissionSelectionPool(missions) {
+    return missions.map(mission => ({ mission, weight: mission.weight }));
 }
 function filterRoutesForContractorMission(candidatePairs, mission, spec, isLocalFlight) {
     if (!mission) return candidatePairs;
@@ -4810,9 +4665,7 @@ function dispatchMissionFirst(spec, type, searchClass, isContractorMode, depOver
     for (let attempt = 0; attempt < 12; attempt++) {
         const remaining = missionPool.filter(m => !triedTypes.has(m.type));
         if (!remaining.length) break;
-        const weightedMissions = buildWeightedMissionSelectionPool(
-            remaining, spec, searchClass, type, isContractorMode
-        );
+        const weightedMissions = buildWeightedMissionSelectionPool(remaining);
         const pickedEntry = pickWeightedMissionEntry(weightedMissions);
         if (!pickedEntry) break;
         const mission = pickedEntry.mission;
@@ -5285,12 +5138,11 @@ function probeDispatchFlight(config) {
             runwayWeightPenalty = shortFieldPenalty;
         }
         let minReservedPaxWeight = 0;
-        if (missionRequiresPassengers(chosenMission, spec, chosenScenario) && spec.maxPax > 0) {
-            let reservePax = 1;
-            if (!isJetFuelCriticalSector(fuelDistanceNm)) {
-                const { minPax } = getPassengerLoadLimits(chosenMission, spec, spec.maxPax, blockMinutes, chosenScenario);
-                reservePax = Math.max(1, minPax);
-            }
+        if (missionRequiresPassengers(chosenScenario) && spec.maxPax > 0) {
+            const { minPax } = getPassengerLoadLimits(
+                chosenMission, spec, spec.maxPax, blockMinutes, chosenScenario
+            );
+            const reservePax = Math.max(1, minPax);
             minReservedPaxWeight = getSimBriefPassengerPayloadKg(spec, reservePax);
         }
         const rawBlockFuel = spec.class === "JET"
@@ -5301,7 +5153,7 @@ function probeDispatchFlight(config) {
 
         const maxStructuralPayload = Math.max(0, safeMtow - safeOew - estimatedBlockFuel - runwayWeightPenalty);
         const paxAllInKg = getPaxAllInWeightKg(spec);
-        if (missionRequiresPassengers(chosenMission, spec, chosenScenario) && spec.maxPax > 0) {
+        if (missionRequiresPassengers(chosenScenario) && spec.maxPax > 0) {
             let maxSafePax = Math.max(0, Math.min(spec.maxPax, Math.floor(maxStructuralPayload / paxAllInKg)));
             if (spec.class === "JET") {
                 const mtowPaxCap = getJetMaxPaxAtMtow(
@@ -5337,21 +5189,10 @@ function probeDispatchFlight(config) {
             }
         }
     }
-    if (missionRequiresPassengers(chosenMission, spec, chosenScenario) && (spec.maxPax || 0) > 0) {
-        if (MTOW_ENFORCED_CLASSES.includes(spec.class)) {
-            pax = capJetPaxForMtow(pax, cargoKg, safeMtow, safeOew, fuelDistanceNm, spec);
-        }
-        if (pax === 0) {
-            return fail("runway_performance",
-                "Runway length and sector distance do not allow a feasible takeoff weight for this aircraft. Try a shorter sector, a different airport, or another airframe.",
-                { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
-        }
-    }
     const mtowReducedForAirport = mtowReducedForRestrictedAirport;
     let payoutAmount = Math.floor(Math.random() * 6200) + 1950;
 
     // --- PHASE 6: SCENARIO SELECTION ---
-    let rPayload = "standard manifest";
     let rInstruction = "Execute standard procedures.";
     let scenarioImgId = null;
     let scenarioPicks = null;
@@ -5387,12 +5228,10 @@ function probeDispatchFlight(config) {
                 "Selected scenario is not in mission-assignments.json for this aircraft. Regenerate mission-assignments-data.js and hard-refresh (Ctrl+F5).",
                 { candidatePairCount: candidatePairCount, filteredMissionCount: filteredMissionCount });
         }
-        rPayload = scenario.payload;
         rInstruction = scenario.instruction;
         scenarioImgId = scenario.imgId;
         imageId = scenario.imgId;
         scenarioPicks = pickScenarioPlaceholderValues(origin, destination);
-        rPayload = resolveScenarioText(rPayload, scenarioPicks);
         rInstruction = resolveScenarioText(rInstruction, scenarioPicks);
     } else if (chosenMission.type > 13) {
         return fail("no_scenario",
@@ -5414,7 +5253,7 @@ function probeDispatchFlight(config) {
 
     if (MTOW_ENFORCED_CLASSES.includes(spec.class)) {
         const towCapped = enforceJetTowPayloadCap(
-            spec, pax, cargoKg, fuelDistanceNm, safeMtow, chosenMission, blockMinutes, chosenScenario
+            spec, pax, cargoKg, fuelDistanceNm, safeMtow, chosenMission, blockMinutes, chosenScenario, hardCargoLimit
         );
         if (!towCapped) {
             return fail("runway_performance",
@@ -5426,7 +5265,9 @@ function probeDispatchFlight(config) {
     }
 
     if (spec.mzfw > 0) {
-        const zfwCapped = enforceMzfwCap(spec, pax, cargoKg, chosenMission, chosenScenario);
+        const zfwCapped = enforceMzfwCap(
+            spec, pax, cargoKg, chosenMission, blockMinutes, chosenScenario, hardCargoLimit
+        );
         if (!zfwCapped) {
             return fail("runway_performance",
                 "Payload exceeds this aircraft's maximum zero fuel weight. Try a lighter load or another airframe.",
@@ -5437,7 +5278,9 @@ function probeDispatchFlight(config) {
     }
 
     if (spec.mlw > 0) {
-        const mlwCapped = enforceMlwCap(spec, pax, cargoKg, fuelDistanceNm, chosenMission, chosenScenario);
+        const mlwCapped = enforceMlwCap(
+            spec, pax, cargoKg, fuelDistanceNm, chosenMission, blockMinutes, chosenScenario, hardCargoLimit
+        );
         if (!mlwCapped) {
             return fail("runway_performance",
                 "Payload and fuel combination exceeds this aircraft's maximum landing weight. Try a lighter load or another airframe.",
@@ -5493,7 +5336,6 @@ function probeDispatchFlight(config) {
         pax,
         cargoKg,
         payout,
-        rPayload,
         rInstruction,
         scenarioPicks,
         scenarioImgId,
