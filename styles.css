@@ -1764,14 +1764,14 @@
             font-weight: inherit;
         }
         #logbookTable .lb-date {
-            width: 10%;
+            width: 9%;
             white-space: nowrap;
         }
         /* Consolidated: merged with the later duplicate #logbookTable .lb-route rule, which set
            width/max-width: 104px (same specificity, later in source, so it was the effective value). */
         #logbookTable .lb-route {
-            width: 104px;
-            max-width: 104px;
+            width: 110px;
+            max-width: 110px;
             white-space: nowrap;
             padding-right: 2px;
         }
@@ -1791,16 +1791,16 @@
             white-space: nowrap;
         }
         #logbookTable .lb-time {
-            width: 52px;
-            max-width: 52px;
+            width: 45px;
+            max-width: 45px;
             white-space: nowrap;
-            text-align: left;
+            text-align: center;
             padding-left: 4px;
             padding-right: 2px;
         }
         #logbookTable .lb-action {
-            width: 60px;
-            max-width: 60px;
+            width: 50px;
+            max-width: 50px;
             text-align: center;
             white-space: nowrap;
         }
