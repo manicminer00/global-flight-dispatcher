@@ -216,13 +216,13 @@ const scenarioDB = {
         { imgId: 144, weight: 10,  title: "Medical Examiner", instruction: "A regional medical examiner has been called to a time-sensitive incident. Minimise the delay and complete the transfer as efficiently as conditions allow." },
         { imgId: 146, weight: 10, title: "New Owner Reposition", instruction: "The owner has requested delivery to the aircraft's new home base. Monitor the temperatures closely and use conservative settings while you learn the airframe." },
 		{ imgId: 251, weight: 10, title: "Same-Day Transfer", instruction: "Two project managers need a same-day transfer for a critical meeting.", exactPax: 2 },
-		{ imgId: 252, weight: 10, title: "Delayed Passenger Link", instruction: "Several passengers have missed their onward connection. Keep to the schedule and stay ahead of changing weather.", minPax: 2 },
+		{ imgId: 252, weight: 10, title: "Support Network", instruction: "Several passengers have missed their onward connection. Keep to the schedule and stay ahead of changing weather.", minPax: 2 },
 		{ imgId: 253, weight: 10, title: "Engineer Callout", instruction: "A specialist engineering team is travelling to assess halted production equipment.", minPax: 2 },
 		{ imgId: 254, weight: 10, title: "Sensitive Documents", instruction: "A legal adviser is carrying sensitive case material to an important consultation.", exactPax: 1 },
 		{ imgId: 255, weight: 10, title: "Relief Crew Transfer", instruction: "A replacement technical crew must reach an aircraft awaiting maintenance support.", minPax: 2 },
 		{ imgId: 256, weight: 10, title: "Night Crew", instruction: "An aircraft maintenance crew needs positioning for planned overnight work.", minPax: 2 },
 		{ imgId: 257, weight: 10, title: "Clinic Team Hop", instruction: "A small clinic team is travelling to relieve colleagues after an extended shift.", minPax: 2 },
-		{ imgId: 258, weight: 10, title: "Family Event Link", instruction: "A family group is using an air taxi after their original travel plan failed.", minPax: 4 }
+		{ imgId: 258, weight: 10, title: "Travel Disruption", instruction: "A family group is using an air taxi after their original travel plan failed.", minPax: 4 }
     ],
     highAltServices: [
         { imgId: 147, weight: 10, title: "Weather Ops", instruction: "A science team is collecting meteorological data during this sortie. Hold the requested profiles accurately and record each observation point." },
@@ -230,7 +230,7 @@ const scenarioDB = {
     ],
     vintageOps: [
         { imgId: 149, weight: 10, title: "Airshow Display", instruction: "A historic aircraft demonstration is scheduled for today. Complete the fluid checks, present the aircraft on the ground, and fly the display within conservative limits." },
-        { imgId: 150, weight: 10, title: "Handicap Race", instruction: "The aircraft is positioning for a closed-course handicap race. Keep the airframe clean, maintain accurate navigation, and arrive ready for the competition." },
+        { imgId: 150, weight: 10, title: "Handicap Race", instruction: "You have been invited to take part in a closed-course handicap race." },
         { imgId: 151, weight: 10, title: "Museum Ferry", instruction: "This ageing aircraft is being delivered to a museum for preservation. Use conservative power settings and treat every stage of the flight with care." },
         { imgId: 152, weight: 10, title: "Historic Chase Plane", instruction: "You are supporting a formation of historic aircraft as the designated chase plane. Maintain safe spacing, monitor the group, and watch your engine temperatures." },
         { imgId: 153, weight: 10, title: "Memorial Fly-by", instruction: "A commemorative low-level fly-by is scheduled. Verify the smoke system and oil levels, then fly the profile with precision and restraint." },
