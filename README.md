@@ -26,7 +26,7 @@ Fly it, log it, and your next departure can pick up where you landed, building a
 
 **The fuel and cruise planning.** VECTOR estimates trip fuel from the aircraft's fuel burn rate and distance, adds reserve and taxi allowances, and picks a cruise altitude that respects the aircraft's operating ceiling and flight regulations, and, on routes near high terrain, applies a safety floor above the ground and any known mountain ranges along the way. That altitude, along with your chosen route, passengers, and cargo, is passed into a ready-made SimBrief flight plan link and a downloadable `.pln` file, so the numbers you see on the job ticket are the numbers your flight plan will actually use.
 
-**The missions.** Underneath the route and numbers sits a scenario system of 230 job types (airline hops, charters, cargo runs, medical relays, military sorties, survey work, and more), each restricted to the aircraft classes and payload levels that make sense for it. Every aircraft in the fleet has its own assigned pool of missions it can be offered, so a Cessna won't turn up flying a state delegation and a widebody won't turn up on a bush cargo drop.
+**The missions.** Underneath the route and numbers sits a scenario system of 245+ jobs (airline hops, charters, cargo runs, medical relays, military sorties, survey work, and more), each restricted to the aircraft classes and payload levels that make sense for it. Every aircraft in the fleet has its own assigned pool of missions it can be offered, so a Cessna won't turn up flying a state delegation and a widebody won't turn up on a bush cargo drop.
 
 **The logbook.** Flights you fly and save are kept in a running logbook with their payout, so you can track completed jobs and earnings over time.
 

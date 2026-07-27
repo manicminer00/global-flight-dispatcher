@@ -982,5 +982,6 @@ var seedThirdPartyAirportDatabase = [
 { icao: "ZUGY", name: "Guiyang Longdongbao Airport & City", rwy: "JET", length: 13100, elev: 3736, lat: 26.538, lon: 106.8, source: "Core", tag: "Third Party", linkText: "SamScene3D via Contrail", url: "https://contrail.shop/search?q=ZUGY" },
 { icao: "ZULS", name: "Tibet Lhasa Gonggar Airport", rwy: "JET", length: 13123, elev: 11713, lat: 29.297, lon: 90.912, source: "Core", tag: "Third Party", linkText: "SamScene3D via Contrail", url: "https://contrail.shop/search?q=ZULS" },
 { icao: "ZUTF", name: "Chengdu Tianfu International Airport", rwy: "JET", length: 13123, elev: 1440, lat: 31.313, lon: 104.441, source: "Core", tag: "Third Party", linkText: "Celestial Team via ORBX", url: "https://orbxdirect.com" },
-{ icao: "ZYHB", name: "Harbin Taiping Airport & City", rwy: "JET", length: 11811, elev: 456, lat: 45.623, lon: 126.25, source: "Core", tag: "Third Party", linkText: "SamScene3D via Contrail", url: "https://contrail.shop/search?q=ZYHB" }
-];
+{ icao: "ZYHB", name: "Harbin Taiping Airport & City", rwy: "JET", length: 11811, elev: 456, lat: 45.623, lon: 126.25, source: "Core", tag: "Third Party", linkText: "SamScene3D via Contrail", url: "https://contrail.shop/search?q=ZYHB" },
+
+{ icao: "LGSR", name: "Santorini Airport", rwy: "JET", length: 7208, elev: 123, lat: 36.399, lon: 25.479, source: "Core", tag: "Third Party", linkText: "29Palms via Contrail", url: "https://contrail.shop/products/lgsr-santorini-airport-island-msfs24" },];

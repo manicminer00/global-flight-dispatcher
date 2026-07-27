@@ -391,7 +391,7 @@ function buildPoolMetadata(scenarioDB, missionMatrix) {
             missionName = mt ? mt.name : "";
         }
         pools[poolKey] = {
-            label: MISSION_POOL_LABELS[poolKey] || poolKey,
+            label: missionNames.length === 1 ? missionNames[0] : (MISSION_POOL_LABELS[poolKey] || poolKey),
             missionType: missionType,
             missionTypes: missionTypes,
             missionName: missionName,

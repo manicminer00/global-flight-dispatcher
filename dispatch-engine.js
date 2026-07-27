@@ -479,6 +479,7 @@ function getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes, s
             ? { minPax: exactPax, effectiveMax: exactPax }
             : { minPax: exactPax, effectiveMax: 0 };
     }
+    const scenarioMinPax = getScenarioMinPax(scenario);
     const isScheduledCommercial = isScheduledCommercialMission(chosenMission);
     const isVipMission = chosenMission && (chosenMission.type === 16
         || chosenMission.pool === "executive");
@@ -501,10 +502,11 @@ function getPassengerLoadLimits(chosenMission, spec, maxSafePax, blockMinutes, s
     } else if (spec.class === "JET") {
         minPax = Math.floor(spec.maxPax * 0.5);
     }
+    minPax = Math.max(minPax, scenarioMinPax);
 
     const effectiveMax = Math.min(maxPaxTarget, maxSafePax, spec.maxPax);
     if (effectiveMax < minPax) {
-        if (isScheduledCommercial) {
+        if (isScheduledCommercial || scenarioMinPax > 0) {
             return { minPax, effectiveMax: 0 };
         }
         // Other passenger missions may still use a reduced feasible band.
@@ -536,6 +538,10 @@ function missionRequiresPassengers(scenario) {
 function getScenarioExactPax(scenario) {
     const exactPax = Number(scenario && scenario.exactPax);
     return Number.isInteger(exactPax) && exactPax > 0 ? exactPax : 0;
+}
+function getScenarioMinPax(scenario) {
+    const minPax = Number(scenario && scenario.minPax);
+    return Number.isInteger(minPax) && minPax > 0 ? minPax : 0;
 }
 function normalizeIcao(icao) {
     return (icao || "").trim().toUpperCase();
@@ -4414,7 +4420,8 @@ function passesMissionContextFilter(m, spec, origin, isContractorMode, aircraftT
 function passesScenarioPhysicalHardLocks(s, type, spec) {
     if (s.minCargo && spec.maxCargo < s.minCargo) return false;
     if (missionRequiresPassengers(s)) {
-        const requiredPax = Math.max(1, getScenarioExactPax(s));
+        const exactPax = getScenarioExactPax(s);
+        const requiredPax = exactPax > 0 ? exactPax : Math.max(1, getScenarioMinPax(s));
         if ((spec.maxPax || 0) < requiredPax) return false;
     }
     return true;
@@ -4552,9 +4559,8 @@ function pickWeightedRandom(items, getWeight) {
     }
     return items[0];
 }
-function getScenarioHatWeight(scenario, mission) {
-    if (scenario.weight != null) return scenario.weight;
-    return mission.weight;
+function getScenarioHatWeight(scenario) {
+    return scenario.weight;
 }
 function buildMissionScenarioHat(missions, type, spec, searchClass, isLocalFlight, isContractorMode) {
     const hat = [];
@@ -4567,7 +4573,7 @@ function buildMissionScenarioHat(missions, type, spec, searchClass, isLocalFligh
                 hat.push({
                     mission,
                     scenario,
-                    weight: getScenarioHatWeight(scenario, mission)
+                    weight: getScenarioHatWeight(scenario)
                 });
             }
             continue;
@@ -4576,7 +4582,7 @@ function buildMissionScenarioHat(missions, type, spec, searchClass, isLocalFligh
             hat.push({
                 mission,
                 scenario,
-                weight: getScenarioHatWeight(scenario, mission)
+                weight: getScenarioHatWeight(scenario)
             });
         }
     }
@@ -4585,9 +4591,6 @@ function buildMissionScenarioHat(missions, type, spec, searchClass, isLocalFligh
 function pickFromMissionScenarioHat(hat) {
     if (!hat.length) return null;
     return pickWeightedRandom(hat, entry => entry.weight);
-}
-function buildWeightedMissionSelectionPool(missions) {
-    return missions.map(mission => ({ mission, weight: mission.weight }));
 }
 function filterRoutesForContractorMission(candidatePairs, mission, spec, isLocalFlight) {
     if (!mission) return candidatePairs;
@@ -4621,17 +4624,6 @@ function buildFilteredMissionList(spec, type, searchClass, origin, isContractorM
     }
     return buildFilteredMissionListFromAssignments(spec, type, searchClass, origin, isContractorMode, isLocalFlight);
 }
-function pickWeightedMissionEntry(weightedMissions) {
-    if (!weightedMissions.length) return null;
-    let totalWeight = weightedMissions.reduce((sum, entry) => sum + entry.weight, 0);
-    if (totalWeight <= 0) return weightedMissions[0];
-    let randomNum = Math.random() * totalWeight;
-    for (let entry of weightedMissions) {
-        if (randomNum < entry.weight) return entry;
-        randomNum -= entry.weight;
-    }
-    return weightedMissions[0];
-}
 function buildContractorRoutePool(candidatePairs, preferOwned) {
     let weightedRoutePool = [];
     if (preferOwned) {
@@ -4653,35 +4645,21 @@ function buildContractorRoutePool(candidatePairs, preferOwned) {
     if (weightedRoutePool.length === 0) weightedRoutePool = [...candidatePairs];
     return weightedRoutePool;
 }
-function dispatchMissionFirst(spec, type, searchClass, isContractorMode, depOverrideUser, destOverride,
-                                routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, preferOwned) {
-    let missionPool = buildFilteredMissionList(spec, type, searchClass, null, isContractorMode, null);
+function buildRouteViableScenarioEntries(spec, type, searchClass, isContractorMode, depOverrideUser, destOverride,
+                                         routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins) {
+    const missionPool = buildFilteredMissionList(spec, type, searchClass, null, isContractorMode, null);
     if (!missionPool.length) return null;
     const depUserCode = normalizeIcao(depOverrideUser);
-    const { minTarget, maxTarget, relaxedMin, relaxedMax, targetDist } = getRouteDistanceLimits(routingTargetMins, spec, type);
-    const targetDistNm = targetDist;
+    const { minTarget, maxTarget, relaxedMin, relaxedMax } = getRouteDistanceLimits(routingTargetMins, spec, type);
     const routedAsGlider = isGliderAircraft(spec);
-    const triedTypes = new Set();
-    for (let attempt = 0; attempt < 12; attempt++) {
-        const remaining = missionPool.filter(m => !triedTypes.has(m.type));
-        if (!remaining.length) break;
-        const weightedMissions = buildWeightedMissionSelectionPool(remaining);
-        const pickedEntry = pickWeightedMissionEntry(weightedMissions);
-        if (!pickedEntry) break;
-        const mission = pickedEntry.mission;
-        triedTypes.add(mission.type);
+    const routeViableEntries = [];
+    for (const mission of missionPool) {
 
         // requiredDep missions (types 1/2/3) force their ICAO as the effective departure via the
         // existing depOverride machinery, unless the user already pinned a conflicting departure.
         const requiredDepCode = mission.requiredDep ? normalizeIcao(mission.requiredDep) : "";
         if (requiredDepCode && depUserCode && depUserCode !== requiredDepCode) continue;
         const effectiveDep = requiredDepCode || depOverrideUser;
-
-        const hat = buildMissionScenarioHat([mission], type, spec, searchClass, null, isContractorMode);
-        if (!hat.length) continue;
-        const hatPick = pickFromMissionScenarioHat(hat);
-        if (!hatPick) continue;
-        const isLocalFlight = !!hatPick.scenario.isLocal;
 
         const { departureAirports, destinationAirports } = buildDispatchRoutingPools(
             effectiveDep, routingScope, spec, type, routingMilitaryOnly, isContractorMode, navigraphOnly
@@ -4692,80 +4670,106 @@ function dispatchMissionFirst(spec, type, searchClass, isContractorMode, depOver
               )
             : destinationAirports;
 
-        let candidatePairs;
-        if (isLocalFlight) {
-            candidatePairs = buildLocalRoutePairs(validAirports, effectiveDep, spec, type);
-        } else if (routedAsGlider) {
-            candidatePairs = buildGliderRoutePairs(validAirports, effectiveDep, spec)
-                .filter(pair => normalizeIcao(pair.src.icao) !== normalizeIcao(pair.dst.icao));
-        } else {
-            const routeSources = effectiveDep ? departureAirports : destinationAirports;
-            const routeResult = buildJetRoutePairs(
-                routeSources, destinationAirports, effectiveDep, destOverride, spec,
-                minTarget, maxTarget, relaxedMin, relaxedMax, routingTargetMins, type
-            );
-            candidatePairs = routeResult.candidatePairs
-                .filter(pair => normalizeIcao(pair.src.icao) !== normalizeIcao(pair.dst.icao));
-        }
-        if (!candidatePairs.length) continue;
+        const activePool = buildActiveScenarioPoolForMission(mission, type, spec, null, isContractorMode);
+        const candidatePairsByLocalFlag = new Map();
+        for (const scenario of activePool) {
+            if (mission.type <= 13 && scenario.imgId !== mission.type) continue;
+            const isLocalFlight = !!scenario.isLocal;
+            let candidatePairs = candidatePairsByLocalFlag.get(isLocalFlight);
+            if (!candidatePairs) {
+                if (isLocalFlight) {
+                    candidatePairs = buildLocalRoutePairs(validAirports, effectiveDep, spec, type);
+                } else if (routedAsGlider) {
+                    candidatePairs = buildGliderRoutePairs(validAirports, effectiveDep, spec)
+                        .filter(pair => normalizeIcao(pair.src.icao) !== normalizeIcao(pair.dst.icao));
+                } else {
+                    const routeSources = effectiveDep ? departureAirports : destinationAirports;
+                    const routeResult = buildJetRoutePairs(
+                        routeSources, destinationAirports, effectiveDep, destOverride, spec,
+                        minTarget, maxTarget, relaxedMin, relaxedMax, routingTargetMins, type
+                    );
+                    candidatePairs = routeResult.candidatePairs
+                        .filter(pair => normalizeIcao(pair.src.icao) !== normalizeIcao(pair.dst.icao));
+                }
 
-        if (spec.class === "JET" && !effectiveDep) {
-            const fullRunwayPairs = candidatePairs.filter((p) => {
-                if (isJetWeightLimitedRunwayAirport(p.src, spec)) return false;
-                if (specIsHeavyJet(spec) && isJetDepartureRunwayPerformanceLimited(p.src, spec)) return false;
-                return true;
-            });
-            if (fullRunwayPairs.length) candidatePairs = fullRunwayPairs;
-        }
+                if (candidatePairs.length && spec.class === "JET" && !effectiveDep) {
+                    const fullRunwayPairs = candidatePairs.filter((p) => {
+                        if (isJetWeightLimitedRunwayAirport(p.src, spec)) return false;
+                        if (specIsHeavyJet(spec) && isJetDepartureRunwayPerformanceLimited(p.src, spec)) return false;
+                        return true;
+                    });
+                    if (fullRunwayPairs.length) candidatePairs = fullRunwayPairs;
+                }
 
-        if (routingMilitaryOnly) {
-            candidatePairs.forEach(pair => {
-                let score = 0;
-                if (pair.src.isMilitary) score += 1;
-                if (pair.dst.isMilitary) score += 1;
-                pair.milScore = score;
-            });
-            const maxMilScore = Math.max(...candidatePairs.map(p => p.milScore || 0));
-            if (maxMilScore > 0) candidatePairs = candidatePairs.filter(p => p.milScore === maxMilScore);
-        }
+                if (candidatePairs.length && routingMilitaryOnly) {
+                    candidatePairs.forEach(pair => {
+                        let score = 0;
+                        if (pair.src.isMilitary) score += 1;
+                        if (pair.dst.isMilitary) score += 1;
+                        pair.milScore = score;
+                    });
+                    const maxMilScore = Math.max(...candidatePairs.map(p => p.milScore || 0));
+                    if (maxMilScore > 0) candidatePairs = candidatePairs.filter(p => p.milScore === maxMilScore);
+                }
 
-        if (isContractorMode) {
-            candidatePairs = filterRoutesForContractorMission(candidatePairs, mission, spec, isLocalFlight);
-            if (!candidatePairs.length) continue;
-        } else if (!isLocalFlight) {
-            // Preserves the old real-origin narrative check (passesMissionContextFilter): a
-            // civilian-flavoured mission shouldn't be narratively attached to a military-airbase departure.
-            candidatePairs = candidatePairs.filter(pair =>
-                !pair.src.isMilitary || mission.militaryOnly || isFreightMission(mission)
-                || (spec.class === "WARBIRD" && isWarbirdHeritageMission(mission))
-            );
-            if (!candidatePairs.length) continue;
-        }
+                if (candidatePairs.length && isContractorMode) {
+                    candidatePairs = filterRoutesForContractorMission(candidatePairs, mission, spec, isLocalFlight);
+                } else if (candidatePairs.length && !isLocalFlight) {
+                    // Preserves the old real-origin narrative check (passesMissionContextFilter): a
+                    // civilian-flavoured mission shouldn't be narratively attached to a military-airbase departure.
+                    candidatePairs = candidatePairs.filter(pair =>
+                        !pair.src.isMilitary || mission.militaryOnly || isFreightMission(mission)
+                        || (spec.class === "WARBIRD" && isWarbirdHeritageMission(mission))
+                    );
+                }
 
-        if (routedAsGlider && !isLocalFlight && candidatePairs.length > 0) {
-            candidatePairs.forEach(pair => { pair.gliderScore = gliderRoutePreferenceScore(pair); });
-            const maxGliderScore = Math.max(...candidatePairs.map(p => p.gliderScore || 0));
-            if (maxGliderScore > 0) {
-                const preferred = candidatePairs.filter(p => p.gliderScore === maxGliderScore);
-                if (preferred.length > 0) candidatePairs = preferred;
+                if (candidatePairs.length && routedAsGlider && !isLocalFlight) {
+                    candidatePairs.forEach(pair => { pair.gliderScore = gliderRoutePreferenceScore(pair); });
+                    const maxGliderScore = Math.max(...candidatePairs.map(p => p.gliderScore || 0));
+                    if (maxGliderScore > 0) {
+                        const preferred = candidatePairs.filter(p => p.gliderScore === maxGliderScore);
+                        if (preferred.length > 0) candidatePairs = preferred;
+                    }
+                }
+
+                candidatePairsByLocalFlag.set(isLocalFlight, candidatePairs);
             }
+            if (!candidatePairs.length) continue;
+            routeViableEntries.push({ mission, scenario, candidatePairs, effectiveDep, isLocalFlight });
         }
-
-        let selectedRoute;
-        if (effectiveDep && destOverride && candidatePairs.length === 1) {
-            selectedRoute = candidatePairs[0];
-        } else {
-            const weightedRoutePool = buildContractorRoutePool(candidatePairs, preferOwned);
-            selectedRoute = pickRouteByTimeFit(weightedRoutePool, routingTargetMins, targetDistNm, spec, type);
-        }
-        if (!selectedRoute) continue;
-
-        return {
-            mission, scenario: hatPick.scenario, route: selectedRoute, isLocalFlight,
-            candidatePairCount: candidatePairs.length
-        };
     }
-    return null;
+    return routeViableEntries;
+}
+function dispatchRouteFirst(spec, type, searchClass, isContractorMode, depOverrideUser, destOverride,
+                            routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, preferOwned) {
+    const routeViableEntries = buildRouteViableScenarioEntries(
+        spec, type, searchClass, isContractorMode, depOverrideUser, destOverride,
+        routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins
+    );
+    if (!routeViableEntries || !routeViableEntries.length) return null;
+    const hatPick = pickFromMissionScenarioHat(routeViableEntries.map(entry => ({
+        mission: entry.mission,
+        scenario: entry.scenario,
+        weight: getScenarioHatWeight(entry.scenario),
+        routeEntry: entry
+    })));
+    if (!hatPick) return null;
+    const routeEntry = hatPick.routeEntry;
+    const targetDistNm = getRouteDistanceLimits(routingTargetMins, spec, type).targetDist;
+    const selectedRoute = routeEntry.effectiveDep && destOverride && routeEntry.candidatePairs.length === 1
+        ? routeEntry.candidatePairs[0]
+        : pickRouteByTimeFit(
+            buildContractorRoutePool(routeEntry.candidatePairs, preferOwned),
+            routingTargetMins, targetDistNm, spec, type
+        );
+    if (!selectedRoute) return null;
+    return {
+        mission: routeEntry.mission,
+        scenario: routeEntry.scenario,
+        route: selectedRoute,
+        isLocalFlight: routeEntry.isLocalFlight,
+        candidatePairCount: routeEntry.candidatePairs.length
+    };
 }
 function calculateBearing(lat1, lon1, lat2, lon2) {
     const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -4922,7 +4926,7 @@ function probeDispatchFlight(config) {
 
     const searchClass = spec.class || "GA";
 
-    // --- MISSION-FIRST: pick mission + scenario before building a route, then build a route to fit ---
+    // --- ROUTE-FIRST: establish viable routes, then select from one scenario-only hat ---
     const missionPoolCheck = buildFilteredMissionList(spec, type, searchClass, null, isContractorMode, null);
     if (missionPoolCheck.length === 0) {
         const assigned = typeof getAssignedImgIdSetForAircraft === "function"
@@ -4933,7 +4937,7 @@ function probeDispatchFlight(config) {
         return fail("no_missions", message, { candidatePairCount: 0, filteredMissionCount: 0 });
     }
 
-    const missionFirstPick = dispatchMissionFirst(
+    const missionFirstPick = dispatchRouteFirst(
         spec, type, searchClass, isContractorMode, depOverride, destOverride,
         routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, preferOwned
     );
