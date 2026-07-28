@@ -30,7 +30,7 @@
 })();
 </script>
 </head>
-<body>
+<body class="ui-scale-active">
 <div class="app-shell">
 <header class="board-topbar" aria-label="VECTOR main navigation">
     <button type="button" class="board-topbar-logo-btn" onclick="boardTabGo('contracts')" aria-label="VECTOR home - Contracts Board">
@@ -42,6 +42,15 @@
         <button type="button" id="boardTabLogbook" class="board-topbar-link" role="tab" aria-selected="false" onclick="boardTabGo('logbook')">LOGBOOK</button>
         <button type="button" id="boardTabSettings" class="board-topbar-link" role="tab" aria-selected="false" onclick="boardTabGo('settings')">SETTINGS</button>
     </nav>
+    <div class="board-ui-scale" role="group" aria-label="UI scale">
+        <svg class="board-ui-scale-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+            <path d="M15.5 15.5L21 21"></path>
+        </svg>
+        <button type="button" id="uiScaleDownBtn" class="board-ui-scale-btn" onclick="adjustUiScale(-1)" aria-label="Zoom out">&minus;</button>
+        <output id="uiScaleValue" class="board-ui-scale-value" aria-live="polite">90%</output>
+        <button type="button" id="uiScaleUpBtn" class="board-ui-scale-btn" onclick="adjustUiScale(1)" aria-label="Zoom in">+</button>
+    </div>
     <a href="https://www.buymeacoffee.com/manicminer" target="_blank" rel="noopener noreferrer" class="board-topbar-bmc footer-bmc" aria-label="Buy Me a Coffee">
         <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me a Coffee" class="board-topbar-bmc-img">
     </a>

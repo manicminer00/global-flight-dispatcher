@@ -76,6 +76,8 @@
             /* Topbar logo (55) + vertical padding (24) + rule (1) */
             --board-app-chrome-height: 80px;
             --board-heading-line-height: 48pt;
+            --ui-scale: 0.9;
+            --ui-scale-inverse: 1.1111111111;
             --board-main-content-width: calc(
                 (3 * var(--board-ticket-width))
                 + (2 * var(--board-ticket-gap))
@@ -210,6 +212,12 @@
             box-sizing: border-box;
             color-scheme: dark;
             overflow: hidden;
+            zoom: var(--ui-scale);
+        }
+        body.ui-scale-active {
+            height: calc(100svh * var(--ui-scale-inverse));
+            min-height: calc(100svh * var(--ui-scale-inverse));
+            max-height: calc(100svh * var(--ui-scale-inverse));
         }
         .app-shell {
             display: flex;
@@ -284,6 +292,55 @@
             align-items: center;
             gap: 36px;
             margin: 0;
+        }
+        .board-ui-scale {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            color: var(--board-text-muted);
+            flex-shrink: 0;
+        }
+        .board-ui-scale-icon {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+        .board-ui-scale-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px !important;
+            height: 28px !important;
+            min-height: 0 !important;
+            margin: 0;
+            padding: 0 !important;
+            border: 1px solid var(--board-border) !important;
+            border-radius: var(--board-control-radius) !important;
+            background: transparent !important;
+            color: var(--board-text-primary) !important;
+            font-size: 18px !important;
+            font-weight: 700 !important;
+            line-height: 1 !important;
+            cursor: pointer;
+        }
+        .board-ui-scale-btn:hover:not(:disabled),
+        .board-ui-scale-btn:focus-visible {
+            border-color: var(--board-text-muted) !important;
+            color: var(--color-link-readme) !important;
+        }
+        .board-ui-scale-btn:disabled {
+            opacity: var(--board-control-disabled-opacity);
+            cursor: default;
+        }
+        .board-ui-scale-value {
+            min-width: 38px;
+            color: var(--board-text-primary);
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
         }
         .board-topbar-link {
             background: transparent;
@@ -2315,7 +2372,7 @@
         #contractsBoardPanel::after {
             content: "";
             position: absolute;
-            inset: 0;
+            inset: 0 0 -1px 0;
             z-index: 30;
             background: rgba(15, 16, 18, 0.94);
             pointer-events: none;
@@ -2531,7 +2588,7 @@
             flex-wrap: nowrap;
             align-items: flex-start;
             gap: var(--board-ticket-gap);
-            padding-bottom: var(--board-ticket-stack-peek);
+            padding-bottom: 0;
             transition: opacity 0.12s ease;
         }
         .contracts-ticket-grid.is-dealing .contract-ticket-slot {
@@ -2563,11 +2620,12 @@
             width: var(--board-ticket-width);
             max-width: var(--board-ticket-width);
             flex: 0 0 var(--board-ticket-width);
-            padding-bottom: var(--board-ticket-stack-peek);
+            padding-bottom: 0;
             isolation: isolate;
         }
         .contract-ticket-slot::before,
         .contract-ticket-slot::after {
+            display: none;
             content: "";
             position: absolute;
             left: 2.5%;

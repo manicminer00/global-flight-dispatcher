@@ -1297,6 +1297,42 @@ function finalizeBoardContractResults(results) {
 }
 let boardPlnObjectUrls = [];
 
+const UI_SCALE_STORAGE_KEY = "vector_ui_scale_v1";
+const UI_SCALE_STEPS = [90, 95, 100];
+
+function applyUiScale(scale, persist = true) {
+    const resolved = UI_SCALE_STEPS.includes(Number(scale)) ? Number(scale) : 90;
+    const ratio = resolved / 100;
+    document.documentElement.style.setProperty("--ui-scale", String(ratio));
+    document.documentElement.style.setProperty("--ui-scale-inverse", String(1 / ratio));
+    document.body.classList.toggle("ui-scale-active", resolved !== 100);
+
+    const valueEl = document.getElementById("uiScaleValue");
+    const downBtn = document.getElementById("uiScaleDownBtn");
+    const upBtn = document.getElementById("uiScaleUpBtn");
+    const index = UI_SCALE_STEPS.indexOf(resolved);
+    if (valueEl) valueEl.textContent = resolved + "%";
+    if (downBtn) downBtn.disabled = index === 0;
+    if (upBtn) upBtn.disabled = index === UI_SCALE_STEPS.length - 1;
+
+    if (persist) {
+        try { localStorage.setItem(UI_SCALE_STORAGE_KEY, String(resolved)); } catch (e) {}
+    }
+}
+
+function adjustUiScale(direction) {
+    const current = Number(document.getElementById("uiScaleValue")?.textContent.replace("%", "")) || 100;
+    const currentIndex = UI_SCALE_STEPS.indexOf(current);
+    const nextIndex = Math.max(0, Math.min(UI_SCALE_STEPS.length - 1, currentIndex + direction));
+    applyUiScale(UI_SCALE_STEPS[nextIndex]);
+}
+
+function initUiScaleControl() {
+    let saved = 90;
+    try { saved = Number(localStorage.getItem(UI_SCALE_STORAGE_KEY)) || 90; } catch (e) {}
+    applyUiScale(saved, false);
+}
+
 function boardTabGo(tab) {
     const contractsPanel = document.getElementById("contractsBoardPanel");
     const logbookPanel = document.getElementById("logbookPanel");
@@ -5865,6 +5901,7 @@ function initBoardPreviewTickets() {
 }
 
 window.onload = function() {
+    initUiScaleControl();
     loadSettings();
     updateCustomAircraftForm();
     rebuildActiveDatabase();
