@@ -1429,7 +1429,7 @@ function fillBoardRouteCells(card, origin, destination) {
     if (routeEl) {
         const depIcao = origin && origin.icao ? String(origin.icao).trim() : "";
         const arrIcao = destination && destination.icao ? String(destination.icao).trim() : "";
-        const isLong = depIcao.length > 4 && arrIcao.length > 4;
+        const isLong = depIcao.length > 4 || arrIcao.length > 4;
         routeEl.classList.toggle("contract-ticket-route--long-icao", isLong);
     }
     const setSceneryLine = (role, label, airport) => {
