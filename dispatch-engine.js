@@ -3611,7 +3611,7 @@ function exportDatabaseBackup() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupObject, null, 2));
     const a = document.createElement('a');
     a.setAttribute("href", dataStr);
-    a.setAttribute("download", "dispatcher_backup.json");
+    a.setAttribute("download", "vector_logbook_backup.json");
     a.click();
     resetLogbookBackupNudgeState();
 }
