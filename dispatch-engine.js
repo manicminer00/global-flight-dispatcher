@@ -2628,11 +2628,21 @@ function loadBoardSession() {
     }
 }
 
+function restoreContractTicketOrder(grid) {
+    if (!grid) return;
+    [...grid.querySelectorAll(".contract-ticket-slot")]
+        .sort((a, b) => Number(a.querySelector(".contract-ticket").getAttribute("data-ticket-index")) - Number(b.querySelector(".contract-ticket").getAttribute("data-ticket-index")))
+        .forEach(slot => grid.appendChild(slot));
+}
+
 function renderContractsBoard(results, options) {
+    const briefingPanel = document.getElementById("flightBriefingPanel");
+    if (briefingPanel) briefingPanel.classList.remove("is-visible");
+    const grid = document.getElementById("contractsTicketGrid");
+    restoreContractTicketOrder(grid);
     const cards = document.querySelectorAll("#contractsTicketGrid .contract-ticket");
     const slots = document.querySelectorAll("#contractsTicketGrid .contract-ticket-slot");
     const note = document.getElementById("contractsBoardNote");
-    const grid = document.getElementById("contractsTicketGrid");
     const animateDeal = !!(options && options.animateDeal);
     const inactive = !!(options && options.inactive);
     boardSelectedIndex = -1;
@@ -2686,6 +2696,11 @@ function renderContractsBoard(results, options) {
 function clearContractTicketSelection() {
     boardSelectedIndex = -1;
     clearContractLogbookPrompts();
+    const briefingPanel = document.getElementById("flightBriefingPanel");
+    if (briefingPanel) briefingPanel.classList.remove("is-visible");
+    flightBriefingMarkers.forEach(marker => marker.remove());
+    flightBriefingMarkers = [];
+    if (flightBriefingMap) { flightBriefingMap.remove(); flightBriefingMap = null; }
     document.querySelectorAll("#contractsTicketGrid .contract-ticket.is-crt-pinned").forEach((card) => {
         releaseTicketPhotoCrtPin(card);
     });
@@ -2700,6 +2715,7 @@ function clearContractTicketSelection() {
             acceptBtn.textContent = "Accept Contract";
         }
     });
+    restoreContractTicketOrder(document.getElementById("contractsTicketGrid"));
     const note = document.getElementById("contractsBoardNote");
     if (note) note.textContent = "";
 }
@@ -2734,7 +2750,7 @@ function acceptContractTicket(index) {
     const cards = document.querySelectorAll("#contractsTicketGrid .contract-ticket");
     let selectedCard = null;
     cards.forEach((card, i) => {
-        const selected = i === index;
+        const selected = Number(card.getAttribute("data-ticket-index")) === index;
         if (!selected && card.classList.contains("is-crt-pinned")) {
             releaseTicketPhotoCrtPin(card);
         }
@@ -2754,9 +2770,79 @@ function acceptContractTicket(index) {
         cancelTicketPhotoTypewriter();
     }
 
+    const selectedSlot = selectedCard && selectedCard.closest(".contract-ticket-slot");
+    if (grid && selectedSlot) grid.prepend(selectedSlot);
+
     const bundle = result._exportBundle;
     currentPendingFlight = { ...bundle.pendingFlight };
     persistLastDispatch(currentPendingFlight);
+    showFlightBriefing(result);
+}
+
+let flightBriefingMap = null;
+let flightBriefingMarkers = [];
+
+function showFlightBriefing(result) {
+    const panel = document.getElementById("flightBriefingPanel");
+    if (!panel || !result || !result.origin || !result.destination) return;
+    const stage = document.querySelector(".contracts-ticket-stage");
+    if (stage && panel.parentElement !== stage) stage.appendChild(panel);
+    panel.classList.toggle("is-military", resultIsMilitary(result));
+    const origin = result.origin, destination = result.destination;
+    panel.innerHTML = `<div class="flight-briefing-stripe"></div><div class="flight-briefing-head"><div><h3>Flight briefing</h3><p class="flight-briefing-route">${escapeHtml(origin.name)} to ${escapeHtml(destination.name)}</p></div><button type="button" class="flight-briefing-refresh" id="flightBriefingRefresh">Refresh METAR</button></div><div class="flight-briefing-content"><div class="flight-route-map"><div id="flightBriefingMap" aria-label="Route map"></div><img class="flight-briefing-north" src="images/north.png" alt=""></div><div class="flight-weather-grid"><section class="flight-metar"><div class="flight-metar-head">DEPARTURE: ${escapeHtml(origin.icao)} <span class="flight-category na" id="flightMetarDepCategory">…</span></div><div class="flight-metar-body flight-metar-loading" id="flightMetarDep">Fetching METAR for ${escapeHtml(origin.icao)}…</div></section><section class="flight-metar"><div class="flight-metar-head">ARRIVAL: ${escapeHtml(destination.icao)} <span class="flight-category na" id="flightMetarArrCategory">…</span></div><div class="flight-metar-body flight-metar-loading" id="flightMetarArr">Fetching METAR for ${escapeHtml(destination.icao)}…</div></section></div></div>`;
+    panel.classList.add("is-visible");
+    document.getElementById("flightBriefingRefresh").addEventListener("click", () => refreshFlightBriefingMetars(origin, destination));
+    renderFlightBriefingMap(origin, destination);
+    refreshFlightBriefingMetars(origin, destination);
+}
+
+function loadFlightBriefingMapLibre() {
+    if (window.maplibregl) return Promise.resolve();
+    if (window.flightBriefingMapLibreLoading) return window.flightBriefingMapLibreLoading;
+    const css = document.createElement("link"); css.rel = "stylesheet"; css.href = "https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css"; document.head.appendChild(css);
+    window.flightBriefingMapLibreLoading = new Promise((resolve, reject) => { const script = document.createElement("script"); script.src = "https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"; script.onload = resolve; script.onerror = reject; document.head.appendChild(script); });
+    return window.flightBriefingMapLibreLoading;
+}
+
+function renderFlightBriefingMap(origin, destination) {
+    flightBriefingMarkers.forEach(marker => marker.remove()); flightBriefingMarkers = [];
+    if (flightBriefingMap) { flightBriefingMap.remove(); flightBriefingMap = null; }
+    loadFlightBriefingMapLibre().then(() => {
+        const element = document.getElementById("flightBriefingMap"); if (!element) return;
+        const routeLons = Math.abs(origin.lon - destination.lon) > 180 ? [origin.lon < 0 ? origin.lon + 360 : origin.lon, destination.lon < 0 ? destination.lon + 360 : destination.lon] : [origin.lon, destination.lon];
+        const west = Math.min(...routeLons), east = Math.max(...routeLons), south = Math.min(origin.lat, destination.lat), north = Math.max(origin.lat, destination.lat);
+        const map = new maplibregl.Map({ container:element, style:"https://tiles.openfreemap.org/styles/positron", interactive:false, attributionControl:{compact:true} }); flightBriefingMap = map;
+        map.once("load", () => { if (flightBriefingMap !== map) return; map.addSource("flight-route", {type:"geojson",data:{type:"Feature",properties:{},geometry:{type:"LineString",coordinates:[[routeLons[0],origin.lat],[routeLons[1],destination.lat]]}}}); map.addLayer({id:"flight-route-line",type:"line",source:"flight-route",layout:{"line-cap":"round"},paint:{"line-color":"#3c9f52","line-width":4}}); map.fitBounds([[west,south],[east,north]],{padding:{top:32,right:72,bottom:64,left:72},duration:0,maxZoom:10}); map.setZoom(map.getZoom() + Math.log2(0.95)); const labelOffset={x:0,y:15}; flightBriefingMarkers=[new maplibregl.Marker({element:flightBriefingMarker("DEP: "+origin.icao,labelOffset),anchor:"center"}).setLngLat([routeLons[0],origin.lat]).addTo(map),new maplibregl.Marker({element:flightBriefingMarker("ARR: "+destination.icao,labelOffset),anchor:"center"}).setLngLat([routeLons[1],destination.lat]).addTo(map)]; });
+    });
+}
+
+function flightBriefingMarker(labelText, offset) { const marker=document.createElement("div"), label=document.createElement("span"); marker.className="flight-route-marker"; label.textContent=labelText; label.style.left=offset.x+"px"; label.style.top=offset.y+"px"; label.style.transform=`translate(${offset.x < -2 ? "-100%" : offset.x > 2 ? "0" : "-50%"}, ${offset.y < -2 ? "-100%" : offset.y > 2 ? "0" : "-50%"})`; marker.appendChild(label); return marker; }
+
+async function fetchFlightBriefingMetar(icao) {
+    const noaaUrl = "https://aviationweather.gov/api/data/metar?format=json&ids=" + encodeURIComponent(icao);
+    const sources = [
+        async () => JSON.parse(await (await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(noaaUrl))).text()),
+        async () => await (await fetch(noaaUrl)).json(),
+        async () => ({ rawOb: (await (await fetch("https://metar.vatsim.net/" + encodeURIComponent(icao))).text()).trim() }),
+        async () => ({ rawOb: (await (await fetch("https://rotatepilot.com/api/v1/metar?icao=" + encodeURIComponent(icao))).json()).raw })
+    ];
+    const data = await Promise.any(sources.map(source => Promise.race([source(), new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))])));
+    const metar = Array.isArray(data) ? (data.find(item => item.icaoId === icao) || data[0]) : data;
+    if (!metar || !metar.rawOb) throw new Error("No METAR");
+    return metar;
+}
+
+function flightBriefingWind(metar) { const match=(metar.rawOb||"").match(/\b(VRB|\d{3})(\d{2,3})(G(\d{2,3}))?KT\b/); if (!match) return "Calm"; return (match[1] === "VRB" ? "Variable" : match[1] + "°") + " at " + match[2] + " kt" + (match[4] ? ", gusts " + match[4] + " kt" : ""); }
+function flightBriefingWeather(metar) { const raw=metar.rawOb||""; if (/\bCAVOK\b/.test(raw)) return "CAVOK"; const cloud=raw.match(/\b(FEW|SCT|BKN|OVC|VV)(\d{3})?\b/g); const wx=raw.match(/\b(?:\+|-)?(?:TS|SH|FZ)?(?:RA|SN|DZ|FG|BR|HZ|GR|GS|PL)+\b/g); const terms=[]; if (wx) terms.push(wx.join(", ").replace(/TS/g,"thunderstorm ").replace(/SH/g,"showers ").replace(/RA/g,"rain").replace(/SN/g,"snow").replace(/DZ/g,"drizzle").replace(/FG/g,"fog").replace(/BR/g,"mist").replace(/HZ/g,"haze")); if (cloud) terms.push(cloud.map(value => value.replace(/(FEW|SCT|BKN|OVC|VV)(\d{3})?/,(_,cover,height)=>({FEW:"few clouds",SCT:"scattered",BKN:"broken",OVC:"overcast",VV:"vertical visibility"}[cover]) + (height ? " at " + height + "00 ft" : ""))).join(", ")); return terms.join(" · ") || "No significant weather"; }
+function flightBriefingTemperature(metar) { const match=(metar.rawOb||"").match(/\b(M?\d{2})\/(M?\d{2})\b/); if (!match) return "Not reported"; const value=text => text[0] === "M" ? "-" + Number(text.slice(1)) : Number(text); return value(match[1]) + "°C · dew point " + value(match[2]) + "°C"; }
+function flightBriefingQnh(metar) { const raw=metar.rawOb||"", q=raw.match(/\bQ(\d{4})\b/); if (q) return q[1] + " hPa (" + (Number(q[1]) / 33.8638866667).toFixed(2) + " inHg)"; const a=raw.match(/\bA(\d{4})\b/); return a ? Math.round(Number(a[1]) / 100 * 33.8638866667) + " hPa (" + (Number(a[1]) / 100).toFixed(2) + " inHg)" : "Not reported"; }
+function flightBriefingObservedTime(metar) { if (metar.reportTime) return new Date(metar.reportTime).toUTCString().replace("GMT", "UTC"); const match=(metar.rawOb||"").match(/\b(\d{2})(\d{2})(\d{2})Z\b/); return match ? "day " + match[1] + " at " + match[2] + ":" + match[3] + " UTC" : "time not available"; }
+function flightBriefingCategory(metar) { if (/^(VFR|MVFR|IFR|LIFR)$/.test(metar.fltCat)) return metar.fltCat; const raw=metar.rawOb||""; if (/\bCAVOK\b/.test(raw)) return "VFR"; const sm=raw.match(/\b([PM]?)(?:(\d+)\s+)?(\d+)\/(\d+)SM\b|\b([PM]?)(\d+)SM\b/), metres=raw.match(/\b(\d{4})(?:NDV)?\b/); const visibility=sm ? (sm[1] === "M" || sm[5] === "M" ? 0 : Number(sm[2]||0)+Number(sm[3]||sm[6])/Number(sm[4]||1)) : metres ? Number(metres[1])/1609.344 : null; if (visibility === null || /\bVV\/{3}\b/.test(raw)) return "N/A"; const ceilings=[...raw.matchAll(/\b(?:BKN|OVC|VV)(\d{3})\b/g)].map(match=>Number(match[1])*100), ceiling=ceilings.length ? Math.min(...ceilings) : Infinity; if (ceiling < 500 || visibility < 1) return "LIFR"; if (ceiling < 1000 || visibility < 3) return "IFR"; if (ceiling <= 3000 || visibility <= 5) return "MVFR"; return "VFR"; }
+
+async function refreshFlightBriefingMetars(origin, destination) {
+    const button=document.getElementById("flightBriefingRefresh"); if (!button) return; button.disabled=true; button.textContent="Refreshing…";
+    await Promise.all([["flightMetarDep",origin.icao],["flightMetarArr",destination.icao]].map(async ([id,icao]) => { const body=document.getElementById(id), badge=document.getElementById(id+"Category"); try { const metar=await fetchFlightBriefingMetar(icao), category=flightBriefingCategory(metar); badge.className="flight-category "+category.toLowerCase(); badge.textContent=category; body.className="flight-metar-body"; body.innerHTML=`<p class="flight-metar-time">Observed: ${escapeHtml(flightBriefingObservedTime(metar))}</p><dl><dt>WIND</dt><dd>${escapeHtml(flightBriefingWind(metar))}</dd><dt>WX</dt><dd>${escapeHtml(flightBriefingWeather(metar))}</dd><dt>TEMP</dt><dd>${escapeHtml(flightBriefingTemperature(metar))}</dd><dt>QNH</dt><dd>${escapeHtml(flightBriefingQnh(metar))}</dd></dl><p class="flight-metar-raw">${escapeHtml(metar.rawOb)}</p>`; } catch (error) { badge.className="flight-category na"; badge.textContent="N/A"; body.className="flight-metar-body flight-metar-error"; body.textContent="Could not fetch METAR for "+icao+". Use Refresh METAR to try again."; } }));
+    button.disabled=false; button.textContent="Refresh METAR";
 }
 
 function toggleDropdown(id) {
