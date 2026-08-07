@@ -6,7 +6,6 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
-	<link rel="stylesheet" href="styles.css">
     <title>VECTOR - FLIGHT DISPATCH</title>
 	<link rel="icon" href="favicon/favicon.ico" sizes="any">
 	<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
@@ -19,13 +18,19 @@
 <script>
 (function () {
     var useFileProtocol = window.location.protocol === "file:";
+    var stylesUrl = useFileProtocol ? "styles.css" : ("styles.css?_=" + Date.now());
     var loaderUrl = useFileProtocol ? "loader.js" : ("loader.js?_=" + Date.now());
     if (!useFileProtocol) {
+        try {
+            stylesUrl = new URL("styles.css", window.location.href).toString();
+            stylesUrl += (stylesUrl.indexOf("?") === -1 ? "?" : "&") + "_=" + Date.now();
+        } catch (e) {}
         try {
             loaderUrl = new URL("loader.js", window.location.href).toString();
             loaderUrl += (loaderUrl.indexOf("?") === -1 ? "?" : "&") + "_=" + Date.now();
         } catch (e) {}
     }
+    document.write('<link rel="stylesheet" href="' + stylesUrl + '">');
     document.write('<script src="' + loaderUrl + '"><\/script>');
 })();
 </script>
