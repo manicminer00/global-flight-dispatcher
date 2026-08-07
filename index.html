@@ -29,29 +29,6 @@
     document.write('<script src="' + loaderUrl + '"><\/script>');
 })();
 </script>
-<style>
-    .flight-briefing-panel { display:none; position:absolute; z-index:4; top:0; left:calc(308px + var(--board-ticket-gap)); width:calc(616px + var(--board-ticket-gap)); height:840px; box-sizing:border-box; overflow:hidden; flex-direction:column; border:0; border-radius:var(--board-ticket-radius); background:var(--board-bg-ticket); color:var(--board-ticket-text); }
-    .flight-briefing-panel.is-visible { display:flex; }
-    .flight-briefing-stripe { height:42px; flex:0 0 42px; border-top:1px solid #aeb7be; background:linear-gradient(to bottom,#aeb7be 0%,#d0d6d9 100%); }
-    .flight-briefing-panel.is-military .flight-briefing-stripe { border-top-color:var(--military-ticket-accent-bottom); background:linear-gradient(to bottom,var(--military-ticket-accent-bottom) 0%,var(--military-ticket-accent-top) 100%); }
-    .flight-briefing-head { display:flex; justify-content:space-between; gap:18px; padding:17px 22px 10px; }
-    .flight-briefing-head h3 { margin:0; color:var(--board-ticket-text); font-size:20px; }
-    .flight-briefing-route { margin:3px 0 0; color:var(--board-ticket-muted); font-size:12px; }
-    .flight-briefing-refresh { align-self:start; width:auto !important; min-width:0; padding:8px 10px; border:1px solid #87919a; border-radius:5px; background:#f7f8f9; color:#242b31; font:700 12px var(--board-ticket-font); white-space:nowrap; cursor:pointer; }
-    .flight-briefing-content { display:grid; grid-template-rows:450px minmax(0,1fr); gap:14px; flex:1; min-height:0; padding:0 22px 22px; }
-    .flight-route-map { position:relative; overflow:hidden; border:1px solid #dfe4e8; border-radius:7px; background:#fafbfc; }
-    #flightBriefingMap { position:absolute; inset:0; width:100%; height:100%; }
-    .flight-briefing-north { position:absolute; top:16px; right:16px; z-index:3; width:25px; pointer-events:none; }
-    .flight-route-marker { width:10px; height:10px; border:3px solid #20242a; border-radius:50%; background:#fff; }
-    .flight-route-marker span { position:absolute; padding:2px 5px; border:1px solid #20242a; border-radius:3px; background:#fff; color:#20242a; font:700 12px var(--board-ticket-font); white-space:nowrap; }
-    .flight-weather-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-    .flight-metar { overflow:hidden; border:1px solid #dfe4e8; border-radius:7px; background:#dde1e5; }
-    .flight-metar-head { display:flex; align-items:center; padding:10px 12px; color:#fff; background:#303940; font-weight:700; letter-spacing:.05em; }
-    .flight-category { display:inline-block; margin-left:6px; padding:2px 5px; border-radius:3px; color:#fff; font-size:10px; letter-spacing:.06em; } .flight-category.vfr{background:#2e8d45}.flight-category.mvfr{background:#3976b8}.flight-category.ifr{background:#b74646}.flight-category.lifr{background:#7753a2}.flight-category.na{background:#6d7780}
-    .flight-metar-body { padding:11px 12px; font-size:12px; }.flight-metar-body dl{display:grid;grid-template-columns:48px 1fr;gap:5px 8px;margin:0}.flight-metar-body dt{color:#67717a;font-size:10px;font-weight:700;letter-spacing:.07em}.flight-metar-body dd{margin:0}.flight-metar-time{margin:0 0 8px;color:var(--board-ticket-muted);font-size:11px}.flight-metar-raw{margin:10px 0 0;padding-top:9px;border-top:1px solid #dfe4e8;color:#66707a;font:10px/1.35 Consolas,monospace;word-break:break-word}.flight-metar-loading,.flight-metar-error{color:var(--board-ticket-muted);font-size:12px}.flight-metar-error{color:#a63f3f}
-    .contract-ticket.is-selected .contract-ticket-export::before { z-index:1; }
-    .contract-ticket.is-selected .contract-ticket-export::after { top:-64px; height:64px; z-index:0; background:linear-gradient(to bottom,rgba(0,0,0,0) 0%,rgba(0,0,0,.38) 100%); }
-</style>
 </head>
 <body class="ui-scale-active">
 <div class="app-shell">
@@ -381,7 +358,7 @@
     </div>
 </div>
 
-<section id="flightBriefingPanel" class="flight-briefing-panel" aria-label="Flight briefing"></section>
+<section id="flightBriefingPanel" class="flight-briefing-panel" aria-label="Flight Briefing"></section>
 
 <div id="logbookPanel" class="settings-panel settings-group board-logbook">
         <h3>PILOT LOGBOOK</h3>

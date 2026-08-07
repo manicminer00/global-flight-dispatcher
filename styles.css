@@ -65,6 +65,8 @@
             /* Match gap between tickets to space from sidebar divider → left ticket */
             --board-ticket-gap: var(--board-main-pad-x);
             --board-ticket-radius: 10px;
+            --board-ticket-stripe-height: 44px; /* contract-ticket-export::before stripe height (near the export/buttons panel); must reach the panel's own top edge (0) with a small overlap so no gap exposes the ticket body content behind it */
+            --board-ticket-header-strip-height: 42px; /* contract-ticket-photo-wrap::before + flight-briefing-stripe: header strip at the very top of the card, must match */
             --board-ticket-stack-step: 18px;
             --board-ticket-stack-peek: calc(var(--board-ticket-stack-step) * 2);
             --board-ticket-rule-width: 98%;
@@ -1109,7 +1111,6 @@
             bottom: 0;
             z-index: 30;
             flex-shrink: 0;
-            width: 100%;
             box-sizing: border-box;
             margin: 0;
             padding: 8px var(--board-main-pad-x) var(--board-footer-bottom-inset);
@@ -2716,7 +2717,7 @@
             position: relative;
             overflow: hidden;
             flex-shrink: 0;
-            padding-top: 42px; /* Reserve the header strip above, rather than over, the mission image. */
+            padding-top: var(--board-ticket-header-strip-height); /* Reserve the header strip above, rather than over, the mission image. */
             border-bottom: none;
         }
         .contract-ticket-photo-wrap::before {
@@ -2725,7 +2726,7 @@
             left: 0;
             right: 0;
             top: 0;
-            height: 42px;
+            height: var(--board-ticket-header-strip-height);
             /* Subtle single-gradient silver header strip; does not alter photo height. */
             background: linear-gradient(to bottom, #aeb7be 0%, #d0d6d9 100%);
             z-index: 1;
@@ -3481,29 +3482,33 @@
             top: -42px;
             left: 0;
             right: 0;
-            height: 44px;
+            height: var(--board-ticket-stripe-height);
             box-sizing: border-box;
             border-radius: var(--board-ticket-radius) var(--board-ticket-radius) 0 0;
             border-top: 1px solid #aeb7be;
             background: linear-gradient(to bottom, #aeb7be 0%, #d0d6d9 100%);
+            z-index: 1;
             pointer-events: none;
         }
+        /* Drop shadow: a duplicate of the stripe's own shape (same width, height, and
+           rounded top corners), solid black at 50% opacity, offset 15px above the stripe's
+           own top edge, with a slight blur so the top edge isn't perfectly hard. */
         .contract-ticket.is-selected .contract-ticket-export::after {
             content: "";
             position: absolute;
-            top: -64px;
+            top: calc(-42px - 9px);
             left: 0;
             right: 0;
-            height: 22px;
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.12) 100%);
+            height: var(--board-ticket-stripe-height);
+            border-radius: var(--board-ticket-radius) var(--board-ticket-radius) 0 0;
+            z-index: 0;
+            background: rgba(0, 0, 0, 0.35);
+            filter: blur(2px);
             pointer-events: none;
         }
         .contract-ticket.is-military.is-selected .contract-ticket-export::before {
             border-top: 1px solid var(--military-ticket-accent-bottom);
             background: linear-gradient(to bottom, var(--military-ticket-accent-bottom) 0%, var(--military-ticket-accent-top) 100%);
-        }
-        .contract-ticket.is-military.is-selected .contract-ticket-export::after {
-            background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 100%);
         }
         .contract-ticket.is-military.is-selected .contract-ticket-export {
             background: var(--military-ticket-body, var(--bg-ticket-military));
@@ -4187,3 +4192,29 @@
         .ticket-fx-preview-crt-regional { font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif; font-weight: 400; letter-spacing: .02em; color: #8ecae6; background: #030812; text-shadow: none; }
         .ticket-fx-preview-crt-starship { font-family: "Courier New", Courier, monospace; font-weight: 400; letter-spacing: .03em; color: #4ade80; background: #040a0e; text-shadow: none; }
         .ticket-fx-preview-crt-helicopter { font-family: "Arial Narrow", "Roboto Condensed", "Segoe UI", sans-serif; font-weight: 400; letter-spacing: .08em; color: #c5d89a; background: #11160e; text-shadow: 0 0 5px rgba(178,208,126,.42); }
+
+        /* ==================== MAP CARD VISUAL SETTINGS ==================== */
+        /* Moved from index.html inline <style> block (was lines 32-54). */
+        .flight-briefing-panel { display:none; position:absolute; z-index:4; top:0; left:calc(308px + var(--board-ticket-gap)); width:calc(616px + var(--board-ticket-gap)); height:840px; box-sizing:border-box; overflow:hidden; flex-direction:column; border:0; border-radius:var(--board-ticket-radius); background:var(--board-bg-ticket); color:var(--board-ticket-text); }
+        .flight-briefing-panel.is-visible { display:flex; }
+        .flight-briefing-stripe { height:var(--board-ticket-header-strip-height); flex:0 0 var(--board-ticket-header-strip-height); background:linear-gradient(to bottom,#aeb7be 0%,#d0d6d9 100%); }
+        .flight-briefing-panel.is-military .flight-briefing-stripe { background:linear-gradient(to bottom,var(--military-ticket-accent-bottom) 0%,var(--military-ticket-accent-top) 100%); }
+        .flight-briefing-head { display:flex; justify-content:space-between; gap:18px; padding:17px 22px 10px; }
+        .flight-briefing-head h3 { margin:0; color:var(--board-ticket-text); font-size:20px; }
+        .flight-briefing-route { margin:3px 0 0; color:var(--board-ticket-muted); font-size:14px; }
+        /* Styled to match the Save/Lookup/Generate Callsign links (.callsign-actions a.link-inline):
+           plain inline text link, no button chrome, muted colour with green hover. */
+        .flight-briefing-refresh { align-self:start; width:auto !important; min-width:0; height:auto !important; margin-top:4px; padding:0 !important; border:none !important; border-radius:0 !important; background:none !important; color:var(--board-ticket-muted) !important; text-decoration:underline; font:400 11px var(--board-ticket-font) !important; white-space:nowrap; cursor:pointer; }
+        .flight-briefing-refresh:hover { background:none !important; color:var(--color-link-readme) !important; }
+        .flight-briefing-content { display:grid; grid-template-rows:450px minmax(0,1fr); gap:14px; flex:1; min-height:0; padding:0 22px 22px; }
+        .flight-route-map { position:relative; overflow:hidden; border:1px solid #c9ced2; border-radius:7px; background:#fafbfc; }
+        #flightBriefingMap { position:absolute; inset:0; width:100%; height:100%; }
+        .flight-briefing-north { position:absolute; top:16px; right:16px; z-index:3; width:25px; pointer-events:none; }
+        .flight-route-marker { width:10px; height:10px; border:3px solid #20242a; border-radius:50%; background:#fff; }
+        .flight-route-marker span { position:absolute; padding:2px 5px; border:1px solid #20242a; border-radius:3px; background:#fff; color:#20242a; font:700 12px var(--board-ticket-font); white-space:nowrap; }
+        .flight-weather-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:4px; }
+        .flight-metar { overflow:hidden; border:1px solid #dfe4e8; border-radius:7px; background:#dde1e5; }
+        .flight-metar-head { display:flex; align-items:center; padding:10px 12px; color:#fff; background:#303940; font-weight:700; letter-spacing:.05em; }
+        .flight-category { display:inline-block; margin-left:6px; padding:2px 5px; border-radius:3px; color:#fff; font-size:10px; letter-spacing:.06em; } .flight-category.vfr{background:#2e8d45}.flight-category.mvfr{background:#3976b8}.flight-category.ifr{background:#b74646}.flight-category.lifr{background:#7753a2}.flight-category.na{background:#6d7780}
+        .flight-metar-body { padding:11px 12px 25px; font-size:12px; }.flight-metar-body dl{display:grid;grid-template-columns:48px 1fr;gap:5px 8px;margin:0}.flight-metar-body dt{color:#67717a;font-size:11px;font-weight:700;letter-spacing:.07em}.flight-metar-body dd{margin:0}.flight-metar-time{margin:0 0 8px;color:var(--board-ticket-muted);font-size:11px}.flight-metar-raw{margin:10px 0 0;padding-top:9px;border-top:1px solid #dfe4e8;color:#66707a;font:11px/1.35 Consolas,monospace;word-break:break-word}.flight-metar-loading,.flight-metar-error{color:var(--board-ticket-muted);font-size:12px}.flight-metar-error{color:#a63f3f}
+        /* ==================== END MAP CARD VISUAL SETTINGS ==================== */
