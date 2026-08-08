@@ -3189,8 +3189,8 @@ function saveCustomAirport() {
     const hasIls = document.getElementById("newApHasIls") && document.getElementById("newApHasIls").checked;
     const lat = parseFloat(document.getElementById("newLat").value);
     const lon = parseFloat(document.getElementById("newLon").value);
-    if (icao.length !== 4 || name === "") {
-        vectorAlert("Please enter a valid 4-character ICAO code and airport name.");
+    if (icao.length < 3 || icao.length > 5 || name === "") {
+        vectorAlert("Please enter a valid 3 to 5 character ICAO code and airport name.");
         return;
     }
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || (lat === 0 && lon === 0)) {
