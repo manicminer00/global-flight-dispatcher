@@ -1,66 +1,34 @@
 # ── Ignore everything by default (whitelist approach) ─────────────────────────
 *
-!mission-assignments.json
-!settings.js
-AUDIT.md
-
-# ── Vector-Dev-Tools ──────────────────────────────────────────────────────────
-!Vector-Dev-Tools/
-Vector-Dev-Tools/*
-!Vector-Dev-Tools/ticket-fx-profiles.html
-!Vector-Dev-Tools/ticket-fx-profiles.js
-!Vector-Dev-Tools/start-ticket-fx-profiles.bat
-!Vector-Dev-Tools/mission-review-tool.html
-!Vector-Dev-Tools/mission-rewrites-staging.json
-!Vector-Dev-Tools/mission-editor.html
-!Vector-Dev-Tools/mission-editor.js
-
-# ── Root config files ─────────────────────────────────────────────────────────
-!.gitignore
-!README.md
-!WEB.md
-!tools/
-tools/*
-!tools/mission-crop-editor.js
-
-# ── Core app files (WEB deploy) ───────────────────────────────────────────────
-!index.html
-!styles.css
-!loader.js
-!dispatch-engine.js
-!mission-assignment-core.js
-!mission-assignments-data.js
-!missions-db.js
-!fleet-db.js
-!airports-asobo-db.js
-!airports-thirdparty-db.js
-!version.json
-!short-haul-routes-db.js
-!mission-scenario-flags-data.js
-!mission-scenario-flags.json
-!data/
-!data/**
-
-# ── Favicon ───────────────────────────────────────────────────────────────────
-!favicon/
-!favicon/**
-
-# ── UI images ─────────────────────────────────────────────────────────────────
-!images/
-!images/**
-images/header0bak.png
-
-# ── Mission card images ───────────────────────────────────────────────────────
-!images-missions/
-!images-missions/**
-!images-missions-unused/
-!images-missions-unused/**
 
 # ── GitHub metadata (sponsor button) ─────────────────────────────────────────
 !.github/
 !.github/**
 
-# ── Change history docs ───────────────────────────────────────────────────────
-!AUDIT.md
-!PATCH_NOTES.md
-!GUIDE.md
+# ── Core app files (WEB deploy) ───────────────────────────────────────────────
+!data/
+!data/**
+!favicon/
+!favicon/**
+!images/
+!images/**
+!images-missions/
+!images-missions/**
+!.gitignore
+!airports-asobo-db.js
+!airports-thirdparty-db.js
+!dispatch-engine.js
+!fleet-db.js
+!index.html
+!loader.js
+!mission-assignment-core.js
+!mission-assignments-data.js
+!mission-assignments.json
+!mission-scenario-flags-data.js
+!mission-scenario-flags.json
+!missions-db.js
+!README.md
+!settings.js
+!short-haul-routes-db.js
+!styles.css
+!version.json

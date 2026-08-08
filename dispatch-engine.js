@@ -1,5 +1,9 @@
 let lastMissions = [];
 let lastScenarioImgIds = [];
+// TEST (reversible): dark scrim over the selected contract ticket's underlying details,
+// behind the 4-button action panel. Set to false (or delete the .is-ticket-masked
+// toggles below + the matching CSS rule in styles.css) to disable.
+const TEST_SELECTED_TICKET_MASK = true;
 const vectorDialogState = { resolver: null, previousFocus: null };
 
 function getVectorDialogElements() {
@@ -2661,7 +2665,7 @@ function renderContractsBoard(results, options) {
     });
 
     cards.forEach((card, i) => {
-        card.classList.remove("is-selected", "is-dimmed");
+        card.classList.remove("is-selected", "is-dimmed", "is-ticket-masked");
         const labelEl = card.querySelector('[data-role="photo-label"]');
         if (labelEl) labelEl.textContent = formatBoardFlightLabel(i);
         const result = results[i];
@@ -2710,7 +2714,7 @@ function clearContractTicketSelection() {
     cancelTicketPhotoTypewriter();
     const cards = document.querySelectorAll("#contractsTicketGrid .contract-ticket");
     cards.forEach((card) => {
-        card.classList.remove("is-selected", "is-dimmed");
+        card.classList.remove("is-selected", "is-dimmed", "is-ticket-masked");
         const acceptBtn = card.querySelector('[data-role="accept"]');
         if (acceptBtn) {
             const hasJob = !!boardContractResults[Number(card.getAttribute("data-ticket-index"))];
@@ -2759,6 +2763,7 @@ function acceptContractTicket(index) {
         }
         card.classList.toggle("is-selected", selected);
         card.classList.toggle("is-dimmed", !selected);
+        card.classList.toggle("is-ticket-masked", selected && TEST_SELECTED_TICKET_MASK);
         if (selected) selectedCard = card;
         const acceptBtn = card.querySelector('[data-role="accept"]');
         if (acceptBtn) {

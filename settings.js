@@ -1,5 +1,5 @@
 window.VECTOR_DEFAULT_SETTINGS = {
-  "ticketPhotoFilterFx": "crt",
+  "ticketPhotoFilterFx": "static",
   "ticketFx": {
     "groupDefaults": {
       "BIZ JET": "crt-business",

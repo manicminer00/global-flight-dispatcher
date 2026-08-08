@@ -2560,7 +2560,7 @@
             position: absolute;
             inset: 0;
             z-index: 25;
-            background: rgba(15, 16, 18, 0.70);
+            background: rgba(15, 16, 18, 0.80);
             border-radius: inherit;
             pointer-events: none;
             opacity: 0;
@@ -3435,7 +3435,28 @@
             margin-top: 0;
             padding-top: 0;
             width: auto;
-            z-index: 3;
+            /* Bumped from 3 to 10 (TEST): guarantees the footer/button panel stays above the
+               dark mask below (z-index:6) with headroom past the photo-effect layers
+               (photo-overlay z:2, photo-brief z:3, photo-matrix z:4, matrix-mode z:5), which
+               only applied to the un-selected/preview state before but are worth clearing
+               explicitly now that a new masked layer sits in between. */
+            z-index: 10;
+        }
+        /* TEST (reversible): dark scrim over the selected ticket's underlying details
+           (photo/headline/body), sitting below the footer (z-index:10) so the 4-button
+           action panel stays fully visible on top. Given z-index:6, comfortably above every
+           other layer inside the card (header strip z:1, photo-overlay z:2, photo-brief z:3,
+           photo-matrix z:4, matrix-mode z:5) so it can't be hidden behind any of them.
+           Toggled via the TEST_SELECTED_TICKET_MASK flag in dispatch-engine.js (adds/removes
+           the .is-ticket-masked class). To remove this test entirely, delete this rule, the
+           z-index bump above, and the .is-ticket-masked class toggles in dispatch-engine.js. */
+        .contract-ticket.is-selected.is-ticket-masked::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            z-index: 6;
+            background: rgba(15, 16, 18, 0.80);
+            pointer-events: none;
         }
         .contract-ticket.is-selected .contract-ticket-actions {
             padding-top: 0;
@@ -3468,11 +3489,27 @@
             flex-direction: column;
             gap: 16px;
         }
+        .contract-ticket-export-label {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--board-ticket-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            line-height: 1;
+            text-align: center;
+        }
+        .contract-ticket.is-military .contract-ticket-export-label {
+            color: var(--military-ticket-muted, var(--board-ticket-muted));
+        }
         .contract-ticket.is-selected .contract-ticket-export {
             position: relative;
             display: flex;
             width: 100%;
-            padding: 27px 16px 16px;
+            /* Top/bottom padding matched to the panel's own 16px flex gap, so the space above
+               the label and below "Save Flight to Logbook" is the same as the space between
+               every other row in the panel — uniform spacing throughout. */
+            padding: 16px;
             background: var(--board-bg-ticket);
             box-sizing: border-box;
         }
@@ -3502,8 +3539,8 @@
             height: var(--board-ticket-stripe-height);
             border-radius: var(--board-ticket-radius) var(--board-ticket-radius) 0 0;
             z-index: 0;
-            background: rgba(0, 0, 0, 0.35);
-            filter: blur(2px);
+            background: rgba(0, 0, 0, 0.20);
+            filter: blur(3px);
             pointer-events: none;
         }
         .contract-ticket.is-military.is-selected .contract-ticket-export::before {
