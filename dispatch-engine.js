@@ -2797,11 +2797,12 @@ function showFlightBriefing(result) {
     if (stage && panel.parentElement !== stage) stage.appendChild(panel);
     panel.classList.toggle("is-military", resultIsMilitary(result));
     const origin = result.origin, destination = result.destination;
-    panel.innerHTML = `<div class="flight-briefing-stripe"></div><div class="flight-briefing-head"><div><h3>FLIGHT BRIEFING</h3><p class="flight-briefing-route">${escapeHtml(origin.name)} to ${escapeHtml(destination.name)}</p></div><button type="button" class="flight-briefing-refresh" id="flightBriefingRefresh">Refresh METAR</button></div><div class="flight-briefing-content"><div class="flight-route-map"><div id="flightBriefingMap" aria-label="Route map"></div><img class="flight-briefing-north" src="images/north.png" alt=""></div><div class="flight-weather-grid"><section class="flight-metar"><div class="flight-metar-head">DEP: ${escapeHtml(origin.icao)} <span class="flight-category na" id="flightMetarDepCategory">…</span></div><div class="flight-metar-body flight-metar-loading" id="flightMetarDep">Fetching METAR for ${escapeHtml(origin.icao)}…</div></section><section class="flight-metar"><div class="flight-metar-head">ARR: ${escapeHtml(destination.icao)} <span class="flight-category na" id="flightMetarArrCategory">…</span></div><div class="flight-metar-body flight-metar-loading" id="flightMetarArr">Fetching METAR for ${escapeHtml(destination.icao)}…</div></section></div></div>`;
+    panel.innerHTML = `<div class="flight-briefing-stripe"></div><div class="flight-briefing-head"><div><h3>FLIGHT BRIEFING</h3><p class="flight-briefing-route">${escapeHtml(origin.icao)} ${escapeHtml(origin.name)} to ${escapeHtml(destination.icao)} ${escapeHtml(destination.name)}</p></div></div><div class="flight-briefing-content"><div class="flight-route-map"><div id="flightBriefingMap" aria-label="Route map"></div><img class="flight-briefing-north" src="images/north.png" alt=""></div><div class="flight-weather-grid"><section class="flight-metar"><div class="flight-metar-head"><span>DEP: ${escapeHtml(origin.icao)} <span class="flight-category na" id="flightMetarDepCategory">…</span></span><button type="button" class="flight-metar-refresh" id="flightMetarDepRefresh">Refresh METAR</button></div><div class="flight-metar-body flight-metar-loading" id="flightMetarDep">Fetching METAR for ${escapeHtml(origin.icao)}…</div></section><section class="flight-metar"><div class="flight-metar-head"><span>ARR: ${escapeHtml(destination.icao)} <span class="flight-category na" id="flightMetarArrCategory">…</span></span><button type="button" class="flight-metar-refresh" id="flightMetarArrRefresh">Refresh METAR</button></div><div class="flight-metar-body flight-metar-loading" id="flightMetarArr">Fetching METAR for ${escapeHtml(destination.icao)}…</div></section></div></div>`;
     panel.classList.add("is-visible");
-    document.getElementById("flightBriefingRefresh").addEventListener("click", () => refreshFlightBriefingMetars(origin, destination));
-    renderFlightBriefingMap(origin, destination);
+    document.getElementById("flightMetarDepRefresh").addEventListener("click", () => refreshSingleFlightBriefingMetar("flightMetarDep", origin.icao));
+    document.getElementById("flightMetarArrRefresh").addEventListener("click", () => refreshSingleFlightBriefingMetar("flightMetarArr", destination.icao));
     refreshFlightBriefingMetars(origin, destination);
+    renderFlightBriefingMap(origin, destination);
 }
 
 function loadFlightBriefingMapLibre() {
@@ -2820,25 +2821,54 @@ function renderFlightBriefingMap(origin, destination) {
         const routeLons = Math.abs(origin.lon - destination.lon) > 180 ? [origin.lon < 0 ? origin.lon + 360 : origin.lon, destination.lon < 0 ? destination.lon + 360 : destination.lon] : [origin.lon, destination.lon];
         const west = Math.min(...routeLons), east = Math.max(...routeLons), south = Math.min(origin.lat, destination.lat), north = Math.max(origin.lat, destination.lat);
         const map = new maplibregl.Map({ container:element, style:"https://tiles.openfreemap.org/styles/positron", interactive:false, attributionControl:{compact:true} }); flightBriefingMap = map;
+        map.addControl(new maplibregl.ScaleControl({ maxWidth: 100, unit: "nautical" }), "bottom-left");
         map.once("load", () => { if (flightBriefingMap !== map) return; map.addSource("flight-route", {type:"geojson",data:{type:"Feature",properties:{},geometry:{type:"LineString",coordinates:[[routeLons[0],origin.lat],[routeLons[1],destination.lat]]}}}); map.addLayer({id:"flight-route-line",type:"line",source:"flight-route",layout:{"line-cap":"round"},paint:{"line-color":"#3c9f52","line-width":4}}); map.fitBounds([[west,south],[east,north]],{padding:{top:32,right:72,bottom:64,left:72},duration:0,maxZoom:10}); map.setZoom(map.getZoom() + Math.log2(0.95)); const labelOffset={x:0,y:15}; flightBriefingMarkers=[new maplibregl.Marker({element:flightBriefingMarker("DEP: "+origin.icao,labelOffset),anchor:"center"}).setLngLat([routeLons[0],origin.lat]).addTo(map),new maplibregl.Marker({element:flightBriefingMarker("ARR: "+destination.icao,labelOffset),anchor:"center"}).setLngLat([routeLons[1],destination.lat]).addTo(map)]; });
     });
 }
 
 function flightBriefingMarker(labelText, offset) { const marker=document.createElement("div"), label=document.createElement("span"); marker.className="flight-route-marker"; label.textContent=labelText; label.style.left=offset.x+"px"; label.style.top=offset.y+"px"; label.style.transform=`translate(${offset.x < -2 ? "-100%" : offset.x > 2 ? "0" : "-50%"}, ${offset.y < -2 ? "-100%" : offset.y > 2 ? "0" : "-50%"})`; marker.appendChild(label); return marker; }
 
-async function fetchFlightBriefingMetar(icao) {
+async function fetchFlightBriefingMetarOnce(icao) {
     const noaaUrl = "https://aviationweather.gov/api/data/metar?format=json&ids=" + encodeURIComponent(icao);
     const sources = [
-        async () => JSON.parse(await (await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(noaaUrl))).text()),
-        async () => await (await fetch(noaaUrl)).json(),
-        async () => ({ rawOb: (await (await fetch("https://metar.vatsim.net/" + encodeURIComponent(icao))).text()).trim() }),
-        async () => ({ rawOb: (await (await fetch("https://rotatepilot.com/api/v1/metar?icao=" + encodeURIComponent(icao))).json()).raw }),
-        async () => { const text=(await (await fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent("https://tgftp.nws.noaa.gov/data/observations/metar/stations/" + icao + ".TXT"))).text()).trim(); const lines=text.split("\n").map(line => line.trim()).filter(Boolean); const raw=lines.find(line => line.startsWith("METAR") || line.startsWith("SPECI")) || lines[lines.length - 1]; if (!raw || raw.length < 10) throw new Error("NOAA TXT: no METAR"); return { rawOb: raw }; }
+        (signal) => fetch("https://api.allorigins.win/raw?url=" + encodeURIComponent(noaaUrl), { signal }).then(r => r.text()).then(t => JSON.parse(t)),
+        (signal) => fetch("https://metar.vatsim.net/" + encodeURIComponent(icao), { signal }).then(r => r.text()).then(t => ({ rawOb: t.trim() })),
+        (signal) => fetch("https://rotatepilot.com/api/v1/metar?icao=" + encodeURIComponent(icao), { signal }).then(r => r.json()).then(d => ({ rawOb: d.raw })),
+        (signal) => fetch("https://api.codetabs.com/v1/proxy?quest=" + encodeURIComponent("https://tgftp.nws.noaa.gov/data/observations/metar/stations/" + icao + ".TXT"), { signal }).then(r => r.text()).then(text => {
+            text = text.trim();
+            const lines = text.split("\n").map(line => line.trim()).filter(Boolean);
+            const raw = lines.find(line => line.startsWith("METAR") || line.startsWith("SPECI")) || lines[lines.length - 1];
+            if (!raw || raw.length < 10) throw new Error("NOAA TXT: no METAR");
+            return { rawOb: raw };
+        })
     ];
-    const data = await Promise.any(sources.map(source => Promise.race([source(), new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), 8000))])));
+    const controllers = sources.map(() => new AbortController());
+    const attempts = sources.map((source, i) => {
+        const controller = controllers[i];
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+        return source(controller.signal).finally(() => clearTimeout(timeoutId));
+    });
+    let data;
+    try {
+        data = await Promise.any(attempts);
+    } finally {
+        controllers.forEach(c => c.abort());
+    }
     const metar = Array.isArray(data) ? (data.find(item => item.icaoId === icao) || data[0]) : data;
     if (!metar || !metar.rawOb) throw new Error("No METAR");
     return metar;
+}
+
+async function fetchFlightBriefingMetar(icao) {
+    const maxAttempts = 5;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            return await fetchFlightBriefingMetarOnce(icao);
+        } catch (error) {
+            if (attempt === maxAttempts) throw error;
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+    }
 }
 
 function flightBriefingWind(metar) { const match=(metar.rawOb||"").match(/\b(VRB|\d{3})(\d{2,3})(G(\d{2,3}))?KT\b/); if (!match) return "Calm"; return (match[1] === "VRB" ? "Variable" : match[1] + "°") + " at " + match[2] + " kt" + (match[4] ? ", gusts " + match[4] + " kt" : ""); }
@@ -2848,10 +2878,28 @@ function flightBriefingQnh(metar) { const raw=metar.rawOb||"", q=raw.match(/\bQ(
 function flightBriefingObservedTime(metar) { if (metar.reportTime) return new Date(metar.reportTime).toUTCString().replace("GMT", "UTC"); const match=(metar.rawOb||"").match(/\b(\d{2})(\d{2})(\d{2})Z\b/); if (!match) return "time not available"; const now=new Date(); const observed=new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), Number(match[1]), Number(match[2]), Number(match[3]))); return isNaN(observed.getTime()) ? "time not available" : observed.toUTCString().replace("GMT", "UTC"); }
 function flightBriefingCategory(metar) { if (/^(VFR|MVFR|IFR|LIFR)$/.test(metar.fltCat)) return metar.fltCat; const raw=metar.rawOb||""; if (/\bCAVOK\b/.test(raw)) return "VFR"; const sm=raw.match(/\b([PM]?)(?:(\d+)\s+)?(\d+)\/(\d+)SM\b|\b([PM]?)(\d+)SM\b/), metres=raw.match(/\b(\d{4})(?:NDV)?\b/); const visibility=sm ? (sm[1] === "M" || sm[5] === "M" ? 0 : Number(sm[2]||0)+Number(sm[3]||sm[6])/Number(sm[4]||1)) : metres ? Number(metres[1])/1609.344 : null; if (visibility === null || /\bVV\/{3}\b/.test(raw)) return "N/A"; const ceilings=[...raw.matchAll(/\b(?:BKN|OVC|VV)(\d{3})\b/g)].map(match=>Number(match[1])*100), ceiling=ceilings.length ? Math.min(...ceilings) : Infinity; if (ceiling < 500 || visibility < 1) return "LIFR"; if (ceiling < 1000 || visibility < 3) return "IFR"; if (ceiling <= 3000 || visibility <= 5) return "MVFR"; return "VFR"; }
 
+async function refreshSingleFlightBriefingMetar(id, icao) {
+    const body=document.getElementById(id), badge=document.getElementById(id+"Category"), link=document.getElementById(id+"Refresh");
+    if (!body || !badge) return;
+    if (link) { link.disabled=true; link.textContent="Refreshing…"; }
+    try {
+        const metar=await fetchFlightBriefingMetar(icao), category=flightBriefingCategory(metar);
+        badge.className="flight-category "+category.toLowerCase(); badge.textContent=category;
+        body.className="flight-metar-body";
+        body.innerHTML=`<p class="flight-metar-time">Observed: ${escapeHtml(flightBriefingObservedTime(metar))}</p><dl><dt>WIND</dt><dd>${escapeHtml(flightBriefingWind(metar))}</dd><dt>WX</dt><dd>${escapeHtml(flightBriefingWeather(metar))}</dd><dt>TEMP</dt><dd>${escapeHtml(flightBriefingTemperature(metar))}</dd><dt>QNH</dt><dd>${escapeHtml(flightBriefingQnh(metar))}</dd></dl><p class="flight-metar-raw">${escapeHtml(metar.rawOb)}</p>`;
+    } catch (error) {
+        badge.className="flight-category na"; badge.textContent="N/A";
+        body.className="flight-metar-body flight-metar-error";
+        body.textContent="No METAR found for "+icao+". It may not have a reporting station, or the data could be temporarily unavailable. Try Refresh METAR.";
+    }
+    if (link) { link.disabled=false; link.textContent="Refresh METAR"; }
+}
+
 async function refreshFlightBriefingMetars(origin, destination) {
-    const button=document.getElementById("flightBriefingRefresh"); if (!button) return; button.disabled=true; button.textContent="Refreshing…";
-    await Promise.all([["flightMetarDep",origin.icao],["flightMetarArr",destination.icao]].map(async ([id,icao]) => { const body=document.getElementById(id), badge=document.getElementById(id+"Category"); try { const metar=await fetchFlightBriefingMetar(icao), category=flightBriefingCategory(metar); badge.className="flight-category "+category.toLowerCase(); badge.textContent=category; body.className="flight-metar-body"; body.innerHTML=`<p class="flight-metar-time">Observed: ${escapeHtml(flightBriefingObservedTime(metar))}</p><dl><dt>WIND</dt><dd>${escapeHtml(flightBriefingWind(metar))}</dd><dt>WX</dt><dd>${escapeHtml(flightBriefingWeather(metar))}</dd><dt>TEMP</dt><dd>${escapeHtml(flightBriefingTemperature(metar))}</dd><dt>QNH</dt><dd>${escapeHtml(flightBriefingQnh(metar))}</dd></dl><p class="flight-metar-raw">${escapeHtml(metar.rawOb)}</p>`; } catch (error) { badge.className="flight-category na"; badge.textContent="N/A"; body.className="flight-metar-body flight-metar-error"; body.textContent="Could not fetch METAR for "+icao+". Use Refresh METAR to try again."; } }));
-    button.disabled=false; button.textContent="Refresh METAR";
+    const depPromise = refreshSingleFlightBriefingMetar("flightMetarDep", origin.icao);
+    await new Promise(resolve => setTimeout(resolve, 400));
+    const arrPromise = refreshSingleFlightBriefingMetar("flightMetarArr", destination.icao);
+    await Promise.all([depPromise, arrPromise]);
 }
 
 function toggleDropdown(id) {

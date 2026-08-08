@@ -821,6 +821,7 @@
             color: var(--board-text-muted);
             text-decoration: underline;
             font-size: 12px;
+            font-weight: 400;
             cursor: pointer;
         }
         .routing-options-header .routing-map-hint a.link-inline:hover {
@@ -968,6 +969,7 @@
         .board-sidebar-form .callsign-actions,
         .board-sidebar-form .callsign-actions a {
             font-weight: 400;
+            font-size: 12px;
         }
         .board-sidebar-form .slider-footer-row.board-sidebar-slider-footer {
             flex-direction: column;
@@ -4237,8 +4239,8 @@
         .flight-briefing-stripe { height:var(--board-ticket-header-strip-height); flex:0 0 var(--board-ticket-header-strip-height); background:linear-gradient(to bottom,#aeb7be 0%,#d0d6d9 100%); }
         .flight-briefing-panel.is-military .flight-briefing-stripe { background:linear-gradient(to bottom,var(--military-ticket-accent-bottom) 0%,var(--military-ticket-accent-top) 100%); }
         .flight-briefing-head { display:flex; justify-content:space-between; gap:18px; padding:17px 22px 10px; }
-        .flight-briefing-head h3 { margin:0; color:var(--board-ticket-text); font-size:20px; }
-        .flight-briefing-route { margin:3px 0 0; color:var(--board-ticket-muted); font-size:14px; }
+        .flight-briefing-head h3 { margin:0; color:#6b7280; font-size:20px; }
+        .flight-briefing-route { margin:3px 0 0; color:#000000; font-size:14px; }
         /* Styled to match the Save/Lookup/Generate Callsign links (.callsign-actions a.link-inline):
            plain inline text link, no button chrome, muted colour with green hover. */
         .flight-briefing-refresh { align-self:start; width:auto !important; min-width:0; height:auto !important; margin-top:4px; padding:0 !important; border:none !important; border-radius:0 !important; background:none !important; color:var(--board-ticket-muted) !important; text-decoration:underline; font:400 11px var(--board-ticket-font) !important; white-space:nowrap; cursor:pointer; }
@@ -4246,12 +4248,16 @@
         .flight-briefing-content { display:grid; grid-template-rows:450px minmax(0,1fr); gap:14px; flex:1; min-height:0; padding:0 22px 22px; }
         .flight-route-map { position:relative; overflow:hidden; border:1px solid #c9ced2; border-radius:7px; background:#fafbfc; }
         #flightBriefingMap { position:absolute; inset:0; width:100%; height:100%; }
+        #flightBriefingMap .maplibregl-ctrl-scale { border-color: #000000; border-width: 1px; color: #000000; background-color: rgba(255,255,255,0.5); }
         .flight-briefing-north { position:absolute; top:16px; right:16px; z-index:3; width:25px; pointer-events:none; }
         .flight-route-marker { width:10px; height:10px; border:3px solid #20242a; border-radius:50%; background:#fff; }
         .flight-route-marker span { position:absolute; padding:2px 5px; border:1px solid #20242a; border-radius:3px; background:#fff; color:#20242a; font:700 12px var(--board-ticket-font); white-space:nowrap; }
         .flight-weather-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:4px; }
         .flight-metar { overflow:hidden; border:1px solid #dfe4e8; border-radius:7px; background:#dde1e5; }
-        .flight-metar-head { display:flex; align-items:center; padding:10px 12px; color:#fff; background:#303940; font-weight:700; letter-spacing:.05em; }
+        .flight-metar-head { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; color:#fff; background:linear-gradient(180deg, #4e555d 0%, #32383f 100%); font-weight:700; letter-spacing:.05em; }
+        .flight-metar-head > span:first-child { display:inline-flex; align-items:center; }
+        .flight-metar-refresh { align-self:center; width:auto !important; min-width:0; height:auto !important; margin:0 !important; padding:0 !important; border:none !important; border-radius:0 !important; background:none !important; color:#9aa0a6 !important; text-decoration:underline; font:400 11px var(--board-ticket-font) !important; text-transform:none; letter-spacing:normal; white-space:nowrap; cursor:pointer; }
+        .flight-metar-refresh:hover { color:#fff !important; }
         .flight-category { display:inline-block; margin-left:6px; padding:2px 5px; border-radius:3px; color:#fff; font-size:10px; letter-spacing:.06em; } .flight-category.vfr{background:#2e8d45}.flight-category.mvfr{background:#3976b8}.flight-category.ifr{background:#b74646}.flight-category.lifr{background:#7753a2}.flight-category.na{background:#6d7780}
-        .flight-metar-body { padding:11px 12px 25px; font-size:12px; }.flight-metar-body dl{display:grid;grid-template-columns:48px 1fr;gap:5px 8px;margin:0}.flight-metar-body dt{color:#67717a;font-size:11px;font-weight:700;letter-spacing:.07em}.flight-metar-body dd{margin:0}.flight-metar-time{margin:0 0 8px;color:var(--board-ticket-muted);font-size:11px}.flight-metar-raw{margin:10px 0 0;padding-top:9px;border-top:1px solid #dfe4e8;color:#66707a;font:11px/1.35 Consolas,monospace;word-break:break-word}.flight-metar-loading,.flight-metar-error{color:var(--board-ticket-muted);font-size:12px}.flight-metar-error{color:#a63f3f}
+        .flight-metar-body { padding:11px 12px 25px; font-size:12px; }.flight-metar-body dl{display:grid;grid-template-columns:48px 1fr;gap:5px 8px;margin:0}.flight-metar-body dt{color:#67717a;font-size:11px;font-weight:700;letter-spacing:.07em}.flight-metar-body dd{margin:0}.flight-metar-time{margin:0 0 8px;color:var(--board-ticket-muted);font-size:11px}.flight-metar-raw{margin:10px 0 0;padding-top:9px;border-top:1px solid #dfe4e8;color:#66707a;font:11px/1.35 Consolas,monospace;word-break:break-word}.flight-metar-loading,.flight-metar-error{color:var(--board-ticket-muted);font-size:12px}.flight-metar-error{color:#6b7280}
         /* ==================== END MAP CARD VISUAL SETTINGS ==================== */
