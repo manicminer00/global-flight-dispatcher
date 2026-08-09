@@ -3828,6 +3828,100 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
     return 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * R;
 }
+
+// Terrain fences deliberately use simplified polygons rather than broad bounding boxes.
+// A route is sampled on its great-circle path and each short segment is tested against
+// every fence, so lowland airports beside a range are not treated as mountain airports
+// while routes that actually cross the range keep the required terrain clearance.
+const TERRAIN_FENCES = [
+    { name: "Alps", safeFloor: 11500, heliSafeFloor: 10000, polygons: [[[44.0, 6.2], [44.3, 8.8], [45.0, 11.3], [45.7, 13.8], [46.5, 16.0], [47.5, 15.4], [48.1, 12.0], [47.9, 9.2], [47.2, 6.3], [46.1, 5.5], [45.0, 5.7]]] },
+    { name: "Pyrenees", safeFloor: 9500, heliSafeFloor: 8500, polygons: [[[42.0, -2.2], [42.1, 0.0], [42.3, 3.4], [43.0, 3.4], [43.3, 1.8], [43.3, -0.5], [43.2, -2.2], [42.8, -2.4]]] },
+    { name: "North American mountain ranges", safeFloor: 14500, heliSafeFloor: 12000, polygons: [
+        [[49.2, -122.5], [49.0, -121.0], [48.2, -120.4], [47.3, -120.2], [46.1, -120.7], [45.0, -121.5], [43.8, -122.5], [42.2, -123.4], [40.5, -123.4], [39.2, -122.2], [38.6, -120.5], [39.3, -119.0], [40.6, -119.6], [41.6, -121.0], [43.0, -121.0], [44.4, -120.1], [46.0, -119.5], [47.5, -119.2], [48.7, -120.0]],
+        [[49.0, -117.4], [49.6, -114.8], [51.0, -113.0], [53.0, -112.0], [55.2, -112.0], [57.0, -114.0], [60.0, -118.0], [60.0, -124.0], [57.0, -125.0], [54.0, -123.0], [51.0, -121.0]],
+        [[49.0, -115.8], [49.0, -110.0], [47.5, -108.8], [45.0, -109.2], [43.0, -108.0], [41.0, -106.0], [37.0, -104.5], [35.0, -106.0], [35.0, -109.0], [37.0, -112.0], [39.0, -113.0], [41.0, -114.5], [43.0, -115.0], [45.0, -116.0], [47.0, -116.6]]
+    ] },
+    { name: "South American Andes", safeFloor: 15500, heliSafeFloor: 12000, polygons: [[[9.5, -77.2], [5.0, -78.2], [0.0, -78.5], [-5.0, -77.5], [-10.0, -76.5], [-15.0, -75.0], [-20.0, -72.5], [-25.0, -70.5], [-30.0, -69.0], [-35.0, -69.0], [-40.0, -70.0], [-45.0, -71.0], [-50.0, -72.0], [-55.0, -72.5], [-55.0, -68.0], [-50.0, -67.5], [-45.0, -68.0], [-40.0, -68.2], [-35.0, -67.0], [-30.0, -66.0], [-25.0, -65.0], [-20.0, -65.5], [-15.0, -67.0], [-10.0, -69.0], [-5.0, -71.0], [0.0, -74.0], [5.0, -75.0], [9.5, -75.5]]] },
+    { name: "Himalayas and Tibetan Plateau", safeFloor: 21500, heliSafeFloor: 12000, polygons: [[[26.0, 74.0], [27.0, 80.0], [28.0, 88.0], [27.5, 96.0], [28.0, 104.0], [33.0, 105.0], [38.0, 98.0], [37.0, 88.0], [36.5, 79.0], [35.5, 73.0], [31.0, 70.0], [27.0, 71.0]]] },
+    { name: "Japanese Alps and central ranges", safeFloor: 10500, heliSafeFloor: 9000, polygons: [[[34.4, 135.4], [34.5, 137.0], [35.1, 138.7], [36.0, 140.0], [37.3, 139.8], [37.6, 138.0], [37.1, 136.2], [36.0, 135.4]]] },
+    { name: "Caucasus", safeFloor: 10500, heliSafeFloor: 9000, polygons: [[[40.5, 40.0], [41.0, 45.0], [41.4, 49.2], [43.6, 49.0], [44.6, 45.0], [44.2, 41.0], [43.0, 39.5]]] },
+    { name: "Ethiopian Highlands", safeFloor: 12000, heliSafeFloor: 10000, polygons: [[[5.0, 35.0], [6.0, 41.0], [9.0, 43.0], [12.0, 41.5], [15.0, 40.0], [14.5, 35.0], [12.0, 34.0], [8.0, 34.0]]] },
+    { name: "Mexican Sierra Madre and Trans-Mexican Volcanic Belt", safeFloor: 13500, heliSafeFloor: 11000, polygons: [[[16.0, -100.5], [17.5, -96.5], [19.5, -95.0], [20.6, -98.0], [20.2, -103.0], [22.0, -105.0], [25.0, -106.0], [28.5, -108.5], [30.0, -110.5], [31.0, -109.0], [29.0, -105.0], [26.0, -103.0], [23.0, -101.5], [21.0, -104.5], [19.0, -104.5], [17.0, -103.0]]] },
+    { name: "New Zealand Southern Alps", safeFloor: 9500, heliSafeFloor: 8000, polygons: [[[-46.0, 166.5], [-45.0, 168.0], [-43.5, 169.5], [-42.0, 171.5], [-42.0, 173.5], [-43.5, 173.0], [-45.0, 171.5], [-46.0, 169.5]]] },
+    { name: "Scandinavian Mountains", safeFloor: 6500, heliSafeFloor: 5500, polygons: [[[59.0, 6.0], [61.0, 7.0], [63.0, 9.0], [65.0, 11.0], [67.0, 14.0], [70.0, 20.0], [70.0, 25.0], [67.0, 23.0], [65.0, 20.0], [63.0, 17.0], [61.0, 13.0], [59.0, 10.0]]] },
+    { name: "Papua New Guinea Highlands", safeFloor: 14000, heliSafeFloor: 12000, polygons: [[[-9.5, 141.0], [-8.5, 147.0], [-7.0, 151.0], [-5.5, 150.0], [-5.0, 145.0], [-5.5, 140.0], [-7.0, 136.0], [-8.5, 134.0], [-10.0, 137.0]]] }
+];
+
+function terrainPointInPolygon(point, polygon) {
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        const [latI, lonI] = polygon[i];
+        const [latJ, lonJ] = polygon[j];
+        const crosses = ((latI > point.lat) !== (latJ > point.lat))
+            && (point.lon < (lonJ - lonI) * (point.lat - latI) / (latJ - latI) + lonI);
+        if (crosses) inside = !inside;
+    }
+    return inside;
+}
+
+function terrainSegmentsIntersect(a, b, c, d) {
+    const cross = (p, q, r) => (q.lon - p.lon) * (r.lat - p.lat) - (q.lat - p.lat) * (r.lon - p.lon);
+    const onSegment = (p, q, r) => Math.min(p.lon, r.lon) <= q.lon && q.lon <= Math.max(p.lon, r.lon)
+        && Math.min(p.lat, r.lat) <= q.lat && q.lat <= Math.max(p.lat, r.lat);
+    const abC = cross(a, b, c), abD = cross(a, b, d), cdA = cross(c, d, a), cdB = cross(c, d, b);
+    if (((abC > 0 && abD < 0) || (abC < 0 && abD > 0)) && ((cdA > 0 && cdB < 0) || (cdA < 0 && cdB > 0))) return true;
+    return (abC === 0 && onSegment(a, c, b)) || (abD === 0 && onSegment(a, d, b))
+        || (cdA === 0 && onSegment(c, a, d)) || (cdB === 0 && onSegment(c, b, d));
+}
+
+function getGreatCircleRoutePoints(origin, destination, maxSpacingNm = 25) {
+    const toRadians = degrees => degrees * Math.PI / 180;
+    const toDegrees = radians => radians * 180 / Math.PI;
+    const lat1 = toRadians(origin.lat), lon1 = toRadians(origin.lon);
+    const lat2 = toRadians(destination.lat), lon2 = toRadians(destination.lon);
+    const angularDistance = calculateDistance(origin.lat, origin.lon, destination.lat, destination.lon) / 3440.065;
+    const steps = Math.max(1, Math.ceil((angularDistance * 3440.065) / maxSpacingNm));
+    const sinDistance = Math.sin(angularDistance);
+    if (sinDistance === 0) return [{ lat: origin.lat, lon: origin.lon }, { lat: destination.lat, lon: destination.lon }];
+    const points = [];
+    for (let step = 0; step <= steps; step++) {
+        const fraction = step / steps;
+        const fromWeight = Math.sin((1 - fraction) * angularDistance) / sinDistance;
+        const toWeight = Math.sin(fraction * angularDistance) / sinDistance;
+        const x = fromWeight * Math.cos(lat1) * Math.cos(lon1) + toWeight * Math.cos(lat2) * Math.cos(lon2);
+        const y = fromWeight * Math.cos(lat1) * Math.sin(lon1) + toWeight * Math.cos(lat2) * Math.sin(lon2);
+        const z = fromWeight * Math.sin(lat1) + toWeight * Math.sin(lat2);
+        points.push({ lat: toDegrees(Math.atan2(z, Math.hypot(x, y))), lon: toDegrees(Math.atan2(y, x)) });
+    }
+    return points;
+}
+
+function routeIntersectsTerrainPolygon(routePoints, polygon) {
+    for (let pointIndex = 0; pointIndex < routePoints.length; pointIndex++) {
+        const point = routePoints[pointIndex];
+        if (terrainPointInPolygon(point, polygon)) return true;
+        if (pointIndex === 0) continue;
+        const previousPoint = routePoints[pointIndex - 1];
+        for (let edgeIndex = 0; edgeIndex < polygon.length; edgeIndex++) {
+            const [edgeStartLat, edgeStartLon] = polygon[edgeIndex];
+            const [edgeEndLat, edgeEndLon] = polygon[(edgeIndex + 1) % polygon.length];
+            if (terrainSegmentsIntersect(previousPoint, point, { lat: edgeStartLat, lon: edgeStartLon }, { lat: edgeEndLat, lon: edgeEndLon })) return true;
+        }
+    }
+    return false;
+}
+
+function getTerrainFenceFloors(origin, destination) {
+    const routePoints = getGreatCircleRoutePoints(origin, destination);
+    let safeFloor = 0;
+    let heliSafeFloor = 0;
+    for (const fence of TERRAIN_FENCES) {
+        if (!fence.polygons.some(polygon => routeIntersectsTerrainPolygon(routePoints, polygon))) continue;
+        safeFloor = Math.max(safeFloor, fence.safeFloor);
+        heliSafeFloor = Math.max(heliSafeFloor, fence.heliSafeFloor);
+    }
+    return { safeFloor, heliSafeFloor };
+}
 const RESTRICTED_JET_BASE_TYPES = {
     EGLC: ["A319", "E190", "E195", "RJ70", "RJ85", "RJ1H", "RJ1F", "B461", "B462", "B462_QT", "B463", "B463_QT", "F70"],
     EGNS: ["A319", "E190", "E195", "RJ70", "RJ85", "RJ1H", "RJ1F", "B461", "B462", "B462_QT", "B463", "B463_QT"],
@@ -4495,6 +4589,9 @@ function formatPinnedAirportUnsuitableNotam(icao, spec, type, depOverride, force
     return formatDispatchNotam("This airport is unsuitable for your currently selected aircraft.");
 }
 function buildRouteFailureMessage(depOverride, type, spec, validAirports, departureAvailable, forceMilitaryBases, isContractorMode, navigraphOnly) {
+    const scope = getRoutingScope();
+    const routingMismatch = getDepartureRoutingScopeMismatchMessage(depOverride, scope);
+    if (routingMismatch) return routingMismatch;
     if (navigraphOnly) {
         if (depOverride) {
             return "Navigraph destinations only is enabled, but no Navigraph arrivals were found within range from your departure. Clear that option, increase flight time, choose Worldwide routing, or pick a different departure.";
@@ -4533,9 +4630,6 @@ function buildRouteFailureMessage(depOverride, type, spec, validAirports, depart
                 return `${depOverride} is only available with the Miltech Simulations MH-60. Select that aircraft to dispatch here.`;
             }
         }
-        const scope = getRoutingScope();
-        const routingMismatch = getDepartureRoutingScopeMismatchMessage(depOverride, scope);
-        if (routingMismatch) return routingMismatch;
         const depIsValid = departureAvailable;
         if (depIsValid) {
             if (scope !== "worldwide") {
@@ -4825,7 +4919,7 @@ function buildContractorRoutePool(candidatePairs, preferOwned) {
     return weightedRoutePool;
 }
 function buildRouteViableScenarioEntries(spec, type, searchClass, isContractorMode, depOverrideUser, destOverride,
-                                         routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins) {
+                                         routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, routePairCache) {
     const missionPool = buildFilteredMissionList(spec, type, searchClass, null, isContractorMode, null);
     if (!missionPool.length) return null;
     const depUserCode = normalizeIcao(depOverrideUser);
@@ -4840,22 +4934,26 @@ function buildRouteViableScenarioEntries(spec, type, searchClass, isContractorMo
         if (requiredDepCode && depUserCode && depUserCode !== requiredDepCode) continue;
         const effectiveDep = requiredDepCode || depOverrideUser;
 
-        const { departureAirports, destinationAirports } = buildDispatchRoutingPools(
-            effectiveDep, routingScope, spec, type, routingMilitaryOnly, isContractorMode, navigraphOnly
-        );
-        const validAirports = effectiveDep
-            ? departureAirports.concat(
-                destinationAirports.filter(dst => !departureAirports.some(src => normalizeIcao(src.icao) === normalizeIcao(dst.icao)))
-              )
-            : destinationAirports;
-
         const activePool = buildActiveScenarioPoolForMission(mission, type, spec, null, isContractorMode);
-        const candidatePairsByLocalFlag = new Map();
         for (const scenario of activePool) {
             if (mission.type <= 13 && scenario.imgId !== mission.type) continue;
             const isLocalFlight = !!scenario.isLocal;
-            let candidatePairs = candidatePairsByLocalFlag.get(isLocalFlight);
-            if (!candidatePairs) {
+            const cacheKey = [
+                type, effectiveDep || "", destOverride || "", routingScope, routingMilitaryOnly ? "mil" : "civil",
+                isContractorMode ? "contractor" : "standard", navigraphOnly ? "navigraph" : "all",
+                routingTargetMins, isLocalFlight ? "local" : "route"
+            ].join("|");
+            let rawCandidatePairs = routePairCache && routePairCache.get(cacheKey);
+            if (!rawCandidatePairs) {
+                const { departureAirports, destinationAirports } = buildDispatchRoutingPools(
+                    effectiveDep, routingScope, spec, type, routingMilitaryOnly, isContractorMode, navigraphOnly
+                );
+                const validAirports = effectiveDep
+                    ? departureAirports.concat(
+                        destinationAirports.filter(dst => !departureAirports.some(src => normalizeIcao(src.icao) === normalizeIcao(dst.icao)))
+                      )
+                    : destinationAirports;
+                let candidatePairs;
                 if (isLocalFlight) {
                     candidatePairs = buildLocalRoutePairs(validAirports, effectiveDep, spec, type);
                 } else if (routedAsGlider) {
@@ -4891,17 +4989,6 @@ function buildRouteViableScenarioEntries(spec, type, searchClass, isContractorMo
                     if (maxMilScore > 0) candidatePairs = candidatePairs.filter(p => p.milScore === maxMilScore);
                 }
 
-                if (candidatePairs.length && isContractorMode) {
-                    candidatePairs = filterRoutesForContractorMission(candidatePairs, mission, spec, isLocalFlight);
-                } else if (candidatePairs.length && !isLocalFlight) {
-                    // Preserves the old real-origin narrative check (passesMissionContextFilter): a
-                    // civilian-flavoured mission shouldn't be narratively attached to a military-airbase departure.
-                    candidatePairs = candidatePairs.filter(pair =>
-                        !pair.src.isMilitary || mission.militaryOnly || isFreightMission(mission)
-                        || (spec.class === "WARBIRD" && isWarbirdHeritageMission(mission))
-                    );
-                }
-
                 if (candidatePairs.length && routedAsGlider && !isLocalFlight) {
                     candidatePairs.forEach(pair => { pair.gliderScore = gliderRoutePreferenceScore(pair); });
                     const maxGliderScore = Math.max(...candidatePairs.map(p => p.gliderScore || 0));
@@ -4910,8 +4997,19 @@ function buildRouteViableScenarioEntries(spec, type, searchClass, isContractorMo
                         if (preferred.length > 0) candidatePairs = preferred;
                     }
                 }
-
-                candidatePairsByLocalFlag.set(isLocalFlight, candidatePairs);
+                rawCandidatePairs = candidatePairs;
+                if (routePairCache) routePairCache.set(cacheKey, rawCandidatePairs);
+            }
+            let candidatePairs = rawCandidatePairs;
+            if (isContractorMode) {
+                candidatePairs = filterRoutesForContractorMission(candidatePairs, mission, spec, isLocalFlight);
+            } else if (candidatePairs.length && !isLocalFlight) {
+                // Preserves the old real-origin narrative check (passesMissionContextFilter): a
+                // civilian-flavoured mission shouldn't be narratively attached to a military-airbase departure.
+                candidatePairs = candidatePairs.filter(pair =>
+                    !pair.src.isMilitary || mission.militaryOnly || isFreightMission(mission)
+                    || (spec.class === "WARBIRD" && isWarbirdHeritageMission(mission))
+                );
             }
             if (!candidatePairs.length) continue;
             routeViableEntries.push({ mission, scenario, candidatePairs, effectiveDep, isLocalFlight });
@@ -4919,14 +5017,49 @@ function buildRouteViableScenarioEntries(spec, type, searchClass, isContractorMo
     }
     return routeViableEntries;
 }
+function getRouteMidpoint(route) {
+    const origin = route && (route.src || route.origin);
+    const destination = route && (route.dst || route.destination);
+    if (!origin || !destination) return null;
+    return {
+        lat: (Number(origin.lat) + Number(destination.lat)) / 2,
+        lon: (Number(origin.lon) + Number(destination.lon)) / 2
+    };
+}
+function routeIsGeographicallySeparated(pair, preferredRouteMidpoints, minSeparationNm) {
+    const midpoint = getRouteMidpoint(pair);
+    if (!midpoint) return false;
+    return preferredRouteMidpoints.every(previous =>
+        calculateDistance(midpoint.lat, midpoint.lon, previous.lat, previous.lon) >= minSeparationNm
+    );
+}
 function dispatchRouteFirst(spec, type, searchClass, isContractorMode, depOverrideUser, destOverride,
-                            routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, preferOwned) {
+                            routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, preferOwned,
+                            routePairCache, preferredDestinationIcaos, preferredRouteMidpoints) {
     const routeViableEntries = buildRouteViableScenarioEntries(
         spec, type, searchClass, isContractorMode, depOverrideUser, destOverride,
-        routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins
+        routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, routePairCache
     );
     if (!routeViableEntries || !routeViableEntries.length) return null;
-    const hatPick = pickFromMissionScenarioHat(routeViableEntries.map(entry => ({
+    const targetDistNm = getRouteDistanceLimits(routingTargetMins, spec, type).targetDist;
+    const hasUsedDestinations = preferredDestinationIcaos && preferredDestinationIcaos.size;
+    const hasRouteMidpoints = !depOverrideUser && preferredRouteMidpoints && preferredRouteMidpoints.length;
+    const minSeparationNm = Math.max(250, Math.min(1000, targetDistNm * 2));
+    const hasUnusedDestination = pair => !hasUsedDestinations || !preferredDestinationIcaos.has(normalizeIcao(pair.dst.icao));
+    const separatedEntries = hasRouteMidpoints
+        ? routeViableEntries.filter(entry => entry.candidatePairs.some(pair =>
+            hasUnusedDestination(pair) && routeIsGeographicallySeparated(pair, preferredRouteMidpoints, minSeparationNm)
+        ))
+        : [];
+    const preferredEntries = hasUsedDestinations
+        ? routeViableEntries.filter(entry => entry.candidatePairs.some(pair =>
+            hasUnusedDestination(pair)
+        ))
+        : [];
+    const selectionEntries = separatedEntries.length
+        ? separatedEntries
+        : preferredEntries.length ? preferredEntries : routeViableEntries;
+    const hatPick = pickFromMissionScenarioHat(selectionEntries.map(entry => ({
         mission: entry.mission,
         scenario: entry.scenario,
         weight: getScenarioHatWeight(entry.scenario),
@@ -4934,11 +5067,17 @@ function dispatchRouteFirst(spec, type, searchClass, isContractorMode, depOverri
     })));
     if (!hatPick) return null;
     const routeEntry = hatPick.routeEntry;
-    const targetDistNm = getRouteDistanceLimits(routingTargetMins, spec, type).targetDist;
+    const preferredPairs = separatedEntries.length
+        ? routeEntry.candidatePairs.filter(pair =>
+            hasUnusedDestination(pair) && routeIsGeographicallySeparated(pair, preferredRouteMidpoints, minSeparationNm)
+        )
+        : preferredEntries.length
+            ? routeEntry.candidatePairs.filter(hasUnusedDestination)
+            : routeEntry.candidatePairs;
     const selectedRoute = routeEntry.effectiveDep && destOverride && routeEntry.candidatePairs.length === 1
         ? routeEntry.candidatePairs[0]
         : pickRouteByTimeFit(
-            buildContractorRoutePool(routeEntry.candidatePairs, preferOwned),
+            buildContractorRoutePool(preferredPairs, preferOwned),
             routingTargetMins, targetDistNm, spec, type
         );
     if (!selectedRoute) return null;
@@ -5030,6 +5169,9 @@ function probeDispatchFlight(config) {
     const isContractorMode = !!cfg.isContractorMode;
     const militaryBasesToggle = !!cfg.militaryBasesToggle;
     const preferOwned = !!cfg.preferOwned;
+    const routePairCache = cfg.routePairCache instanceof Map ? cfg.routePairCache : new Map();
+    const preferredDestinationIcaos = cfg.preferredDestinationIcaos instanceof Set ? cfg.preferredDestinationIcaos : new Set();
+    const preferredRouteMidpoints = Array.isArray(cfg.preferredRouteMidpoints) ? cfg.preferredRouteMidpoints : [];
     const navigraphOnly = !!cfg.navigraphOnly;
     const routingScope = cfg.routingScope === "americas" || cfg.routingScope === "row" ? cfg.routingScope : "worldwide";
     const mutateHistory = cfg.mutateHistory !== false;
@@ -5118,7 +5260,8 @@ function probeDispatchFlight(config) {
 
     const missionFirstPick = dispatchRouteFirst(
         spec, type, searchClass, isContractorMode, depOverride, destOverride,
-        routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, preferOwned
+        routingScope, routingMilitaryOnly, navigraphOnly, routingTargetMins, preferOwned,
+        routePairCache, preferredDestinationIcaos, preferredRouteMidpoints
     );
     if (!missionFirstPick) {
         if (isContractorMode) {
@@ -5150,36 +5293,9 @@ function probeDispatchFlight(config) {
     let depElev = origin.elev || 0;
     let arrElev = destination.elev || 0;
     let terrainSafetyFloor = Math.max(depElev, arrElev) + 3000;
-    let midLat = (origin.lat + destination.lat) / 2;
-    let midLon = (origin.lon + destination.lon) / 2;
-    // heliSafeFloor: real-world helicopter mountain-crossing transit tops out around
-    // 8,000-12,000ft MSL regardless of range (engine/rotor performance in thin air), unlike
-    // fixed-wing safeFloor which scales with the actual terrain height.
-    const globalRanges = [
-        { name: "Alps", latMin: 45.0, latMax: 48.0, lonMin: 5.0, lonMax: 15.0, safeFloor: 11500, heliSafeFloor: 10000 },
-        { name: "Pyrenees", latMin: 42.0, latMax: 43.3, lonMin: -2.0, lonMax: 3.3, safeFloor: 9500, heliSafeFloor: 8500 },
-        { name: "North American Rockies", latMin: 35.0, latMax: 60.0, lonMin: -125.0, lonMax: -105.0, safeFloor: 14500, heliSafeFloor: 12000 },
-        { name: "South American Andes", latMin: -55.0, latMax: 10.0, lonMin: -76.0, lonMax: -65.0, safeFloor: 15500, heliSafeFloor: 12000 },
-        { name: "Himalayas / Tibetan Plateau", latMin: 26.0, latMax: 38.0, lonMin: 70.0, lonMax: 105.0, safeFloor: 21500, heliSafeFloor: 12000 },
-        { name: "Japanese Alps / Central Ranges", latMin: 34.5, latMax: 37.5, lonMin: 136.0, lonMax: 139.5, safeFloor: 10500, heliSafeFloor: 9000 },
-        { name: "Caucasus", latMin: 40.5, latMax: 44.5, lonMin: 40.0, lonMax: 49.0, safeFloor: 10500, heliSafeFloor: 9000 },
-        { name: "Ethiopian Highlands", latMin: 5.0, latMax: 15.0, lonMin: 34.0, lonMax: 43.0, safeFloor: 12000, heliSafeFloor: 10000 },
-        { name: "Mexican Sierra Madre / Trans-Mexican Volcanic Belt", latMin: 16.0, latMax: 20.5, lonMin: -102.0, lonMax: -95.0, safeFloor: 13500, heliSafeFloor: 11000 },
-        { name: "New Zealand Southern Alps", latMin: -46.0, latMax: -42.0, lonMin: 166.0, lonMax: 174.0, safeFloor: 9500, heliSafeFloor: 8000 },
-        { name: "Scandinavian Mountains", latMin: 59.0, latMax: 70.0, lonMin: 5.0, lonMax: 25.0, safeFloor: 6500, heliSafeFloor: 5500 },
-        { name: "Papua New Guinea Highlands", latMin: -10.0, latMax: 0.0, lonMin: 134.0, lonMax: 151.0, safeFloor: 14000, heliSafeFloor: 12000 }
-    ];
-    let heliMountainTransitFloor = 0;
-    for (let range of globalRanges) {
-        let dMatch = (origin.lat >= range.latMin && origin.lat <= range.latMax && origin.lon >= range.lonMin && origin.lon <= range.lonMax);
-        let aMatch = (destination.lat >= range.latMin && destination.lat <= range.latMax && destination.lon >= range.lonMin && destination.lon <= range.lonMax);
-        let mMatch = (midLat >= range.latMin && midLat <= range.latMax && midLon >= range.lonMin && midLon <= range.lonMax);
-        if (dMatch || aMatch || mMatch) {
-            if (spec.class !== "HELI") terrainSafetyFloor = Math.max(terrainSafetyFloor, range.safeFloor);
-            else heliMountainTransitFloor = range.heliSafeFloor;
-            break;
-        }
-    }
+    const terrainFenceFloors = getTerrainFenceFloors(origin, destination);
+    terrainSafetyFloor = Math.max(terrainSafetyFloor, terrainFenceFloors.safeFloor);
+    const heliMountainTransitFloor = terrainFenceFloors.heliSafeFloor;
 
     // Real-world sea-level rate of climb per class (POH/manufacturer figures). Decay
     // toward each aircraft's actual service ceiling (spec.maxAlt) is handled by
@@ -5568,6 +5684,8 @@ function dispatchFlight() {
     boardContractResults = [];
     boardSelectedIndex = -1;
     const results = [];
+    cfg.preferredDestinationIcaos = new Set();
+    cfg.preferredRouteMidpoints = [];
     let lastError = "";
     const animateDeal = !boardTicketsDealt;
     // Up to 24 probe attempts to collect up to 3 contracts with distinct briefings
@@ -5581,6 +5699,9 @@ function dispatchFlight() {
         if (results.some((r) => getContractResultSignature(r) === sig)) continue;
         if (isDuplicateBoardScenario(results, result)) continue;
         results.push(result);
+        if (result.destination) cfg.preferredDestinationIcaos.add(normalizeIcao(result.destination.icao));
+        const routeMidpoint = getRouteMidpoint(result);
+        if (routeMidpoint) cfg.preferredRouteMidpoints.push(routeMidpoint);
     }
     if (results.length === 0) {
         vectorAlert(lastError || "Could not generate contracts with the current settings. Try adjusting aircraft, flight time, or departure.");
