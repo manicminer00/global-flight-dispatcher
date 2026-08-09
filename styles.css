@@ -30,10 +30,10 @@
             --spacing-hint-bottom: 10px;           /* gap below hint-block / note blocks */
             --spacing-section-title-bottom: 6px;  /* gap below h3 / form section titles */
 
-            /* ---- v3 board tokens (Gemini + UI greyscale ticket look) ---- */
-            --board-bg-page: #0f1012;
+            /* ---- v4 board tokens (UI greyscale ticket look) ---- */
+            --board-bg-page: #0f1012; /* new idea bkgd 17191c */
             --board-bg-sidebar: #15171a;
-            --board-bg-panel: #1b1d21;
+			--board-bg-panel: #1b1d21; /* pre-flight container */
             --board-bg-panel-inner: #16181c;
             --board-btn-idle-top: color-mix(in srgb, var(--board-bg-page) 80%, #ffffff);
             --board-btn-idle-bottom: color-mix(in srgb, var(--board-bg-page) 72%, #8a9199);
@@ -2377,7 +2377,7 @@
             position: absolute;
             inset: 0 0 -1px 0;
             z-index: 30;
-            background: rgba(15, 16, 18, 0.94);
+            background: rgba(23, 25, 28, 0.94);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.35s ease;
