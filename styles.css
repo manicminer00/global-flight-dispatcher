@@ -2377,7 +2377,7 @@
             position: absolute;
             inset: 0 0 -1px 0;
             z-index: 30;
-            background: rgba(23, 25, 28, 0.94);
+            background: color-mix(in srgb, var(--board-bg-page) 94%, transparent);
             pointer-events: none;
             opacity: 0;
             transition: opacity 0.35s ease;
