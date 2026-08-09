@@ -2871,6 +2871,10 @@ async function fetchFlightBriefingMetar(icao) {
     }
 }
 
+function getFlightBriefingMetarIcao(airport) {
+    return normalizeIcao((airport && airport.metarIcao) || (airport && airport.icao));
+}
+
 function flightBriefingWind(metar) { const match=(metar.rawOb||"").match(/\b(VRB|\d{3})(\d{2,3})(G(\d{2,3}))?KT\b/); if (!match) return "Calm"; return (match[1] === "VRB" ? "Variable" : match[1] + "°") + " at " + match[2] + " kt" + (match[4] ? ", gusts " + match[4] + " kt" : ""); }
 function flightBriefingWeather(metar) { const raw=metar.rawOb||""; if (/\bCAVOK\b/.test(raw)) return "CAVOK"; const cloud=raw.match(/\b(FEW|SCT|BKN|OVC|VV)(\d{3})?\b/g); const wx=raw.match(/\b(?:\+|-)?(?:TS|SH|FZ)?(?:RA|SN|DZ|FG|BR|HZ|GR|GS|PL)+\b/g); const terms=[]; if (wx) terms.push(wx.join(", ").replace(/TS/g,"thunderstorm ").replace(/SH/g,"showers ").replace(/RA/g,"rain").replace(/SN/g,"snow").replace(/DZ/g,"drizzle").replace(/FG/g,"fog").replace(/BR/g,"mist").replace(/HZ/g,"haze")); if (cloud) terms.push(cloud.map(value => value.replace(/(FEW|SCT|BKN|OVC|VV)(\d{3})?/,(_,cover,height)=>({FEW:"few clouds",SCT:"scattered",BKN:"broken",OVC:"overcast",VV:"vertical visibility"}[cover]) + (height ? " at " + (Number(height) * 100) + " ft" : ""))).join(", ")); return terms.join(" · ") || "No significant weather"; }
 function flightBriefingTemperature(metar) { const match=(metar.rawOb||"").match(/\b(M?\d{2})\/(M?\d{2})\b/); if (!match) return "Not reported"; const value=text => text[0] === "M" ? "-" + Number(text.slice(1)) : Number(text); return value(match[1]) + "°C · dew point " + value(match[2]) + "°C"; }
@@ -2896,9 +2900,9 @@ async function refreshSingleFlightBriefingMetar(id, icao) {
 }
 
 async function refreshFlightBriefingMetars(origin, destination) {
-    const depPromise = refreshSingleFlightBriefingMetar("flightMetarDep", origin.icao);
+    const depPromise = refreshSingleFlightBriefingMetar("flightMetarDep", getFlightBriefingMetarIcao(origin));
     await new Promise(resolve => setTimeout(resolve, 400));
-    const arrPromise = refreshSingleFlightBriefingMetar("flightMetarArr", destination.icao);
+    const arrPromise = refreshSingleFlightBriefingMetar("flightMetarArr", getFlightBriefingMetarIcao(destination));
     await Promise.all([depPromise, arrPromise]);
 }
 
